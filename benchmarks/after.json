@@ -1,0 +1,23 @@
+{
+  "canvas": [
+    375,
+    667
+  ],
+  "stats": {
+    "actions": 360,
+    "cpuP50": 0.2,
+    "cpuP95": 0.3,
+    "frames": 9019,
+    "fxTextures": 72,
+    "gapP95": 10.1,
+    "paintP95": 0.3,
+    "samples": 600,
+    "slowFrames": 0,
+    "spritesBuilt": 40,
+    "vfx": 10
+  },
+  "viewport": [
+    375,
+    667
+  ]
+}

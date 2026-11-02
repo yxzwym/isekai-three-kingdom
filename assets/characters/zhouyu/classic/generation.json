@@ -1,0 +1,15 @@
+{
+  "provider": "built-in imagegen",
+  "status": "fullbody-ready",
+  "fullbodyPrompt": "Use case: historical-scene. Asset type: ONE standalone full-body character illustration for a Chinese Three Kingdoms strategy RPG. Subject: Zhou Yu (周瑜), a handsome clean-shaven Chinese male commander in his early thirties, ornate bronze helmet with a single red plume, dark late-Han lamellar armor, crimson silk scarf and cloak, a sword held downward at his side. Serious realistic painterly historical game artwork, detailed face and costume materials, restrained colors, cool studio rim lighting. Composition: one character only, vertical 2:3 high-resolution canvas, complete figure from top of helmet plume to both boots, weapon and cloak entirely inside frame with comfortable margins. Genuine transparent alpha background. No scenery, ground, text, labels, frame, collage, contact sheet or other people. Full-body production character master, not a bust or cropped portrait.",
+  "portraitPrompt": "Create a standalone large head-and-upper-chest portrait of 周瑜, based only on this character full-body master. Preserve exact face, hairstyle, headwear, colors and outfit identity. Crop close enough that face is large and readable in game. Front three-quarter view. 512x768 or larger portrait canvas. Transparent background, no UI, no text, no border. Do not substitute another character.",
+  "portraitReference": "fullbody.png",
+  "note": "2026-11-02：周瑜已用内置imagegen单独生成全身图（1024×1536 RGBA）。配套独立头像编辑请求返回HTTP429，目前保留旧头像。其他人物按用户要求在后续需要时再生成。",
+  "fullbodyReference": null,
+  "fullbodyStatus": "ready",
+  "portraitStatus": "blocked-429",
+  "fullbodySize": [
+    1024,
+    1536
+  ]
+}

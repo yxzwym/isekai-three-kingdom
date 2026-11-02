@@ -1,0 +1,317 @@
+{
+  "schemaVersion": 1,
+  "characters": {
+    "zhouyu": {
+      "id": "zhouyu",
+      "name": "周瑜",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/zhouyu/classic/fullbody.png",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "legacy",
+            "src": "./assets/legacy/generals-v1.png",
+            "crop": {
+              "x": 0,
+              "y": 55,
+              "width": 256,
+              "height": 440
+            }
+          }
+        }
+      }
+    },
+    "huanggai": {
+      "id": "huanggai",
+      "name": "黄盖",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "pending-generation",
+            "plannedSrc": "./assets/characters/huanggai/classic/fullbody.png",
+            "width": 2048,
+            "height": 3072
+          },
+          "portrait": {
+            "status": "legacy",
+            "src": "./assets/legacy/generals-v1.png",
+            "crop": {
+              "x": 256,
+              "y": 55,
+              "width": 256,
+              "height": 440
+            }
+          }
+        }
+      }
+    },
+    "ganning": {
+      "id": "ganning",
+      "name": "甘宁",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "pending-generation",
+            "plannedSrc": "./assets/characters/ganning/classic/fullbody.png",
+            "width": 2048,
+            "height": 3072
+          },
+          "portrait": {
+            "status": "legacy",
+            "src": "./assets/legacy/generals-v1.png",
+            "crop": {
+              "x": 512,
+              "y": 55,
+              "width": 256,
+              "height": 440
+            }
+          }
+        }
+      }
+    },
+    "lusu": {
+      "id": "lusu",
+      "name": "鲁肃",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "pending-generation",
+            "plannedSrc": "./assets/characters/lusu/classic/fullbody.png",
+            "width": 2048,
+            "height": 3072
+          },
+          "portrait": {
+            "status": "legacy",
+            "src": "./assets/legacy/generals-v1.png",
+            "crop": {
+              "x": 768,
+              "y": 55,
+              "width": 256,
+              "height": 440
+            }
+          }
+        }
+      }
+    },
+    "zhugeliang": {
+      "id": "zhugeliang",
+      "name": "诸葛亮",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "pending-generation",
+            "plannedSrc": "./assets/characters/zhugeliang/classic/fullbody.png",
+            "width": 2048,
+            "height": 3072
+          },
+          "portrait": {
+            "status": "legacy",
+            "src": "./assets/legacy/generals-v1.png",
+            "crop": {
+              "x": 1024,
+              "y": 55,
+              "width": 256,
+              "height": 440
+            }
+          }
+        }
+      }
+    },
+    "sunquan": {
+      "id": "sunquan",
+      "name": "孙权",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "pending-generation",
+            "plannedSrc": "./assets/characters/sunquan/classic/fullbody.png",
+            "width": 2048,
+            "height": 3072
+          },
+          "portrait": {
+            "status": "legacy",
+            "src": "./assets/legacy/generals-v1.png",
+            "crop": {
+              "x": 1280,
+              "y": 55,
+              "width": 256,
+              "height": 440
+            }
+          }
+        }
+      }
+    },
+    "caocao": {
+      "id": "caocao",
+      "name": "曹操",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "pending-generation",
+            "plannedSrc": "./assets/characters/caocao/classic/fullbody.png",
+            "width": 2048,
+            "height": 3072
+          },
+          "portrait": {
+            "status": "legacy",
+            "src": "./assets/legacy/generals-v1.png",
+            "crop": {
+              "x": 0,
+              "y": 500,
+              "width": 256,
+              "height": 440
+            }
+          }
+        }
+      }
+    },
+    "zhangliao": {
+      "id": "zhangliao",
+      "name": "张辽",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "pending-generation",
+            "plannedSrc": "./assets/characters/zhangliao/classic/fullbody.png",
+            "width": 2048,
+            "height": 3072
+          },
+          "portrait": {
+            "status": "legacy",
+            "src": "./assets/legacy/generals-v1.png",
+            "crop": {
+              "x": 256,
+              "y": 500,
+              "width": 256,
+              "height": 440
+            }
+          }
+        }
+      }
+    },
+    "xuhuang": {
+      "id": "xuhuang",
+      "name": "徐晃",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "pending-generation",
+            "plannedSrc": "./assets/characters/xuhuang/classic/fullbody.png",
+            "width": 2048,
+            "height": 3072
+          },
+          "portrait": {
+            "status": "legacy",
+            "src": "./assets/legacy/generals-v1.png",
+            "crop": {
+              "x": 512,
+              "y": 500,
+              "width": 256,
+              "height": 440
+            }
+          }
+        }
+      }
+    },
+    "yujin": {
+      "id": "yujin",
+      "name": "于禁",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "pending-generation",
+            "plannedSrc": "./assets/characters/yujin/classic/fullbody.png",
+            "width": 2048,
+            "height": 3072
+          },
+          "portrait": {
+            "status": "legacy",
+            "src": "./assets/legacy/generals-v1.png",
+            "crop": {
+              "x": 768,
+              "y": 500,
+              "width": 256,
+              "height": 440
+            }
+          }
+        }
+      }
+    },
+    "caoren": {
+      "id": "caoren",
+      "name": "曹仁",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "pending-generation",
+            "plannedSrc": "./assets/characters/caoren/classic/fullbody.png",
+            "width": 2048,
+            "height": 3072
+          },
+          "portrait": {
+            "status": "legacy",
+            "src": "./assets/legacy/generals-v1.png",
+            "crop": {
+              "x": 1024,
+              "y": 500,
+              "width": 256,
+              "height": 440
+            }
+          }
+        }
+      }
+    },
+    "lvbu": {
+      "id": "lvbu",
+      "name": "吕布",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "pending-generation",
+            "plannedSrc": "./assets/characters/lvbu/classic/fullbody.png",
+            "width": 2048,
+            "height": 3072
+          },
+          "portrait": {
+            "status": "legacy",
+            "src": "./assets/legacy/generals-v1.png",
+            "crop": {
+              "x": 1280,
+              "y": 500,
+              "width": 256,
+              "height": 440
+            }
+          }
+        }
+      }
+    }
+  }
+}

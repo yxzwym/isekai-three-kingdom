@@ -1,0 +1,151 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const E = require('../js/engine.js');
+const D = require('../js/data.js');
+const makeBattle = (rules = {}) => new E.Battle(D.createChibi(rules));
+const sample = { side: 'ally', war: 200, intelligence: 210, soldiers: 2000, attack: 100, armor:120,resistance:0 };
+const close = (a, b) => assert.ok(Math.abs(a - b) < 1e-8, `${a} != ${b}`);
+function ready(b, id) { const u = b.unit(id); u.ready = true; u.progress = 1; return u; }
+function simulate(config = {}) { const b = makeBattle(config); b.start(); while (b.status === 'running' && b.time < 180) b.advance(.1); return b; }
+
+test('255尺度、武将固定值与曹操统御', () => {
+  assert.equal(D.REINFORCEMENTS.find(u => u.id === 'lvbu').war, 255);
+  assert.equal(D.ALLIES.find(u => u.id === 'zhugeliang').intelligence, 255);
+  assert.equal(D.ENEMIES.find(u => u.id === 'caocao').leadership, 255);
+  assert.equal(E.attr(0), 1); assert.equal(E.attr(-20), 1); assert.equal(E.attr(300), 300);
+});
+test('等级与统御分别提高兵力，突破255仍有效', () => {
+  assert.equal(E.maxSoldiers(1, 255), 200);
+  assert.equal(E.maxSoldiers(50, 255), 4100);
+  assert.equal(E.maxSoldiers(99, 255), 9922);
+  assert.ok(E.maxSoldiers(40, 128) < E.maxSoldiers(40, 255));
+  assert.ok(E.maxSoldiers(41, 255) > E.maxSoldiers(40, 255));
+  assert.ok(E.maxSoldiers(40, 300) > E.maxSoldiers(40, 255));
+});
+test('物理原始伤害对当前兵力、武力、装备攻击各自线性', () => {
+  const args = { attacker: sample, target: sample };
+  const full = E.physical(args).raw;
+  close(E.physical({ ...args, attacker: { ...sample, soldiers: 1000 } }).raw, full / 2);
+  close(E.physical({ ...args, attacker: { ...sample, war: 100 } }).raw, full / 2);
+  close(E.physical({ ...args, attacker: { ...sample, attack: 200 } }).raw, full * 2);
+  assert.equal(E.physical({ ...args, attacker: { ...sample, soldiers: 0 } }).amount, 0);
+});
+test('保留阵营等级与兵力因素，护甲和抗性使用同一减伤曲线',()=>{
+  const friendly=E.physical({attacker:sample,target:sample,level:40});
+  close(friendly.raw,.5*(1+(40-2.95125)/82.03125)*(100/100)*200/256*2000*(100/220));
+  const enemy=E.physical({attacker:{...sample,side:'enemy'},target:sample,level:40});
+  close(enemy.raw,.25*(100/100)*200/256*2000*.9*(100/220));
+  for(const protection of [0,50,100,200,999]){
+    const p=E.physical({attacker:sample,target:{...sample,armor:protection}}),m=E.tactic({skill:D.SKILLS.dare,intelligence:200,target:{resistance:protection}});
+    close(p.raw/p.beforeMitigation,m.raw/m.beforeMitigation);close(p.mitigation,100/(100+protection));
+  }
+});
+test('护甲不影响计策，抗性不影响物理，无视护甲能真正穿透到0',()=>{
+  const args={attacker:sample,target:sample};
+  close(E.physical({...args,target:{...sample,resistance:999}}).raw,E.physical(args).raw);
+  const m={skill:D.SKILLS.dare,intelligence:200,target:{armor:0,resistance:100}};
+  close(E.tactic(m).raw,E.tactic({...m,target:{armor:999,resistance:100}}).raw);
+  const attacker={...sample,ignoreArmor:true};
+  close(E.physical({attacker,target:{...sample,armor:999}}).raw,E.physical({attacker,target:{...sample,armor:0}}).raw);
+  assert.ok(Number.isFinite(E.physical({attacker:sample,target:{...sample,armor:0}}).raw));
+});
+test('计策不乘兵力，群体按实际存活目标分摊，单人不除零', () => {
+  const args = { skill: D.SKILLS.huoshen, intelligence: 255, random: 1 };
+  close(E.tactic(args).raw, 4000 * 255 / 256);
+  close(E.tactic({ ...args, count: 5, scope: 'all' }).raw, E.tactic(args).raw / 4);
+  close(E.tactic({ ...args, count: 6, scope: 'all' }).raw, E.tactic(args).raw / 5);
+  close(E.tactic({ ...args, count: 1, scope: 'all' }).raw, E.tactic(args).raw);
+});
+test('力速比封顶3，武力高允许慢，读条不会无界增加', () => {
+  assert.equal(E.ratio(255, 1), 3); assert.equal(E.ratio(255, 255), 1);
+  assert.equal(E.interval({ war: 255, speed: 1 }), 4.5);
+  assert.equal(E.ratio(100, 100, 'modern'), .9);
+});
+test('手动预备不绕过读条，仅满条时执行并扣资源', () => {
+  const b = makeBattle({ random: false, hit: false }); b.start();
+  const z = b.unit('zhouyu');
+  assert.equal(b.queue(z.id, 'huoshen', 'caocao').queued, true);
+  assert.equal(b.allySp, 64);
+  b.advance(1); assert.equal(z.stats.actions, 0);
+  b.advance(1.4); assert.equal(z.stats.actions, 1); assert.equal(b.allySp, 56);
+  assert.equal(z.mode, 'manual'); assert.equal(z.queued, null);
+});
+test('技能时间修正作用于下一次读条，物理技能恢复基础间隔', () => {
+  const b = makeBattle({ random: false, hit: false }); b.start(); const u = ready(b, 'zhouyu');
+  b.act(u.id, 'huoshen', 'caocao'); close(u.interval, E.interval(u, b.config) + 1);
+  assert.equal(b.events.at(-1).nextInterval, u.interval);
+  ready(b, 'zhouyu'); b.act(u.id, 'strike', 'caocao'); close(u.interval, E.interval(u, b.config));
+  assert.equal(E.interval(u, b.config, -100), .5);
+});
+test('策略不足或目标无效不扣资源、不消耗读条', () => {
+  const b = makeBattle({ allySp: 2 }); b.start(); const z = ready(b, 'zhouyu');
+  assert.equal(b.act(z.id, 'huoshen', 'caocao').ok, false);
+  assert.equal(z.ready, true); assert.equal(b.allySp, 2);
+  assert.equal(b.act(z.id, 'strike', 'lusu').ok, false);
+  assert.equal(b.events.filter(e => e.type === 'action').length, 0);
+});
+test('失效的预备目标不会复活或被攻击，其他人继续行动', () => {
+  const b = makeBattle(); b.start(); b.queue('zhouyu', 'strike', 'caocao');
+  b.unit('caocao').soldiers = 0; b.advance(2.5);
+  assert.equal(b.unit('caocao').soldiers, 0); assert.equal(b.unit('zhouyu').stats.actions, 0);
+  assert.ok(b.actionCount > 0); assert.ok(b.events.some(e => e.type === 'notice'));
+});
+test('回复有容量上限且不能复活，统计只计有效回复', () => {
+  const b = makeBattle({ random: false }); b.start(); const healer = ready(b, 'lusu'), target = b.unit('ganning'); target.soldiers -= 10;
+  assert.equal(b.act(healer.id, 'yinxian', target.id).ok, true);
+  assert.equal(target.soldiers, target.maxSoldiers); assert.equal(healer.stats.healing, 10);
+  ready(b, 'lusu'); target.soldiers = 0;
+  assert.equal(b.act(healer.id, 'yinxian', target.id).ok, false); assert.equal(target.soldiers, 0);
+});
+test('诸葛亮闪避产生0损失，不被最低伤害覆盖', () => {
+  const b = makeBattle({ hit: false, random: false }); b.start(); b.rng = () => 0;
+  ready(b, 'zhangliao'); const target = b.unit('zhugeliang'), before = target.soldiers;
+  b.act('zhangliao', 'strike', target.id);
+  assert.equal(target.soldiers, before); assert.equal(target.stats.dodges, 1);
+  assert.equal(b.events.at(-1).results[0].actual, 0);
+});
+test('吕布必会心独立于普通会心开关，最多3倍且无视高防', () => {
+  const b = makeBattle({ reinforcements: ['lvbu'], hit: false, random: false, critical: false }); b.start();
+  for (let n = 0; n < 5; n++) { ready(b, 'lvbu'); b.unit('caocao').soldiers = 1e8; b.act('lvbu', 'strike', 'caocao'); const e = b.events.at(-1); assert.equal(e.results[0].critical, true); assert.equal(e.results[0].armor,0); }
+  assert.equal(b.events.at(-1).results[0].multiplier, 3);
+});
+test('我军共享策略，敌军独立策略，资源不小于0', () => {
+  const b = makeBattle({ random: false }); b.start(); ready(b, 'zhouyu'); b.act('zhouyu', 'huoshen', 'caocao');
+  assert.equal(b.availableSp(b.unit('lusu')), 56);
+  ready(b, 'caocao'); const other = b.unit('yujin').sp; b.act('caocao', 'dare', 'huanggai');
+  assert.equal(b.unit('caocao').sp, 24); assert.equal(b.unit('yujin').sp, other);
+});
+test('超过五人的剧情单位均参战，不被固定槽位截掉', () => {
+  const b = simulate({ reinforcements: ['sunquan', 'lvbu'] });
+  assert.equal(b.units.filter(u => u.side === 'ally').length, 7);
+  assert.ok(b.unit('sunquan').stats.actions > 0); assert.ok(b.unit('lvbu').stats.actions > 0);
+});
+test('同种子与同输入可复现，帧长不同不改变结算', () => {
+  const a = makeBattle(), b = makeBattle(); a.start(); b.start();
+  a.advance(12); for (let n = 0; n < 120; n++) b.advance(.1);
+  assert.deepEqual(a.events, b.events); assert.deepEqual(a.units, b.units);
+});
+test('保存优先级后立即生效，无可用技能时保持待命', () => {
+  const b = makeBattle(); b.start();
+  b.setPriorities('zhouyu', [{ skill: 'huoshen', when: 'always', threshold: 0, scope: 'all', disabled: true }]);
+  assert.equal(b.autoCommand(b.unit('zhouyu')),null);
+  assert.equal(b.config.rosterOverrides.zhouyu.priorities[0].disabled, true);
+});
+test('默认完整战斗有攻、计、回复、溃退和真实结算，记录守恒', () => {
+  const b = simulate(); assert.equal(b.status, 'defeat'); assert.ok(b.time>0&&b.time<180); assert.equal(b.actionCount,b.events.filter(e=>e.type==='action').length); assert.ok(b.actionCount>0);
+  assert.ok(b.units.some(u => u.stats.healing > 0));
+  assert.ok(b.events.some(e => e.type === 'action' && e.skill === 'strike'));
+  assert.ok(b.events.some(e => e.type === 'action' && e.scope === 'all'));
+  assert.equal(b.total('ally'),0);
+  for (const side of ['ally', 'enemy']) {
+    const received = b.units.filter(u => u.side === side).reduce((n, u) => n + u.stats.received, 0);
+    const healed = b.units.filter(u => u.side === side).reduce((n, u) => n + u.stats.healing, 0);
+    assert.equal(b.initialTroops[side] + healed - received, b.total(side));
+  }
+  for (const u of b.units) { assert.ok(u.soldiers >= 0 && u.soldiers <= u.maxSoldiers); assert.ok(u.sp >= 0); }
+});
+test('没有脚本锁定胜利，强敌可以击败联军，0兵不会变回1兵', () => {
+  const hard = simulate({ enemyLevel: 80 }); assert.equal(hard.status, 'defeat');
+  const overrides = Object.fromEntries(D.ALLIES.map(u => [u.id, { startSoldiers: 0 }]));
+  const b = makeBattle({ rosterOverrides: overrides }); b.start(); assert.equal(b.status, 'defeat'); assert.equal(b.actionCount, 0);
+});
