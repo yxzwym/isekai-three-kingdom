@@ -19,14 +19,14 @@ test('设置面板按1%保存治疗和嘲讽阈值，保留从不与始终两端
   for(const id of ['lusu','huanggai']){
     const b=new Battle(D.createEffectsPreview());b.start();const u=b.unit(id),sliders=[],buttons=[];
     const view={battle:b,h:667,w:375,hits:[],ctx:{save(){},beginPath(){},rect(){},clip(){},restore(){}},
-      panelFrame(){return{x:12,y:50,w:351,h:567};},box(){},drawSkillIcon(){},text(){},
+      panelFrame(){return{x:12,y:50,w:351,h:567};},box(){},skillRole:CanvasBattle.prototype.skillRole,drawSkillIcon(){},text(){},
       slider(label,x,y,w,value,max,change,format){sliders.push({label,value,max,change,format});},
       button(label,x,y,w,h,action){buttons.push({label,action});}};
     CanvasBattle.prototype.openTactics.call(view,u);CanvasBattle.prototype.drawTactics.call(view);
     const s=sliders.find(s=>s.max===101),rule=view.panel.rules.find(r=>id==='lusu'?b.skills[r.skill].kind==='heal':b.skills[r.skill].buff?.taunt);
     assert.ok(s);assert.equal(s.format(0),'从不施放');assert.equal(s.format(101),'始终');
     for(const percent of [1,37,100,101,0]){s.change(percent);assert.equal(id==='lusu'?rule.selfThreshold:rule.displayThreshold,percent/100);}
-    s.change(37);buttons.find(button=>button.label==='确定').action();const saved=u.priorities.find(r=>r.skill===rule.skill);
+    s.change(37);CanvasBattle.prototype.commitTactics.call(view);const saved=u.priorities.find(r=>r.skill===rule.skill);
     assert.equal(id==='lusu'?saved.selfThreshold:saved.threshold,.37);assert.equal(saved.disabled,false);
   }
 });

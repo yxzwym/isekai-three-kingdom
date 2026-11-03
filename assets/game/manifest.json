@@ -8,11 +8,13 @@
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 348,
-        "y": 0,
-        "width": 348,
-        "height": 430
-      }
+        "x": 335,
+        "y": 45,
+        "width": 354,
+        "height": 410
+      },
+      "defaultWeapon": "sword",
+      "artDirection": "origins"
     },
     "scholar": {
       "name": "青衣书生",
@@ -21,11 +23,13 @@
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 348,
-        "y": 0,
-        "width": 348,
-        "height": 430
-      }
+        "x": 335,
+        "y": 45,
+        "width": 354,
+        "height": 410
+      },
+      "defaultWeapon": "fan",
+      "artDirection": "origins"
     },
     "swordswoman": {
       "name": "红衣女侠",
@@ -34,11 +38,13 @@
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 348,
-        "y": 0,
-        "width": 348,
-        "height": 430
-      }
+        "x": 335,
+        "y": 45,
+        "width": 354,
+        "height": 410
+      },
+      "defaultWeapon": "sword",
+      "artDirection": "origins"
     },
     "healer": {
       "name": "素衣医者",
@@ -47,11 +53,13 @@
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 348,
-        "y": 0,
-        "width": 348,
-        "height": 430
-      }
+        "x": 335,
+        "y": 45,
+        "width": 354,
+        "height": 410
+      },
+      "defaultWeapon": "needle",
+      "artDirection": "origins"
     },
     "armored": {
       "name": "铁甲猛将",
@@ -60,11 +68,13 @@
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 348,
-        "y": 0,
-        "width": 348,
-        "height": 430
-      }
+        "x": 335,
+        "y": 45,
+        "width": 354,
+        "height": 410
+      },
+      "defaultWeapon": "blade",
+      "artDirection": "origins"
     },
     "silverguard": {
       "name": "银甲战将",
@@ -73,11 +83,13 @@
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 348,
-        "y": 0,
-        "width": 348,
-        "height": 430
-      }
+        "x": 335,
+        "y": 45,
+        "width": 354,
+        "height": 410
+      },
+      "defaultWeapon": "spear",
+      "artDirection": "origins"
     },
     "beggar": {
       "name": "破衣乞者",
@@ -86,11 +98,13 @@
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 348,
-        "y": 0,
-        "width": 348,
-        "height": 430
-      }
+        "x": 335,
+        "y": 45,
+        "width": 354,
+        "height": 410
+      },
+      "defaultWeapon": "dagger",
+      "artDirection": "origins"
     },
     "warlord": {
       "name": "乱世霸主",
@@ -99,11 +113,13 @@
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 348,
-        "y": 0,
-        "width": 348,
-        "height": 430
-      }
+        "x": 335,
+        "y": 45,
+        "width": 354,
+        "height": 410
+      },
+      "defaultWeapon": "halberd",
+      "artDirection": "origins"
     }
   }
 }

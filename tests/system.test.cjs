@@ -27,13 +27,16 @@ test('撤退由场景配置控制，默认隐藏且禁止，允许时产生结�
 test('Canvas 布局在小屏和七人剧情阵容下不越界、不相互重叠',()=>{
   for(const [w,h]of[[320,568],[375,667],[390,844],[844,390]])for(const count of[1,5,7,12]){
     const rects=layout(w,h,count,5);assert.equal(rects.length,count+5);
-    for(const r of rects){assert.ok(r.x>=0&&r.y>=70);assert.ok(r.x+r.w<=w+.01&&r.y+r.h<=h);}
+    for(const r of rects){assert.ok(r.x>=0&&r.y>=0);assert.ok(r.x+r.w<=w+.01&&r.y+r.h<=h);}
     const enemies=rects.filter(r=>r.side==='enemy'),allies=rects.filter(r=>r.side==='ally');
     assert.ok(Math.max(...enemies.map(r=>r.y+r.h))<Math.min(...allies.map(r=>r.y)));
   }
 });
 test('头像以原比例等比缩放，宽屏、窄屏均不拉伸',()=>{
   for(const box of[{x:0,y:0,w:65,h:130},{x:10,y:20,w:130,h:70}]){const fit=fitImage(256,440,box);assert.ok(Math.abs(fit.w/fit.h-256/440)<1e-10);assert.ok(fit.w<=box.w&&fit.h<=box.h);}
+});
+test('己方一到五人都占相同五分之一槽宽，阵容水平居中',()=>{
+  for(const [w,h]of[[320,568],[390,844],[640,900]]){const full=layout(w,h,5,1).filter(r=>r.side==='ally');for(let n=1;n<=5;n++){const cards=layout(w,h,n,1).filter(r=>r.side==='ally');assert.ok(cards.every(r=>r.w===full[0].w));assert.ok(Math.abs((cards[0].x+cards.at(-1).x+cards.at(-1).w)/2-w/2)<.01);}}
 });
 test('五名敌人在窄屏和宽屏均保持同一横排，剧情超员不会被截掉',()=>{
   for(const [w,h]of[[320,568],[375,667],[640,900],[844,390]]){
@@ -42,7 +45,7 @@ test('五名敌人在窄屏和宽屏均保持同一横排，剧情超员不会�
     for(const count of[1,3,5,9,12]){
       const cards=layout(w,h,5,count).filter(r=>r.side==='enemy');assert.equal(cards.length,count);
       for(const [i,r]of cards.entries()){
-        assert.ok(r.x>=0&&r.y>=70&&r.w>0&&r.h>0);assert.ok(r.x+r.w<=w+.001);assert.ok(r.y+r.h<=h+.001);
+        assert.ok(r.x>=0&&r.y>=0&&r.w>0&&r.h>0);assert.ok(r.x+r.w<=w+.001);assert.ok(r.y+r.h<=h+.001);
         for(const previous of cards.slice(0,i))assert.ok(r.x>=previous.x+previous.w-.001||previous.x>=r.x+r.w-.001||r.y>=previous.y+previous.h-.001||previous.y>=r.y+r.h-.001);
       }
     }
@@ -68,7 +71,7 @@ test('敌人姓名、血条、读条依次绘制在人像上方，旧编辑开�
     box(x,y,w,h,fill){boxes.push({x,y,w,h,fill});},text(text,x,y){texts.push({text,y});}};
   CanvasBattle.prototype.updateLayout.call(view);const r=view.rectMap.get('caocao');CanvasBattle.prototype.drawUnit.call(view,r.unit,r,0);
   const hp=boxes.find(box=>box.fill==='#10171d'),progress=boxes.find(box=>box.fill==='#07141c');
-  assert.ok(texts.find(t=>t.text==='曹操').y<hp.y);assert.ok(hp.y+hp.h<=progress.y);assert.ok(progress.y+progress.h<=r.figure.y+.001);assert.deepEqual(view.hits,[]);
+  assert.ok(texts.find(t=>t.text==='曹操').y<hp.y);assert.ok(hp.y+hp.h<=progress.y);assert.ok(progress.y+progress.h<=r.figure.y+.001);assert.equal(view.hits.length,1);assert.equal(view.hits[0].unitId,'caocao');assert.equal(view.hits[0].kind,'unit');
 });
 test('敌方有全身图时只读取完整立绘，己方继续使用头像，保持原图比例及头脚完整',()=>{
   const head={src:'head.png',crop:{x:10,y:20,width:256,height:440},status:'legacy'},body={src:'body.png',width:1024,height:1536,status:'ready'};

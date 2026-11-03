@@ -5,7 +5,7 @@ const manifest=require('./sync-assets.cjs');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const gameAssets=JSON.parse(read('assets/game/manifest.json'));
 fs.writeFileSync(path.join(root,'assets/game/manifest.js'),`// Generated from manifest.json.\nglobalThis.PengpaiAssets=${JSON.stringify(gameAssets)};\n`);
-const files=['assets/characters/manifest.js','js/character-assets.js','js/rules.js','js/data.js','js/engine.js','js/presentation.js','js/canvas-effects.js','js/canvas-battle.js','assets/game/manifest.js','js/game-rules.js','js/canvas-menu.js','js/app.js'];
+const files=['assets/characters/manifest.js','js/character-assets.js','js/rules.js','js/data.js','js/passives.js','js/game-rules.js','js/statuses.js','js/weapon-skills.js','js/engine.js','js/ui-theme.js','js/presentation.js','js/canvas-effects.js','js/canvas-battle.js','assets/game/manifest.js','js/canvas-menu.js','js/prologue.js','js/canvas-story.js','js/app.js'];
 let html=read('index.html').replace('<link rel="stylesheet" href="./styles.css">',()=>`<style>${read('styles.css')}</style>`);
 for(const file of files)html=html.replace(`  <script defer src="./${file}"></script>\n`,'');
 const refs=new Set();

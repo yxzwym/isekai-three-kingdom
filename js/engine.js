@@ -1,6 +1,9 @@
 (function (root) {
   'use strict';
   const DATA = typeof module !== 'undefined' && module.exports ? require('./rules.js') : root.BattleRules;
+  const PASSIVES = typeof module !== 'undefined' && module.exports ? require('./passives.js') : root.BattlePassives;
+  const STATES = typeof module !== 'undefined' && module.exports ? require('./statuses.js') : root.BattleStatuses;
+  const WEAPONS = typeof module !== 'undefined' && module.exports ? require('./weapon-skills.js') : root.WeaponSkills;
   const { SKILLS, DEFAULTS } = DATA;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const attr = value => Math.max(1, Math.floor(Number(value) || 1));
@@ -53,16 +56,17 @@
   function normalizeRule(rule,skill){
     const r=copy(rule);if(!skill)return r;
     if(['physical','tactic'].includes(skill.kind)){
-      return {skill:rule.skill,disabled:!!rule.disabled,when:skill.scope==='all'?'enemyCount':'always',threshold:skill.scope==='all'?(rule.when==='enemyCount'?Math.max(1,Math.floor(Number(rule.threshold)||1)):1):0};
+      return {skill:rule.skill,disabled:!!rule.disabled,when:skill.scope==='all'?'enemyCount':'always',threshold:skill.scope==='all'?(rule.when==='enemyCount'?Math.max(2,Math.floor(Number(rule.threshold)||2)):2):0,...(rule.frequency==='sometimes'?{frequency:'sometimes'}:{})};
     }
     return r;
   }
   class Battle {
     constructor(options = {}) {
       if (!Array.isArray(options.allies) || !Array.isArray(options.enemies)) throw new TypeError('战斗必须传入 allies 和 enemies 阵容');
-      this.scenario = { id:options.id || 'battle', title:options.title || '战斗', scene:copy(options.scene || {}), allowRetreat:!!options.allowRetreat };
+      this.scenario = { id:options.id || 'battle', title:options.title || '战斗', scene:copy(options.scene || {}), allowRetreat:!!options.allowRetreat, control:copy(options.control || {}) };
       this.config = { ...copy(DEFAULTS), ...copy(options.rules || {}) };
-      this.skills = {...copy(SKILLS),...copy(options.skills || {})};
+      this.skills = {...copy(SKILLS),...copy(WEAPONS.skills),...copy(STATES.skills),...copy(PASSIVES.skills),...copy(options.skills || {})};
+      this.passives = {...copy(PASSIVES.definitions),...copy(options.passives || {})};
       this.rng = seededRandom(this.config.seed);
       this.time = 0; this.tick = 0; this.accumulator = 0; this.status = 'ready'; this.events = []; this.sequence = 0;
       this.allySp = Math.max(0, Math.floor(this.config.allySp)); this.initialAllySp = this.allySp;
@@ -75,14 +79,15 @@
         for (const key of ['war', 'intelligence', 'leadership', 'speed', 'technique']) u[key] = attr(u[key]);
         u.attack = Math.max(1, Math.floor(Number(u.attack) || 1)); u.armor = Math.max(0,Math.floor(Number(u.armor)||0));u.resistance=Math.max(0,Math.floor(Number(u.resistance)||0));
         u.level = attr(u.level ?? (u.side === 'enemy' ? this.config.enemyLevel || this.config.level : this.config.level));
-        u.skills = Array.isArray(u.skills) ? u.skills.filter(id=>this.skills[id]) : [];
+        u.skills = Array.isArray(u.skills) ? u.skills.filter(id=>this.skills[id]&&!this.skills[id].reactionOnly) : [];
+        u.passives = Array.isArray(u.passives) ? [...new Set(u.passives)].filter(id=>this.passives[id]) : [];
         u.priorities = Array.isArray(u.priorities) ? u.priorities.map(r=>normalizeRule(r,this.skills[r.skill])) : [];
-        u.targetRule=u.targetRule||'lowestCurrent';u.lastSingleSkill=null;
-        u.maxSoldiers = maxSoldiers(u.level, u.leadership);
+        u.targetRule=u.targetRule||'lowestCurrent';u.lastSingleSkill=null;u.lastManualSkill=null;
+        u.maxSoldiers = u.maxSoldiers == null ? maxSoldiers(u.level, u.leadership) : attr(u.maxSoldiers);
         u.soldiers = clamp(Math.floor(Number(u.startSoldiers ?? u.maxSoldiers)), 0, u.maxSoldiers);
         u.sp = Math.max(0, Number(u.enemySp) || 0); u.initialSp = u.sp;
-        u.interval = interval(u, this.config); u.progress = 0; u.ready = false; u.readyTick=null; u.mode = u.initialMode==='manual'?'manual':'auto'; u.queued = null;
-        u.statuses = [];u.autoCheckedRevision=-1; u.criticalChain = 0; u.order = order;
+        u.interval = interval(u, this.config); u.progress = clamp(Number(u.initialProgress)||0,0,1); u.ready = u.progress>=1; u.readyTick=u.ready?0:null; u.mode = u.initialMode==='manual'||(u.side==='ally'&&this.scenario.control.manualOnly)?'manual':'auto'; u.queued = null;
+        u.statuses = [];u.lastSkillDelay=0;u.waitTime=u.progress*u.interval;u.progressStamp=u.progress;u.autoCheckedRevision=-1; u.criticalChain = 0; u.order = order;
         u.stats = { damage: 0, healing: 0, received: 0, actions: 0, kills: 0, tactics: 0, dodges: 0 };
         return u;
       });
@@ -103,11 +108,11 @@
       let iterations = 0;
       while (this.accumulator + 1e-9 >= .02 && this.status === 'running' && iterations++ < 50000) {
         this.accumulator -= .02; this.tick++; this.time = this.tick * .02;
-        for(const u of this.units)if(u.statuses.length){const old=u.statuses.length;u.statuses=u.statuses.filter(s=>s.expiresAt>this.time);if(u.statuses.length!==old)this.revision++;}
-        for (const u of this.units) if (u.soldiers > 0) { u.progress = Math.min(1, u.progress + .02 / u.interval); if(!u.ready&&u.progress>=1-1e-9)u.readyTick=this.tick; u.ready = u.progress >= 1 - 1e-9; }
+        for(const u of this.units)this.tickStatuses(u);if(this.status!=='running')break;
+        for (const u of this.units) if (u.soldiers > 0&&!this.stunned(u)) {if(u.progress!==u.progressStamp)u.waitTime=u.progress*u.interval;u.interval=interval(this.effective(u),this.config,u.lastSkillDelay);u.waitTime+=.02;const raw=Math.min(1,u.waitTime/u.interval);u.progress=Math.max(u.progress,raw);u.progressStamp=u.progress;if(!u.ready&&u.waitTime>=u.interval-1e-9)u.readyTick=this.tick;u.ready=u.waitTime>=u.interval-1e-9;}
         for (const u of this.units) {
           if (this.status !== 'running') break;
-          if (u.soldiers <= 0 || !u.ready) continue;
+          if (u.soldiers <= 0 || !u.ready || this.stunned(u)) continue;
           if (u.queued) {
             const command = u.queued; u.queued = null;
             const result = this.act(u.id, command.skill, command.target, command.scope);
@@ -117,7 +122,34 @@
         }
       }
     }
-    setMode(id, mode) { const u = this.unit(id); if (!u || u.side !== 'ally' || u.soldiers <= 0 || !['auto', 'manual'].includes(mode)) return false; u.mode = mode; if (mode === 'auto') u.queued = null; this.emit('mode', { actor: id, mode, text: `${u.name}切换为${mode === 'auto' ? '自动' : '手动'}指挥。` }); return true; }
+    effective(u){
+      const out={...u};for(const key of ['war','intelligence','leadership','speed','technique','attack','armor','resistance']){
+        const add=u.statuses.reduce((n,s)=>n+(s.attribute===key?(Number(s.amount)||0)*(s.stacks||1):0),0),mult=u.statuses.reduce((n,s)=>n*(Number(s[key+'Multiplier'])||1),1);out[key]=Math.max(['armor','resistance'].includes(key)?0:1,(u[key]+add)*mult);
+      }return out;
+    }
+    stunned(u){return u.statuses.some(s=>s.stun&&s.expiresAt>this.time);}
+    addStatus(source,target,effect,skill={}){
+      const base=STATES.definitions[effect.id]||{},definition={...copy(base),...copy(effect)},id=definition.id||skill.id;
+      if(target.soldiers<=0||(target.statusImmunities||[]).includes(id))return null;
+      if(definition.chance!==undefined){const chance=clamp(Number(definition.chance)-(source.side!==target.side?this.effective(target).resistance/1000:0),0,1);if(this.rng()>=chance)return null;}
+      const owner=this.effective(source),coefficient=Number(definition.coefficient)||0;
+      let amount=Number(definition.amount??((Number(definition.base)||0)+coefficient*(owner[definition.stat||'technique']||1)))||0;if(definition.negative)amount=-Math.abs(amount);
+      const previous=target.statuses.find(s=>s.id===id),origin=skill.id||id,maxStacks=Math.max(1,Number(definition.maxStacks)||1),same=previous?.origin===origin;
+      const status={...definition,id,name:definition.name||skill.name||id,source:source.id,origin,amount,stacks:same?Math.min(maxStacks,(previous.stacks||1)+1):1,expiresAt:this.time+Math.max(.02,Number(definition.duration)||5),nextTick:this.time+(Number(definition.period)||1)};
+      target.statuses=target.statuses.filter(s=>s.id!==id);target.statuses.push(status);this.emit('status',{actor:source.id,target:target.id,status:copy(status)});return status;
+    }
+    tickStatuses(u){
+      if(u.soldiers<=0)return;
+      for(const status of [...u.statuses])if(status.period){while(status.nextTick<=this.time+1e-9&&status.nextTick<=status.expiresAt+1e-9&&u.soldiers>0){
+        status.nextTick+=status.period;const source=this.unit(status.source)||u,before=u.soldiers,amount=Math.max(1,Math.floor(Math.abs(status.amount)*(status.stacks||1))),actual=Math.min(amount,status.healing?u.maxSoldiers-before:before);u.soldiers+=status.healing?actual:-actual;
+        const after=u.soldiers,restored=this.survive(u),defeated=u.soldiers===0;
+        if(status.healing)source.stats.healing+=actual;else{source.stats.damage+=actual;u.stats.received+=actual;}
+        if(defeated){source.stats.kills++;u.progress=0;u.progressStamp=0;u.waitTime=0;u.ready=false;u.queued=null;u.statuses=[];}
+        this.emit('action',{actor:source.id,actorName:source.name,side:source.side,skill:'status-'+status.id,skillName:status.name,scope:'single',cost:0,periodic:true,results:[{target:u.id,targetName:u.name,before,after,actual,healing:!!status.healing,defeated,raw:amount,amount,factors:[],formula:'持续状态每秒结算'}]});if(restored)this.emit('action',restored);this.checkEnd();if(this.status!=='running')return;
+      }}
+      const old=u.statuses.length;u.statuses=u.statuses.filter(s=>s.expiresAt>this.time+1e-9);if(u.statuses.length!==old)this.invalidateAI();
+    }
+    setMode(id, mode) { const u = this.unit(id); if (!u || u.side !== 'ally' || u.soldiers <= 0 || !['auto', 'manual'].includes(mode)) return false; if(mode==='auto'&&this.scenario.control.manualOnly){this.emit('modeblocked',{actor:id,text:'无法自动战斗'});return false;} u.mode = mode; if (mode === 'auto') u.queued = null; this.emit('mode', { actor: id, mode, text: `${u.name}切换为${mode === 'auto' ? '自动' : '手动'}指挥。` }); return true; }
     setPriorities(id, priorities) {
       const u = this.unit(id); if (!u) return false;
       u.priorities = priorities.filter(r=>u.skills.includes(r.skill)).map(r=>normalizeRule(r,this.skills[r.skill]));u.lastSingleSkill=null;
@@ -149,8 +181,14 @@
       const u=this.unit(id),skill=this.skills[skillId];
       if(!u||u.side!=='ally'||u.mode!=='manual')return {ok:false,reason:'请先切换该武将为手动'};
       if(!u.ready)return {ok:false,reason:'尚未完成读条'};
+      if(this.stunned(u))return {ok:false,reason:'眩晕中，无法行动'};
       if(!skill)return {ok:false,reason:'技能不存在'};
-      return this.act(id,skillId,skill.side==='self'?id:targetId,skill.scope==='all'?'all':'single');
+      const result=this.act(id,skillId,skill.side==='self'?id:targetId,skill.scope==='all'?'all':'single');if(result.ok)u.lastManualSkill=skillId;return result;
+    }
+    targetPool(u,skill,scope=skill.scope||'single'){
+      const side=skill.side==='enemy'?(u.side==='ally'?'enemy':'ally'):u.side,pool=skill.side==='self'?[u]:this.living(side);
+      if(scope!=='single'||skill.side!=='enemy'||!['physical','tactic'].includes(skill.kind)||skill.ignoreTaunt)return pool;
+      const taunted=pool.filter(t=>t.statuses.some(s=>s.taunt&&s.expiresAt>this.time));return taunted.length?taunted:pool;
     }
     validate(u, skillId, targetId, scope = 'single') {
       const skill = this.skills[skillId];
@@ -161,7 +199,7 @@
       const side = skill.side === 'enemy' ? (u.side === 'ally' ? 'enemy' : 'ally') : u.side;
       let targets = skill.side === 'self' ? [u] : scope === 'all' ? this.living(side) : [this.unit(targetId)];
       if (!targets.length || targets.some(t => !t || t.side !== side || t.soldiers <= 0)) return { ok: false, reason: '目标已溃退或阵营不符' };
-      if (skill.kind === 'physical') { const taunt = this.living(side).filter(t=>t.statuses.some(s=>s.taunt && s.expiresAt>this.time)); if (taunt.length && !targets.some(t=>taunt.includes(t))) targets=[taunt[0]]; }
+      if(scope==='single'&&skill.side==='enemy'&&!this.targetPool(u,skill,scope).some(t=>t.id===targetId))return {ok:false,reason:'只能选择嘲讽目标'};
       if (skill.kind === 'heal' && targets.every(t => t.soldiers >= t.maxSoldiers)) return { ok: false, reason: '目标兵力已满' };
       return { ok: true, skill, targets };
     }
@@ -183,21 +221,48 @@
         if(!enabled)continue;
         const scope=skill.scope||(skill.all?r.scope||'single':'single');
         if(skill.kind==='buff'&&!skill.buff?.reapply){const id=skill.buff?.id||skill.id,pool=skill.side==='self'?[u]:skill.side==='ally'?friends:sortedFoes,missing=pool.filter(t=>!t.statuses.some(s=>s.id===id&&s.expiresAt>this.time));if(!missing.length)continue;if(scope==='single')target=missing[0];}
-        if(this.validate(u,skill.id,target.id,scope).ok)candidates.push({skill:skill.id,target:target.id,scope,kind:skill.kind});
+        if(skill.side==='enemy'&&scope==='single'){const pool=this.targetPool(u,skill,scope),sorted=sortedFoes.filter(t=>pool.includes(t));target=sorted[0];}
+        if(target&&this.validate(u,skill.id,target.id,scope).ok)candidates.push({skill:skill.id,target:target.id,scope,kind:skill.kind,frequency:r.frequency});
       }
       if(!candidates.length)return null;
       let chosen=candidates[0];
       if(['physical','tactic'].includes(chosen.kind)){
         const damage=candidates.filter(c=>['physical','tactic'].includes(c.kind)),groups=damage.filter(c=>c.scope==='all');
         if(groups.length)chosen=groups[0];
+        else if(damage.some(c=>c.frequency==='sometimes'))chosen=damage[Math.floor(this.rng()*damage.length)];
         else{const previous=damage.findIndex(c=>c.skill===u.lastSingleSkill);chosen=damage[(previous+1)%damage.length];}
       }
-      if(this.skills[chosen.skill].side==='enemy'&&u.targetRule==='random'&&chosen.scope==='single')chosen={...chosen,target:foes[Math.floor(this.rng()*foes.length)].id};
+      if(this.skills[chosen.skill].side==='enemy'&&chosen.scope==='single'){const skill=this.skills[chosen.skill],pool=this.targetPool(u,skill),taunted=pool.some(t=>t.statuses.some(s=>s.taunt&&s.expiresAt>this.time));if(u.targetRule==='random'||(u.side==='enemy'&&taunted))chosen={...chosen,target:pool[Math.floor(this.rng()*pool.length)].id};}
       return {skill:chosen.skill,target:chosen.target,scope:chosen.scope};
+    }
+    dodgeChance(unit,kind){
+      const bonus=unit.passives.reduce((n,id)=>n+(Number(this.passives[id]?.stats?.dodgeBonus)||0),0);
+      return clamp((kind==='physical'?(Number(unit.dodge)||0):0)+bonus,0,1);
+    }
+    survive(unit){
+      if(unit.soldiers>0)return null;
+      for(const id of unit.passives){const definition=this.passives[id],trigger=definition.triggers?.find(t=>t.on==='lethal'&&t.effect==='restoreFull');if(!trigger)continue;
+        unit.soldiers=unit.maxSoldiers;unit.stats.healing+=unit.maxSoldiers;
+        return {actor:unit.id,actorName:unit.name,side:unit.side,skill:trigger.skill,skillName:definition.name,passive:id,reaction:true,scope:'single',cost:0,results:[{target:unit.id,targetName:unit.name,before:0,after:unit.soldiers,actual:unit.soldiers,healing:true,raw:unit.soldiers,amount:unit.soldiers,factors:[],formula:'教程被动：濒死恢复全部兵力'}]};
+      }
+      return null;
+    }
+    reactions(on,owner,source){
+      // 反应技能不再触发反应，避免被动互相反击造成无限递归。
+      for(const id of owner.passives)for(const trigger of this.passives[id]?.triggers||[]){
+        const skill=this.skills[trigger.skill];
+        if(trigger.on!==on||!skill||owner.soldiers<=0||source.soldiers<=0||owner.side===source.side)continue;
+        const calc=tactic({skill,intelligence:this.effective(owner).intelligence,target:this.effective(source),mitigationScale:this.config.mitigationScale});
+        const before=source.soldiers,actual=Math.min(before,calc.amount);source.soldiers-=actual;
+        owner.stats.damage+=actual;source.stats.received+=actual;
+        const after=source.soldiers,restored=this.survive(source),defeated=source.soldiers===0;if(defeated){owner.stats.kills++;source.progress=0;source.ready=false;source.queued=null;source.statuses=[];}
+        this.emit('action',{actor:owner.id,actorName:owner.name,side:owner.side,skill:skill.id,skillName:this.passives[id].name,passive:id,reaction:true,scope:'single',cost:0,results:[{target:source.id,targetName:source.name,before,after,actual,healing:false,defeated,critical:false,...calc}]});if(restored)this.emit('action',restored);
+      }
     }
     act(id, skillId, targetId, scope = 'single') {
       const u = this.unit(id);
       if (!u || u.soldiers <= 0 || !u.ready || this.status !== 'running') return { ok: false, reason: '尚未完成读条' };
+      if(this.stunned(u))return {ok:false,reason:'眩晕中，无法行动'};
       const validation = this.validate(u, skillId, targetId, scope);
       if (!validation.ok) return validation;
       const { skill, targets } = validation;
@@ -207,45 +272,53 @@
       u.stats.actions++; this.actionCount++;
       if (skill.kind === 'tactic' || skill.kind === 'heal') u.stats.tactics++;
       const event = { actor: id, actorName: u.name, side: u.side, skill: skillId, skillName: skill.name, scope, cost: skill.cost, spBefore: beforeSp, spAfter: this.availableSp(u), attackerSoldiers: u.soldiers, results: [] };
+      const dodged=[],restores=[],reflections=[];let drain=0;
       for (const target of targets) {
         const before = target.soldiers;
         if (skill.kind === 'buff') {
-          const definition=skill.buff || {},status={...copy(definition),id:definition.id || skill.id,name:definition.name || skill.name,source:u.id,expiresAt:this.time+Math.max(.02,Number(definition.duration)||5)};
-          target.statuses=target.statuses.filter(s=>s.id!==status.id);target.statuses.push(status);
+          const definition=skill.buff || {},status=this.addStatus(u,target,{...definition,id:definition.id||skill.id},skill);
+          for(const effect of skill.effects||[])this.addStatus(u,target,effect,skill);
           event.results.push({target:target.id,targetName:target.name,before,after:before,actual:0,buff:true,status:copy(status),healing:false,raw:0,amount:0,factors:[],formula:'附加状态'});continue;
         }
         let miss = null, critical = false, multiplier = 1, random = 1, calc;
+        const dodge=skill.kind==='heal'?0:this.dodgeChance(target,skill.kind);
+        if(dodge>0&&this.rng()<dodge){miss='闪避';target.stats.dodges++;dodged.push(target);}
         if (skill.kind === 'physical') {
-          if (target.dodge && this.rng() < target.dodge) { miss = '闪避'; target.stats.dodges++; }
-          else if (this.config.hit && this.rng() >= (u.side === 'ally' ? 244 : 235) / 256) miss = '未命中';
+          if (!miss&&!skill.alwaysHit&&this.config.hit && this.rng() >= (u.side === 'ally' ? 244 : 235) / 256) miss = '未命中';
           if (!miss) {
-            critical = !!u.guaranteedCritical || (this.config.critical && this.rng() < criticalChance(u, this.config));
+            critical = !!u.guaranteedCritical || (this.config.critical && this.rng() < clamp(criticalChance(this.effective(u), this.config)+(skill.criticalBonus||0),0,1));
             if (critical) { u.criticalChain++; multiplier = [1.2, 1.4, 1.6, 2, 3][Math.min(4, u.criticalChain - 1)]; }
             else u.criticalChain = 0;
             const values = this.config.physicalRandom === 'list' ? [.8, .92, 1, 1.12, 1.2] : [.8, .9, 1, 1.1, 1.2];
             random = this.config.random ? weighted(this.rng, values, [1, 4, 6, 4, 1]) : 1;
-            const attackBonus=u.statuses.reduce((n,s)=>n*(Number(s.attackMultiplier)||1),1),armorBonus=target.statuses.reduce((n,s)=>n*(Number(s.armorMultiplier)||1),1);
-            calc = physical({ attacker: {...u,attack:u.attack*attackBonus}, target:{...target,armor:target.armor*armorBonus}, level: u.side === 'ally' ? u.level : target.level, random, critical: multiplier, mitigationScale:this.config.mitigationScale });
+            const attacker=this.effective(u);attacker.attack*=Number(skill.power)||1;
+            calc = physical({ attacker, target:this.effective(target), level: u.side === 'ally' ? u.level : target.level, random, critical: multiplier, mitigationScale:this.config.mitigationScale });
           } else { calc = { raw: 0, amount: 0, factors: [], formula: miss }; }
-        } else {
+        } else if(miss){calc={raw:0,amount:0,factors:[],formula:miss};} else {
           random = this.config.random ? weighted(this.rng, [.6, .8, 1, 1.2, 1.4], [1, 3, 8, 2, 2]) : 1;
-          const resistanceBonus=target.statuses.reduce((n,s)=>n*(Number(s.resistanceMultiplier)||1),1);
-          calc = tactic({skill,intelligence:u.intelligence,random,count:targets.length,scope,target:{...target,resistance:target.resistance*resistanceBonus},mitigationScale:this.config.mitigationScale});
+          calc = tactic({skill,intelligence:this.effective(u).intelligence,random,count:targets.length,scope,target:this.effective(target),mitigationScale:this.config.mitigationScale});
         }
         const healing = skill.kind === 'heal';
         const actual = Math.min(calc.amount, healing ? target.maxSoldiers - before : before);
         target.soldiers = healing ? before + actual : before - actual;
+        const after=target.soldiers,restored=!healing?this.survive(target):null;if(restored)restores.push(restored);
         if (healing) u.stats.healing += actual;
         else { u.stats.damage += actual; target.stats.received += actual; }
+        if(!healing&&!miss){drain+=Math.floor(actual*(Number(skill.lifesteal)||0));if(skill.kind==='physical'){const reflect=target.statuses.reduce((n,s)=>n+(Number(s.reflect)||0),0);if(reflect>0)reflections.push({source:target,amount:Math.floor(actual*reflect)});}}
+        if(!miss&&target.soldiers>0)for(const effect of skill.effects||[])this.addStatus(u,target,effect,skill);
         const defeated = !healing && before > 0 && target.soldiers === 0;
         if (defeated) { u.stats.kills++; target.progress = 0; target.ready = false; target.queued = null; target.statuses=[]; }
-        event.results.push({ target: target.id, targetName: target.name, before, after: target.soldiers, actual, healing, miss, critical, multiplier, random, defeated, ...calc });
+        event.results.push({ target: target.id, targetName: target.name, before, after, actual, healing, miss, critical, multiplier, random, defeated, ...calc });
       }
       if (skill.element === 'fire') this.fireCount++;
-      u.progress = 0; u.ready = false; u.readyTick=null; u.interval = interval(u, this.config, this.config.skillDelays?.[skillId]);
-      event.skillDelay = Number(this.config.skillDelays?.[skillId]) || 0;
+      if(drain>0&&u.soldiers>0){const before=u.soldiers,actual=Math.min(drain,u.maxSoldiers-before);u.soldiers+=actual;u.stats.healing+=actual;event.results.push({target:u.id,targetName:u.name,before,after:u.soldiers,actual,healing:true,raw:drain,amount:drain,factors:[],formula:'吸血回复'});}
+      const delay=this.config.skillDelays?.[skillId]??skill.cooldown??0;
+      u.progress = 0;u.progressStamp=0;u.waitTime=0;u.lastSkillDelay=Number(delay)||0; u.ready = false; u.readyTick=null; u.interval = interval(this.effective(u), this.config, delay);
+      event.skillDelay = Number(delay) || 0;
       event.nextInterval = u.interval;
-      this.emit('action', event); this.checkEnd();
+      this.emit('action', event);for(const restored of restores)this.emit('action',restored);for(const target of dodged)this.reactions('dodge',target,u);
+      for(const reflect of reflections)if(u.soldiers>0&&reflect.amount>0){const before=u.soldiers,actual=Math.min(before,reflect.amount);u.soldiers-=actual;const after=u.soldiers,restored=this.survive(u),defeated=u.soldiers===0;reflect.source.stats.damage+=actual;u.stats.received+=actual;if(defeated){reflect.source.stats.kills++;u.progress=0;u.ready=false;u.statuses=[];}this.emit('action',{actor:reflect.source.id,actorName:reflect.source.name,side:reflect.source.side,skill:'status-reflect',skillName:'反伤',reaction:true,scope:'single',cost:0,results:[{target:u.id,targetName:u.name,before,after,actual,raw:actual,amount:actual,healing:false,defeated,factors:[],formula:'已承受物理伤害 × 反伤比例'}]});if(restored)this.emit('action',restored);}
+      this.checkEnd();
       return { ok: true };
     }
     checkEnd() {
@@ -255,7 +328,7 @@
       this.emit('end', { result: this.status, text: this.status === 'victory' ? '敌军溃退，我方取胜。' : this.status === 'defeat' ? '我方溃退，此役失利。' : '两军俱溃。' });
     }
     retreat() { if (!this.scenario.allowRetreat || this.status !== 'running') return false; this.status = 'retreated'; this.emit('end',{result:'retreated',text:'我方撤退。'}); return true; }
-    export() { return { version: 2, scenario: copy(this.scenario), skills:copy(this.skills), config: copy(this.config), result: this.status, time: this.time, units: copy(this.units), events: copy(this.events) }; }
+    export() { return { version: 2, scenario: copy(this.scenario), skills:copy(this.skills), passives:copy(this.passives), config: copy(this.config), result: this.status, time: this.time, units: copy(this.units), events: copy(this.events) }; }
   }
   const api = { Battle, attr, maxSoldiers, ratio, interval, physical, tactic, mitigation, normalizeRule, criticalChance, seededRandom, seedNumber };
   root.BattleEngine = api;

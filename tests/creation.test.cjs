@@ -33,7 +33,7 @@ test('旧身份存档映射五档难度，新存档兼容独立装备和武器�
 });
 test('武器种类使用独立ID，三种治疗器具包含在可扩展注册表内',()=>{
   assert.equal(new Set(R.WEAPON_TYPES.map(type=>type.id)).size,R.WEAPON_TYPES.length);for(const type of R.WEAPON_TYPES){assert.ok(type.id&&type.name);}
-  for(const id of ['blade','sword','spear','staff','fan','jade','dagger','bow','crossbow','needle','talisman','gourd','halberd','shield'])assert.ok(R.WEAPON_TYPES.some(type=>type.id===id));
+  for(const id of ['blade','sword','spear','staff','fan','qin','dagger','bow','crossbow','needle','talisman','gourd','halberd','shield'])assert.ok(R.WEAPON_TYPES.some(type=>type.id===id));
 });
 test('开局为每种武器独立重掷熟练度，地狱固定1、主角剧本固定255',()=>{
   const rng=random(3810);for(const difficulty of R.DIFFICULTIES){for(let n=0;n<80;n++){const roll=R.rollHero(difficulty.id,rng);assert.deepEqual(Object.keys(roll.weaponProficiencies),R.WEAPON_TYPES.map(type=>type.id));for(const value of Object.values(roll.weaponProficiencies)){assert.ok(Number.isInteger(value)&&value>=difficulty.proficiencyRange[0]&&value<=difficulty.proficiencyRange[1]);if(difficulty.id==='hell')assert.equal(value,1);if(difficulty.id==='protagonist')assert.equal(value,255);}}}

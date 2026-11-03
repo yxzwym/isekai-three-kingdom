@@ -25,8 +25,8 @@
     {id:'protagonist',name:'主角剧本',stars:1,profiles:['overlord']}
   ].map(d=>{const profiles=d.profiles.map(id=>IDENTITIES.find(p=>p.id===id)),bounds=profiles.flatMap(p=>Object.values(p.ranges));return {...d,passiveWeights:IDENTITY_PASSIVE_WEIGHTS[d.profiles[0]],proficiencyRange:[Math.min(...bounds.map(r=>r[0])),Math.max(...bounds.map(r=>r[1]))],proficiencyBands:profiles[0].attributeBands};});
   const getDifficulty=id=>DIFFICULTIES.find(d=>d.id===id||d.profiles.includes(id));
-  const WEAPON_TYPES=[['blade','刀','单体重击'],['sword','剑','精准爆发'],['spear','枪','破甲控制'],['halberd','戟','群体物理'],['shield','盾','嘲讽反伤'],['staff','杖','火计输出'],['fan','扇','治疗增益'],['jade','玉','削弱控制'],['dagger','匕首','高速刺杀'],['bow','弓','持续伤害'],['crossbow','弩','狙击压制'],['needle','金针','单体急救'],['talisman','符箓','群疗抗性'],['gourd','药葫芦','持续回复']].map(([id,name,role])=>({id,name,role,skillPlanId:id}));
-  const getWeaponProficiency=(character,id)=>{const values=character?.weaponProficiencies,value=values?.[id]??(id==='talisman'?values?.['medicine-bag']:undefined);return Number.isSafeInteger(value)&&value>=1?value:1;};
+  const WEAPON_TYPES=[['blade','刀','单体重击'],['sword','剑','精准爆发'],['spear','枪','破甲控制'],['halberd','戟','群体物理'],['shield','盾','嘲讽反伤'],['staff','杖','火计输出'],['fan','扇','治疗增益'],['qin','琴','削弱控制'],['dagger','匕首','高速刺杀'],['bow','弓','持续伤害'],['crossbow','弩','狙击压制'],['needle','金针','单体急救'],['talisman','符箓','群疗抗性'],['gourd','药葫芦','持续回复']].map(([id,name,role])=>({id,name,role,skillPlanId:id}));
+  const getWeaponProficiency=(character,id)=>{const values=character?.weaponProficiencies,value=values?.[id]??(id==='talisman'?values?.['medicine-bag']:id==='qin'?values?.jade:undefined);return Number.isSafeInteger(value)&&value>=1?value:1;};
   // 武器方案描述本作技能与效果，结算系数另行配置。
   const skillTemplate=(id,name,kind,side,scope,effects=[])=>({id,name,kind,side,scope,effects});
   const WEAPON_SKILL_PLANS={
@@ -58,10 +58,10 @@
       skillTemplate('fan-fire','火攻计','tactic','enemy','single',['burn']),
       skillTemplate('fan-frost','寒风阵','tactic','enemy','all',['speedDown']),
       skillTemplate('fan-rain','清风化雨','heal','ally','all',['techniqueUp','primaryHeal'])]},
-    jade:{status:'design',skills:[
-      skillTemplate('jade-confusion','迷魂阵','tactic','enemy','all',['techniqueDown']),
-      skillTemplate('jade-drain','摄生诀','tactic','enemy','single',['lifesteal']),
-      skillTemplate('jade-slow','缚足咒','tactic','enemy','single',['speedDown'])]},
+    qin:{status:'design',skills:[
+      skillTemplate('qin-confusion','迷魂曲','tactic','enemy','all',['techniqueDown']),
+      skillTemplate('qin-drain','摄魂音','tactic','enemy','single',['lifesteal']),
+      skillTemplate('qin-slow','缓弦咒','tactic','enemy','single',['speedDown'])]},
     dagger:{status:'design',skills:[
       skillTemplate('dagger-bleed','断筋刺','physical','enemy','single',['bleed']),
       skillTemplate('dagger-fast','无影连刺','physical','enemy','single',['fastRecovery','highCritical']),
@@ -203,6 +203,7 @@
     if(!character||typeof character!=='object')return character;
     const next=clone(character),difficulty=getDifficulty(next.difficulty||next.identity);if(difficulty)next.difficulty=difficulty.id;delete next.identity;
     if(next.weaponProficiencies&&typeof next.weaponProficiencies==='object'&&!Array.isArray(next.weaponProficiencies)&&Object.hasOwn(next.weaponProficiencies,'medicine-bag')){if(!Object.hasOwn(next.weaponProficiencies,'talisman'))next.weaponProficiencies.talisman=next.weaponProficiencies['medicine-bag'];delete next.weaponProficiencies['medicine-bag'];}
+    if(next.weaponProficiencies&&Object.hasOwn(next.weaponProficiencies,'jade')){next.weaponProficiencies.qin??=next.weaponProficiencies.jade;delete next.weaponProficiencies.jade;}
     if(Array.isArray(next.passives))next.passives=next.passives.filter(id=>id!=='revive');return next;
   }
   const SETTINGS={screenShake:true,effects:true,menuScale:1};
@@ -212,9 +213,9 @@
       let data;try{data=JSON.parse(this.storage.getItem(this.key)||'[]');}catch{return [null,null,null];}
       return Array.from({length:3},(_,i)=>{const slot=Array.isArray(data)?data[i]:null,character=normalizeCharacter(slot?.character);return [1,2].includes(slot?.version)&&validCharacter(character)&&typeof slot.savedAt==='string'&&Number.isFinite(Date.parse(slot.savedAt))?clone({...slot,version:2,character}):null;});
     }
-    save(index,character){
+    save(index,character,progress){
       const current=normalizeCharacter(character);if(!Number.isInteger(index)||index<0||index>2||!validCharacter(current))throw new TypeError('人物或存档位置无效');
-      const slots=this.slots();slots[index]={version:2,character:current,savedAt:new Date().toISOString(),chapter:'prologue-start'};
+      const slots=this.slots();slots[index]={version:2,character:current,savedAt:new Date().toISOString(),chapter:progress?.stage==='complete'?'prologue-complete':'prologue-start',...(progress?{progress:clone(progress)}:{})};
       this.storage.setItem(this.key,JSON.stringify(slots));return clone(slots[index]);
     }
     settings(){let data;try{data=JSON.parse(this.storage.getItem(this.settingsKey)||'{}');}catch{data={};}return {screenShake:typeof data?.screenShake==='boolean'?data.screenShake:true,effects:typeof data?.effects==='boolean'?data.effects:true,menuScale:[.9,1,1.1].includes(data?.menuScale)?data.menuScale:1};}

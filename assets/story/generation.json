@@ -1,0 +1,14 @@
+{
+  "provider": "built-in image_gen",
+  "created": "2026-11-03",
+  "scenes": {
+    "village-road.png": {
+      "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-d650845f-0287-432b-a9ca-95eca155401a.png",
+      "promptSummary": "Late-Han poor village dirt road, clay and thatched houses, cart and grain sacks, a few distant villagers, open central foreground for game actors and HUD, muted cool daylight, portrait opaque background."
+    },
+    "yellow-camp.png": {
+      "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-e3f9e5dd-c75e-4280-9072-5e1fc0ac8c90.png",
+      "promptSummary": "Modest Yellow Turban rebel camp at dusk, ochre tents, plain yellow flags with no lettering, communal grain and cooking fire, awning with table and stools, open foreground, warm-cool portrait opaque background."
+    }
+  }
+}

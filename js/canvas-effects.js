@@ -45,7 +45,7 @@
     addEffect(id,kind,now,duration,critical=false){kind=style(kind);const prior=this.items.find(e=>e.id===id&&e.kind===kind);if(prior){prior.born=now;prior.duration=duration;prior.critical=prior.critical||critical;}else this.items.push({id,kind,born:now,duration,critical});}
     addMotion(motion){const prior=this.motions.find(m=>m.id===motion.id&&m.role===motion.role);if(prior)Object.assign(prior,motion,{critical:prior.critical||motion.critical});else this.motions.push(motion);}
     action(event,skill,now){
-      const kind=kindOf(skill);this.addMotion({id:event.actor,born:now,role:'cast',physical:skill.kind==='physical'});
+      const kind=kindOf(skill);if(!event.periodic)this.addMotion({id:event.actor,born:now,role:'cast',physical:skill.kind==='physical'});
       for(const r of event.results){
         if(!r.miss)this.addEffect(r.target,kind,now,kind==='physical'?330:kind==='thunder'?650:850,r.critical);
         if(!r.healing&&!r.buff&&!r.miss&&r.actual>0){const hit=this.hits.find(f=>f.id===r.target);if(hit){hit.born=now;hit.critical=hit.critical||r.critical;}else this.hits.push({id:r.target,born:now,critical:r.critical});this.addMotion({id:r.target,born:now,role:'hit',critical:r.critical});this.addEffect(r.target,'impact',now,190,r.critical);if(now>=this.shakeUntil){this.shakePower=1.7;this.shakeDuration=110;this.shakeStart=now;this.shakeUntil=now+110;}}

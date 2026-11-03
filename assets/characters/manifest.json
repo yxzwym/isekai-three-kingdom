@@ -312,6 +312,110 @@
           }
         }
       }
+    },
+    "zhangjiao": {
+      "id": "zhangjiao",
+      "name": "张角",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/zhangjiao/classic/fullbody.png",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/zhangjiao/classic/fullbody.png",
+            "crop": {
+              "x": 335,
+              "y": 45,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
+    },
+    "zhangbao": {
+      "id": "zhangbao",
+      "name": "张宝",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/zhangbao/classic/fullbody.png",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/zhangbao/classic/fullbody.png",
+            "crop": {
+              "x": 335,
+              "y": 45,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
+    },
+    "zhangliang": {
+      "id": "zhangliang",
+      "name": "张梁",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/zhangliang/classic/fullbody.png",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/zhangliang/classic/fullbody.png",
+            "crop": {
+              "x": 335,
+              "y": 45,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
+    },
+    "imperial-soldier": {
+      "id": "imperial-soldier",
+      "name": "官兵",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/imperial-soldier/classic/fullbody.png",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/imperial-soldier/classic/fullbody.png",
+            "crop": {
+              "x": 335,
+              "y": 45,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
     }
   }
 }
