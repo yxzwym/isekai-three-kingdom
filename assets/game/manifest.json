@@ -1,0 +1,109 @@
+{
+  "background": "./assets/game/main-menu.png",
+  "protagonists": {
+    "wanderer": {
+      "name": "行旅少年",
+      "status": "ready",
+      "src": "./assets/protagonists/wanderer/fullbody.png",
+      "width": 1024,
+      "height": 1536,
+      "portrait": {
+        "x": 348,
+        "y": 0,
+        "width": 348,
+        "height": 430
+      }
+    },
+    "scholar": {
+      "name": "青衣书生",
+      "status": "ready",
+      "src": "./assets/protagonists/scholar/fullbody.png",
+      "width": 1024,
+      "height": 1536,
+      "portrait": {
+        "x": 348,
+        "y": 0,
+        "width": 348,
+        "height": 430
+      }
+    },
+    "swordswoman": {
+      "name": "红衣女侠",
+      "status": "ready",
+      "src": "./assets/protagonists/swordswoman/fullbody.png",
+      "width": 1024,
+      "height": 1536,
+      "portrait": {
+        "x": 348,
+        "y": 0,
+        "width": 348,
+        "height": 430
+      }
+    },
+    "healer": {
+      "name": "素衣医者",
+      "status": "ready",
+      "src": "./assets/protagonists/healer/fullbody.png",
+      "width": 1024,
+      "height": 1536,
+      "portrait": {
+        "x": 348,
+        "y": 0,
+        "width": 348,
+        "height": 430
+      }
+    },
+    "armored": {
+      "name": "铁甲猛将",
+      "status": "ready",
+      "src": "./assets/protagonists/armored/fullbody.png",
+      "width": 1024,
+      "height": 1536,
+      "portrait": {
+        "x": 348,
+        "y": 0,
+        "width": 348,
+        "height": 430
+      }
+    },
+    "silverguard": {
+      "name": "银甲战将",
+      "status": "ready",
+      "src": "./assets/protagonists/silverguard/fullbody.png",
+      "width": 1024,
+      "height": 1536,
+      "portrait": {
+        "x": 348,
+        "y": 0,
+        "width": 348,
+        "height": 430
+      }
+    },
+    "beggar": {
+      "name": "破衣乞者",
+      "status": "ready",
+      "src": "./assets/protagonists/beggar/fullbody.png",
+      "width": 1024,
+      "height": 1536,
+      "portrait": {
+        "x": 348,
+        "y": 0,
+        "width": 348,
+        "height": 430
+      }
+    },
+    "warlord": {
+      "name": "乱世霸主",
+      "status": "ready",
+      "src": "./assets/protagonists/warlord/fullbody.png",
+      "width": 1024,
+      "height": 1536,
+      "portrait": {
+        "x": 348,
+        "y": 0,
+        "width": 348,
+        "height": 430
+      }
+    }
+  }
+}

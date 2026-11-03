@@ -107,11 +107,11 @@
     }
     draw(now=performance.now()) {
       if(!this.battle||!this.w)return;
-      const c=this.ctx,w=this.w,h=this.h;c.save();c.clearRect(0,0,w,h);c.fillStyle=this.scenario.scene?.color||'#10272d';c.fillRect(0,0,w,h);this.vfx.beginFrame(now);const shake=this.vfx.offset(now);c.translate(shake.x,shake.y);if(this.background)c.drawImage(this.background,0,0,w,h);
+      const c=this.ctx,w=this.w,h=this.h;c.save();c.clearRect(0,0,w,h);c.fillStyle=this.scenario.scene?.color||'#10272d';c.fillRect(0,0,w,h);this.vfx.beginFrame(now);const shake=this.options.screenShake===false?{x:0,y:0}:this.vfx.offset(now);c.translate(shake.x,shake.y);if(this.background)c.drawImage(this.background,0,0,w,h);
       this.hits=[];this.text(this.scenario.title||'战斗',w/2,29,20);this.text(clock(this.battle.time),w/2,56,18);
       if(this.scenario.allowRetreat&&this.battle.status==='running')this.button('撤退',w-63,12,53,30,()=>this.battle.retreat());
       for(const r of this.rects)this.drawUnit(r.unit,r,now);
-      this.drawTargeting(now);this.vfx.draw(c,this.rectMap,now);this.drawReadySkills(now);
+      this.drawTargeting(now);if(this.options.effects!==false)this.vfx.draw(c,this.rectMap,now);this.drawReadySkills(now);
       for(const f of this.floats){const r=this.rectMap.get(f.id);if(!r)continue;const progress=(now-f.born)/1100,pop=f.type==='skill'?1:1+.25*Math.sin(Math.PI*Math.min(1,progress*5));c.save();c.globalAlpha=1-progress;const x=r.x+r.w/2,y=(f.type==='skill'?r.y-5:r.floatY)-progress*32;c.translate(x,y);c.scale(pop,pop);this.text(f.text,0,0,Math.min(f.type==='skill'?14:f.critical?25:22,r.w*(f.type==='skill'?.2:.33)),f.critical?'#ffe4ad':f.color);c.restore();}
       if(this.panel)this.drawPanel();
       if(this.notice?.until>now){this.box(12,h-55,w-24,36,'#112d36f5','#728d8d');this.text(this.notice.text,w/2,h-37,12,'#e8d7aa');}
