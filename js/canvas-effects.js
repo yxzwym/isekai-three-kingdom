@@ -60,7 +60,7 @@
     offset(now){if(now>=this.shakeUntil)return{x:0,y:0};const a=this.shakePower*(this.shakeUntil-now)/this.shakeDuration;return{x:Math.sin((now-this.shakeStart)*.14)*a,y:Math.cos((now-this.shakeStart)*.19)*a*.65};}
     pose(id,side,now){this.beginFrame(now);const p=this.poses.get(id);if(!p)return{x:0,y:0,angle:0,scale:1};const dir=side==='ally'?-1:1;return{x:p.hitX,y:dir*(p.cast-p.hit),angle:p.angle,scale:p.scale};}
     redAlpha(id,now){this.beginFrame(now);return this.red.get(id)||0;}
-    draw(c,rects,now){this.beginFrame(now);const lookup=rects instanceof Map?rects:new Map(rects.map(r=>[r.id,r]));for(const e of this.items){const r=lookup.get(e.id);if(!r)continue;const p=(now-e.born)/e.duration,frame=Math.min(FRAME_COUNT-1,Math.floor(p*FRAME_COUNT)),scale=Math.max(20,Math.min(64,r.w*.65))/32;c.drawImage(texture(e.kind,e.critical,frame),r.x+r.w/2-64*scale,r.y+(r.h-50)*.58-80*scale,128*scale,160*scale);}}
+    draw(c,rects,now){this.beginFrame(now);const lookup=rects instanceof Map?rects:new Map(rects.map(r=>[r.id,r]));for(const e of this.items){const r=lookup.get(e.id);if(!r)continue;const p=(now-e.born)/e.duration,frame=Math.min(FRAME_COUNT-1,Math.floor(p*FRAME_COUNT)),scale=Math.max(20,Math.min(64,r.w*.65))/32;c.drawImage(texture(e.kind,e.critical,frame),r.x+r.w/2-64*scale,(r.effectY??r.y+(r.h-50)*.58)-80*scale,128*scale,160*scale);}}
     cacheInfo(){return{textures:textureCache.size,maximumTextures:(styles.size+1)*FRAME_COUNT,warmRemaining:this.warmJobs.length-this.warmCursor};}
   }
   const api={BattleEffects,kindOf,COLORS};root.BattleVFX=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;

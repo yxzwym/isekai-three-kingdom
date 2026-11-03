@@ -28,12 +28,15 @@
   const DEFAULTS = { seed: '赤壁-208', level: 40, enemyLevel: 60, allySp: 64, random: true, critical: true, hit: true, criticalSource: 'technique', physicalRandom: 'list', timing: 'classic', skillDelays: { huoshen: 1, dare: .6, hongshui: .8, luoshi: .4, yinxian: .5, tongxian: .3 }, reinforcements: [], rosterOverrides: {} };
   function appearance(u) {
     const art=CharacterAssets.resolve(u.characterId || u.id,u.artVariant);
-    return {...u,artVariant:art.variant,portrait:u.portrait || art.portrait,fullbody:art.fullbody};
+    return {...u,artVariant:art.variant,portrait:u.portrait || art.portrait,fullbody:u.fullbody || art.fullbody};
   }
   function createChibi(rules = {}) {
     const config = {...DEFAULTS,...rules};
     const allies = [...ALLIES, ...REINFORCEMENTS.filter(u=>(config.reinforcements||[]).includes(u.id))].map(appearance);
     return {id:'chibi-demo',title:'赤壁之战',allies,enemies:ENEMIES.map(appearance),rules:config,allowRetreat:false,scene:{background:'./assets/chibi-night.jpg',color:'#081d27',allowedElements:['fire','water','stone']}};
+  }
+  function createFormationPreview(){
+    const scenario=createChibi();scenario.id='formation-preview';scenario.title='全身立绘验证';scenario.allies=scenario.allies.map(u=>({...u,initialMode:'manual'}));scenario.enemies=[appearance({...ALLIES[0],id:'opponent-zhouyu',characterId:'zhouyu',attack:1,armor:99999,resistance:99999,leadership:1020,skills:['strike'],priorities:[rule('strike','always',0)]})];return scenario;
   }
   function createEncounter() {
     return {id:'road-encounter',title:'道旁遇袭',allies:[appearance({...ALLIES[2],id:'traveler',name:'旅人',skills:['luoshi','strike'],priorities:[rule('luoshi','always',0),rule('strike','always',0)]})],enemies:[appearance({...ENEMIES[1],id:'raider',name:'盗匪',skills:['strike'],priorities:[rule('strike','always',0)]})],rules:{...DEFAULTS,level:10,enemyLevel:10,seed:'road-1',allySp:12},allowRetreat:true,scene:{color:'#25352d',allowedElements:['fire','stone']}};
@@ -59,7 +62,7 @@
     const unit=u=>appearance({...u,war:200,speed:200,leadership:1020,armor:100000,resistance:100000,skills:['stress_burst'],priorities:[rule('stress_burst','always',0)],enemySp:99999});
     return{id:'stress',title:'同步施法压力验证',allies:ALLIES.map(unit),enemies:ENEMIES.map(unit),skills:{stress_burst:burst},rules:{...DEFAULTS,level:99,enemyLevel:99,allySp:99999,random:false,critical:false,hit:false},scene:{background:'./assets/chibi-night.jpg'}};
   }
-  const api = { SKILLS, ALLIES, ENEMIES, REINFORCEMENTS, DEFAULTS, convert, createChibi, createEncounter, createEffectsPreview, createStress };
+  const api = { SKILLS, ALLIES, ENEMIES, REINFORCEMENTS, DEFAULTS, convert, createChibi, createEncounter, createEffectsPreview, createStress,createFormationPreview };
   root.BattleScenarios = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(globalThis);
