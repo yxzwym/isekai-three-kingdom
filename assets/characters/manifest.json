@@ -10,18 +10,18 @@
           "label": "基础形象",
           "fullbody": {
             "status": "ready",
-            "src": "./assets/characters/zhouyu/classic/fullbody.png",
+            "src": "./assets/characters/zhouyu/classic/fullbody.webp",
             "width": 1024,
             "height": 1536
           },
           "portrait": {
             "status": "legacy",
-            "src": "./assets/legacy/generals-v1.png",
+            "src": "./assets/legacy/generals-v1.webp",
             "crop": {
-              "x": 0,
-              "y": 55,
-              "width": 256,
-              "height": 440
+              "x": 0.0,
+              "y": 55.0,
+              "width": 256.0,
+              "height": 440.0
             }
           }
         }
@@ -42,12 +42,12 @@
           },
           "portrait": {
             "status": "legacy",
-            "src": "./assets/legacy/generals-v1.png",
+            "src": "./assets/legacy/generals-v1.webp",
             "crop": {
-              "x": 256,
-              "y": 55,
-              "width": 256,
-              "height": 440
+              "x": 256.0,
+              "y": 55.0,
+              "width": 256.0,
+              "height": 440.0
             }
           }
         }
@@ -68,12 +68,12 @@
           },
           "portrait": {
             "status": "legacy",
-            "src": "./assets/legacy/generals-v1.png",
+            "src": "./assets/legacy/generals-v1.webp",
             "crop": {
-              "x": 512,
-              "y": 55,
-              "width": 256,
-              "height": 440
+              "x": 512.0,
+              "y": 55.0,
+              "width": 256.0,
+              "height": 440.0
             }
           }
         }
@@ -94,12 +94,12 @@
           },
           "portrait": {
             "status": "legacy",
-            "src": "./assets/legacy/generals-v1.png",
+            "src": "./assets/legacy/generals-v1.webp",
             "crop": {
-              "x": 768,
-              "y": 55,
-              "width": 256,
-              "height": 440
+              "x": 768.0,
+              "y": 55.0,
+              "width": 256.0,
+              "height": 440.0
             }
           }
         }
@@ -120,12 +120,12 @@
           },
           "portrait": {
             "status": "legacy",
-            "src": "./assets/legacy/generals-v1.png",
+            "src": "./assets/legacy/generals-v1.webp",
             "crop": {
-              "x": 1024,
-              "y": 55,
-              "width": 256,
-              "height": 440
+              "x": 1024.0,
+              "y": 55.0,
+              "width": 256.0,
+              "height": 440.0
             }
           }
         }
@@ -146,12 +146,12 @@
           },
           "portrait": {
             "status": "legacy",
-            "src": "./assets/legacy/generals-v1.png",
+            "src": "./assets/legacy/generals-v1.webp",
             "crop": {
-              "x": 1280,
-              "y": 55,
-              "width": 256,
-              "height": 440
+              "x": 1280.0,
+              "y": 55.0,
+              "width": 256.0,
+              "height": 440.0
             }
           }
         }
@@ -172,12 +172,12 @@
           },
           "portrait": {
             "status": "legacy",
-            "src": "./assets/legacy/generals-v1.png",
+            "src": "./assets/legacy/generals-v1.webp",
             "crop": {
-              "x": 0,
-              "y": 500,
-              "width": 256,
-              "height": 440
+              "x": 0.0,
+              "y": 500.0,
+              "width": 256.0,
+              "height": 440.0
             }
           }
         }
@@ -198,12 +198,12 @@
           },
           "portrait": {
             "status": "legacy",
-            "src": "./assets/legacy/generals-v1.png",
+            "src": "./assets/legacy/generals-v1.webp",
             "crop": {
-              "x": 256,
-              "y": 500,
-              "width": 256,
-              "height": 440
+              "x": 256.0,
+              "y": 500.0,
+              "width": 256.0,
+              "height": 440.0
             }
           }
         }
@@ -224,12 +224,12 @@
           },
           "portrait": {
             "status": "legacy",
-            "src": "./assets/legacy/generals-v1.png",
+            "src": "./assets/legacy/generals-v1.webp",
             "crop": {
-              "x": 512,
-              "y": 500,
-              "width": 256,
-              "height": 440
+              "x": 512.0,
+              "y": 500.0,
+              "width": 256.0,
+              "height": 440.0
             }
           }
         }
@@ -250,12 +250,12 @@
           },
           "portrait": {
             "status": "legacy",
-            "src": "./assets/legacy/generals-v1.png",
+            "src": "./assets/legacy/generals-v1.webp",
             "crop": {
-              "x": 768,
-              "y": 500,
-              "width": 256,
-              "height": 440
+              "x": 768.0,
+              "y": 500.0,
+              "width": 256.0,
+              "height": 440.0
             }
           }
         }
@@ -276,12 +276,12 @@
           },
           "portrait": {
             "status": "legacy",
-            "src": "./assets/legacy/generals-v1.png",
+            "src": "./assets/legacy/generals-v1.webp",
             "crop": {
-              "x": 1024,
-              "y": 500,
-              "width": 256,
-              "height": 440
+              "x": 1024.0,
+              "y": 500.0,
+              "width": 256.0,
+              "height": 440.0
             }
           }
         }
@@ -302,12 +302,12 @@
           },
           "portrait": {
             "status": "legacy",
-            "src": "./assets/legacy/generals-v1.png",
+            "src": "./assets/legacy/generals-v1.webp",
             "crop": {
-              "x": 1280,
-              "y": 500,
-              "width": 256,
-              "height": 440
+              "x": 1280.0,
+              "y": 500.0,
+              "width": 256.0,
+              "height": 440.0
             }
           }
         }
@@ -322,18 +322,18 @@
           "label": "基础形象",
           "fullbody": {
             "status": "ready",
-            "src": "./assets/characters/zhangjiao/classic/fullbody.png",
+            "src": "./assets/characters/zhangjiao/classic/fullbody.webp",
             "width": 1024,
             "height": 1536
           },
           "portrait": {
             "status": "ready",
-            "src": "./assets/characters/zhangjiao/classic/fullbody.png",
+            "src": "./assets/characters/zhangjiao/classic/fullbody.webp",
             "crop": {
-              "x": 335,
-              "y": 45,
-              "width": 354,
-              "height": 410
+              "x": 335.0,
+              "y": 45.0,
+              "width": 354.0,
+              "height": 410.0
             }
           }
         }
@@ -348,18 +348,18 @@
           "label": "基础形象",
           "fullbody": {
             "status": "ready",
-            "src": "./assets/characters/zhangbao/classic/fullbody.png",
+            "src": "./assets/characters/zhangbao/classic/fullbody.webp",
             "width": 1024,
             "height": 1536
           },
           "portrait": {
             "status": "ready",
-            "src": "./assets/characters/zhangbao/classic/fullbody.png",
+            "src": "./assets/characters/zhangbao/classic/fullbody.webp",
             "crop": {
-              "x": 335,
-              "y": 45,
-              "width": 354,
-              "height": 410
+              "x": 335.0,
+              "y": 45.0,
+              "width": 354.0,
+              "height": 410.0
             }
           }
         }
@@ -374,18 +374,18 @@
           "label": "基础形象",
           "fullbody": {
             "status": "ready",
-            "src": "./assets/characters/zhangliang/classic/fullbody.png",
+            "src": "./assets/characters/zhangliang/classic/fullbody.webp",
             "width": 1024,
             "height": 1536
           },
           "portrait": {
             "status": "ready",
-            "src": "./assets/characters/zhangliang/classic/fullbody.png",
+            "src": "./assets/characters/zhangliang/classic/fullbody.webp",
             "crop": {
-              "x": 335,
-              "y": 45,
-              "width": 354,
-              "height": 410
+              "x": 335.0,
+              "y": 45.0,
+              "width": 354.0,
+              "height": 410.0
             }
           }
         }
@@ -400,18 +400,18 @@
           "label": "基础形象",
           "fullbody": {
             "status": "ready",
-            "src": "./assets/characters/imperial-soldier/classic/fullbody.png",
+            "src": "./assets/characters/imperial-soldier/classic/fullbody.webp",
             "width": 1024,
             "height": 1536
           },
           "portrait": {
             "status": "ready",
-            "src": "./assets/characters/imperial-soldier/classic/fullbody.png",
+            "src": "./assets/characters/imperial-soldier/classic/fullbody.webp",
             "crop": {
-              "x": 335,
-              "y": 45,
-              "width": 354,
-              "height": 410
+              "x": 335.0,
+              "y": 45.0,
+              "width": 354.0,
+              "height": 410.0
             }
           }
         }
@@ -426,18 +426,18 @@
           "label": "基础形象",
           "fullbody": {
             "status": "ready",
-            "src": "./assets/characters/imperial-captain/classic/fullbody.png",
+            "src": "./assets/characters/imperial-captain/classic/fullbody.webp",
             "width": 1024,
             "height": 1536
           },
           "portrait": {
             "status": "ready",
-            "src": "./assets/characters/imperial-captain/classic/fullbody.png",
+            "src": "./assets/characters/imperial-captain/classic/fullbody.webp",
             "crop": {
-              "x": 335,
-              "y": 45,
-              "width": 354,
-              "height": 410
+              "x": 335.0,
+              "y": 45.0,
+              "width": 354.0,
+              "height": 410.0
             }
           }
         }

@@ -46,7 +46,7 @@
       urls.forEach(src=>this.image(src));this.visuals.clear();this.vfx.prepare([...this.battle.units.flatMap(u=>u.skills.map(id=>root.BattleVFX.kindOf(this.battle.skills[id]))),'thunder']);this.updateLayout();this.buildBackground();this.preparePortraits();if(this.options.autoStart!==false)this.battle.start();return this;
     }
     image(src) {
-      if(!src) return null;
+      if(!src) return null;const loaded=root.GameAssetLoader?.get(src);if(loaded){if(!this.imageIds.has(loaded))this.imageIds.set(loaded,++this.imageSerial);return loaded;}
       if(!this.images.has(src)){const img=new Image();this.imageIds.set(img,++this.imageSerial);img.onload=()=>{if(!this.disposed){this.buildBackground();this.preparePortraits();}};img.src=root.BattleEmbeddedAssets?.[src]||src;this.images.set(src,img);}
       const img=this.images.get(src);return img.complete&&img.naturalWidth?img:null;
     }

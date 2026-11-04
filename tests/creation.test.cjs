@@ -110,7 +110,7 @@ test('八种形象均可保存并兼容旧形象，独立立绘与头像区域�
   for(const look of R.APPEARANCES){
     const c=hero(),before=JSON.stringify({identity:c.identity,attributes:c.attributes,passives:c.passives});c.appearance=look.id;store.save(0,c);assert.equal(store.slots()[0].character.appearance,look.id);assert.equal(JSON.stringify({identity:c.identity,attributes:c.attributes,passives:c.passives}),before);
     const art=manifest.protagonists[look.id];assert.equal(art.status,'ready');const file=path.resolve(__dirname,'..',art.src);assert.ok(fs.existsSync(file));paths.add(file);
-    const bytes=fs.readFileSync(file),width=bytes.readUInt32BE(16),height=bytes.readUInt32BE(20);assert.equal(bytes.toString('ascii',1,4),'PNG');assert.equal(width,art.width);assert.equal(height,art.height);assert.ok(width>=1024&&height>=1536);
+    const bytes=fs.readFileSync(file);assert.equal(bytes.toString('ascii',0,4),'RIFF');assert.equal(bytes.toString('ascii',8,12),'WEBP');assert.equal(bytes.toString('ascii',12,16),'VP8X');const width=bytes.readUIntLE(24,3)+1,height=bytes.readUIntLE(27,3)+1;assert.equal(width,art.width);assert.equal(height,art.height);const compression=Object.values(require('../assets/compression-report.json').images).find(entry=>entry.src===art.src);assert.deepEqual([width,height],compression.originalSize);assert.ok(bytes[20]&16,'人物必须保留透明通道');assert.ok(bytes.length<compression.originalBytes);
     const crop=art.portrait;assert.ok(crop.x>=0&&crop.y>=0&&crop.width>0&&crop.height>0);assert.ok(crop.x+crop.width<=width&&crop.y+crop.height<=height);
   }
   assert.equal(paths.size,8);

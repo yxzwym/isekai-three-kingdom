@@ -3,6 +3,10 @@ const {HealthTrack,formatNumber}=require('../js/presentation.js');
 const Assets=require('../js/character-assets.js');
 const {Battle}=require('../js/engine.js');
 const D=require('../js/data.js');
+test('剧情半身像按原图比例裁切，缩小素材后仍保持同一部位且不越界',()=>{
+  const original=Assets.bustCrop(1024,1536);assert.deepEqual(original,{x:150,y:0,width:724,height:830});
+  for(const [width,height]of [[384,576],[512,768],[2048,3072]]){const crop=Assets.bustCrop(width,height);assert.equal(crop.x/width,original.x/1024);assert.equal(crop.width/width,original.width/1024);assert.equal(crop.height/height,original.height/1536);assert.ok(crop.x+crop.width<=width);assert.ok(crop.y+crop.height<=height);}
+});
 test('所有显示数字均为无分隔符的整数',()=>{assert.equal(formatNumber(1234567),'1234567');assert.equal(formatNumber(9999.8),'9999');assert.equal(formatNumber(0),'0');});
 test('扣兵先变化主条，白条延迟追赶，并最终收敛真实值',()=>{
   const h=new HealthTrack(1000,1000);h.set(600,100);

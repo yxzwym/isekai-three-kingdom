@@ -85,7 +85,7 @@
     return {id:'soldier-'+i,name:'官兵',...assets('imperial-soldier'),war:p.war,intelligence:80,leadership:90,speed:p.speed,technique:80,level:1,weapon:{type:'spear',name:'长枪'},equipment:{armor:{name:'旧铁甲'}},weaponProficiencies:{spear:90},maxSoldiers:max,attack:150,armor:10,resistance:10,skills:['spear-cut','spear-sweep'],priorities:[{skill:'spear-sweep',when:'enemyCount',threshold:p.group},{skill:'spear-cut',when:'always',frequency:'sometimes'}]};
   }
   function createBattle(stage,character,preparation={}){
-    const basic={id:stage,title:'村道交锋',scene:{background:'./assets/story/village-road-v3.png'},skills:clone(skills),rules:{level:1,enemyLevel:1,allySp:0,random:false,critical:false,hit:false,seed:'prologue-'+stage}};
+    const basic={id:stage,title:'村道交锋',scene:{background:'./assets/story/village-road-v3.webp'},skills:clone(skills),rules:{level:1,enemyLevel:1,allySp:0,random:false,critical:false,hit:false,seed:'prologue-'+stage}};
     if(stage==='first-fight')return {...basic,title:'陌路冲突',allies:[{...hero(character),initialMode:'manual'}],enemies:[{...soldier(1,200),war:100,speed:50}],rules:{...basic.rules,random:false,critical:false,hit:false}};
     if(stage==='manual-fight'){const j=general('zhangjiao');j.passives=['thunder-lord-tutorial'];return {...basic,title:'一杖退敌',hint:'点击技能，再选择敌人',control:{manualOnly:true,lockTactics:true},allies:[j],enemies:[soldier(1,200)]};}
     if(!['prepare','squad-fight'].includes(stage))throw new TypeError('未知序章战斗');

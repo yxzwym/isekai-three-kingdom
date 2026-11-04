@@ -33,7 +33,7 @@
   function createChibi(rules = {}) {
     const config = {...DEFAULTS,...rules};
     const allies = [...ALLIES, ...REINFORCEMENTS.filter(u=>(config.reinforcements||[]).includes(u.id))].map(appearance);
-    return {id:'chibi-demo',title:'赤壁之战',allies,enemies:ENEMIES.map(appearance),rules:config,allowRetreat:false,scene:{background:'./assets/chibi-night.jpg',color:'#081d27',allowedElements:['fire','water','stone']}};
+    return {id:'chibi-demo',title:'赤壁之战',allies,enemies:ENEMIES.map(appearance),rules:config,allowRetreat:false,scene:{background:'./assets/chibi-night.webp',color:'#081d27',allowedElements:['fire','water','stone']}};
   }
   function createFormationPreview(){
     const scenario=createChibi();scenario.id='formation-preview';scenario.title='全身立绘验证';scenario.allies=scenario.allies.map(u=>({...u,initialMode:'manual'}));scenario.enemies=[appearance({...ALLIES[0],id:'opponent-zhouyu',characterId:'zhouyu',attack:1,armor:99999,resistance:99999,leadership:1020,skills:['strike'],priorities:[rule('strike','always',0)]})];return scenario;
@@ -55,12 +55,12 @@
     return {id:'effects-preview',title:'特效与操作验证',skills,
       allies:ALLIES.map((u,i)=>appearance({...u,initialMode:'manual',leadership:510,startSoldiers:6000,attack:1000,armor:999,resistance:100,skills:slots[i],priorities:[rule(slots[i][0],'always',0)],guaranteedCritical:true})),
       enemies:ENEMIES.map(u=>appearance({...u,leadership:1020,attack:1,speed:1,armor:999,resistance:100,skills:['strike'],priorities:[rule('strike','always',0)],guaranteedCritical:true})),
-      rules:{...DEFAULTS,level:80,enemyLevel:80,allySp:64,random:false,hit:false},scene:{background:'./assets/chibi-night.jpg'},allowRetreat:false};
+      rules:{...DEFAULTS,level:80,enemyLevel:80,allySp:64,random:false,hit:false},scene:{background:'./assets/chibi-night.webp'},allowRetreat:false};
   }
   function createStress(){
     const burst={...SKILLS.huoshen,id:'stress_burst',name:'火攻',cost:0};
     const unit=u=>appearance({...u,war:200,speed:200,leadership:1020,armor:100000,resistance:100000,skills:['stress_burst'],priorities:[rule('stress_burst','always',0)],enemySp:99999});
-    return{id:'stress',title:'同步施法压力验证',allies:ALLIES.map(unit),enemies:ENEMIES.map(unit),skills:{stress_burst:burst},rules:{...DEFAULTS,level:99,enemyLevel:99,allySp:99999,random:false,critical:false,hit:false},scene:{background:'./assets/chibi-night.jpg'}};
+    return{id:'stress',title:'同步施法压力验证',allies:ALLIES.map(unit),enemies:ENEMIES.map(unit),skills:{stress_burst:burst},rules:{...DEFAULTS,level:99,enemyLevel:99,allySp:99999,random:false,critical:false,hit:false},scene:{background:'./assets/chibi-night.webp'}};
   }
   const api = { SKILLS, ALLIES, ENEMIES, REINFORCEMENTS, DEFAULTS, convert, createChibi, createEncounter, createEffectsPreview, createStress,createFormationPreview };
   root.BattleScenarios = api;

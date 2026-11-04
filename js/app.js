@@ -1,5 +1,7 @@
 // Only the host chooses a fixture; the battle system accepts any scenario data.
 (function () {
+  GameAssetLoader.mount(document.getElementById('battleCanvas'),GameAssetManifest,start);
+  function start(){
   const name = new URLSearchParams(location.search).get('scenario');
   let storage;try{storage=window.localStorage;}catch{storage={getItem(){return null;},setItem(){throw new Error('浏览器存储不可用');}};}
   const store=new PengpaiRules.SaveStore(storage);
@@ -14,4 +16,5 @@
     : name === 'effects' ? BattleScenarios.createEffectsPreview() : name==='formation'?BattleScenarios.createFormationPreview():BattleScenarios.createChibi();
   const settings=store.settings();
   window.battleDemo = BattleSystem.mount(document.getElementById('battleCanvas'), scenario,{autoStart:name!=='preparation',profile:new URLSearchParams(location.search).has('profile'),screenShake:settings.screenShake,effects:settings.effects});
+  }
 })();

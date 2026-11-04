@@ -1,17 +1,17 @@
 {
-  "background": "./assets/game/main-menu.png",
+  "background": "./assets/game/main-menu.webp",
   "protagonists": {
     "wanderer": {
       "name": "行旅少年",
       "status": "ready",
-      "src": "./assets/protagonists/wanderer/fullbody.png",
+      "src": "./assets/protagonists/wanderer/fullbody.webp",
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 335,
-        "y": 45,
-        "width": 354,
-        "height": 410
+        "x": 335.0,
+        "y": 45.0,
+        "width": 354.0,
+        "height": 410.0
       },
       "defaultWeapon": "sword",
       "artDirection": "origins"
@@ -19,14 +19,14 @@
     "scholar": {
       "name": "青衣书生",
       "status": "ready",
-      "src": "./assets/protagonists/scholar/fullbody.png",
+      "src": "./assets/protagonists/scholar/fullbody.webp",
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 335,
-        "y": 45,
-        "width": 354,
-        "height": 410
+        "x": 335.0,
+        "y": 45.0,
+        "width": 354.0,
+        "height": 410.0
       },
       "defaultWeapon": "fan",
       "artDirection": "origins"
@@ -34,14 +34,14 @@
     "swordswoman": {
       "name": "红衣女侠",
       "status": "ready",
-      "src": "./assets/protagonists/swordswoman/fullbody.png",
+      "src": "./assets/protagonists/swordswoman/fullbody.webp",
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 335,
-        "y": 45,
-        "width": 354,
-        "height": 410
+        "x": 335.0,
+        "y": 45.0,
+        "width": 354.0,
+        "height": 410.0
       },
       "defaultWeapon": "sword",
       "artDirection": "origins"
@@ -49,14 +49,14 @@
     "healer": {
       "name": "素衣医者",
       "status": "ready",
-      "src": "./assets/protagonists/healer/fullbody.png",
+      "src": "./assets/protagonists/healer/fullbody.webp",
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 335,
-        "y": 45,
-        "width": 354,
-        "height": 410
+        "x": 335.0,
+        "y": 45.0,
+        "width": 354.0,
+        "height": 410.0
       },
       "defaultWeapon": "needle",
       "artDirection": "origins"
@@ -64,14 +64,14 @@
     "armored": {
       "name": "铁甲猛将",
       "status": "ready",
-      "src": "./assets/protagonists/armored/fullbody.png",
+      "src": "./assets/protagonists/armored/fullbody.webp",
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 335,
-        "y": 45,
-        "width": 354,
-        "height": 410
+        "x": 335.0,
+        "y": 45.0,
+        "width": 354.0,
+        "height": 410.0
       },
       "defaultWeapon": "blade",
       "artDirection": "origins"
@@ -79,14 +79,14 @@
     "silverguard": {
       "name": "银甲战将",
       "status": "ready",
-      "src": "./assets/protagonists/silverguard/fullbody.png",
+      "src": "./assets/protagonists/silverguard/fullbody.webp",
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 335,
-        "y": 45,
-        "width": 354,
-        "height": 410
+        "x": 335.0,
+        "y": 45.0,
+        "width": 354.0,
+        "height": 410.0
       },
       "defaultWeapon": "spear",
       "artDirection": "origins"
@@ -94,14 +94,14 @@
     "beggar": {
       "name": "破衣乞者",
       "status": "ready",
-      "src": "./assets/protagonists/beggar/fullbody.png",
+      "src": "./assets/protagonists/beggar/fullbody.webp",
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 335,
-        "y": 45,
-        "width": 354,
-        "height": 410
+        "x": 335.0,
+        "y": 45.0,
+        "width": 354.0,
+        "height": 410.0
       },
       "defaultWeapon": "dagger",
       "artDirection": "origins"
@@ -109,14 +109,14 @@
     "warlord": {
       "name": "乱世霸主",
       "status": "ready",
-      "src": "./assets/protagonists/warlord/fullbody.png",
+      "src": "./assets/protagonists/warlord/fullbody.webp",
       "width": 1024,
       "height": 1536,
       "portrait": {
-        "x": 335,
-        "y": 45,
-        "width": 354,
-        "height": 410
+        "x": 335.0,
+        "y": 45.0,
+        "width": 354.0,
+        "height": 410.0
       },
       "defaultWeapon": "halberd",
       "artDirection": "origins"
