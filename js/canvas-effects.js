@@ -1,6 +1,6 @@
 (function(root){
   'use strict';
-  const COLORS={fire:'#ff9b37',thunder:'#b3a0ff',wood:'#8bd468',water:'#52cafa',earth:'#c9a16d',heal:'#69ee98',buff:'#f4d987',debuff:'#d296f4',physical:'#e0ecf2'};
+  const COLORS={fire:'#ff9b37',thunder:'#b3a0ff',wood:'#8bd468',water:'#52cafa',earth:'#c9a16d',heal:'#69ee98',buff:'#f4d987',taunt:'#f4bc65',debuff:'#d296f4',physical:'#e0ecf2'};
   const kindOf=skill=>skill.kind==='heal'?'heal':skill.kind==='buff'?(skill.vfx||skill.buff?.visual||(skill.side==='enemy'?'debuff':'buff')):skill.vfx||({stone:'earth',lightning:'thunder'}[skill.element]||skill.element)||'physical';
   const FRAME_COUNT=24,textureCache=new Map(),styles=new Set(['physical','fire','thunder','wood','water','earth','heal','buff','debuff','impact']);
   const style=kind=>kind==='taunt'?'buff':styles.has(kind)?kind:'physical';

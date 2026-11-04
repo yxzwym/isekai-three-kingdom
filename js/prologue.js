@@ -79,15 +79,18 @@
     };
     const u={id,level:1,...clone(data[id]),...assets(id)};u.weaponProficiencies={[u.weapon.type]:100};u.equipment={armor:{name:id==='zhangliang'?'铁甲':'道袍'}};return u;
   }
-  function soldier(i,max=200){return {id:'soldier-'+i,name:'官兵',...assets('imperial-soldier'),war:100,intelligence:80,leadership:90,speed:70,technique:80,level:1,weapon:{type:'sword',name:'铁剑'},equipment:{armor:{name:'旧铁甲'}},weaponProficiencies:{sword:90},maxSoldiers:max,attack:80,armor:10,resistance:10,skills:['sword-cut','sword-sweep'],priorities:[{skill:'sword-sweep',when:'enemyCount',threshold:3},{skill:'sword-cut',when:'always'}]};}
+  function soldier(i,max=200){
+    const profiles=[{war:100,speed:70,group:2,target:'lowestCurrent'},{war:90,speed:95,group:4,target:'lowestCurrent'},{war:96,speed:80,group:3,target:'random'},{war:85,speed:110,group:4,target:'random'}],p=profiles[Math.max(0,i-1)%profiles.length];
+    return {id:'soldier-'+i,name:'官兵',...assets('imperial-soldier'),war:p.war,intelligence:80,leadership:90,speed:p.speed,technique:80,level:1,weapon:{type:'spear',name:'长枪'},equipment:{armor:{name:'旧铁甲'}},weaponProficiencies:{spear:90},maxSoldiers:max,attack:100,armor:10,resistance:10,skills:['spear-cut','spear-sweep'],priorities:[{skill:'spear-sweep',when:'enemyCount',threshold:p.group},{skill:'spear-cut',when:'always'}],targetRule:p.target};
+  }
   function createBattle(stage,character,preparation={}){
     const basic={id:stage,title:'村道交锋',scene:{background:'./assets/story/village-road.png'},skills:clone(skills),rules:{level:1,enemyLevel:1,allySp:0,random:false,critical:false,hit:false,seed:'prologue-'+stage}};
     if(stage==='first-fight')return {...basic,title:'陌路冲突',allies:[{...hero(character),initialMode:'manual'}],enemies:[{...soldier(1,200),war:100,speed:50}],rules:{...basic.rules,random:false,critical:false,hit:false}};
     if(stage==='manual-fight'){const j=general('zhangjiao');j.passives=['thunder-lord-tutorial'];return {...basic,title:'一杖退敌',hint:'点击技能，再选择敌人',control:{manualOnly:true,lockTactics:true},allies:[j],enemies:[soldier(1,200)]};}
     if(!['prepare','squad-fight'].includes(stage))throw new TypeError('未知序章战斗');
     const allies=['zhangjiao','zhangbao','zhangliang'].map(id=>{const u=general(id),saved=preparation[id];if(id==='zhangjiao')u.passives=['thunder-lord-tutorial'];if(saved){if(['manual','auto'].includes(saved.mode))u.initialMode=saved.mode;if(Array.isArray(saved.rules))u.priorities=saved.rules.filter(r=>u.skills.includes(r.skill));u.targetRule=saved.targetRule;}return u;});
-    const captain={...soldier(0,360),id:'captain',name:'官兵队长',attack:650,armor:40,equipment:{armor:{name:'旧铁甲'},offhand:{type:'shield',name:'木盾'}},weaponProficiencies:{sword:90,shield:90},skills:['shield-taunt','sword-cut','sword-sweep'],priorities:[{skill:'shield-taunt',when:'always'},{skill:'sword-cut',when:'always'}],targetRule:'random'};
-    return {...basic,title:'黄巾并肩',preparationHint:'点击人物头像，可配置技能释放设置',scene:{...basic.scene,enemyFormation:{back:[1,2,3,4],front:[0]}},allies,enemies:[captain,...Array.from({length:4},(_,i)=>({...soldier(i+1),attack:130,targetRule:'lowestCurrent'}))]};
+    const captain={...soldier(0,360),id:'captain',name:'官兵队长',war:105,speed:85,attack:550,armor:40,...assets('imperial-captain'),weapon:{type:'blade',name:'军刀'},equipment:{armor:{name:'旧铁甲'},offhand:{type:'shield',name:'木盾'}},weaponProficiencies:{blade:90,shield:90},skills:['shield-taunt','blade-cut','blade-sweep'],priorities:[{skill:'shield-taunt',when:'always'},{skill:'blade-sweep',when:'enemyCount',threshold:4},{skill:'blade-cut',when:'always'}],targetRule:'random'};
+    return {...basic,title:'黄巾并肩',preparationHint:'点击人物头像，可配置技能释放设置',scene:{...basic.scene,enemyFormation:{back:[1,2,3,4],front:[0]}},allies,enemies:[captain,...Array.from({length:4},(_,i)=>soldier(i+1))]};
   }
   function preparationOf(battle){return Object.fromEntries(battle.units.filter(u=>u.side==='ally').map(u=>[u.id,{mode:u.mode,rules:clone(u.priorities),targetRule:u.targetRule}]));}
   const api={chapters,stages,checkpoint,createBattle,preparationOf,assets,general};root.PengpaiPrologue=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;

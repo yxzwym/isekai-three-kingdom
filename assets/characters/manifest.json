@@ -416,6 +416,32 @@
           }
         }
       }
+    },
+    "imperial-captain": {
+      "id": "imperial-captain",
+      "name": "官兵队长",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/imperial-captain/classic/fullbody.png",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/imperial-captain/classic/fullbody.png",
+            "crop": {
+              "x": 335,
+              "y": 45,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
     }
   }
 }
