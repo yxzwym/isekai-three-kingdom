@@ -4,15 +4,16 @@
   const line=(speaker,text,partner,figure)=>({speaker,text,partner,figure});
   const chapters={
     arrival:{scene:'village',title:'序章 · 陌路',next:'first-fight',lines:[
-      line('narrator','你推开便利店的门，低头拧开饮料。脚下一软，鞋底竟陷进了泥里。',null),
-      line('hero','……我刚才不是在店门口吗？',null),
-      line('narrator','身后没有便利店。只有土路、茅屋，还有几个穿甲的人，正往车上搬粮。',null),
+      line('narrator','傍晚，你沿着景区的古道下山。雾起得很快，前面的石阶很快就看不清了。',null),
+      line('narrator','你扶着路边的石墙慢慢走。雾里传来车轮声，像有人就在前头。再走几步，脚下的石阶忽然成了泥路。',null),
+      line('hero','……走错了？山下什么时候有个村子？',null),
+      line('narrator','雾散了。眼前是一排茅屋，几个穿甲的人正从屋里往外搬粮。身后的山路却不见了，只剩一片庄稼地。',null),
       line('imperial-soldier','松手！军中征粮，听不懂？','imperial-soldier'),
       line('narrator','一个老人被推到你跟前。你下意识扶住他，抬头想问路。','imperial-soldier'),
       line('hero','这是哪儿？你们……','imperial-soldier'),
       line('imperial-soldier','谁让你碰他的？一伙的？','imperial-soldier'),
       line('hero','什么一伙的？我就是路过。','imperial-soldier'),
-      line('imperial-soldier','穿得古里古怪，问你话还装傻。拿下！','imperial-soldier'),
+      line('imperial-soldier','还敢装傻？方才就见你在这儿探头探脑。拿下！','imperial-soldier'),
       line('hero','等一下！别动手——','imperial-soldier')
     ]},
     aftermath:{scene:'village',title:'序章 · 援手',next:'manual-fight',lines:[
@@ -50,7 +51,7 @@
       line('zhangjiao','你听过我？','zhangjiao'),
       line('hero','听过一点。现在……是哪一年？','zhangjiao'),
       line('zhangjiao','光和七年。怎么了？','zhangjiao'),
-      line('narrator','光和七年。张角。营外那些黄巾。你握了握手里早已不凉的饮料瓶。不是拍戏，也不是做梦。','zhangjiao'),
+      line('narrator','你想起雾里那段怎么也走不到头的石阶，又看了一眼营外的黄巾。手机早已没了信号，胸口的伤却还在隐隐作痛。','zhangjiao'),
       line('hero','你们聚这么多人，到底想做什么？','zhangjiao'),
       line('zhangjiao','今日你也看见了。田是百姓耕的，粮却进了豪门的仓。灾年卖儿卖女，官府还来催租。','zhangjiao'),
       line('zhangjiao','我想换个活法。没有乡绅贵族压在头上，也不凭门第分人的高低。耕田的人有饭吃，老弱有人照料。','zhangjiao'),
@@ -73,24 +74,24 @@
   function hero(character){return {id:'hero',name:character.name,...character.attributes,...assets('hero',character.appearance),weapon:null,attack:1,armor:0,resistance:0,maxSoldiers:1,startSoldiers:1,skills:['punch'],priorities:[{skill:'punch',when:'always'}]};}
   function general(id){
     const data={
-      zhangjiao:{name:'张角',war:90,intelligence:95,leadership:95,speed:90,technique:90,maxSoldiers:200,attack:100,armor:70,resistance:70,weapon:{type:'staff',id:'fire-god-staff',name:'火神杖',school:'thunder'},skills:['staff-shock','staff-storm'],passives:['thunder-lord'],priorities:[{skill:'staff-storm',when:'enemyCount',threshold:3},{skill:'staff-shock',when:'always'}]},
+      zhangjiao:{name:'张角',war:90,intelligence:190,leadership:95,speed:90,technique:90,maxSoldiers:200,attack:100,armor:70,resistance:70,weapon:{type:'staff',id:'fire-god-staff',name:'火神杖',school:'thunder'},skills:['staff-shock','staff-storm'],passives:['thunder-lord'],priorities:[{skill:'staff-storm',when:'enemyCount',threshold:3},{skill:'staff-shock',when:'always',frequency:'sometimes'}]},
       zhangbao:{name:'张宝',war:85,intelligence:90,leadership:90,speed:90,technique:90,maxSoldiers:200,attack:100,armor:60,resistance:65,weapon:{type:'talisman',name:'太平符'},skills:['talisman-clear','talisman-rain'],priorities:[{skill:'talisman-rain',when:'healThresholds',selfThreshold:.85,allyThreshold:.85},{skill:'talisman-clear',when:'enemyCount',threshold:2,disabled:true}]},
-      zhangliang:{name:'张梁',war:100,intelligence:80,leadership:95,speed:90,technique:90,maxSoldiers:200,attack:75,armor:90,resistance:50,weapon:{type:'spear',name:'铁枪'},skills:['spear-break','spear-stun'],priorities:[{skill:'spear-break',when:'enemyCount',threshold:2},{skill:'spear-stun',when:'always'}]}
+      zhangliang:{name:'张梁',war:100,intelligence:80,leadership:95,speed:90,technique:90,maxSoldiers:200,attack:75,armor:90,resistance:50,weapon:{type:'spear',name:'铁枪'},skills:['spear-break','spear-stun'],priorities:[{skill:'spear-break',when:'enemyCount',threshold:2},{skill:'spear-stun',when:'always',frequency:'sometimes'}]}
     };
     const u={id,level:1,...clone(data[id]),...assets(id)};u.weaponProficiencies={[u.weapon.type]:100};u.equipment={armor:{name:id==='zhangliang'?'铁甲':'道袍'}};return u;
   }
   function soldier(i,max=200){
-    const profiles=[{war:100,speed:70,group:2,target:'lowestCurrent'},{war:90,speed:95,group:4,target:'lowestCurrent'},{war:96,speed:80,group:3,target:'random'},{war:85,speed:110,group:4,target:'random'}],p=profiles[Math.max(0,i-1)%profiles.length];
-    return {id:'soldier-'+i,name:'官兵',...assets('imperial-soldier'),war:p.war,intelligence:80,leadership:90,speed:p.speed,technique:80,level:1,weapon:{type:'spear',name:'长枪'},equipment:{armor:{name:'旧铁甲'}},weaponProficiencies:{spear:90},maxSoldiers:max,attack:100,armor:10,resistance:10,skills:['spear-cut','spear-sweep'],priorities:[{skill:'spear-sweep',when:'enemyCount',threshold:p.group},{skill:'spear-cut',when:'always'}],targetRule:p.target};
+    const profiles=[{war:100,speed:70,group:2},{war:90,speed:95,group:4},{war:96,speed:80,group:3},{war:85,speed:110,group:4}],p=profiles[Math.max(0,i-1)%profiles.length];
+    return {id:'soldier-'+i,name:'官兵',...assets('imperial-soldier'),war:p.war,intelligence:80,leadership:90,speed:p.speed,technique:80,level:1,weapon:{type:'spear',name:'长枪'},equipment:{armor:{name:'旧铁甲'}},weaponProficiencies:{spear:90},maxSoldiers:max,attack:150,armor:10,resistance:10,skills:['spear-cut','spear-sweep'],priorities:[{skill:'spear-sweep',when:'enemyCount',threshold:p.group},{skill:'spear-cut',when:'always',frequency:'sometimes'}]};
   }
   function createBattle(stage,character,preparation={}){
-    const basic={id:stage,title:'村道交锋',scene:{background:'./assets/story/village-road.png'},skills:clone(skills),rules:{level:1,enemyLevel:1,allySp:0,random:false,critical:false,hit:false,seed:'prologue-'+stage}};
+    const basic={id:stage,title:'村道交锋',scene:{background:'./assets/story/village-road-v3.png'},skills:clone(skills),rules:{level:1,enemyLevel:1,allySp:0,random:false,critical:false,hit:false,seed:'prologue-'+stage}};
     if(stage==='first-fight')return {...basic,title:'陌路冲突',allies:[{...hero(character),initialMode:'manual'}],enemies:[{...soldier(1,200),war:100,speed:50}],rules:{...basic.rules,random:false,critical:false,hit:false}};
     if(stage==='manual-fight'){const j=general('zhangjiao');j.passives=['thunder-lord-tutorial'];return {...basic,title:'一杖退敌',hint:'点击技能，再选择敌人',control:{manualOnly:true,lockTactics:true},allies:[j],enemies:[soldier(1,200)]};}
     if(!['prepare','squad-fight'].includes(stage))throw new TypeError('未知序章战斗');
     const allies=['zhangjiao','zhangbao','zhangliang'].map(id=>{const u=general(id),saved=preparation[id];if(id==='zhangjiao')u.passives=['thunder-lord-tutorial'];if(saved){if(['manual','auto'].includes(saved.mode))u.initialMode=saved.mode;if(Array.isArray(saved.rules))u.priorities=saved.rules.filter(r=>u.skills.includes(r.skill));u.targetRule=saved.targetRule;}return u;});
-    const captain={...soldier(0,360),id:'captain',name:'官兵队长',war:105,speed:85,attack:550,armor:40,...assets('imperial-captain'),weapon:{type:'blade',name:'军刀'},equipment:{armor:{name:'旧铁甲'},offhand:{type:'shield',name:'木盾'}},weaponProficiencies:{blade:90,shield:90},skills:['shield-taunt','blade-cut','blade-sweep'],priorities:[{skill:'shield-taunt',when:'always'},{skill:'blade-sweep',when:'enemyCount',threshold:4},{skill:'blade-cut',when:'always'}],targetRule:'random'};
-    return {...basic,title:'黄巾并肩',preparationHint:'点击人物头像，可配置技能释放设置',scene:{...basic.scene,enemyFormation:{back:[1,2,3,4],front:[0]}},allies,enemies:[captain,...Array.from({length:4},(_,i)=>soldier(i+1))]};
+    const captain={...soldier(0,360),id:'captain',name:'官兵队长',armor:35,resistance:20,...assets('imperial-captain'),weapon:{type:'blade',name:'军刀'},equipment:{armor:{name:'加固铁甲'},offhand:{type:'shield',name:'木盾'}},weaponProficiencies:{blade:90,shield:90},skills:['shield-taunt','blade-cut','blade-sweep'],priorities:[{skill:'shield-taunt',when:'always'},{skill:'blade-sweep',when:'enemyCount',threshold:4},{skill:'blade-cut',when:'always',frequency:'sometimes'}]};
+    return {...basic,title:'黄巾并肩',preparationHint:'点击人物头像，可配置技能释放设置',scene:{...basic.scene,enemyFormation:{back:[1,2,3,4],front:[0]}},allies,enemies:[captain,...Array.from({length:4},(_,i)=>soldier(i+1,300))]};
   }
   function preparationOf(battle){return Object.fromEntries(battle.units.filter(u=>u.side==='ally').map(u=>[u.id,{mode:u.mode,rules:clone(u.priorities),targetRule:u.targetRule}]));}
   const api={chapters,stages,checkpoint,createBattle,preparationOf,assets,general};root.PengpaiPrologue=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;

@@ -39,3 +39,10 @@ test('技能配置关闭即保存，教学战点头像不能打开配置；状�
 test('阵型由场景配置决定，前排队长在四个后排前方，缺省仍横排',()=>{
   const rects=layout(390,844,3,5,{back:[1,2,3,4],front:[0]}).filter(r=>r.side==='enemy'),front=rects.find(r=>r.index===0);assert.ok(rects.filter(r=>r.index!==0).every(r=>r.y<front.y));assert.ok(Math.abs(front.x+front.w/2-195)<.01);assert.equal(new Set(layout(390,844,3,5).filter(r=>r.side==='enemy').map(r=>r.y)).size,1);
 });
+test('状态提示实时显示剩余时间，时间推进和刷新状态后都会更新',()=>{
+  const b=battle(),source=b.unit('a'),target=b.unit('x'),texts=[],view={battle:b,w:390,h:844,box(){},text:value=>texts.push(value)};b.start();
+  const status=b.addStatus(source,target,{id:'taunt',duration:30});CanvasBattle.prototype.notifyStatus.call(view,target,status);
+  const draw=()=>{texts.length=0;CanvasBattle.prototype.drawNotice.call(view,performance.now());return [...texts];};
+  assert.deepEqual(draw(),['嘲讽','剩余30秒']);b.advance(7.25);assert.deepEqual(draw(),['嘲讽','剩余23秒']);
+  b.addStatus(source,target,{id:'taunt',duration:30});assert.deepEqual(draw(),['嘲讽','剩余30秒']);b.advance(31);assert.deepEqual(draw(),['嘲讽','剩余0秒']);
+});

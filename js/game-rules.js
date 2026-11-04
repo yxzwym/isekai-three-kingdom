@@ -2,6 +2,8 @@
   'use strict';
   const ATTRIBUTES=[['war','武力'],['intelligence','智力'],['leadership','统御'],['speed','速度'],['technique','技巧']];
   const ranges=(war,intelligence,leadership,speed,technique)=>({war,intelligence,leadership,speed,technique});
+  const PROFICIENCY_BASE=100;
+  const proficiencyFromLegacy=value=>Math.max(1,Math.round(value*PROFICIENCY_BASE/255));
   const IDENTITIES=[
     {id:'worthless',name:'无用之人',difficulty:5,ranges:ranges([1,1],[1,1],[1,1],[1,1],[1,1])},
     {id:'civilian',name:'老百姓',difficulty:4,ranges:ranges([40,195],[40,195],[40,195],[40,195],[40,195]),attributeBands:[{weight:90,min:40,max:110},{weight:10,min:111,max:195}]},
@@ -23,7 +25,7 @@
     {id:'normal',name:'初出茅庐',stars:3,profiles:['teacher','bully']},
     {id:'heroic',name:'天纵之才',stars:2,profiles:['strategist','warrior']},
     {id:'protagonist',name:'主角剧本',stars:1,profiles:['overlord']}
-  ].map(d=>{const profiles=d.profiles.map(id=>IDENTITIES.find(p=>p.id===id)),bounds=profiles.flatMap(p=>Object.values(p.ranges));return {...d,passiveWeights:IDENTITY_PASSIVE_WEIGHTS[d.profiles[0]],proficiencyRange:[Math.min(...bounds.map(r=>r[0])),Math.max(...bounds.map(r=>r[1]))],proficiencyBands:profiles[0].attributeBands};});
+  ].map(d=>{const profiles=d.profiles.map(id=>IDENTITIES.find(p=>p.id===id)),bounds=profiles.flatMap(p=>Object.values(p.ranges));return {...d,passiveWeights:IDENTITY_PASSIVE_WEIGHTS[d.profiles[0]],proficiencyRange:[Math.min(...bounds.map(r=>r[0])),Math.max(...bounds.map(r=>r[1]))].map(proficiencyFromLegacy),proficiencyBands:profiles[0].attributeBands?.map(b=>({...b,min:proficiencyFromLegacy(b.min),max:proficiencyFromLegacy(b.max)}))};});
   const getDifficulty=id=>DIFFICULTIES.find(d=>d.id===id||d.profiles.includes(id));
   const WEAPON_TYPES=[['blade','刀','单体重击'],['sword','剑','精准爆发'],['spear','枪','破甲控制'],['halberd','戟','群体物理'],['shield','盾','嘲讽反伤'],['staff','杖','火计输出'],['fan','扇','治疗增益'],['qin','琴','削弱控制'],['dagger','匕首','高速刺杀'],['bow','弓','持续伤害'],['crossbow','弩','狙击压制'],['needle','金针','单体急救'],['talisman','符箓','群疗抗性'],['gourd','药葫芦','持续回复']].map(([id,name,role])=>({id,name,role,skillPlanId:id}));
   const getWeaponProficiency=(character,id)=>{const values=character?.weaponProficiencies,value=values?.[id]??(id==='talisman'?values?.['medicine-bag']:id==='qin'?values?.jade:undefined);return Number.isSafeInteger(value)&&value>=1?value:1;};
@@ -211,16 +213,18 @@
     constructor(storage){this.storage=storage;this.key='pengpai-sanguo:saves:v1';this.settingsKey='pengpai-sanguo:settings:v1';}
     slots(){
       let data;try{data=JSON.parse(this.storage.getItem(this.key)||'[]');}catch{return [null,null,null];}
-      return Array.from({length:3},(_,i)=>{const slot=Array.isArray(data)?data[i]:null,character=normalizeCharacter(slot?.character);return [1,2].includes(slot?.version)&&validCharacter(character)&&typeof slot.savedAt==='string'&&Number.isFinite(Date.parse(slot.savedAt))?clone({...slot,version:2,character}):null;});
+      return Array.from({length:3},(_,i)=>{const slot=Array.isArray(data)?data[i]:null,character=normalizeCharacter(slot?.character);if(![1,2,3].includes(slot?.version)||!validCharacter(character)||typeof slot.savedAt!=='string'||!Number.isFinite(Date.parse(slot.savedAt)))return null;
+        if(slot.version<3&&character.weaponProficiencies)character.weaponProficiencies=Object.fromEntries(Object.entries(character.weaponProficiencies).map(([id,value])=>[id,proficiencyFromLegacy(value)]));
+        return clone({...slot,version:3,character});});
     }
     save(index,character,progress){
       const current=normalizeCharacter(character);if(!Number.isInteger(index)||index<0||index>2||!validCharacter(current))throw new TypeError('人物或存档位置无效');
-      const slots=this.slots();slots[index]={version:2,character:current,savedAt:new Date().toISOString(),chapter:progress?.stage==='complete'?'prologue-complete':'prologue-start',...(progress?{progress:clone(progress)}:{})};
+      const slots=this.slots();slots[index]={version:3,character:current,savedAt:new Date().toISOString(),chapter:progress?.stage==='complete'?'prologue-complete':'prologue-start',...(progress?{progress:clone(progress)}:{})};
       this.storage.setItem(this.key,JSON.stringify(slots));return clone(slots[index]);
     }
     settings(){let data;try{data=JSON.parse(this.storage.getItem(this.settingsKey)||'{}');}catch{data={};}return {screenShake:typeof data?.screenShake==='boolean'?data.screenShake:true,effects:typeof data?.effects==='boolean'?data.effects:true,menuScale:[.9,1,1.1].includes(data?.menuScale)?data.menuScale:1};}
     setSettings(settings){const next={...SETTINGS,...settings};if(typeof next.screenShake!=='boolean'||typeof next.effects!=='boolean'||![.9,1,1.1].includes(next.menuScale))throw new TypeError('设置无效');this.storage.setItem(this.settingsKey,JSON.stringify(next));return next;}
   }
-  const api={ATTRIBUTES,DIFFICULTIES,getDifficulty,WEAPON_TYPES,WEAPON_SKILL_PLANS,getWeaponProficiency,IDENTITIES,IDENTITY_PASSIVE_WEIGHTS,QUALITIES,PASSIVES,PASSIVE_MAP,APPEARANCES,randomInt,rollPassives,rollHero,sanitizeName,heroName,nameLength:value=>segments(value).length,validCharacter,SaveStore};
+  const api={ATTRIBUTES,PROFICIENCY_BASE,DIFFICULTIES,getDifficulty,WEAPON_TYPES,WEAPON_SKILL_PLANS,getWeaponProficiency,IDENTITIES,IDENTITY_PASSIVE_WEIGHTS,QUALITIES,PASSIVES,PASSIVE_MAP,APPEARANCES,randomInt,rollPassives,rollHero,sanitizeName,heroName,nameLength:value=>segments(value).length,validCharacter,SaveStore};
   root.PengpaiRules=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

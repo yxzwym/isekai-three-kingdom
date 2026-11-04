@@ -17,13 +17,13 @@
   function layout(width,height,allies,enemies,formation) {
     const rects=[],gap=3,groupWidth=Math.min(width-12,640),cw=(groupWidth-gap*4)/5;
     for(const [side,count]of[['ally',allies],['enemy',enemies]]){
-      if(!count)continue;const rows=Math.ceil(count/5),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),startEnemy=Math.min(110,height*.13),ch=side==='ally'?Math.min((height*.33-gap*(rows-1))/rows,cw*440/256+54):Math.max(30,Math.min((allyTop-112-startEnemy-gap*(rows-1))/rows,cw*440/256+90)),start=side==='ally'?height-14-rows*ch-gap*(rows-1):startEnemy;
+      if(!count)continue;const rows=Math.ceil(count/5),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),startEnemy=enemies===1?Math.min(110,height*.13):Math.min(170,height*.22),partyRatio=height<650&&height>width&&rows===1?.23:.33,ch=side==='ally'?Math.min((height*partyRatio-gap*(rows-1))/rows,cw*440/256+54):Math.max(30,Math.min((allyTop-112-startEnemy-gap*(rows-1))/rows,cw*440/256+90)),start=side==='ally'?height-14-rows*ch-gap*(rows-1):startEnemy;
       for(let i=0;i<count;i++){const row=Math.floor(i/5),col=i%5,n=Math.min(5,count-row*5),rowWidth=n*cw+(n-1)*gap;rects.push({side,index:i,row,column:col,x:(width-rowWidth)/2+col*(cw+gap),y:start+row*(ch+gap),w:cw,h:ch});}
     }
     if(enemies===1){const r=rects.find(r=>r.side==='enemy'),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y));r.x=16;r.y=Math.min(110,height*.13);r.w=width-32;r.h=Math.max(54,allyTop-116-r.y);r.boss=true;}
     if(formation&&enemies>1){const back=formation.back||[],front=formation.front||[],all=[...back,...front];
       if(all.length===enemies&&new Set(all).size===enemies&&all.every(i=>Number.isInteger(i)&&i>=0&&i<enemies)){
-        const allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),top=Math.min(110,height*.13),frontY=top+Math.min(198,height*.23),end=allyTop-116;
+        const allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),top=Math.min(110,height*.13),end=allyTop-116,frontY=top+Math.min(198,height*.23,(end-top)*.5);
         for(const [ids,row,y,ch]of[[back,0,top,frontY-top-14],[front,1,frontY,Math.max(44,end-frontY)]]){const widthUnit=ids.length===1?cw*1.4:cw,total=ids.length*widthUnit+(ids.length-1)*gap;ids.forEach((index,col)=>{const r=rects.find(r=>r.side==='enemy'&&r.index===index);Object.assign(r,{x:(width-total)/2+col*(widthUnit+gap),y,w:widthUnit,h:Math.max(44,ch),row,column:col,boss:false});});}
         rects.sort((a,b)=>a.side===b.side?(a.side==='enemy'?a.row-b.row:a.index-b.index):a.side==='enemy'?-1:1);
       }
@@ -62,9 +62,9 @@
       if(!this.w||!this.battle)return;this.allies=this.battle.units.filter(u=>u.side==='ally');this.enemies=this.battle.units.filter(u=>u.side==='enemy');
       this.rects=layout(this.w,this.h,this.allies.length,this.enemies.length,this.scenario.scene?.enemyFormation);
       for(const r of this.rects){r.unit=(r.side==='ally'?this.allies:this.enemies)[r.index];r.id=r.unit.id;
-        const enemy=r.side==='enemy',hud=enemy?30:50,extra=enemy&&r.row===0?60:0,barWidth=r.boss?Math.min(280,this.w*.52):r.w;
-        r.hud={x:r.boss?(this.w-barWidth)/2:r.x,y:r.y,w:barWidth};
-        r.figure={x:r.x,y:r.y+(enemy?hud+extra:0),w:r.w,h:Math.max(0,r.h-hud-extra)};
+        const enemy=r.side==='enemy',barWidth=r.boss?Math.min(280,this.w*.52):r.w;
+        r.figure={x:r.x,y:r.y+(r.boss?84:0),w:r.w,h:Math.max(0,r.h-(r.boss?84:50))};
+        r.hud={x:r.boss?(this.w-barWidth)/2:r.x,y:enemy&&!r.boss?r.figure.y+r.figure.h+20:r.y,w:barWidth,belowFigure:enemy&&!r.boss};
         r.effectY=r.figure.y+r.figure.h*.55;r.floatY=r.figure.y+22;
       }
       this.rectMap=new Map(this.rects.map(r=>[r.id,r]));this.allyTop=Math.min(...this.rects.filter(r=>r.side==='ally').map(r=>r.y));
@@ -80,7 +80,7 @@
       c.fillStyle=this.scenario.scene?.color||'#10272d';c.fillRect(0,0,w,h);
       if(bg){const scale=Math.max(w/bg.naturalWidth,h/bg.naturalHeight);c.drawImage(bg,(w-bg.naturalWidth*scale)/2,(h-bg.naturalHeight*scale)/2,bg.naturalWidth*scale,bg.naturalHeight*scale);}
       else{const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,'#04131d');g.addColorStop(.55,this.scenario.scene?.color||'#253b3c');g.addColorStop(1,'#09191d');c.fillStyle=g;c.fillRect(0,0,w,h);}
-      const shade=c.createLinearGradient(0,0,0,h);shade.addColorStop(0,'#00101b66');shade.addColorStop(.5,'#00101b00');shade.addColorStop(1,'#00101b66');c.fillStyle=shade;c.fillRect(0,0,w,h);this.background=canvas;
+      const shade=c.createLinearGradient(0,0,0,h);shade.addColorStop(0,'#00101b24');shade.addColorStop(.5,'#00101b00');shade.addColorStop(1,'#00101b44');c.fillStyle=shade;c.fillRect(0,0,w,h);this.background=canvas;
     }
     resize(){
       const r=this.canvas.getBoundingClientRect();this.w=Math.max(1,r.width);this.h=Math.max(1,r.height);this.dpr=Math.min(this.options.maxDpr||2,window.devicePixelRatio||1);
@@ -96,11 +96,14 @@
       const b=this.battle,events=b.events,totals=new Map(),health=new Map();
       for(let i=this.seen;i<events.length;i++){const e=events[i];if(e.type==='modeblocked')this.floats.push({id:e.actor,text:e.text,color:'#f1dfae',born:now,type:'skill'});if(e.type!=='action')continue;const skill=b.skills[e.skill];this.vfx.action(e,skill,now);
         if(!e.periodic)this.floats.push({id:e.actor,text:e.skillName,color:root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]||'#ead8a5',born:now,type:'skill'});
-        for(const r of e.results){if(r.buff)continue;if(!r.miss)health.set(r.target,r.after);const key=r.target+':'+(r.miss||Number(!!r.healing)),old=totals.get(key);if(old){old.actual+=r.actual;old.critical=old.critical||r.critical;}else totals.set(key,{...r});}
+        for(const r of e.results){if(r.buff)continue;if(!r.miss)health.set(r.target,r.after);const damageType=r.damageType||skill?.damageType||skill?.kind||'physical',displayAmount=r.healing?r.actual:r.amount??r.actual,key=r.target+':'+(r.miss||(r.healing?'heal':damageType)),old=totals.get(key);if(old){old.actual+=r.actual;old.displayAmount+=displayAmount;old.critical=old.critical||r.critical;}else totals.set(key,{...r,damageType,displayAmount});}
         this.options.onAction?.(e,this);if(this.battle!==b)return;
       }this.seen=events.length;
       for(const [id,value]of health)this.health.get(id)?.set(value,now);
-      for(const r of totals.values())this.floats.push({id:r.target,text:r.miss||`${r.healing?'+':'−'}${number(r.actual)}${r.critical?'!':''}`,color:r.healing?'#8ceba5':r.miss?'#d5dbcb':'#ff5b51',born:now,critical:r.critical});
+      for(const r of totals.values()){
+        const occupied=this.floats.filter(f=>f.id===r.target&&f.type!=='skill'&&now-f.born<650).map(f=>f.lane||0);let lane=0;while(occupied.includes(lane)&&lane<4)lane++;
+        this.floats.push({id:r.target,text:r.miss||`${r.healing?'+':'−'}${number(r.displayAmount)}${r.critical?'!':''}`,color:Presentation.resultColor(r),born:now,critical:r.critical,lane});
+      }
       if(!this.ended&&!['ready','running'].includes(b.status)){this.ended=true;if(!this.options.hideResult)this.panel={type:'result'};const result=b.export();this.canvas.dispatchEvent(new CustomEvent('battlecomplete',{detail:result}));this.options.onComplete?.(result,this);}
       this.floats=this.floats.filter(f=>now-f.born<1100);const limit=Math.max(48,b.units.length*6);if(this.floats.length>limit)this.floats.splice(0,this.floats.length-limit);
     }
@@ -119,15 +122,15 @@
     draw(now=performance.now()) {
       if(!this.battle||!this.w)return;
       const c=this.ctx,w=this.w,h=this.h;c.save();c.clearRect(0,0,w,h);c.fillStyle=this.scenario.scene?.color||'#10272d';c.fillRect(0,0,w,h);this.vfx.beginFrame(now);const shake=this.options.screenShake===false?{x:0,y:0}:this.vfx.offset(now);c.translate(shake.x,shake.y);if(this.background)c.drawImage(this.background,0,0,w,h);
-      this.hits=[];this.text(clock(this.battle.time),w/2,Math.min(110,h*.13)+55,16);
+      this.hits=[];this.text(clock(this.battle.time),w/2,this.enemies.length===1?Math.min(110,h*.13)+55:30,16);
 
       if(this.scenario.allowRetreat&&this.battle.status==='running')this.button('撤退',w-63,12,53,30,()=>this.battle.retreat());
       for(const r of this.rects)this.drawUnit(r.unit,r,now);
       this.drawTargeting(now);if(this.options.effects!==false)this.vfx.draw(c,this.rectMap,now);this.drawReadySkills(now);if(this.battle.status==='ready')this.drawPreparation();
-      for(const f of this.floats){const r=this.rectMap.get(f.id);if(!r)continue;const progress=(now-f.born)/1100,pop=f.type==='skill'?1:1+.25*Math.sin(Math.PI*Math.min(1,progress*5));c.save();c.globalAlpha=1-progress;const face=this.visuals.get(f.id)?.dst||r.figure,x=face.x+face.w/2,y=(f.type==='skill'?face.y-8:face.y+20)-progress*32;c.translate(x,y);c.scale(pop,pop);this.text(f.text,0,0,Math.min(f.type==='skill'?14:f.critical?25:22,r.w*(f.type==='skill'?.2:.33)),f.critical?'#ffe4ad':f.color);c.restore();}
+      for(const f of this.floats){const r=this.rectMap.get(f.id);if(!r)continue;const progress=(now-f.born)/1100,pop=f.type==='skill'?1:1+.25*Math.sin(Math.PI*Math.min(1,progress*5));c.save();c.globalAlpha=1-progress;const face=this.visuals.get(f.id)?.dst||r.figure,x=face.x+face.w/2,y=(f.type==='skill'?face.y-8:face.y+20+(f.lane||0)*22)-progress*32;c.translate(x,y);c.scale(pop,pop);this.text(f.text,0,0,Math.min(f.type==='skill'?14:f.critical?25:22,r.w*(f.type==='skill'?.2:.33)),f.color);c.restore();}
       if(this.battle.status==='running'&&this.scenario.hint&&!this.allies.some(u=>u.stats.actions>0||u.ready)){this.box(24,h/2-22,w-48,44,'#091e29d9','#8d9a8e');this.text(this.scenario.hint,w/2,h/2,14,'#f2dfb8');}
       if(this.panel)this.drawPanel();
-      if(this.notice?.until>now){this.box(20,h/2-22,w-40,44,'#112d36f5','#728d8d');this.text(this.notice.text,w/2,h/2,14,'#e8d7aa');}
+      this.drawNotice(now);
       if(this.focus>=0&&this.hits.length){this.focus%=this.hits.length;const hit=this.hits[this.focus];c.strokeStyle='#f1d697';c.lineWidth=2;c.strokeRect(hit.x-2,hit.y-2,hit.w+4,hit.h+4);}
       c.restore();
       const label=`${clock(this.battle.time)}，${this.battle.status==='running'?'交战中':this.battle.status==='ready'?'战前准备':this.battle.status}。`;if(label!==this.ariaLabel){this.ariaLabel=label;this.canvas.setAttribute('aria-label',label);}
@@ -136,7 +139,7 @@
       const c=this.ctx,enemy=u.side==='enemy',portraitBox=r.figure,hudScale=1;
       c.save();if(u.soldiers<=0)c.globalAlpha=.3;
       const visual=this.visuals.get(u.id);
-      if(visual){const dst=visual.dst,pose=this.vfx.pose(u.id,u.side,now),idle=Presentation.idlePose(u,now);c.save();c.translate(dst.x+dst.w/2+pose.x+idle.x,dst.y+dst.h/2+pose.y+idle.y);c.rotate(pose.angle+idle.angle);c.scale(pose.scale*idle.scale,pose.scale*idle.scale);c.drawImage(visual.sprite,-dst.w/2,-dst.h/2,dst.w,dst.h);const red=this.vfx.redAlpha(u.id,now);if(red>0){c.globalAlpha*=red;c.drawImage(visual.red,-dst.w/2,-dst.h/2,dst.w,dst.h);}c.restore();}
+      if(visual){const dst=visual.dst,pose=this.vfx.pose(u.id,u.side,now),idle=Presentation.idlePose(u,now);if(enemy)this.drawGroundShadow(dst);c.save();c.translate(dst.x+dst.w/2+pose.x+idle.x,dst.y+dst.h/2+pose.y+idle.y);c.rotate(pose.angle+idle.angle);c.scale(pose.scale*idle.scale,pose.scale*idle.scale);c.drawImage(visual.sprite,-dst.w/2,-dst.h/2,dst.w,dst.h);const red=this.vfx.redAlpha(u.id,now);if(red>0){c.globalAlpha*=red;c.drawImage(visual.red,-dst.w/2,-dst.h/2,dst.w,dst.h);}c.restore();}
       else {this.text(u.name?.slice(0,1)||'将',r.x+r.w/2,r.y+portraitBox.h*.6,Math.min(40,r.w*.6),'#9aafb0');}
       let y=enemy?r.hud.y:r.y+r.h-50;const hx=enemy?r.hud.x:r.x,hw=enemy?r.hud.w:r.w;
       const hpHeight=enemy?20:22;if(enemy)this.text(u.name,hx+hw/2,y-12,14,'#d5e3de');
@@ -152,10 +155,15 @@
       if(u.mode==='manual'){const mark=visual?.dst||r.figure;this.text('手动',mark.x+mark.w-3,mark.y+mark.h-10,12,'#c78c52','right');}
       if(u.side==='ally'&&u.mode==='manual'&&u.soldiers>0){c.save();c.strokeStyle='#f5ffff';c.shadowColor='#a6d9ed';c.shadowBlur=5;c.lineWidth=1.5;c.globalAlpha=.8+.15*Math.sin(now*.004);const frame=visual?.dst||r.figure,left=frame.x+1,top=frame.y+1,bottom=frame.y+frame.h-1,right=frame.x+frame.w-1,len=8;c.beginPath();for(const [x,y,dx,dy]of[[left,top,1,1],[right,top,-1,1],[left,bottom,1,-1],[right,bottom,-1,-1]]){c.moveTo(x+dx*len,y);c.lineTo(x,y);c.lineTo(x,y+dy*len);}c.stroke();c.restore();}
       c.restore();
-      if(this.aim)this.hits.push({...r,kind:'unit',unitId:u.id,label:u.name,action:()=>this.selectUnit(u)});
-      else this.hits.push({...r,kind:'unit',unitId:u.id,label:u.name,action:()=>u.side==='ally'?this.openTactics(u):this.openInspect(u)});
+      const action=(intent=this.aim)=>{if(this.panel)return;if(intent)this.selectUnit(u,intent);else if(u.side==='ally')this.openTactics(u);else if(this.battle.status==='ready')this.openInspect(u);};
+      const areas=enemy?[visual?.dst||r.figure,{x:r.hud.x,y:r.hud.y-20,w:r.hud.w,h:50}]:[r];
+      for(const area of areas)this.hits.push({...area,kind:'unit',unitId:u.id,label:u.name,action});
       if(u.side==='ally')this.hits.push({x:r.x,y:y,w:r.w,h:23,kind:'unit',unitId:u.id,label:u.name,action:()=>this.toggleMode(u)});
       if(u.statuses.length)this.drawStatuses(u,r);
+    }
+    drawGroundShadow(dst){
+      if(!this.groundShadow){const canvas=document.createElement('canvas');canvas.width=128;canvas.height=40;const c=canvas.getContext('2d');c.translate(64,20);c.scale(1,.3);const g=c.createRadialGradient(0,0,1,0,0,62);g.addColorStop(0,'#08100ed0');g.addColorStop(.25,'#08100e90');g.addColorStop(1,'#08100e00');c.fillStyle=g;c.fillRect(-64,-66,128,132);this.groundShadow=canvas;}
+      const w=clamp(dst.w*.72,24,150),h=w*.27;this.ctx.drawImage(this.groundShadow,dst.x+dst.w/2-w/2,dst.y+dst.h*.974-h/2,w,h);
     }
     statusTexture(status){
       this.statusTextures||=new Map();const id=status.id;if(this.statusTextures.has(id))return this.statusTextures.get(id);
@@ -177,8 +185,13 @@
       else plus();this.statusTextures.set(id,canvas);return canvas;
     }
     drawStatuses(u,r){
-      const c=this.ctx,size=20,gap=2,enemy=u.side==='enemy',cols=Math.max(1,Math.floor((enemy?r.hud.w:r.w)/(size+gap))),top=enemy?r.hud.y+33:r.y+r.h-88;
-      u.statuses.forEach((s,i)=>{const x=(enemy?r.hud.x:r.x)+(i%cols)*(size+gap),y=top-Math.floor(i/cols)*(size+gap);c.drawImage(this.statusTexture(s),x,y,size,size);if(s.stacks>1)this.text(String(s.stacks),x+size-2,y+size-3,12,'#fff','right');this.hits.push({x,y,w:size,h:size,label:s.name,action:()=>this.notify(`${s.name} · ${Math.max(0,Math.ceil(s.expiresAt-this.battle.time))}秒`)});});
+      const c=this.ctx,size=20,gap=2,enemy=u.side==='enemy',cols=Math.max(1,Math.floor((enemy?r.hud.w:r.w)/(size+gap))),top=enemy?(r.hud.belowFigure?r.figure.y+r.figure.h-24:r.hud.y+33):r.y+r.h-88;
+      u.statuses.forEach((s,i)=>{
+        const x=(enemy?r.hud.x:r.x)+(i%cols)*(size+gap),y=top+(enemy?1:-1)*Math.floor(i/cols)*(size+gap),remaining=Math.max(0,s.expiresAt-this.battle.time);
+        c.save();if(remaining<=5)c.globalAlpha*=Math.min(1,remaining/.25)*(.25+.75*(.5+.5*Math.cos((5-remaining)*Math.PI*4)));
+        c.drawImage(this.statusTexture(s),x,y,size,size);if(s.stacks>1)this.text(String(s.stacks),x+size-2,y+size-3,12,'#fff','right');c.restore();
+        if(!this.aim)this.hits.push({x,y,w:size,h:size,kind:'unit',unitId:u.id,label:s.name,action:(intent=this.aim)=>{if(intent)this.selectUnit(u,intent);else this.notifyStatus(u,s);}});
+      });
     }
     toggleMode(u) {
       if(u.soldiers<=0||!['ready','running'].includes(this.battle.status))return;
@@ -186,14 +199,14 @@
       if(this.aim?.actor===u.id)this.aim=null;
       if(this.activeManual===u.id&&u.mode==='auto'){this.activeManual=null;this.selectionKey=null;}
     }
-    selectUnit(u) {
-      if(!this.aim)return;const a=this.aim;if(u.side!==a.side||u.soldiers<=0)return;
+    selectUnit(u,intent=this.aim) {
+      if(!intent||intent!==this.aim||this.panel||this.battle.status!=='running')return;const a=intent;if(u.side!==a.side||u.soldiers<=0)return;
       const result=this.battle.manual(a.actor,a.skill,u.id);if(result.ok){this.aim=null;this.activeManual=null;}else this.notify(result.reason);
     }
     chooseSkill(u,id) {
       if(!u.ready||u.mode!=='manual')return;
       const skill=this.battle.skills[id];
-      if(this.aim?.actor===u.id&&this.aim.skill===id){this.aim=null;return;}
+      if(this.aim?.actor===u.id&&this.aim.skill===id)return;
       if(skill.side==='self'||skill.scope==='all'){
         const result=this.battle.manual(u.id,id,skill.side==='self'?u.id:undefined);if(!result.ok)this.notify(result.reason);else this.activeManual=null;this.aim=null;
       }else this.aim={actor:u.id,skill:id,side:skill.side==='enemy'?'enemy':'ally'};
@@ -225,20 +238,20 @@
       const u=this.battle.unit(this.activeManual);if(!u)return;
       const key=u.id+':'+u.readyTick;if(this.selectionKey!==key){this.selectionKey=key;const last=this.battle.skills[u.lastManualSkill];if(last&&last.scope!=='all'&&last.side!=='self')this.aim={actor:u.id,skill:last.id,side:last.side==='enemy'?'enemy':'ally'};}
       const top=this.allyTop;
-      const ids=u.skills,gap=8,cw=Math.min(88,(this.w-24-gap*(ids.length-1))/ids.length),total=ids.length*cw+(ids.length-1)*gap,x=(this.w-total)/2,y=top-100,icon=48;
+      const ids=u.skills,gap=8,cw=Math.min(88,(this.w-24-gap*(ids.length-1))/ids.length),total=ids.length*cw+(ids.length-1)*gap,x=(this.w-total)/2,y=top-100,icon=48,readyTick=u.readyTick;
       this.text(u.name,this.w/2,y-15,13,'#fff');
       ids.forEach((id,i)=>{
         const skill=this.battle.skills[id],kind=root.BattleVFX.kindOf(skill),color=skill.kind==='heal'?'#82e4a5':skill.kind==='buff'?(skill.side==='enemy'?'#c6a2ec':'#e5cb83'):'#edaa91';
         const left=x+i*(cw+gap),ix=left+(cw-icon)/2,chosen=(this.aim?.actor===u.id&&this.aim.skill===id)||(!this.aim&&u.lastManualSkill===id),disabled=this.battle.availableSp(u)<skill.cost,c=this.ctx;
         c.save();if(disabled)c.globalAlpha=.35;this.box(ix,y,icon,icon,chosen?'#284552':'#0a222ded',chosen?'#fff':'#cadadd',4);
         this.drawSkillIcon(skill,ix,y,icon,root.BattleVFX.COLORS[kind]||'#dfcf92');this.text(skill.name,left+cw/2,y+61,13,'#f0f4f5');this.text(this.skillRole(skill),left+cw/2,y+80,11,color);c.restore();
-        if(!disabled)this.hits.push({x:left,y,w:cw,h:91,label:`${skill.name}，${this.skillRole(skill)}`,action:()=>this.chooseSkill(u,id)});
+        if(!disabled)this.hits.push({x:left,y,w:cw,h:91,label:`${skill.name}，${this.skillRole(skill)}`,action:()=>{if(u.ready&&u.readyTick===readyTick)this.chooseSkill(u,id);}});
       });
     }
     drawTargeting(now) {
       if(!this.aim)return;const actor=this.battle.unit(this.aim.actor);if(!actor||actor.soldiers<=0||!actor.ready||actor.mode!=='manual'){this.aim=null;return;}
       const skill=this.battle.skills[this.aim.skill],color=skill.kind==='heal'?'#82ffac':skill.kind==='buff'?(skill.side==='enemy'?'#d3a0ff':'#f4db87'):'#ffcc76',c=this.ctx;
-      for(const u of this.battle.targetPool(actor,skill)){const r=this.rectMap.get(u.id);c.save();c.strokeStyle=color;c.shadowColor=color;c.shadowBlur=10;c.lineWidth=1.5+Math.sin(now*.008)*.5;c.globalAlpha=.75+.2*Math.sin(now*.008);const target=this.visuals.get(u.id)?.dst||r.figure,len=Math.min(14,target.w*.25),x=target.x-1,y=target.y-1,w=target.w+2,h=target.h+2;c.beginPath();for(const [xx,yy,sx,sy]of[[x,y,1,1],[x+w,y,-1,1],[x,y+h,1,-1],[x+w,y+h,-1,-1]]){c.moveTo(xx+sx*len,yy);c.lineTo(xx,yy);c.lineTo(xx,yy+sy*len);}c.stroke();c.beginPath();c.ellipse(r.x+r.w/2,r.figure.y+r.figure.h-3,r.w*.46,7,0,now*.002,now*.002+Math.PI*1.6);c.stroke();c.restore();}
+      for(const u of this.battle.targetPool(actor,skill)){const r=this.rectMap.get(u.id);c.save();c.strokeStyle=color;c.shadowColor=color;c.shadowBlur=10;c.lineWidth=1.5+Math.sin(now*.008)*.5;c.globalAlpha=.75+.2*Math.sin(now*.008);const target=this.visuals.get(u.id)?.dst||r.figure,len=Math.min(14,target.w*.25),x=target.x-1,y=target.y-1,w=target.w+2,h=target.h+2;c.beginPath();for(const [xx,yy,sx,sy]of[[x,y,1,1],[x+w,y,-1,1],[x,y+h,1,-1],[x+w,y+h,-1,-1]]){c.moveTo(xx+sx*len,yy);c.lineTo(xx,yy);c.lineTo(xx,yy+sy*len);}c.stroke();c.beginPath();c.ellipse(x+w/2,y+h-3,w/2,Math.min(7,w*.12),0,now*.002,now*.002+Math.PI*1.6);c.stroke();c.restore();}
     }
     panelFrame(title,height) {
       const frame=modalLayout(this.w,this.h,height),{x,y,w,h}=frame;cOverlay(this.ctx,this.w,this.h);this.box(x,y,w,h,'#081e29fa','#52727c',7);this.hits=[];
@@ -250,6 +263,10 @@
       this.button('开战',(this.w-w)/2,y+18,w,48,()=>{this.options.onPrepared?.(this);this.battle.start();},true);
     }
     openInspect(u){if(u)this.panel={type:'inspect',id:u.id,scroll:0};}
+    openSkillInfo(u,id){
+      if(!u?.skills.includes(id)||!this.battle.skills[id])return;
+      this.panel={type:'skillInfo',id:u.id,skill:id,previous:this.panel,scroll:0};
+    }
     drawInspect(){
       const p=this.panel,u=this.battle.unit(p.id);if(!u){this.panel=null;return;}
       const {x,y,w,h}=this.panelFrame(u.name+' · 属性',620),left=x+22,right=x+w-22,start=y+54,bottom=y+h-14,c=this.ctx,headerHits=this.hits.length;let row=start+12-(p.scroll||0);
@@ -260,11 +277,11 @@
       const armor=u.equipment?.armor,off=u.equipment?.offhand;if(armor||off){this.text([armor?.name||armor,off?.name].filter(Boolean).join(' · '),left,row,14,'#c5d3d5','left');row+=25;}
       this.text('武器熟练度',left,row,14,'#ebd4a6','left');row+=24;const names=Object.fromEntries((root.PengpaiRules?.WEAPON_TYPES||[]).map(t=>[t.id,t.name])),entries=Object.entries(u.weaponProficiencies||{});this.text(entries.length?entries.map(([id,v])=>`${names[id]||id} ${v}`).join('　'):'未习得',left,row,14,'#c5d3d5','left');row+=30;
       this.text('技能',left,row,14,'#ebd4a6','left');row+=20;const col=(w-44)/Math.max(1,u.skills.length),icon=44;
-      u.skills.forEach((id,i)=>{const skill=this.battle.skills[id],cx=left+col*(i+.5),ix=cx-icon/2;this.box(ix,row,icon,icon,'#0b222d','#7b9ba6');this.drawSkillIcon(skill,ix,row,icon,root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]);this.text(skill.name,cx,row+57,14,'#e6e8dd');this.text(this.skillRole(skill),cx,row+76,12,'#b7cbd0');this.hits.push({x:left+col*i,y:row,w:col,h:88,label:skill.name,action:()=>{this.panel={type:'skillInfo',id:u.id,skill:id,previous:p,scroll:0};}});});row+=110;
+      u.skills.forEach((id,i)=>{const skill=this.battle.skills[id],cx=left+col*(i+.5),ix=cx-icon/2;this.box(ix,row,icon,icon,'#0b222d','#7b9ba6');this.drawSkillIcon(skill,ix,row,icon,root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]);this.text(skill.name,cx,row+57,14,'#e6e8dd');this.text(this.skillRole(skill),cx,row+76,12,'#b7cbd0');this.hits.push({x:left+col*i,y:row,w:col,h:88,label:skill.name,action:()=>this.openSkillInfo(u,id)});});row+=110;
       for(const id of u.passives){const passive=this.battle.passives[id];this.text(passive.name,left,row,14,'#ef9389','left');row+=24;for(const line of this.wrapInfo(passive.description,w-44)){this.text(line,left,row,14,'#c5d3d5','left');row+=22;}}
       c.restore();p.maxScroll=Math.max(0,row+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);this.hits=this.hits.filter((hit,i)=>i<headerHits||(hit.y>=start&&hit.y+hit.h<=bottom));
     }
-    wrapInfo(value,width){const c=this.ctx;c.font=`14px ${font}`;const rows=[];let line='';for(const ch of Array.from(value)){if(line&&c.measureText(line+ch).width>width){rows.push(line);line='';}line+=ch;}if(line)rows.push(line);return rows;}
+    wrapInfo(value,width){const c=this.ctx;c.font=`14px ${font}`;const rows=[];let line='';for(const ch of Array.from(value)){if(line&&c.measureText(line+ch).width>width&&!/[，。！？、；：）】》]/.test(ch)){rows.push(line);line='';}line+=ch;}if(line)rows.push(line);return rows;}
     drawSkillInfo(){
       const p=this.panel,u=this.battle.unit(p.id),skill=this.battle.skills[p.skill];if(!u||!skill){this.closePanel();return;}
       const {x,y,w,h}=this.panelFrame(skill.name,470),c=this.ctx,start=y+54,bottom=y+h-16,info=root.BattleSkillInfo.describe(this.battle,u,skill);let row=start+12-(p.scroll||0);
@@ -303,19 +320,24 @@
     }
     point(e){const r=this.canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*this.w/r.width,y:(e.clientY-r.top)*this.h/r.height};}
     down(e){
-      if(e.button!==0)return;const point=this.point(e),hit=[...this.hits].reverse().find(r=>point.x>=r.x&&point.x<=r.x+r.w&&point.y>=r.y&&point.y<=r.y+r.h);
-      this.press={...point,hit,pointer:e.pointerId,long:false,moved:false,scroll:this.panel?.scroll||0};this.canvas.setPointerCapture?.(e.pointerId);
+      if(e.button!==0||e.isPrimary===false||this.press)return;const point=this.point(e),hit=[...this.hits].reverse().find(r=>point.x>=r.x&&point.x<=r.x+r.w&&point.y>=r.y&&point.y<=r.y+r.h);
+      const press=this.press={...point,hit,pointer:e.pointerId,long:false,moved:false,scroll:this.panel?.scroll||0,panel:this.panel,battle:this.battle,intent:this.aim};this.canvas.setPointerCapture?.(e.pointerId);
       const unit=hit?.unitId?this.battle.unit(hit.unitId):null;
-      if(unit?.side==='ally'&&unit.soldiers>0&&!this.panel)this.pressTimer=setTimeout(()=>{if(!this.press||this.press.moved)return;this.press.long=true;this.openTactics(unit);},1000);
+      if(unit&&!this.panel&&(unit.side==='enemy'||unit.soldiers>0))this.pressTimer=setTimeout(()=>{if(this.press!==press||press.moved||this.panel!==press.panel||this.battle!==press.battle||!['ready','running'].includes(this.battle.status))return;press.long=true;if(unit.side==='enemy')this.openInspect(unit);else this.openTactics(unit);},1000);
     }
     move(e){
-      if(!this.press)return;const p=this.point(e),dx=p.x-this.press.x,dy=p.y-this.press.y;
+      if(!this.press||(e.pointerId!==undefined&&e.pointerId!==this.press.pointer))return;const p=this.point(e),dx=p.x-this.press.x,dy=p.y-this.press.y;
       if(!this.press.axis&&Math.max(Math.abs(dx),Math.abs(dy))>7)this.press.axis=this.press.hit?.kind==='slider'&&Math.abs(dx)>Math.abs(dy)?'slider':'scroll';
       if(this.press.axis==='slider'){clearTimeout(this.pressTimer);this.press.moved=true;this.press.hit.change(p.x);}
       else if(this.press.axis==='scroll'){clearTimeout(this.pressTimer);this.press.moved=true;if(['tactics','inspect','skillInfo'].includes(this.panel?.type))this.panel.scroll=clamp(this.press.scroll-dy,0,this.panel.maxScroll||0);}
     }
-    up(e){if(!this.press)return;const press=this.press,p=this.point(e);this.cancel();if(press.hit?.kind==='slider'&&press.axis!=='scroll')press.hit.change(p.x);else if(!press.long&&!press.moved&&press.hit){press.hit.action();this.focus=-1;}}
-    cancel(){clearTimeout(this.pressTimer);this.press=null;}
+    up(e){
+      if(!this.press||e.pointerId!==this.press.pointer)return;const press=this.press,p=this.point(e);this.cancel();
+      if(this.panel!==press.panel||this.battle!==press.battle)return;
+      if(press.hit?.kind==='slider'&&press.axis!=='scroll')press.hit.change(p.x);
+      else if(!press.long&&!press.moved&&press.hit&&Math.hypot(p.x-press.x,p.y-press.y)<=7&&p.x>=press.hit.x&&p.x<=press.hit.x+press.hit.w&&p.y>=press.hit.y&&p.y<=press.hit.y+press.hit.h){press.hit.action(press.intent);this.focus=-1;}
+    }
+    cancel(e){if(e?.pointerId!==undefined&&this.press?.pointer!==e.pointerId)return;clearTimeout(this.pressTimer);this.press=null;}
     openTactics(u){
       if(!u||u.side!=='ally'||u.soldiers<=0||!['ready','running'].includes(this.battle.status))return;
       if(this.battle.scenario.control.lockTactics){this.notify('本场无法配置技能');return;}this.preparationHintDismissed=true;
@@ -340,7 +362,7 @@
     }
     drawTactics(){
       const p=this.panel,u=this.battle.unit(p.id);if(!u||!['ready','running'].includes(this.battle.status)){this.panel=null;return;}
-      const contentHeight=p.rules.reduce((height,r)=>height+(this.battle.skills[r.skill].kind==='heal'?154:102),70);
+      const contentHeight=p.rules.reduce((height,r)=>height+(this.battle.skills[r.skill].kind==='heal'?166:114),70);
       const c=this.ctx,{x,y:top,w,h}=this.panelFrame(`${u.name} · 施法设置`,contentHeight+65),pad=17,left=x+pad,bottom=top+h-18;
       const start=top+49,viewHeight=bottom-start;let y=start-p.scroll;
       p.maxScroll=Math.max(0,contentHeight-viewHeight);p.scroll=clamp(p.scroll,0,p.maxScroll);y=start-p.scroll;
@@ -348,12 +370,13 @@
       const thresholdLabel=value=>value===0?'从不施放':value===101?'始终':`低于 ${value}%`;
       const percent=(r,key,label,row)=>{const value=clamp(Math.round((Number(r[key])||0)*100),0,101);this.slider(label,left+9,row,w-(pad+9)*2,value,101,value=>{r[key]=value/100;r.disabled=(Number(r.selfThreshold)||0)===0&&(Number(r.allyThreshold)||0)===0;},thresholdLabel);};
       p.rules.forEach(r=>{
-        const skill=this.battle.skills[r.skill],heal=skill.kind==='heal',group=skill.scope==='all'&&['physical','tactic'].includes(skill.kind),height=heal?154:102;
-        this.box(left-5,y,w-pad*2+10,height-8,'#102a32','#2d4a54',4);this.drawSkillIcon(skill,left+3,y+6,25,root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]||'#d9c48c');this.text(skill.name,left+37,y+18,14,'#d9e9e9','left');this.text(this.skillRole(skill),left+w-pad*2-8,y+18,12,skill.kind==='heal'?'#8fdfae':'#b5c6d4','right');
-        if(heal){percent(r,'selfThreshold','治疗自己',y+37);percent(r,'allyThreshold','治疗队友',y+91);}
-        else if(group){const count=Math.max(2,this.battle.units.filter(t=>t.side==='enemy').length,Math.floor(r.threshold)||2);this.slider('施放条件',left+9,y+37,w-(pad+9)*2,r.disabled?0:Math.max(1,Math.min(count,r.threshold)-1),count-1,v=>{r.disabled=v===0;r.when='enemyCount';r.threshold=v+1;},v=>v===0?'从不释放':`至少 ${v+1} 人`);}
-        else if(skill.buff?.taunt){const value=clamp(Math.round((r.displayThreshold||0)*100),0,101);this.slider('施放条件',left+9,y+37,w-(pad+9)*2,value,101,value=>{r.displayThreshold=value/100;r.disabled=value===0;},value=>value>0&&value<101?`自身兵力低于 ${value}%`:thresholdLabel(value));}
-        else this.slider('施放频率',left+9,y+37,w-(pad+9)*2,r.disabled?0:r.frequency==='sometimes'?1:2,2,v=>{r.disabled=v===0;r.frequency=v===1?'sometimes':'always';r.when='always';r.threshold=0;},v=>['从不释放','偶尔释放','始终释放'][v]);
+        const skill=this.battle.skills[r.skill],heal=skill.kind==='heal',group=skill.scope==='all'&&['physical','tactic'].includes(skill.kind),height=heal?166:114;
+        this.box(left-5,y,w-pad*2+10,height-8,'#102a32','#2d4a54',4);this.box(left,y+5,36,36,'#0b222d','#7b9ba6');this.drawSkillIcon(skill,left,y+5,36,root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]);this.text(skill.name,left+44,y+23,14,'#d9e9e9','left');this.text(this.skillRole(skill),left+w-pad*2-8,y+23,12,skill.kind==='heal'?'#8fdfae':'#b5c6d4','right');
+        this.hits.push({x:left-2,y:y+3,w:40,h:40,label:`查看${skill.name}详情`,action:()=>this.openSkillInfo(u,skill.id)});
+        if(heal){percent(r,'selfThreshold','治疗自己',y+49);percent(r,'allyThreshold','治疗队友',y+103);}
+        else if(group){const count=Math.max(2,this.battle.units.filter(t=>t.side==='enemy').length,Math.floor(r.threshold)||2);this.slider('施放条件',left+9,y+49,w-(pad+9)*2,r.disabled?0:Math.max(1,Math.min(count,r.threshold)-1),count-1,v=>{r.disabled=v===0;r.when='enemyCount';r.threshold=v+1;},v=>v===0?'从不释放':`至少 ${v+1} 人`);}
+        else if(skill.buff?.taunt){const value=clamp(Math.round((r.displayThreshold||0)*100),0,101);this.slider('施放条件',left+9,y+49,w-(pad+9)*2,value,101,value=>{r.displayThreshold=value/100;r.disabled=value===0;},value=>value>0&&value<101?`自身兵力低于 ${value}%`:thresholdLabel(value));}
+        else this.slider('施放频率',left+9,y+49,w-(pad+9)*2,r.disabled?0:r.frequency==='sometimes'?1:2,2,v=>{r.disabled=v===0;r.frequency=v===1?'sometimes':'always';r.when='always';r.threshold=0;},v=>['从不释放','偶尔释放','始终释放'][v]);
         y+=height;
       });
       const targets=[['lowestCurrent','剩余兵力最少'],['highestCurrent','剩余兵力最多'],['highestMax','最大兵力最多'],['random','随机目标']];
@@ -368,6 +391,14 @@
     }
     closePanel(){if(this.panel?.type==='tactics')this.commitTactics();else if(this.panel?.type==='skillInfo')this.panel=this.panel.previous;else this.panel=null;}
     notify(text){this.notice={text,until:performance.now()+2000};}
+    notifyStatus(u,status){this.notice={unitId:u.id,statusId:status.id,statusName:status.name,until:performance.now()+2000};}
+    drawNotice(now){
+      const notice=this.notice;if(!notice||notice.until<=now)return;
+      if(notice.statusId){
+        const current=this.battle.unit(notice.unitId)?.statuses.find(s=>s.id===notice.statusId),remaining=current?Math.max(0,Math.ceil(current.expiresAt-this.battle.time-1e-6)):0;
+        this.box(20,this.h/2-34,this.w-40,68,'#112d36f5','#728d8d');this.text(current?.name||notice.statusName,this.w/2,this.h/2-11,16,'#e8d7aa');this.text(`剩余${remaining}秒`,this.w/2,this.h/2+15,14,'#c5dade');
+      }else {this.box(20,this.h/2-22,this.w-40,44,'#112d36f5','#728d8d');this.text(notice.text,this.w/2,this.h/2,14,'#e8d7aa');}
+    }
     click(e){const r=this.canvas.getBoundingClientRect(),x=(e.clientX-r.left)*this.w/r.width,y=(e.clientY-r.top)*this.h/r.height;const hit=[...this.hits].reverse().find(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h);this.focus=-1;if(hit)hit.action?.();}
     key(e){if(e.key==='Escape'){this.closePanel();this.aim=null;}if(e.key.toLowerCase()==='t'&&this.focus>=0){const hit=this.hits[this.focus];if(hit?.unitId)this.openTactics(this.battle.unit(hit.unitId));}if(e.key==='Tab'){e.preventDefault();this.focus=(this.focus+(e.shiftKey?-1:1)+this.hits.length)%this.hits.length;}if(['ArrowLeft','ArrowRight'].includes(e.key)&&this.focus>=0&&this.hits[this.focus]?.kind==='slider'){e.preventDefault();this.hits[this.focus].step(e.key==='ArrowRight'?1:-1);}if(e.key==='Enter'&&this.focus>=0){e.preventDefault();this.hits[this.focus]?.action?.();this.focus=-1;}}
     restart(){return this.load({...this.scenario,rules:JSON.parse(JSON.stringify(this.battle.config))});}

@@ -1,6 +1,8 @@
 (function(root){
   'use strict';
   const formatNumber=n=>String(Math.floor(Number(n)||0));
+  const DAMAGE_COLORS={physical:'#ff5b51',tactic:'#c28aff',true:'#ffffff'};
+  const resultColor=result=>result.healing?'#8ceba5':result.miss?'#d5dbcb':DAMAGE_COLORS[result.damageType]||DAMAGE_COLORS.physical;
   const ease=t=>1-Math.pow(1-Math.max(0,Math.min(1,t)),3);
   const mix=(a,b,t)=>a+(b-a)*ease(t);
   class HealthTrack{
@@ -20,5 +22,5 @@
     add(total,logic,paint,gap,now){this.samples.push({total,logic,paint,gap});if(this.samples.length>600)this.samples.shift();this.count++;if(now-this.last<1000)return null;this.last=now;const pick=key=>this.samples.map(s=>s[key]).sort((a,b)=>a-b),p=(a,q)=>Number(a[Math.min(a.length-1,Math.floor(a.length*q))].toFixed(2));const cpu=pick('total'),draw=pick('paint'),gaps=pick('gap');return{frames:this.count,samples:cpu.length,cpuP50:p(cpu,.5),cpuP95:p(cpu,.95),paintP95:p(draw,.95),gapP95:p(gaps,.95),slowFrames:this.samples.filter(s=>s.total>16.7).length};}
   }
   const sliderValue=(x,left,width,max)=>Math.max(0,Math.min(max,Math.round((x-left)/Math.max(1,width)*max)));
-  const api={formatNumber,HealthTrack,idlePose,FrameStats,sliderValue};root.BattlePresentation=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const api={formatNumber,DAMAGE_COLORS,resultColor,HealthTrack,idlePose,FrameStats,sliderValue};root.BattlePresentation=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

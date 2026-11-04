@@ -40,26 +40,26 @@
     portrait(id,rect){const art=this.art(id),record=art?.portrait,img=this.image(record?.src||art?.src);if(!img)return;const crop=record?.src?(record.crop||{x:0,y:0,width:img.naturalWidth,height:img.naturalHeight}):(record||{x:img.naturalWidth*.23,y:0,width:img.naturalWidth*.54,height:img.naturalHeight*.38});this.ctx.save();this.ctx.beginPath();this.ctx.roundRect(rect.x,rect.y,rect.w,rect.h,3);this.ctx.clip();const scale=Math.max(rect.w/crop.width,rect.h/crop.height),w=crop.width*scale,h=crop.height*scale;this.ctx.drawImage(img,crop.x,crop.y,crop.width,crop.height,rect.x+(rect.w-w)/2,rect.y+(rect.h-h)/2,w,h);this.ctx.restore();}
     drawMain(){const w=this.w,h=this.h;this.ctx.save();this.ctx.shadowColor='#000c';this.ctx.shadowBlur=16;this.text('异界三国',w/2,h*.24,Math.min(52,w*.135),GOLD,'center',true);this.ctx.restore();const bw=Math.min(254,w-96),x=(w-bw)/2,start=h*.49,gap=Math.min(58,(h*.43)/4);const buttons=[['新游戏',()=>this.startNew()],['载入游戏',()=>this.go('load')],['设置',()=>{this.modal={type:'settings'};}],['关于',()=>{this.modal={type:'about'};}]];buttons.forEach(([label,action],i)=>this.button(label,x,start+i*gap,bw,43,action,{active:i===0,plain:i>0}));}
     difficultyStars(count,right,y){const c=this.ctx,size=14,gap=5,color=['','#6ecb8d','#77b7ed','#e5c16d','#ec9a66','#ef716d'][count];c.save();c.fillStyle=color;for(let i=0;i<count;i++){const x=right-size/2-(count-1-i)*(size+gap);c.beginPath();for(let point=0;point<10;point++){const angle=-Math.PI/2+point*Math.PI/5,r=point%2?size*.22:size*.5,px=x+Math.cos(angle)*r,py=y+Math.sin(angle)*r;if(point)c.lineTo(px,py);else c.moveTo(px,py);}c.closePath();c.fill();}c.restore();}
-    statListLayout(){const perColumn=Math.ceil(R.WEAPON_TYPES.length/2),rows=Math.max(R.ATTRIBUTES.length,perColumn),cardH=this.h<620?30:34,available=this.h-154-60-10-53-14-cardH*3-10-12,rowH=Math.min(this.h<620?16:20,Math.max(10,(available-22)/rows));return {perColumn,rows,rowH,height:22+rows*rowH};}
+    statListLayout(){const perColumn=Math.ceil(R.WEAPON_TYPES.length/2),rows=Math.max(R.ATTRIBUTES.length,perColumn),rowH=this.h<740?20:22;return {perColumn,rows,rowH,height:26+rows*rowH};}
     drawStatLists(character,top){
       const w=this.w,c=this.ctx,{perColumn,rows,rowH}=this.statListLayout(),colW=(w-40)/3;
-      this.text('基础属性',20,top+7,11,MUTED,'left');this.text('武器熟练度',(w+colW)/2,top+7,11,MUTED);
-      c.strokeStyle='#53645b66';c.lineWidth=1;c.beginPath();for(const x of[20+colW-4,20+colW*2+3]){c.moveTo(x,top+22);c.lineTo(x,top+22+rows*rowH);}c.stroke();
-      R.ATTRIBUTES.forEach(([key,label],i)=>{const y=top+22+rowH/2+i*(rows-1)*rowH/(R.ATTRIBUTES.length-1);this.text(label,20,y,12,WHITE,'left');this.text(character.attributes[key],20+colW-9,y,15,GOLD,'right');});
-      R.WEAPON_TYPES.forEach((type,i)=>{const col=i<perColumn?1:2,x=20+colW*col+7,y=top+22+rowH*(i%perColumn+.5);this.text(type.name,x,y,Math.min(this.h<620?11:12,rowH-1),WHITE,'left');this.text(R.getWeaponProficiency(character,type.id),20+colW*(col+1)-7,y,Math.min(this.h<620?12:13,rowH-1),GOLD,'right');});
+      this.text('基础属性',20,top+7,14,MUTED,'left');this.text('武器熟练度',(w+colW)/2,top+7,14,MUTED);
+      c.strokeStyle='#53645b66';c.lineWidth=1;c.beginPath();for(const x of[20+colW-4,20+colW*2+3]){c.moveTo(x,top+26);c.lineTo(x,top+26+rows*rowH);}c.stroke();
+      R.ATTRIBUTES.forEach(([key,label],i)=>{const y=top+26+rowH/2+i*(rows-1)*rowH/(R.ATTRIBUTES.length-1);this.text(label,20,y,14,WHITE,'left');this.text(character.attributes[key],20+colW-9,y,14,GOLD,'right');});
+      R.WEAPON_TYPES.forEach((type,i)=>{const col=i<perColumn?1:2,x=20+colW*col+7,y=top+26+rowH*(i%perColumn+.5);this.text(type.name,x,y,14,WHITE,'left');this.text(R.getWeaponProficiency(character,type.id),20+colW*(col+1)-7,y,14,GOLD,'right');});
     }
     drawCreate(){
-      const w=this.w,h=this.h,cardH=h<620?30:34,gap=5,footerY=h-53,passiveTop=footerY-14-cardH*3-gap*2,statsTop=passiveTop-12-this.statListLayout().height;
+      const w=this.w,h=this.h,compact=h<740,cardH=compact?44:48,gap=compact?10:12,footerY=h-53,passiveTop=footerY-(compact?10:14)-cardH*3-gap*2,statsTop=passiveTop-(compact?12:16)-this.statListLayout().height;
       this.heading('创建人物');this.button('‹',18,18,30,34,()=>this.go('main'),{plain:true});
-      const difficultyX=20,difficultyW=w-40;this.text('姓名',20,75,13,WHITE,'left');this.nameRect={x:65,y:58,w:w-85,h:34};
-      const difficulty=R.getDifficulty(this.draft.difficulty),difficultyY=102;
-      this.box(difficultyX,difficultyY,difficultyW,42,'#13242be6','#8b826c',3);this.text(difficulty.name,difficultyX+10,difficultyY+12,15,WHITE,'left',true);
+      const difficultyX=20,difficultyW=w-40;this.text('姓名',20,compact?68:75,14,WHITE,'left');this.nameRect={x:65,y:compact?52:58,w:w-85,h:compact?32:34};
+      const difficulty=R.getDifficulty(this.draft.difficulty),difficultyY=compact?92:102;
+      this.box(difficultyX,difficultyY,difficultyW,42,'#13242be6','#8b826c',3);this.text(difficulty.name,difficultyX+10,difficultyY+12,14,WHITE,'left',true);
       this.text('难度',difficultyX+10,difficultyY+32,10,MUTED,'left');this.difficultyStars(difficulty.stars,difficultyX+42+difficulty.stars*19,difficultyY+31);this.text('⌄',w-32,difficultyY+17,14,GOLD);
       this.hits.push({x:difficultyX,y:difficultyY,w:difficultyW,h:42,label:'选择难度 '+difficulty.name,action:()=>{this.modal={type:'difficulty'};this.input?.blur();}});
-      const artTop=154,artH=Math.max(50,statsTop-artTop-10),lookIndex=R.APPEARANCES.findIndex(look=>look.id===this.draft.appearance),changeLook=step=>{this.draft.appearance=R.APPEARANCES[(lookIndex+step+R.APPEARANCES.length)%R.APPEARANCES.length].id;};
+      const artTop=compact?144:154,artH=Math.max(50,statsTop-artTop-10),lookIndex=R.APPEARANCES.findIndex(look=>look.id===this.draft.appearance),changeLook=step=>{this.draft.appearance=R.APPEARANCES[(lookIndex+step+R.APPEARANCES.length)%R.APPEARANCES.length].id;};
       this.figure(this.draft.appearance,{x:57,y:artTop,w:w-114,h:artH});this.button('‹',20,artTop+artH/2-17,30,34,()=>changeLook(-1),{plain:true});this.button('›',w-50,artTop+artH/2-17,30,34,()=>changeLook(1),{plain:true});
       this.drawStatLists(this.draft.roll,statsTop);
-      this.draft.roll.passives.forEach((id,i)=>{const p=R.PASSIVE_MAP[id],q=R.QUALITIES[p.quality],y=passiveTop+i*(cardH+gap);this.box(20,y,w-40,cardH,'#102128e6',q.color,4);this.text(p.name,31,y+9,13,q.color,'left',true);this.text(this.fitText(p.description,w-64),31,y+cardH-8,Math.min(h<620?9:10,(w-64)/(p.description.length*this.settings.menuScale)),MUTED,'left');this.hits.push({x:20,y,w:w-40,h:cardH,label:p.name,action:()=>{this.modal={type:'passive',id};this.input?.blur();}});});
+      this.draft.roll.passives.forEach((id,i)=>{const p=R.PASSIVE_MAP[id],q=R.QUALITIES[p.quality],y=passiveTop+i*(cardH+gap);this.box(20,y,w-40,cardH,'#102128e6',q.color,4);this.text(p.name,32,y+12,14,q.color,'left',true);this.text(this.fitText(p.description,w-64,14),32,y+cardH-13,14,MUTED,'left');this.hits.push({x:20,y,w:w-40,h:cardH,label:p.name,action:()=>{this.modal={type:'passive',id};this.input?.blur();}});});
       this.button('重掷',20,footerY,96,36,()=>this.roll(),{plain:true});this.button('确认人物',128,footerY,w-148,36,()=>this.confirmCreation(),{active:true});
     }
     fitText(value,width,size=12){this.ctx.font=`${UI.textSize(size)*this.settings.menuScale}px ${FONT}`;let text=String(value);while(text&&this.ctx.measureText(text+'…').width>width)text=Array.from(text).slice(0,-1).join('');return text===value?value:text+'…';}

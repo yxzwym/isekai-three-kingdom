@@ -11,18 +11,18 @@
     general('zhouyu', '周瑜', '大都督', 'ally', 71, 96, 97, 84, 88, 85, 150, ['huoshen', 'dare', 'strike'], [rule('huoshen', 'enemyCount', 3, 'all'), rule('dare','always',0), rule('strike','always',0)]),
     general('huanggai', '黄盖', '破浪先锋', 'ally', 83, 69, 80, 68, 78, 105, 165, ['dare', 'strike'], [rule('dare', 'enemyCount', 4, 'all'), rule('strike','always',0)]),
     general('ganning', '甘宁', '锦帆将军', 'ally', 94, 76, 90, 92, 92, 115, 135, ['luoshi', 'strike'], [rule('luoshi','always',0), rule('strike','always',0)]),
-    general('lusu', '鲁肃', '赞军校尉', 'ally', 56, 92, 88, 70, 74, 60, 155, ['yinxian', 'hongshui', 'strike'], [rule('yinxian', 'allyBelow', .55), { ...rule('hongshui', 'enemyCount', 4, 'all'), disabled: true }, rule('strike','always',0)]),
-    general('zhugeliang', '诸葛亮', '卧龙', 'ally', 38, 100, 92, 86, 90, 60, 140, ['yinxian', 'huoshen', 'strike'], [rule('yinxian', 'allyBelow', .45), { ...rule('huoshen', 'enemyCount', 3, 'all'), disabled: true }, rule('strike','always',0)], { passives:['bagua'],passive: '八卦阵 · 物理技能50%闪避', dodge: .5 })
+    general('lusu', '鲁肃', '赞军校尉', 'ally', 56, 92, 88, 70, 74, 60, 155, ['yinxian', 'hongshui', 'strike'], [rule('yinxian', 'allyBelow', .55), { ...rule('hongshui', 'enemyCount', 4, 'all'), disabled: true }, {...rule('strike','always',0),frequency:'sometimes'}]),
+    general('zhugeliang', '诸葛亮', '卧龙', 'ally', 38, 100, 92, 86, 90, 60, 140, ['yinxian', 'huoshen', 'strike'], [rule('yinxian', 'allyBelow', .45), { ...rule('huoshen', 'enemyCount', 3, 'all'), disabled: true }, {...rule('strike','always',0),frequency:'sometimes'}], { passives:['bagua'],passive: '八卦阵 · 物理技能50%闪避', dodge: .5 })
   ];
   const ENEMIES = [
-    general('caocao', '曹操', '北军主帅', 'enemy', 72, 91, 100, 80, 87, 100, 190, ['yinxian', 'dare', 'strike'], [rule('yinxian', 'allyBelow', .4), rule('dare', 'enemyCount', 3, 'all'), rule('strike','always',0)], { enemySp: 30 }),
+    general('caocao', '曹操', '北军主帅', 'enemy', 72, 91, 100, 80, 87, 100, 190, ['yinxian', 'dare', 'strike'], [rule('yinxian', 'allyBelow', .4), {...rule('dare','always',0),frequency:'sometimes'}, {...rule('strike','always',0),frequency:'sometimes'}], { enemySp: 30 }),
     general('zhangliao', '张辽', '前军都督', 'enemy', 92, 78, 95, 88, 90, 120, 160, ['luoshi', 'strike'], [rule('luoshi','always',0), rule('strike','always',0)]),
     general('xuhuang', '徐晃', '长驱将军', 'enemy', 90, 72, 90, 76, 85, 125, 165, ['luoshi', 'strike'], [rule('luoshi','always',0), rule('strike','always',0)]),
-    general('yujin', '于禁', '水军都督', 'enemy', 78, 76, 92, 72, 80, 100, 180, ['tongxian', 'hongshui', 'strike'], [rule('tongxian', 'allyBelow', .45), rule('hongshui', 'enemyCount', 4, 'all'), rule('strike','always',0)]),
+    general('yujin', '于禁', '水军都督', 'enemy', 78, 76, 92, 72, 80, 100, 180, ['tongxian', 'hongshui', 'strike'], [rule('tongxian', 'allyBelow', .45), rule('hongshui', 'enemyCount', 4, 'all'), {...rule('strike','always',0),frequency:'sometimes'}]),
     general('caoren', '曹仁', '铁壁中军', 'enemy', 86, 64, 89, 60, 72, 110, 200, ['dare', 'strike'], [rule('dare','always',0), rule('strike','always',0)])
   ];
   const REINFORCEMENTS = [
-    general('sunquan', '孙权', '剧情援军', 'ally', 67, 80, 94, 75, 78, 95, 175, ['tongxian', 'dare', 'strike'], [rule('tongxian', 'allyBelow', .5), rule('dare', 'enemyCount', 3, 'all'), rule('strike','always',0)]),
+    general('sunquan', '孙权', '剧情援军', 'ally', 67, 80, 94, 75, 78, 95, 175, ['tongxian', 'dare', 'strike'], [rule('tongxian', 'allyBelow', .5), rule('dare', 'enemyCount', 3, 'all'), {...rule('strike','always',0),frequency:'sometimes'}]),
     general('lvbu', '吕布', '跨时空校验', 'ally', 100, 26, 87, 85, 95, 145, 170, ['strike'], [rule('strike','always',0)], { passives:['guishen','pojun'],passive: '鬼神无双 · 破军绝阵', guaranteedCritical: true, ignoreArmor: true })
   ];
   const DEFAULTS = { seed: '赤壁-208', level: 40, enemyLevel: 60, allySp: 64, random: true, critical: true, hit: true, criticalSource: 'technique', physicalRandom: 'list', timing: 'classic', skillDelays: { huoshen: 1, dare: .6, hongshui: .8, luoshi: .4, yinxian: .5, tongxian: .3 }, reinforcements: [], rosterOverrides: {} };

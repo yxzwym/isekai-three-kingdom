@@ -20,6 +20,6 @@
     reflectDamage:{name:'反伤',icon:'反',color:'#dbb28e',duration:8,reflect:.25}
   };
   const skills=Object.fromEntries(Object.entries(definitions).filter(([,s])=>s.period).map(([id,s])=>['status-'+id,{id:'status-'+id,name:s.name,kind:s.healing?'heal':'tactic',side:s.healing?'ally':'enemy',scope:'single',cost:0,reactionOnly:true,vfx:s.healing?'heal':id==='burn'?'fire':id==='poison'?'wood':'physical'}]));
-  skills['status-reflect']={id:'status-reflect',name:'反伤',kind:'physical',side:'enemy',scope:'single',cost:0,reactionOnly:true};
+  skills['status-reflect']={id:'status-reflect',name:'反伤',kind:'physical',damageType:'true',side:'enemy',scope:'single',cost:0,reactionOnly:true};
   const api={definitions,skills};root.BattleStatuses=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

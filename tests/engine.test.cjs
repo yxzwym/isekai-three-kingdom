@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const E = require('../js/engine.js');
 const D = require('../js/data.js');
 const makeBattle = (rules = {}) => new E.Battle(D.createChibi(rules));
-const sample = { side: 'ally', war: 200, intelligence: 210, soldiers: 2000, attack: 100, armor:120,resistance:0 };
+const sample = { side: 'ally', war: 200, intelligence: 210, soldiers: 2000, maxSoldiers:2000, attack: 100, armor:120,resistance:0 };
 const close = (a, b) => assert.ok(Math.abs(a - b) < 1e-8, `${a} != ${b}`);
 function ready(b, id) { const u = b.unit(id); u.ready = true; u.progress = 1; return u; }
 function simulate(config = {}) { const b = makeBattle(config); b.start(); while (b.status === 'running' && b.time < 180) b.advance(.1); return b; }
@@ -22,10 +22,11 @@ test('等级与统御分别提高兵力，突破255仍有效', () => {
   assert.ok(E.maxSoldiers(41, 255) > E.maxSoldiers(40, 255));
   assert.ok(E.maxSoldiers(40, 300) > E.maxSoldiers(40, 255));
 });
-test('物理原始伤害对当前兵力、武力、装备攻击各自线性', () => {
+test('物理伤害不随残兵下降，武力和装备攻击保持线性', () => {
   const args = { attacker: sample, target: sample };
   const full = E.physical(args).raw;
-  close(E.physical({ ...args, attacker: { ...sample, soldiers: 1000 } }).raw, full / 2);
+  for(const soldiers of [2000,1000,1])close(E.physical({ ...args, attacker: { ...sample, soldiers } }).raw, full);
+  close(E.physical({...args,attacker:{...sample,maxSoldiers:4000}}).raw,full*2);
   close(E.physical({ ...args, attacker: { ...sample, war: 100 } }).raw, full / 2);
   close(E.physical({ ...args, attacker: { ...sample, attack: 200 } }).raw, full * 2);
   assert.equal(E.physical({ ...args, attacker: { ...sample, soldiers: 0 } }).amount, 0);
@@ -49,12 +50,24 @@ test('护甲不影响计策，抗性不影响物理，无视护甲能真正穿�
   close(E.physical({attacker,target:{...sample,armor:999}}).raw,E.physical({attacker,target:{...sample,armor:0}}).raw);
   assert.ok(Number.isFinite(E.physical({attacker:sample,target:{...sample,armor:0}}).raw));
 });
-test('计策不乘兵力，群体按实际存活目标分摊，单人不除零', () => {
-  const args = { skill: D.SKILLS.huoshen, intelligence: 255, random: 1 };
-  close(E.tactic(args).raw, 4000 * 255 / 256);
-  close(E.tactic({ ...args, count: 5, scope: 'all' }).raw, E.tactic(args).raw / 4);
-  close(E.tactic({ ...args, count: 6, scope: 'all' }).raw, E.tactic(args).raw / 5);
-  close(E.tactic({ ...args, count: 1, scope: 'all' }).raw, E.tactic(args).raw);
+test('计策及治疗逐目标独立结算，单体、群体和目标人数不改变同一技能数值', () => {
+  for(const kind of ['tactic','heal']){
+    const args = { skill: {...D.SKILLS.huoshen,kind}, intelligence: 255, random: 1,target:{resistance:100} };
+    const expected=4000*255/256*(kind==='heal'?1:.5);close(E.tactic(args).raw,expected);
+    for(const count of [1,2,3,5,6,12])close(E.tactic({ ...args, count, scope: 'all' }).raw,expected);
+  }
+});
+test('群体物理、计策及治疗实战中对1至7个同属性目标逐个结算相同数值',()=>{
+  const unit=id=>({id,name:id,war:100,intelligence:90,speed:90,technique:80,leadership:90,attack:80,armor:50,resistance:50,maxSoldiers:1000,startSoldiers:500,skills:[]});
+  for(const kind of ['physical','tactic','heal']){
+    let expected;
+    for(const count of [1,2,3,5,7]){
+      const caster={...unit('caster'),initialMode:'manual',skills:['area']},targets=Array.from({length:kind==='heal'?count-1:count},(_,i)=>unit('target-'+i));
+      const b=new E.Battle({allies:kind==='heal'?[caster,...targets]:[caster],enemies:kind==='heal'?[unit('enemy')]:targets,skills:{area:{id:'area',name:'群体技能',kind,side:kind==='heal'?'ally':'enemy',scope:'all',all:true,base:120,cost:0,cooldown:2}},rules:{level:1,random:false,critical:false,hit:false}});
+      b.start();ready(b,'caster');assert.ok(b.manual('caster','area').ok);const event=b.events.find(e=>e.type==='action');
+      expected??=event.results[0].actual;assert.equal(event.results.length,count);assert.ok(event.results.every(r=>r.actual===expected));
+    }
+  }
 });
 test('力速比封顶3，武力高允许慢，读条不会无界增加', () => {
   assert.equal(E.ratio(255, 1), 3); assert.equal(E.ratio(255, 255), 1);
@@ -132,11 +145,11 @@ test('保存优先级后立即生效，无可用技能时保持待命', () => {
   assert.equal(b.config.rosterOverrides.zhouyu.priorities[0].disabled, true);
 });
 test('默认完整战斗有攻、计、回复、溃退和真实结算，记录守恒', () => {
-  const b = simulate(); assert.equal(b.status, 'defeat'); assert.ok(b.time>0&&b.time<180); assert.equal(b.actionCount,b.events.filter(e=>e.type==='action').length); assert.ok(b.actionCount>0);
+  const b = simulate(); assert.ok(['victory','defeat'].includes(b.status)); assert.ok(b.time>0&&b.time<180); assert.equal(b.actionCount,b.events.filter(e=>e.type==='action').length); assert.ok(b.actionCount>0);
   assert.ok(b.units.some(u => u.stats.healing > 0));
   assert.ok(b.events.some(e => e.type === 'action' && e.skill === 'strike'));
   assert.ok(b.events.some(e => e.type === 'action' && e.scope === 'all'));
-  assert.equal(b.total('ally'),0);
+  assert.equal(b.total(b.status==='victory'?'enemy':'ally'),0);
   for (const side of ['ally', 'enemy']) {
     const received = b.units.filter(u => u.side === side).reduce((n, u) => n + u.stats.received, 0);
     const healed = b.units.filter(u => u.side === side).reduce((n, u) => n + u.stats.healing, 0);
@@ -145,7 +158,7 @@ test('默认完整战斗有攻、计、回复、溃退和真实结算，记录�
   for (const u of b.units) { assert.ok(u.soldiers >= 0 && u.soldiers <= u.maxSoldiers); assert.ok(u.sp >= 0); }
 });
 test('没有脚本锁定胜利，强敌可以击败联军，0兵不会变回1兵', () => {
-  const hard = simulate({ enemyLevel: 80 }); assert.equal(hard.status, 'defeat');
+  const hard = simulate({ enemyLevel: 80,rosterOverrides:Object.fromEntries(D.ENEMIES.map(u=>[u.id,{attack:1000,armor:1000,resistance:1000}])) }); assert.equal(hard.status, 'defeat');
   const overrides = Object.fromEntries(D.ALLIES.map(u => [u.id, { startSoldiers: 0 }]));
   const b = makeBattle({ rosterOverrides: overrides }); b.start(); assert.equal(b.status, 'defeat'); assert.equal(b.actionCount, 0);
 });

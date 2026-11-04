@@ -64,14 +64,20 @@ test('敌人按阵容顺序横排，旧分排配置或拖动不会改变位置�
     assert.deepEqual(b.export(),before);assert.equal(JSON.stringify(input),source);
   }
 });
-test('敌人姓名、血条、读条依次绘制在人像上方，旧编辑开关不会生成拖动热区',()=>{
+test('多名敌人的姓名和双条贴在脚下，只有单敌血条位于上方',()=>{
+  for(const count of [1,5]){
   const input=D.createEffectsPreview(),b=new Battle(input),boxes=[],texts=[];
+  b.units=b.units.filter(u=>u.side==='ally'||u.id==='caocao'||count===5);
   const view={battle:b,scenario:input,w:375,h:667,visuals:new Map(),health:new Map(),hits:[],formationEditing:true,
     ctx:{save(){},restore(){},fillRect(){},createLinearGradient(){return{addColorStop(){}};}},
     box(x,y,w,h,fill){boxes.push({x,y,w,h,fill});},text(text,x,y){texts.push({text,y});}};
   CanvasBattle.prototype.updateLayout.call(view);const r=view.rectMap.get('caocao');CanvasBattle.prototype.drawUnit.call(view,r.unit,r,0);
   const hp=boxes.find(box=>box.fill==='#10171d'),progress=boxes.find(box=>box.fill==='#07141c');
-  assert.ok(texts.find(t=>t.text==='曹操').y<hp.y);assert.ok(hp.y+hp.h<=progress.y);assert.ok(progress.y+progress.h<=r.figure.y+.001);assert.equal(view.hits.length,1);assert.equal(view.hits[0].unitId,'caocao');assert.equal(view.hits[0].kind,'unit');
+  assert.ok(texts.find(t=>t.text==='曹操').y<hp.y);assert.ok(hp.y+hp.h<=progress.y);
+  if(count===1)assert.ok(progress.y+progress.h<=r.figure.y+.001);
+  else {assert.ok(texts.find(t=>t.text==='曹操').y>=r.figure.y+r.figure.h);assert.equal(hp.y-r.figure.y-r.figure.h,20);}
+  assert.equal(view.hits.length,2);assert.ok(view.hits.every(hit=>hit.unitId==='caocao'&&hit.kind==='unit'));
+  }
 });
 test('敌方有全身图时只读取完整立绘，己方继续使用头像，保持原图比例及头脚完整',()=>{
   const head={src:'head.png',crop:{x:10,y:20,width:256,height:440},status:'legacy'},body={src:'body.png',width:1024,height:1536,status:'ready'};

@@ -28,15 +28,15 @@ test('新建只提供五档难度，原身份模板不再作为职业选项',()=
 });
 test('旧身份存档映射五档难度，新存档兼容独立装备和武器熟练度字段',()=>{
   const storage=memory(),store=new R.SaveStore(storage);
-  for(const [oldId,newId]of Object.entries({worthless:'hell',civilian:'survival',teacher:'normal',bully:'normal',strategist:'heroic',warrior:'heroic',overlord:'protagonist'})){const c=hero();c.identity=oldId;storage.setItem(store.key,JSON.stringify([{version:1,character:c,savedAt:'2026-11-03T00:00:00.000Z'}]));const loaded=store.slots()[0];assert.equal(loaded.version,2);assert.equal(loaded.character.difficulty,newId);assert.equal(loaded.character.identity,undefined);assert.deepEqual(loaded.character.attributes,c.attributes);}
-  const c={...hero(),difficulty:'survival',equipment:{mainHand:'sample-fan'},weaponProficiencies:{blade:12,fan:83}};delete c.identity;const before=JSON.stringify(c);const saved=store.save(1,c);assert.equal(saved.version,2);assert.deepEqual(store.slots()[1].character,c);assert.equal(JSON.stringify(c),before);
+  for(const [oldId,newId]of Object.entries({worthless:'hell',civilian:'survival',teacher:'normal',bully:'normal',strategist:'heroic',warrior:'heroic',overlord:'protagonist'})){const c=hero();c.identity=oldId;storage.setItem(store.key,JSON.stringify([{version:1,character:c,savedAt:'2026-11-03T00:00:00.000Z'}]));const loaded=store.slots()[0];assert.equal(loaded.version,3);assert.equal(loaded.character.difficulty,newId);assert.equal(loaded.character.identity,undefined);assert.deepEqual(loaded.character.attributes,c.attributes);}
+  const c={...hero(),difficulty:'survival',equipment:{mainHand:'sample-fan'},weaponProficiencies:{blade:12,fan:83}};delete c.identity;const before=JSON.stringify(c);const saved=store.save(1,c);assert.equal(saved.version,3);assert.deepEqual(store.slots()[1].character,c);assert.equal(JSON.stringify(c),before);
 });
 test('武器种类使用独立ID，三种治疗器具包含在可扩展注册表内',()=>{
   assert.equal(new Set(R.WEAPON_TYPES.map(type=>type.id)).size,R.WEAPON_TYPES.length);for(const type of R.WEAPON_TYPES){assert.ok(type.id&&type.name);}
   for(const id of ['blade','sword','spear','staff','fan','qin','dagger','bow','crossbow','needle','talisman','gourd','halberd','shield'])assert.ok(R.WEAPON_TYPES.some(type=>type.id===id));
 });
-test('开局为每种武器独立重掷熟练度，地狱固定1、主角剧本固定255',()=>{
-  const rng=random(3810);for(const difficulty of R.DIFFICULTIES){for(let n=0;n<80;n++){const roll=R.rollHero(difficulty.id,rng);assert.deepEqual(Object.keys(roll.weaponProficiencies),R.WEAPON_TYPES.map(type=>type.id));for(const value of Object.values(roll.weaponProficiencies)){assert.ok(Number.isInteger(value)&&value>=difficulty.proficiencyRange[0]&&value<=difficulty.proficiencyRange[1]);if(difficulty.id==='hell')assert.equal(value,1);if(difficulty.id==='protagonist')assert.equal(value,255);}}}
+test('开局为每种武器独立重掷熟练度，地狱固定1、主角剧本固定100',()=>{
+  const rng=random(3810);for(const difficulty of R.DIFFICULTIES){for(let n=0;n<80;n++){const roll=R.rollHero(difficulty.id,rng);assert.deepEqual(Object.keys(roll.weaponProficiencies),R.WEAPON_TYPES.map(type=>type.id));for(const value of Object.values(roll.weaponProficiencies)){assert.ok(Number.isInteger(value)&&value>=difficulty.proficiencyRange[0]&&value<=difficulty.proficiencyRange[1]);if(difficulty.id==='hell')assert.equal(value,1);if(difficulty.id==='protagonist')assert.equal(value,100);assert.ok(value>=1&&value<=100);}}}
   const a=R.rollHero('survival',rng),b=R.rollHero('survival',rng);assert.notDeepEqual(a.weaponProficiencies,b.weaponProficiencies);
 });
 test('熟练度兼容旧存档及后续武器类型，缺项按1读取且不改原值',()=>{
@@ -114,4 +114,10 @@ test('八种形象均可保存并兼容旧形象，独立立绘与头像区域�
     const crop=art.portrait;assert.ok(crop.x>=0&&crop.y>=0&&crop.width>0&&crop.height>0);assert.ok(crop.x+crop.width<=width&&crop.y+crop.height<=height);
   }
   assert.equal(paths.size,8);
+});
+
+test('旧255熟练度按比例迁移一次，新存档允许突破100且不再换算',()=>{
+  const storage=memory(),store=new R.SaveStore(storage),c=hero();c.weaponProficiencies={blade:255,sword:128,spear:1};
+  for(const version of [1,2]){storage.setItem(store.key,JSON.stringify([{version,character:c,savedAt:'2026-11-03T00:00:00.000Z',progress:{stage:'camp',index:2}}]));const loaded=store.slots()[0];assert.equal(loaded.version,3);assert.deepEqual(loaded.character.weaponProficiencies,{blade:100,sword:50,spear:1});assert.deepEqual(loaded.character.attributes,c.attributes);store.save(0,loaded.character,loaded.progress);assert.deepEqual(store.slots()[0].progress,loaded.progress);assert.deepEqual(store.slots()[0].character.weaponProficiencies,{blade:100,sword:50,spear:1});}
+  const current=hero();current.weaponProficiencies={blade:175,spear:500};store.save(1,current);assert.deepEqual(store.slots()[1].character.weaponProficiencies,current.weaponProficiencies);assert.equal(R.PROFICIENCY_BASE,100);
 });
