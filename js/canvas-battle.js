@@ -1,7 +1,7 @@
 (function (root) {
   'use strict';
   const UI=typeof module!=='undefined'&&module.exports?require('./ui-theme.js'):root.PengpaiUI;
-  const font=UI.font;
+  const font=UI.font,PARTY_LIMIT=(typeof module!=='undefined'&&module.exports?require('./game-rules.js'):root.PengpaiRules).PARTY_LIMIT;
   const clamp = (n,a,b) => Math.max(a,Math.min(b,n));
   const clock = time => `${String(Math.floor(time/60)).padStart(2,'0')}:${String(Math.floor(time%60)).padStart(2,'0')}`;
   const Presentation=typeof module!=='undefined'&&module.exports?require('./presentation.js'):root.BattlePresentation;
@@ -14,17 +14,17 @@
     const w=Math.max(1,Math.min(width-24,460)),h=Math.max(1,Math.min(height-24,desiredHeight));
     return {x:(width-w)/2,y:(height-h)/2,w,h};
   }
-  function layout(width,height,allies,enemies,formation) {
-    const rects=[],gap=3,groupWidth=Math.min(width-12,640),cw=(groupWidth-gap*4)/5;
+  function layout(width,height,allies,enemies,formation,allyColumns=PARTY_LIMIT) {
+    const rects=[],gap=3,groupWidth=Math.min(width-12,640);
     for(const [side,count]of[['ally',allies],['enemy',enemies]]){
-      if(!count)continue;const rows=Math.ceil(count/5),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),startEnemy=enemies===1?Math.min(110,height*.13):Math.min(170,height*.22),partyRatio=height<650&&height>width&&rows===1?.23:.33,ch=side==='ally'?Math.min((height*partyRatio-gap*(rows-1))/rows,cw*440/256+54):Math.max(30,Math.min((allyTop-112-startEnemy-gap*(rows-1))/rows,cw*440/256+90)),start=side==='ally'?height-14-rows*ch-gap*(rows-1):startEnemy;
-      for(let i=0;i<count;i++){const row=Math.floor(i/5),col=i%5,n=Math.min(5,count-row*5),rowWidth=n*cw+(n-1)*gap;rects.push({side,index:i,row,column:col,x:(width-rowWidth)/2+col*(cw+gap),y:start+row*(ch+gap),w:cw,h:ch});}
+      if(!count)continue;const columns=side==='ally'?allyColumns:Math.min(5,count),cardWidth=((side==='ally'?Math.min(width-32,640):groupWidth)-gap*(columns-1))/columns,rows=Math.ceil(count/columns),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),startEnemy=enemies===1?Math.min(110,height*.13):enemies<=3?Math.min(76,height*.13):Math.min(170,height*.22),partyRatio=height<650&&height>width&&rows===1?.23:.33,ch=side==='ally'?Math.min((height*partyRatio-gap*(rows-1))/rows,cardWidth*440/256+54):Math.max(30,Math.min((allyTop-112-startEnemy-gap*(rows-1))/rows,cardWidth*440/256+90)),start=side==='ally'?height-14-rows*ch-gap*(rows-1):startEnemy;
+      for(let i=0;i<count;i++){const row=Math.floor(i/columns),col=i%columns,n=Math.min(columns,count-row*columns),rowWidth=n*cardWidth+(n-1)*gap;rects.push({side,index:i,row,column:col,x:(width-rowWidth)/2+col*(cardWidth+gap),y:start+row*(ch+gap),w:cardWidth,h:ch});}
     }
     if(enemies===1){const r=rects.find(r=>r.side==='enemy'),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y));r.x=16;r.y=Math.min(110,height*.13);r.w=width-32;r.h=Math.max(54,allyTop-116-r.y);r.boss=true;}
     if(formation&&enemies>1){const back=formation.back||[],front=formation.front||[],all=[...back,...front];
       if(all.length===enemies&&new Set(all).size===enemies&&all.every(i=>Number.isInteger(i)&&i>=0&&i<enemies)){
         const allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),top=Math.min(110,height*.13),end=allyTop-116,frontY=top+Math.min(198,height*.23,(end-top)*.5);
-        for(const [ids,row,y,ch]of[[back,0,top,frontY-top-14],[front,1,frontY,Math.max(44,end-frontY)]]){const widthUnit=ids.length===1?cw*1.4:cw,total=ids.length*widthUnit+(ids.length-1)*gap;ids.forEach((index,col)=>{const r=rects.find(r=>r.side==='enemy'&&r.index===index);Object.assign(r,{x:(width-total)/2+col*(widthUnit+gap),y,w:widthUnit,h:Math.max(44,ch),row,column:col,boss:false});});}
+        for(const [ids,row,y,ch]of[[back,0,top,frontY-top-14],[front,1,frontY,Math.max(44,end-frontY)]]){const widthUnit=ids.length===1?Math.min(groupWidth*.42,180):(groupWidth-gap*(ids.length-1))/Math.max(1,ids.length),total=ids.length*widthUnit+(ids.length-1)*gap;ids.forEach((index,col)=>{const r=rects.find(r=>r.side==='enemy'&&r.index===index);Object.assign(r,{x:(width-total)/2+col*(widthUnit+gap),y,w:widthUnit,h:Math.max(44,ch),row,column:col,boss:false});});}
         rects.sort((a,b)=>a.side===b.side?(a.side==='enemy'?a.row-b.row:a.index-b.index):a.side==='enemy'?-1:1);
       }
     }
@@ -41,7 +41,7 @@
       this.load(scenario);this.resize();this.lastTime=performance.now();this.raf=requestAnimationFrame(this.frame);
     }
     load(scenario) {
-      this.battle=new root.BattleEngine.Battle(scenario);this.scenario=scenario;this.seen=0;this.ended=false;this.panel=null;this.floats=[];this.aim=null;this.activeManual=null;this.selectionKey=null;this.preparationHintDismissed=false;this.health=new Map(this.battle.units.map(u=>[u.id,new Presentation.HealthTrack(u.soldiers,u.maxSoldiers)]));this.vfx=new root.BattleVFX.BattleEffects();
+      this.battle=new root.BattleEngine.Battle(scenario);this.scenario=scenario;this.seen=0;this.ended=false;this.enemyDefeats=new Map();this.resultAt=0;this.panel=null;this.floats=[];this.aim=null;this.activeManual=null;this.selectionKey=null;this.preparationHintDismissed=false;this.health=new Map(this.battle.units.map(u=>[u.id,new Presentation.HealthTrack(u.soldiers,u.maxSoldiers)]));this.vfx=new root.BattleVFX.BattleEffects();
       const urls=[scenario.scene?.background,...this.battle.units.map(u=>(u.side==='enemy'?u.fullbody||u.portrait:u.portrait)?.src)].filter(Boolean);
       urls.forEach(src=>this.image(src));this.visuals.clear();this.vfx.prepare([...this.battle.units.flatMap(u=>u.skills.map(id=>root.BattleVFX.kindOf(this.battle.skills[id]))),'thunder']);this.updateLayout();this.buildBackground();this.preparePortraits();if(this.options.autoStart!==false)this.battle.start();return this;
     }
@@ -60,11 +60,11 @@
     }
     updateLayout(){
       if(!this.w||!this.battle)return;this.allies=this.battle.units.filter(u=>u.side==='ally');this.enemies=this.battle.units.filter(u=>u.side==='enemy');
-      this.rects=layout(this.w,this.h,this.allies.length,this.enemies.length,this.scenario.scene?.enemyFormation);
+      this.rects=layout(this.w,this.h,this.allies.length,this.enemies.length,this.scenario.scene?.enemyFormation,this.scenario.rules?.partySlots||PARTY_LIMIT);
       for(const r of this.rects){r.unit=(r.side==='ally'?this.allies:this.enemies)[r.index];r.id=r.unit.id;
-        const enemy=r.side==='enemy',barWidth=r.boss?Math.min(280,this.w*.52):r.w;
+        const enemy=r.side==='enemy',barWidth=r.boss?Math.min(280,this.w*.52):enemy?Math.min(r.w,180):r.w;
         r.figure={x:r.x,y:r.y+(r.boss?84:0),w:r.w,h:Math.max(0,r.h-(r.boss?84:50))};
-        r.hud={x:r.boss?(this.w-barWidth)/2:r.x,y:enemy&&!r.boss?r.figure.y+r.figure.h+20:r.y,w:barWidth,belowFigure:enemy&&!r.boss};
+        r.hud={x:r.x+(r.w-barWidth)/2,y:enemy&&!r.boss?r.figure.y+r.figure.h+20:r.y,w:barWidth,belowFigure:enemy&&!r.boss};
         r.effectY=r.figure.y+r.figure.h*.55;r.floatY=r.figure.y+22;
       }
       this.rectMap=new Map(this.rects.map(r=>[r.id,r]));this.allyTop=Math.min(...this.rects.filter(r=>r.side==='ally').map(r=>r.y));
@@ -93,18 +93,19 @@
       this.processEvents(now);if(this.disposed)return;this.vfx.prewarm(2);const updated=this.metrics?performance.now():0;this.draw(now);if(this.metrics){const ended=performance.now(),report=this.metrics.add(ended-started,updated-started,ended-updated,delta*1000,now);if(report)this.canvas.dataset.frameStats=JSON.stringify({...report,actions:this.battle.actionCount,vfx:this.vfx.items.length,spritesBuilt:this.spriteBuilds,fxTextures:this.vfx.cacheInfo().textures});}if(!this.disposed)this.raf=requestAnimationFrame(this.frame);
     }
     processEvents(now){
+      this.enemyDefeats||=new Map();
       const b=this.battle,events=b.events,totals=new Map(),health=new Map();
-      for(let i=this.seen;i<events.length;i++){const e=events[i];if(e.type==='modeblocked')this.floats.push({id:e.actor,text:e.text,color:'#f1dfae',born:now,type:'skill'});if(e.type!=='action')continue;const skill=b.skills[e.skill];this.vfx.action(e,skill,now);
+      for(let i=this.seen;i<events.length;i++){const e=events[i];if(e.type==='modeblocked')this.floats.push({id:e.actor,text:e.text,color:'#f1dfae',born:now,type:'skill'});if(e.type==='passive'){this.floats.push({id:e.actor,text:e.skillName,color:'#ef9389',born:now,type:'skill'});this.vfx.addEffect(e.target||e.actor,e.effect==='cleanse'?'heal':'buff',now,650,false);}if(e.type!=='action')continue;const skill=b.skills[e.skill];this.vfx.action(e,skill,now);
         if(!e.periodic)this.floats.push({id:e.actor,text:e.skillName,color:root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]||'#ead8a5',born:now,type:'skill'});
         for(const r of e.results){if(r.buff)continue;if(!r.miss)health.set(r.target,r.after);const damageType=r.damageType||skill?.damageType||skill?.kind||'physical',displayAmount=r.healing?r.actual:r.amount??r.actual,key=r.target+':'+(r.miss||(r.healing?'heal':damageType)),old=totals.get(key);if(old){old.actual+=r.actual;old.displayAmount+=displayAmount;old.critical=old.critical||r.critical;}else totals.set(key,{...r,damageType,displayAmount});}
         this.options.onAction?.(e,this);if(this.battle!==b)return;
       }this.seen=events.length;
-      for(const [id,value]of health)this.health.get(id)?.set(value,now);
+      for(const [id,value]of health){this.health.get(id)?.set(value,now);const u=b.unit(id);if(u?.side==='enemy'){if(u.soldiers<=0&&!this.enemyDefeats.has(id))this.enemyDefeats.set(id,now);else if(u.soldiers>0)this.enemyDefeats.delete(id);}}
       for(const r of totals.values()){
         const occupied=this.floats.filter(f=>f.id===r.target&&f.type!=='skill'&&now-f.born<650).map(f=>f.lane||0);let lane=0;while(occupied.includes(lane)&&lane<4)lane++;
         this.floats.push({id:r.target,text:r.miss||`${r.healing?'+':'−'}${number(r.displayAmount)}${r.critical?'!':''}`,color:Presentation.resultColor(r),born:now,critical:r.critical,lane});
       }
-      if(!this.ended&&!['ready','running'].includes(b.status)){this.ended=true;if(!this.options.hideResult)this.panel={type:'result'};const result=b.export();this.canvas.dispatchEvent(new CustomEvent('battlecomplete',{detail:result}));this.options.onComplete?.(result,this);}
+      if(!this.ended&&!['ready','running'].includes(b.status)){this.ended=true;this.resultAt=now+(b.status==='victory'&&[...this.enemyDefeats.values()].some(t=>now-t<500)?500:0);if(!this.options.hideResult&&now>=this.resultAt)this.panel={type:'result'};const result=b.export();this.canvas.dispatchEvent(new CustomEvent('battlecomplete',{detail:result}));this.options.onComplete?.(result,this);}
       this.floats=this.floats.filter(f=>now-f.born<1100);const limit=Math.max(48,b.units.length*6);if(this.floats.length>limit)this.floats.splice(0,this.floats.length-limit);
     }
     text(text,x,y,size=14,color='#dce6e5',align='center'){
@@ -121,10 +122,11 @@
     }
     draw(now=performance.now()) {
       if(!this.battle||!this.w)return;
+      if(this.ended&&!this.panel&&!this.options.hideResult&&now>=this.resultAt)this.panel={type:'result'};
       const c=this.ctx,w=this.w,h=this.h;c.save();c.clearRect(0,0,w,h);c.fillStyle=this.scenario.scene?.color||'#10272d';c.fillRect(0,0,w,h);this.vfx.beginFrame(now);const shake=this.options.screenShake===false?{x:0,y:0}:this.vfx.offset(now);c.translate(shake.x,shake.y);if(this.background)c.drawImage(this.background,0,0,w,h);
       this.hits=[];this.text(clock(this.battle.time),w/2,this.enemies.length===1?Math.min(110,h*.13)+55:30,16);
 
-      if(this.scenario.allowRetreat&&this.battle.status==='running')this.button('撤退',w-63,12,53,30,()=>this.battle.retreat());
+      if(this.battle.canRetreat())this.button('撤退',w-63,12,53,30,()=>this.battle.retreat());
       for(const r of this.rects)this.drawUnit(r.unit,r,now);
       this.drawTargeting(now);if(this.options.effects!==false)this.vfx.draw(c,this.rectMap,now);this.drawReadySkills(now);if(this.battle.status==='ready')this.drawPreparation();
       for(const f of this.floats){const r=this.rectMap.get(f.id);if(!r)continue;const progress=(now-f.born)/1100,pop=f.type==='skill'?1:1+.25*Math.sin(Math.PI*Math.min(1,progress*5));c.save();c.globalAlpha=1-progress;const face=this.visuals.get(f.id)?.dst||r.figure,x=face.x+face.w/2,y=(f.type==='skill'?face.y-8:face.y+20+(f.lane||0)*22)-progress*32;c.translate(x,y);c.scale(pop,pop);this.text(f.text,0,0,Math.min(f.type==='skill'?14:f.critical?25:22,r.w*(f.type==='skill'?.2:.33)),f.color);c.restore();}
@@ -137,11 +139,12 @@
     }
     drawUnit(u,r,now) {
       const c=this.ctx,enemy=u.side==='enemy',portraitBox=r.figure,hudScale=1;
-      c.save();if(u.soldiers<=0)c.globalAlpha=.3;
+      let defeat=null;if(enemy&&u.soldiers<=0){this.enemyDefeats||=new Map();if(!this.enemyDefeats.has(u.id))this.enemyDefeats.set(u.id,now);defeat=Presentation.enemyDefeatPose(now-this.enemyDefeats.get(u.id));if(defeat.finished)return;}
+      c.save();if(defeat){c.globalAlpha*=defeat.alpha;c.translate(0,defeat.sink);}c.save();if(!enemy&&u.soldiers<=0)c.globalAlpha*=u.wounded?.55:.3;
       const visual=this.visuals.get(u.id);
-      if(visual){const dst=visual.dst,pose=this.vfx.pose(u.id,u.side,now),idle=Presentation.idlePose(u,now);if(enemy)this.drawGroundShadow(dst);c.save();c.translate(dst.x+dst.w/2+pose.x+idle.x,dst.y+dst.h/2+pose.y+idle.y);c.rotate(pose.angle+idle.angle);c.scale(pose.scale*idle.scale,pose.scale*idle.scale);c.drawImage(visual.sprite,-dst.w/2,-dst.h/2,dst.w,dst.h);const red=this.vfx.redAlpha(u.id,now);if(red>0){c.globalAlpha*=red;c.drawImage(visual.red,-dst.w/2,-dst.h/2,dst.w,dst.h);}c.restore();}
+      if(visual){const dst=visual.dst,pose=this.vfx.pose(u.id,u.side,now),idle=Presentation.idlePose(u,now);if(enemy)this.drawGroundShadow(dst);c.save();c.translate(dst.x+dst.w/2+pose.x+idle.x,dst.y+dst.h/2+pose.y+idle.y);c.rotate(pose.angle+idle.angle);c.scale(pose.scale*idle.scale*(defeat?.scale??1),pose.scale*idle.scale*(defeat?.scale??1));c.drawImage(visual.sprite,-dst.w/2,-dst.h/2,dst.w,dst.h);const red=this.vfx.redAlpha(u.id,now);if(red>0){c.globalAlpha*=red;c.drawImage(visual.red,-dst.w/2,-dst.h/2,dst.w,dst.h);}c.restore();}
       else {this.text(u.name?.slice(0,1)||'将',r.x+r.w/2,r.y+portraitBox.h*.6,Math.min(40,r.w*.6),'#9aafb0');}
-      let y=enemy?r.hud.y:r.y+r.h-50;const hx=enemy?r.hud.x:r.x,hw=enemy?r.hud.w:r.w;
+      c.restore();let y=enemy?r.hud.y:r.y+r.h-50;const hx=enemy?r.hud.x:r.x,hw=enemy?r.hud.w:r.w;
       const hpHeight=enemy?20:22;if(enemy)this.text(u.name,hx+hw/2,y-12,14,'#d5e3de');
       this.box(hx,y,hw,hpHeight,'#10171d',u.side==='ally'&&u.mode==='manual'?'#f4f7f8':'#75a8b5',4);
       const g=c.createLinearGradient(0,y,0,y+hpHeight);g.addColorStop(0,'#f33b33');g.addColorStop(.55,'#ad0009');g.addColorStop(1,'#e5221c');
@@ -149,14 +152,15 @@
       c.fillStyle=health.healing?'#bdfbd5':'#f3f1e4';c.fillRect(hx+2,y+2,(hw-4)*clamp(health.trail/u.maxSoldiers,0,1),hpHeight-4);
       c.fillStyle=g;c.fillRect(hx+2,y+2,(hw-4)*clamp(health.value/u.maxSoldiers,0,1),hpHeight-4);
       if(health.healing){c.fillStyle='#94f3ad';c.fillRect(hx+2+(hw-4)*clamp(health.value/u.maxSoldiers,0,1)-2,y+2,2,hpHeight-4);}
-      this.text(number(u.soldiers),enemy?hx+hw/2:hx+4,y+hpHeight/2,14,'#fff0ec',enemy?'center':'left');
+      this.text(!enemy&&u.dead?'濒死':!enemy&&u.wounded?'重伤':number(u.soldiers),enemy?hx+hw/2:hx+4,y+hpHeight/2,14,'#fff0ec',enemy?'center':'left');
       y+=hpHeight+3*hudScale;this.box(hx+1,y,hw-2,5*hudScale,'#07141c','#527d89',1);c.fillStyle='#23c8d0';c.fillRect(hx+2,y+hudScale,(hw-4)*clamp(u.progress,0,1),3*hudScale);
       if(!enemy){y+=9;this.box(r.x,y,r.w,23,'#091e29',u.mode==='manual'?'#f4f7f8':'#75a8b5',3);this.text(u.name,r.x+r.w/2,y+11.5,Math.max(12,Math.min(14,r.w/4)),u.mode==='manual'?'#ffffff':'#75dbe7');}
       if(u.mode==='manual'){const mark=visual?.dst||r.figure;this.text('手动',mark.x+mark.w-3,mark.y+mark.h-10,12,'#c78c52','right');}
       if(u.side==='ally'&&u.mode==='manual'&&u.soldiers>0){c.save();c.strokeStyle='#f5ffff';c.shadowColor='#a6d9ed';c.shadowBlur=5;c.lineWidth=1.5;c.globalAlpha=.8+.15*Math.sin(now*.004);const frame=visual?.dst||r.figure,left=frame.x+1,top=frame.y+1,bottom=frame.y+frame.h-1,right=frame.x+frame.w-1,len=8;c.beginPath();for(const [x,y,dx,dy]of[[left,top,1,1],[right,top,-1,1],[left,bottom,1,-1],[right,bottom,-1,-1]]){c.moveTo(x+dx*len,y);c.lineTo(x,y);c.lineTo(x,y+dy*len);}c.stroke();c.restore();}
       c.restore();
+      if(defeat)return;
       const action=(intent=this.aim)=>{if(this.panel)return;if(intent)this.selectUnit(u,intent);else if(u.side==='ally')this.openTactics(u);else if(this.battle.status==='ready')this.openInspect(u);};
-      const areas=enemy?[visual?.dst||r.figure,{x:r.hud.x,y:r.hud.y-20,w:r.hud.w,h:50}]:[r];
+      const areas=enemy?[visual?.dst||r.figure,{x:r.hud.x,y:r.hud.y-20,w:r.hud.w,h:50}]:[visual?.dst||r.figure,{x:r.x,y:r.y+r.h-50,w:r.w,h:50}];
       for(const area of areas)this.hits.push({...area,kind:'unit',unitId:u.id,label:u.name,action});
       if(u.side==='ally')this.hits.push({x:r.x,y:y,w:r.w,h:23,kind:'unit',unitId:u.id,label:u.name,action:()=>this.toggleMode(u)});
       if(u.statuses.length)this.drawStatuses(u,r);
@@ -167,22 +171,10 @@
     }
     statusTexture(status){
       this.statusTextures||=new Map();const id=status.id;if(this.statusTextures.has(id))return this.statusTextures.get(id);
-      const base=root.BattleStatuses.definitions[id]||status,color=base.color||'#aac5d9',canvas=document.createElement('canvas');canvas.width=40;canvas.height=40;const c=canvas.getContext('2d');c.scale(2,2);c.beginPath();c.roundRect(1,1,18,18,4);const bg=c.createLinearGradient(0,1,0,19);bg.addColorStop(0,'#293a46');bg.addColorStop(1,'#081522');c.fillStyle=bg;c.fill();c.strokeStyle=color;c.lineWidth=1;c.stroke();c.translate(10,10);c.strokeStyle=color;c.fillStyle=color;c.lineWidth=1.7;c.lineCap='round';c.lineJoin='round';
-      const shield=()=>{c.beginPath();c.moveTo(0,-6);c.lineTo(5,-4);c.lineTo(5,1);c.quadraticCurveTo(4,5,0,7);c.quadraticCurveTo(-4,5,-5,1);c.lineTo(-5,-4);c.closePath();c.stroke();};
-      const plus=()=>{c.beginPath();c.moveTo(-3,0);c.lineTo(3,0);c.moveTo(0,-3);c.lineTo(0,3);c.stroke();};
-      if(status.taunt||id==='taunt'){shield();c.fillRect(-.8,-3,1.6,4);c.beginPath();c.arc(0,3,1,0,Math.PI*2);c.fill();}
-      else if(id==='armorDown'){shield();c.beginPath();c.moveTo(1,-5);c.lineTo(-2,-1);c.lineTo(2,2);c.lineTo(-1,5);c.stroke();}
-      else if(id==='armorUp'){shield();plus();}
-      else if(id==='resistanceUp'||id==='resistanceDown'){c.beginPath();c.moveTo(0,-7);c.lineTo(6,0);c.lineTo(0,7);c.lineTo(-6,0);c.closePath();c.stroke();if(id==='resistanceUp')plus();else{c.beginPath();c.moveTo(-3,0);c.lineTo(3,0);c.stroke();}}
-      else if(id==='bleed'){c.beginPath();c.moveTo(0,-7);c.bezierCurveTo(1,-4,7,2,4,5);c.bezierCurveTo(0,9,-6,5,-4,0);c.closePath();c.fill();c.strokeStyle='#ffd2d2';c.beginPath();c.moveTo(-2,1);c.lineTo(-2,4);c.stroke();}
-      else if(id==='poison'){c.beginPath();c.arc(0,-1,5.5,0,Math.PI*2);c.fill();c.fillStyle='#142329';c.fillRect(-3,-2,2,2);c.fillRect(1,-2,2,2);c.fillStyle=color;c.fillRect(-3,3,6,3);c.strokeStyle=color;c.beginPath();c.moveTo(-5,6);c.lineTo(5,3);c.moveTo(-5,3);c.lineTo(5,6);c.stroke();}
-      else if(id==='burn'){c.beginPath();c.moveTo(0,-7);c.bezierCurveTo(6,-2,7,4,2,6);c.bezierCurveTo(-6,8,-7,0,-2,-3);c.lineTo(-1,1);c.closePath();c.fill();c.fillStyle='#ffe9a4';c.beginPath();c.moveTo(0,-1);c.quadraticCurveTo(5,6,0,6);c.quadraticCurveTo(-3,4,0,-1);c.fill();}
-      else if(id==='stun'){c.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?2.8:6.5;const x=Math.cos(a)*r,y=Math.sin(a)*r;i?c.lineTo(x,y):c.moveTo(x,y);}c.closePath();c.fill();c.beginPath();c.ellipse(0,2,7,3,-.3,0,Math.PI);c.stroke();}
-      else if(id==='paralysis'){c.beginPath();c.moveTo(2,-7);c.lineTo(-5,1);c.lineTo(0,1);c.lineTo(-2,7);c.lineTo(5,-2);c.lineTo(1,-2);c.closePath();c.fill();}
-      else if(id==='speedUp'||id==='speedDown'){const d=id==='speedUp'?-1:1;for(let i=-1;i<=1;i+=2){c.beginPath();c.moveTo(-5,i*3-d*2);c.lineTo(0,i*3+d*2);c.lineTo(5,i*3-d*2);c.stroke();}}
-      else if(id==='regeneration'){c.beginPath();c.moveTo(-5,6);c.quadraticCurveTo(-7,-5,5,-6);c.quadraticCurveTo(7,4,-5,6);c.stroke();plus();}
-      else if(id==='reflectDamage'){c.beginPath();c.arc(0,0,6,-1,4);c.lineTo(-5,1);c.moveTo(-5,5);c.lineTo(-6,1);c.stroke();}
-      else plus();this.statusTextures.set(id,canvas);return canvas;
+      const canvas=document.createElement('canvas');canvas.width=64;canvas.height=64;const c=canvas.getContext('2d'),base=root.BattleStatuses.definitions[id]||status;
+      c.beginPath();c.roundRect(1,1,62,62,6);c.fillStyle='#10242bed';c.fill();c.strokeStyle=base.color||'#88a49b';c.lineWidth=2;c.stroke();
+      const painted=root.RpgIcons.draw(c,status.taunt?'taunt':id,3,3,58,{image:src=>this.image(src)});if(!painted)root.RpgIcons.draw(c,status.negative?'resistanceDown':'resistanceUp',3,3,58,{image:src=>this.image(src)});
+      this.statusTextures.set(id,canvas);return canvas;
     }
     drawStatuses(u,r){
       const c=this.ctx,size=20,gap=2,enemy=u.side==='enemy',cols=Math.max(1,Math.floor((enemy?r.hud.w:r.w)/(size+gap))),top=enemy?(r.hud.belowFigure?r.figure.y+r.figure.h-24:r.hud.y+33):r.y+r.h-88;
@@ -200,7 +192,7 @@
       if(this.activeManual===u.id&&u.mode==='auto'){this.activeManual=null;this.selectionKey=null;}
     }
     selectUnit(u,intent=this.aim) {
-      if(!intent||intent!==this.aim||this.panel||this.battle.status!=='running')return;const a=intent;if(u.side!==a.side||u.soldiers<=0)return;
+      if(!intent||intent!==this.aim||this.panel||this.battle.status!=='running')return;const a=intent;if(u.side!==a.side||u.dead||u.soldiers<=0&&!u.wounded)return;
       const result=this.battle.manual(a.actor,a.skill,u.id);if(result.ok){this.aim=null;this.activeManual=null;}else this.notify(result.reason);
     }
     chooseSkill(u,id) {
@@ -215,21 +207,11 @@
       if(skill.functionLabel)return skill.functionLabel;
       const all=skill.scope==='all';
       if(skill.kind==='heal')return all?'群体治疗':'单体治疗';
-      if(skill.kind==='buff')return skill.buff?.taunt?'嘲讽':skill.side==='enemy'?(all?'群体削弱':'单体削弱'):skill.side==='self'?'自身增益':all?'群体增益':'单体增益';
-      return (all?'群体':'单体')+(skill.kind==='physical'?'物理伤害':'计策伤害');
+      if(skill.kind==='buff')return skill.buff?.taunt?'嘲讽':skill.buff?.reflect||skill.buff?.reflectFormula?'反伤':skill.side==='enemy'?(all?'群体削弱':'单体削弱'):skill.side==='self'?'自身增益':all?'群体增益':'单体增益';
+      return (all?'群体':'单体')+(skill.kind==='physical'?'物理伤害':'魔法伤害');
     }
     drawSkillIcon(skill,x,y,size,color) {
-      const c=this.ctx,kind=root.BattleVFX.kindOf(skill),cx=x+size/2,cy=y+size/2,k=size*.28;
-      color||=root.BattleVFX.COLORS[kind]||'#e0ecf2';c.save();c.translate(cx,cy);c.fillStyle=color;c.strokeStyle=color;c.lineWidth=2;c.shadowColor=color;c.shadowBlur=7;
-      if(kind==='fire'){c.beginPath();c.moveTo(0,-k*1.2);c.bezierCurveTo(k*.2,-k*.3,k*1.3,k*.4,k*.6,k);c.bezierCurveTo(-k*.2,k*1.6,-k*1.2,k*.6,-k*.65,0);c.bezierCurveTo(-k*.55,k*.3,-k*.2,k*.2,0,-k*1.2);c.fill();}
-      else if(kind==='thunder'){c.beginPath();c.moveTo(k*.3,-k*1.2);c.lineTo(-k*.7,k*.15);c.lineTo(-k*.05,k*.15);c.lineTo(-k*.3,k*1.3);c.lineTo(k*.8,-k*.2);c.lineTo(k*.1,-k*.2);c.closePath();c.fill();}
-      else if(kind==='wood'){c.beginPath();c.moveTo(-k*.7,k*.8);c.bezierCurveTo(-k*1.1,-k*.5,0,-k, k*.8,-k);c.bezierCurveTo(k*.9,0,k*.4,k,-k*.7,k*.8);c.stroke();c.beginPath();c.moveTo(-k,k*1.1);c.lineTo(k*.5,-k*.65);c.stroke();}
-      else if(kind==='water'){c.beginPath();c.moveTo(0,-k*1.2);c.bezierCurveTo(k*.3,-k*.5,k*1.2,k*.4,k*.6,k);c.bezierCurveTo(0,k*1.4,-k,k*.8,-k*.65,k*.1);c.closePath();c.fill();}
-      else if(kind==='earth'){for(const [dx,dy,a] of[[-.5,.4,.7],[.55,.55,.55],[.15,-.6,.6]]){c.beginPath();c.moveTo((dx-a)*k,(dy+.4)*k);c.lineTo((dx-a*.8)*k,(dy-.4)*k);c.lineTo((dx+a*.25)*k,(dy-.7)*k);c.lineTo((dx+a)*k,(dy+.15)*k);c.lineTo((dx+a*.4)*k,(dy+.6)*k);c.closePath();c.stroke();}}
-      else if(kind==='heal'){c.fillRect(-k*.3,-k,k*.6,k*2);c.fillRect(-k,-k*.3,k*2,k*.6);}
-      else if(kind==='buff'||kind==='debuff'||kind==='taunt'){c.beginPath();c.moveTo(0,-k*1.1);c.lineTo(k*.8,-k*.6);c.lineTo(k*.65,k*.45);c.lineTo(0,k*1.15);c.lineTo(-k*.65,k*.45);c.lineTo(-k*.8,-k*.6);c.closePath();c.stroke();if(kind==='taunt'){c.fillRect(-k*.1,-k*.55,k*.2,k*.7);c.fillRect(-k*.1,k*.4,k*.2,k*.2);}else{c.beginPath();c.moveTo(0,kind==='debuff'?-k*.5:k*.6);c.lineTo(0,kind==='debuff'?k*.5:-k*.6);c.moveTo(-k*.3,0);c.lineTo(0,kind==='debuff'?k*.5:-k*.6);c.lineTo(k*.3,0);c.stroke();}}
-      else{c.save();c.rotate(.6);c.beginPath();c.moveTo(0,-k*1.2);c.lineTo(k*.2,-k*.65);c.lineTo(k*.15,k*.55);c.lineTo(-k*.15,k*.55);c.lineTo(-k*.2,-k*.65);c.closePath();c.fill();c.fillRect(-k*.55,k*.45,k*1.1,k*.15);c.fillRect(-k*.12,k*.6,k*.24,k*.5);c.restore();}
-      c.restore();
+      root.SkillIcons.draw(this.ctx,skill,x+2,y+2,size-4,{image:src=>this.image(src)});
     }
     drawReadySkills(now) {
       if(this.battle.status!=='running')return;
@@ -262,29 +244,32 @@
 
       this.button('开战',(this.w-w)/2,y+18,w,48,()=>{this.options.onPrepared?.(this);this.battle.start();},true);
     }
-    openInspect(u){if(u)this.panel={type:'inspect',id:u.id,scroll:0};}
+    openInspect(u){if(u&&!(u.side==='enemy'&&u.soldiers<=0))this.panel={type:'inspect',id:u.id,scroll:0};}
     openSkillInfo(u,id){
       if(!u?.skills.includes(id)||!this.battle.skills[id])return;
       this.panel={type:'skillInfo',id:u.id,skill:id,previous:this.panel,scroll:0};
     }
     drawInspect(){
       const p=this.panel,u=this.battle.unit(p.id);if(!u){this.panel=null;return;}
-      const {x,y,w,h}=this.panelFrame(u.name+' · 属性',620),left=x+22,right=x+w-22,start=y+54,bottom=y+h-14,c=this.ctx,headerHits=this.hits.length;let row=start+12-(p.scroll||0);
+      const potential=root.CharacterGrowth.isGeneral(u)&&u.potentials,{x,y,w,h}=this.panelFrame(u.name+' · 属性',u.side==='enemy'&&!potential?440:620),left=x+22,right=x+w-22,start=y+54,bottom=y+h-14,c=this.ctx,headerHits=this.hits.length;let row=start+12-(p.scroll||0);
       c.save();c.beginPath();c.rect(x,start,w,bottom-start);c.clip();
-      const pairs=[['兵力',`${number(u.soldiers)} / ${number(u.maxSoldiers)}`],['等级',number(u.level)],['武力',number(u.war)],['智力',number(u.intelligence)],['统御',number(u.leadership)],['速度',number(u.speed)],['技巧',number(u.technique)],['护甲',number(this.battle.effective(u).armor)],['抗性',number(this.battle.effective(u).resistance)]];
+      const pairs=[['生命',number(u.soldiers)+' / '+number(u.maxSoldiers)],['等级',number(u.level)],...(!potential?root.PengpaiRules.ATTRIBUTES.map(([key,label])=>[label,number(u[key])]):[]),['护甲',number(this.battle.effective(u).armor)],['抗性',number(this.battle.effective(u).resistance)]];
       for(let i=0;i<pairs.length;i++){const xx=left+(i%2)*(w-44)/2,yy=row+Math.floor(i/2)*26;this.text(pairs[i][0],xx,yy,14,'#acbec2','left');this.text(pairs[i][1],xx+(w-44)/2-10,yy,14,'#eddfbd','right');}
-      row+=143;this.text('装备',left,row,14,'#ebd4a6','left');row+=25;this.text(u.weapon?.name||(u.weapon===null?'徒手':'未登记武器'),left,row,14,'#d6e2e3','left');this.text(`攻击 ${number(u.attack)}`,right,row,14,'#c5d3d5','right');row+=25;
-      const armor=u.equipment?.armor,off=u.equipment?.offhand;if(armor||off){this.text([armor?.name||armor,off?.name].filter(Boolean).join(' · '),left,row,14,'#c5d3d5','left');row+=25;}
-      this.text('武器熟练度',left,row,14,'#ebd4a6','left');row+=24;const names=Object.fromEntries((root.PengpaiRules?.WEAPON_TYPES||[]).map(t=>[t.id,t.name])),entries=Object.entries(u.weaponProficiencies||{});this.text(entries.length?entries.map(([id,v])=>`${names[id]||id} ${v}`).join('　'):'未习得',left,row,14,'#c5d3d5','left');row+=30;
+      row+=Math.ceil(pairs.length/2)*26+13;
+      if(potential){this.text('属性',left,row,14,'#acbec2','left');this.text('当前',left+(w-44)*.55,row,14,'#acbec2','right');this.text('潜力',right,row,14,'#d8bc8b','right');row+=27;for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.text(label,left,row,14,'#c5d3d5','left');this.text(u[key],left+(w-44)*.55,row,14,'#e4e2d4','right');this.text(u.potentials[key],right,row,14,'#ddc393','right');row+=27;}row+=14;}
+      if(u.side!=='enemy'){this.text('装备',left,row,14,'#ebd4a6','left');row+=25;this.text(u.weapon?.name||(u.weapon===null?'徒手':'未登记武器'),left,row,14,'#d6e2e3','left');this.text(`攻击 ${number(u.attack)}`,right,row,14,'#c5d3d5','right');row+=25;
+      for(const [slot,label]of [['armor','盔甲'],['accessory1','饰品'],['accessory2','饰品']]){this.text(label,left,row,14,'#acbec2','left');this.text(u.equipment?.[slot]?.name||'未装备',right,row,14,'#c5d3d5','right');row+=25;}
+      this.text('武器熟练度',left,row,14,'#ebd4a6','left');row+=28;const columns=Math.max(2,Math.min(3,Math.floor((w-44)/96))),cellW=(w-44)/columns;for(const group of root.WeaponCatalog.groupedTypes()){this.text(group.name,(left+right)/2,row,14,'#d9bf8e','center');row+=24;group.types.forEach((type,i)=>{const xx=left+i%columns*cellW,yy=row+Math.floor(i/columns)*26;this.text(type.name,xx,yy,14,'#acbec2','left');this.text(u.weaponProficiencies?.[type.id]||0,xx+cellW-14,yy,14,'#e4dfca','right');});row+=Math.ceil(group.types.length/columns)*26+12;}}
+      const weaponType=root.PengpaiRules.WEAPON_TYPES.find(t=>t.id===u.weapon?.type),profession=root.PengpaiRules.WEAPON_GROUPS.find(g=>g.id===weaponType?.group);if(profession){this.text('职业　'+profession.name+(u.side==='ally'?' · '+weaponType.name:''),left,row,14,'#c5d3d5','left');row+=26;}
       this.text('技能',left,row,14,'#ebd4a6','left');row+=20;const col=(w-44)/Math.max(1,u.skills.length),icon=44;
       u.skills.forEach((id,i)=>{const skill=this.battle.skills[id],cx=left+col*(i+.5),ix=cx-icon/2;this.box(ix,row,icon,icon,'#0b222d','#7b9ba6');this.drawSkillIcon(skill,ix,row,icon,root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]);this.text(skill.name,cx,row+57,14,'#e6e8dd');this.text(this.skillRole(skill),cx,row+76,12,'#b7cbd0');this.hits.push({x:left+col*i,y:row,w:col,h:88,label:skill.name,action:()=>this.openSkillInfo(u,id)});});row+=110;
-      for(const id of u.passives){const passive=this.battle.passives[id];this.text(passive.name,left,row,14,'#ef9389','left');row+=24;for(const line of this.wrapInfo(passive.description,w-44)){this.text(line,left,row,14,'#c5d3d5','left');row+=22;}}
+      for(const id of root.PengpaiRules.sortPassives(u.passives,this.battle.passives)){const passive=this.battle.passives[id];this.text(passive.name,left,row,14,'#ef9389','left');row+=24;for(const line of this.wrapInfo(passive.description,w-44)){this.text(line,left,row,14,'#c5d3d5','left');row+=22;}}
       c.restore();p.maxScroll=Math.max(0,row+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);this.hits=this.hits.filter((hit,i)=>i<headerHits||(hit.y>=start&&hit.y+hit.h<=bottom));
     }
-    wrapInfo(value,width){const c=this.ctx;c.font=`14px ${font}`;const rows=[];let line='';for(const ch of Array.from(value)){if(line&&c.measureText(line+ch).width>width&&!/[，。！？、；：）】》]/.test(ch)){rows.push(line);line='';}line+=ch;}if(line)rows.push(line);return rows;}
+    wrapInfo(value,width){const c=this.ctx;c.font=`14px ${font}`;const rows=[];let line='';for(const ch of String(value).match(/(?:武器威力|武力|智力|体质|速度|技巧)(?:×\d+(?:\.\d+)?)?|\d+(?:\.\d+)?%?|./gu)||[]){if(line&&c.measureText(line+ch).width>width&&!/[，。！？、；：）】》]/.test(ch)){rows.push(line);line='';}line+=ch;}if(line)rows.push(line);return rows;}
     drawSkillInfo(){
       const p=this.panel,u=this.battle.unit(p.id),skill=this.battle.skills[p.skill];if(!u||!skill){this.closePanel();return;}
-      const {x,y,w,h}=this.panelFrame(skill.name,470),c=this.ctx,start=y+54,bottom=y+h-16,info=root.BattleSkillInfo.describe(this.battle,u,skill);let row=start+12-(p.scroll||0);
+      const info=root.BattleSkillInfo.describe(this.battle,u,skill),contentH=info.lines.slice(1).reduce((n,line)=>n+this.wrapInfo(line,Math.min(this.w-24,460)-44).length*23+8,65),{x,y,w,h}=this.panelFrame(skill.name,82+contentH),c=this.ctx,start=y+54,bottom=y+h-16;let row=start+12-(p.scroll||0);
       c.save();c.beginPath();c.rect(x,start,w,bottom-start);c.clip();this.box(x+20,row,42,42,'#102b35','#7b9ba6');this.drawSkillIcon(skill,x+20,row,42,root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]);this.text(info.role,x+76,row+21,14,'#e6d8af','left');row+=65;
       for(const line of info.lines.slice(1)){for(const wrapped of this.wrapInfo(line,w-44)){this.text(wrapped,x+22,row,14,'#d2e0df','left');row+=23;}row+=8;}c.restore();p.maxScroll=Math.max(0,row+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);
     }
@@ -299,7 +284,7 @@
     }
     drawResult() {
       const b=this.battle,{x,y:top,w}=this.panelFrame({victory:'战斗胜利',defeat:'战斗失利',draw:'两军俱溃',retreated:'已撤退'}[b.status]||'战斗结束',285);let y=top+65;
-      this.text(`${clock(b.time)}  ·  剩余兵力 ${number(b.total('ally'))}`,x+w/2,y,15);y+=43;
+      this.text(`${clock(b.time)}  ·  剩余生命 ${number(b.total('ally'))}`,x+w/2,y,15);y+=43;
       this.button('战报',x+14,y,(w-35)/2,39,()=>{this.panel={type:'log',page:0};});this.button('再战',x+21+(w-35)/2,y,(w-35)/2,39,()=>this.restart());y+=52;
       const mvp=[...b.units.filter(u=>u.side==='ally')].sort((a,b)=>b.stats.damage-a.stats.damage)[0];
       if(mvp)this.text(`${mvp.name}  ·  造成伤害 ${number(mvp.stats.damage)}`,x+w/2,y,13,'#a2bfc0');
@@ -323,7 +308,7 @@
       if(e.button!==0||e.isPrimary===false||this.press)return;const point=this.point(e),hit=[...this.hits].reverse().find(r=>point.x>=r.x&&point.x<=r.x+r.w&&point.y>=r.y&&point.y<=r.y+r.h);
       const press=this.press={...point,hit,pointer:e.pointerId,long:false,moved:false,scroll:this.panel?.scroll||0,panel:this.panel,battle:this.battle,intent:this.aim};this.canvas.setPointerCapture?.(e.pointerId);
       const unit=hit?.unitId?this.battle.unit(hit.unitId):null;
-      if(unit&&!this.panel&&(unit.side==='enemy'||unit.soldiers>0))this.pressTimer=setTimeout(()=>{if(this.press!==press||press.moved||this.panel!==press.panel||this.battle!==press.battle||!['ready','running'].includes(this.battle.status))return;press.long=true;if(unit.side==='enemy')this.openInspect(unit);else this.openTactics(unit);},1000);
+      if(unit&&!this.panel&&(unit.side==='enemy'||unit.soldiers>0))this.pressTimer=setTimeout(()=>{if(this.press!==press||press.moved||this.panel!==press.panel||this.battle!==press.battle||!['ready','running'].includes(this.battle.status)||unit.soldiers<=0)return;press.long=true;if(unit.side==='enemy')this.openInspect(unit);else this.openTactics(unit);},1000);
     }
     move(e){
       if(!this.press||(e.pointerId!==undefined&&e.pointerId!==this.press.pointer))return;const p=this.point(e),dx=p.x-this.press.x,dy=p.y-this.press.y;
@@ -374,12 +359,12 @@
         this.box(left-5,y,w-pad*2+10,height-8,'#102a32','#2d4a54',4);this.box(left,y+5,36,36,'#0b222d','#7b9ba6');this.drawSkillIcon(skill,left,y+5,36,root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]);this.text(skill.name,left+44,y+23,14,'#d9e9e9','left');this.text(this.skillRole(skill),left+w-pad*2-8,y+23,12,skill.kind==='heal'?'#8fdfae':'#b5c6d4','right');
         this.hits.push({x:left-2,y:y+3,w:40,h:40,label:`查看${skill.name}详情`,action:()=>this.openSkillInfo(u,skill.id)});
         if(heal){percent(r,'selfThreshold','治疗自己',y+49);percent(r,'allyThreshold','治疗队友',y+103);}
-        else if(group){const count=Math.max(2,this.battle.units.filter(t=>t.side==='enemy').length,Math.floor(r.threshold)||2);this.slider('施放条件',left+9,y+49,w-(pad+9)*2,r.disabled?0:Math.max(1,Math.min(count,r.threshold)-1),count-1,v=>{r.disabled=v===0;r.when='enemyCount';r.threshold=v+1;},v=>v===0?'从不释放':`至少 ${v+1} 人`);}
-        else if(skill.buff?.taunt){const value=clamp(Math.round((r.displayThreshold||0)*100),0,101);this.slider('施放条件',left+9,y+49,w-(pad+9)*2,value,101,value=>{r.displayThreshold=value/100;r.disabled=value===0;},value=>value>0&&value<101?`自身兵力低于 ${value}%`:thresholdLabel(value));}
+        else if(group){const count=Math.max(2,this.battle.config.tacticsEnemyCount||0,this.battle.units.filter(t=>t.side==='enemy').length,Math.floor(r.threshold)||2);this.slider('施放条件',left+9,y+49,w-(pad+9)*2,r.disabled?0:Math.max(1,Math.min(count,r.threshold)-1),count-1,v=>{r.disabled=v===0;r.when='enemyCount';r.threshold=v+1;},v=>v===0?'从不释放':`至少 ${v+1} 人`);}
+        else if(skill.buff?.taunt){const value=clamp(Math.round((r.displayThreshold||0)*100),0,101);this.slider('施放条件',left+9,y+49,w-(pad+9)*2,value,101,value=>{r.displayThreshold=value/100;r.disabled=value===0;},value=>value>0&&value<101?`自身生命低于 ${value}%`:thresholdLabel(value));}
         else this.slider('施放频率',left+9,y+49,w-(pad+9)*2,r.disabled?0:r.frequency==='sometimes'?1:2,2,v=>{r.disabled=v===0;r.frequency=v===1?'sometimes':'always';r.when='always';r.threshold=0;},v=>['从不释放','偶尔释放','始终释放'][v]);
         y+=height;
       });
-      const targets=[['lowestCurrent','剩余兵力最少'],['highestCurrent','剩余兵力最多'],['highestMax','最大兵力最多'],['random','随机目标']];
+      const targets=[['lowestCurrent','剩余生命最少'],['highestCurrent','剩余生命最多'],['highestMax','最大生命最多'],['random','随机目标']];
       this.slider('优先攻击目标',left+9,y+6,w-(pad+9)*2,Math.max(0,targets.findIndex(t=>t[0]===p.targetRule)),3,index=>{p.targetRule=targets[index][0];},index=>targets[index][1]);
       c.restore();this.hits=this.hits.filter((hit,i)=>i<before||(hit.y>=start&&hit.y+hit.h<=bottom));
 

@@ -35,8 +35,8 @@ test('Canvas 布局在小屏和七人剧情阵容下不越界、不相互重叠'
 test('头像以原比例等比缩放，宽屏、窄屏均不拉伸',()=>{
   for(const box of[{x:0,y:0,w:65,h:130},{x:10,y:20,w:130,h:70}]){const fit=fitImage(256,440,box);assert.ok(Math.abs(fit.w/fit.h-256/440)<1e-10);assert.ok(fit.w<=box.w&&fit.h<=box.h);}
 });
-test('己方一到五人都占相同五分之一槽宽，阵容水平居中',()=>{
-  for(const [w,h]of[[320,568],[390,844],[640,900]]){const full=layout(w,h,5,1).filter(r=>r.side==='ally');for(let n=1;n<=5;n++){const cards=layout(w,h,n,1).filter(r=>r.side==='ally');assert.ok(cards.every(r=>r.w===full[0].w));assert.ok(Math.abs((cards[0].x+cards.at(-1).x+cards.at(-1).w)/2-w/2)<.01);}}
+test('己方一到四人都占相同四分之一槽宽，阵容水平居中',()=>{
+  for(const [w,h]of[[320,568],[390,844],[640,900]]){const full=layout(w,h,4,1).filter(r=>r.side==='ally');for(let n=1;n<=4;n++){const cards=layout(w,h,n,1).filter(r=>r.side==='ally');assert.ok(cards.every(r=>r.w===full[0].w));assert.ok(Math.abs((cards[0].x+cards.at(-1).x+cards.at(-1).w)/2-w/2)<.01);}}
 });
 test('五名敌人在窄屏和宽屏均保持同一横排，剧情超员不会被截掉',()=>{
   for(const [w,h]of[[320,568],[375,667],[640,900],[844,390]]){
@@ -47,6 +47,24 @@ test('五名敌人在窄屏和宽屏均保持同一横排，剧情超员不会�
       for(const [i,r]of cards.entries()){
         assert.ok(r.x>=0&&r.y>=0&&r.w>0&&r.h>0);assert.ok(r.x+r.w<=w+.001);assert.ok(r.y+r.h<=h+.001);
         for(const previous of cards.slice(0,i))assert.ok(r.x>=previous.x+previous.w-.001||previous.x>=r.x+r.w-.001||r.y>=previous.y+previous.h-.001||previous.y>=r.y+r.h-.001);
+      }
+    }
+  }
+});
+test('两到四名敌人按实际人数分配站位，两名敌人左右展开且模型可用空间更大',()=>{
+  for(const [w,h]of [[320,568],[375,667],[390,844],[640,800]]){
+    const five=layout(w,h,4,5).filter(r=>r.side==='enemy');
+    for(const count of [2,3,4]){
+      const cards=layout(w,h,4,count).filter(r=>r.side==='enemy');
+      assert.equal(cards.length,count);assert.equal(new Set(cards.map(r=>r.y)).size,1);
+      assert.ok(cards.every(r=>r.w>five[0].w));
+      assert.ok(Math.abs((cards[0].x+cards.at(-1).x+cards.at(-1).w)/2-w/2)<.01);
+      for(let i=1;i<cards.length;i++)assert.ok(cards[i].x>cards[i-1].x+cards[i-1].w);
+      if(count===2){
+        assert.ok(cards[0].x+cards[0].w<w/2&&cards[1].x>w/2);
+        const large=fitImage(1024,1536,{x:cards[0].x,y:cards[0].y,w:cards[0].w,h:cards[0].h-50});
+        const small=fitImage(1024,1536,{x:five[0].x,y:five[0].y,w:five[0].w,h:five[0].h-50});
+        assert.ok(large.h>small.h*1.5);
       }
     }
   }
@@ -103,12 +121,12 @@ test('单奶、群奶、自身Buff、友军Buff、敌军状态直接作用且到
   assert.equal(b.manual('zhugeliang','fx_heal_all').ok,true);assert.equal(b.events.at(-1).results.length,5);
   assert.equal(b.manual('huanggai','fx_taunt').ok,true);assert.ok(b.unit('huanggai').statuses.some(s=>s.taunt));
   assert.equal(b.manual('ganning','fx_boost','zhouyu').ok,true);assert.equal(b.unit('zhouyu').statuses[0].attackMultiplier,1.2);
-  b.advance(4.5);assert.equal(b.manual('zhugeliang','fx_weaken','caocao').ok,true);assert.equal(b.unit('caocao').statuses[0].armorMultiplier,.8);
+  b.advance(6);assert.equal(b.manual('zhugeliang','fx_weaken','caocao').ok,true);assert.equal(b.unit('caocao').statuses[0].armorMultiplier,.8);
   b.advance(11);assert.equal(b.unit('caocao').statuses.length,0);assert.equal(b.unit('huanggai').statuses.length,0);
 });
 test('恢复自动会正常出手，其他角色不因手动待命停止行动',()=>{
   const b=new Battle(D.createEffectsPreview());b.start();b.advance(4.5);const count=b.actionCount;
-  b.advance(4.5);assert.ok(b.actionCount>count);assert.equal(b.unit('zhouyu').stats.actions,0);
+  b.advance(6);assert.ok(b.actionCount>count);assert.equal(b.unit('zhouyu').stats.actions,0);
   b.setMode('zhouyu','auto');b.advance(.02);assert.ok(b.unit('zhouyu').stats.actions>0);
 });
 

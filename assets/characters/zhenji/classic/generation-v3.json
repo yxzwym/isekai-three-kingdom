@@ -1,0 +1,12 @@
+{
+  "mode": "built-in image_gen",
+  "useCase": "precise-object-edit",
+  "prompt": "Use case: precise-object-edit. Redesign ONLY the costume of this full-body adult Zhen Ji, age 24, into a more beautiful and sophisticated Chinese goddess-inspired outfit. Keep her lovely adult face, long black hair, lotus hair ornaments, graceful standing pose, realistic anatomy and premium realistic painted game-art rendering. The new costume must look like a coherent elegant high-budget fantasy character design: asymmetrical silver-blue silk mini dress with one delicate shoulder strap and one bare shoulder, beautifully draped crossover bodice, small tasteful silver lotus ornament at the waist, a graceful cutout at one side of the waist, sculpted diagonal folds; short opaque skirt reaching upper mid-thigh with an asymmetrical high slit and only two narrow translucent pale-blue silk streamers floating behind the hips. Arms and legs bare, graceful delicate silver ankle sandals. Refined luminous blue-to-white silk, silver filigree at edges, subtle wave embroidery, little jewelry. Airy, alluring, feminine, elegant and fully clothed, with opaque bust and pelvis coverage. No separate crop-top-and-wrap-skirt look, no bulky gown, no large collar, no heavy sleeves, no long underskirt, no modern underwear or bikini. Keep the tiny medical needle case. Exactly one complete standing adult woman, full head to toes and all hands inside frame with margins. Genuinely transparent clean alpha cutout; no backdrop, gradient cloud, floor, mist, text, watermark or UI.",
+  "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-47c80ed9-8b80-4986-a372-185db1a12870.png",
+  "runtime": "assets/characters/zhenji/classic/fullbody.webp",
+  "quality": 90,
+  "resize": false,
+  "note": "仅甄姬采用清凉仙裙，其余女性角色沿用原素材；v2为未接入的服装草稿。",
+  "selected": false,
+  "selectionNote": "现行采用最初的华丽蓝白古风长裙，不采用清凉版；其他角色保持原图。"
+}

@@ -1,18 +1,213 @@
 (function(root){
   'use strict';
-  const ATTRIBUTES=[['war','武力'],['intelligence','智力'],['leadership','统御'],['speed','速度'],['technique','技巧']];
-  const ranges=(war,intelligence,leadership,speed,technique)=>({war,intelligence,leadership,speed,technique});
+  const C=typeof module!=='undefined'&&module.exports?require('./weapon-catalog.js'):root.WeaponCatalog;
+  const G=typeof module!=='undefined'&&module.exports?require('./character-growth.js'):root.CharacterGrowth;
+  const ATTRIBUTES=G.ATTRIBUTES;
   const PROFICIENCY_BASE=100;
-  const proficiencyFromLegacy=value=>Math.max(1,Math.round(value*PROFICIENCY_BASE/255));
+  const proficiencyFromLegacy=value=>value===0?0:Math.max(1,Math.round(value*PROFICIENCY_BASE/255));
   const IDENTITIES=[
-    {id:'worthless',name:'无用之人',difficulty:5,ranges:ranges([1,1],[1,1],[1,1],[1,1],[1,1])},
-    {id:'civilian',name:'老百姓',difficulty:4,ranges:ranges([40,195],[40,195],[40,195],[40,195],[40,195]),attributeBands:[{weight:90,min:40,max:110},{weight:10,min:111,max:195}]},
-    {id:'teacher',name:'教书先生',difficulty:3,ranges:ranges([25,80],[140,195],[105,155],[100,150],[95,155])},
-    {id:'bully',name:'横行乡里',difficulty:3,ranges:ranges([140,195],[25,80],[105,155],[100,150],[95,155])},
-    {id:'strategist',name:'无双谋将',difficulty:2,ranges:ranges([80,140],[220,250],[195,235],[175,220],[175,220])},
-    {id:'warrior',name:'无双猛将',difficulty:2,ranges:ranges([220,250],[80,140],[195,235],[175,220],[175,220])},
-    {id:'overlord',name:'龙傲天',difficulty:1,ranges:ranges([255,255],[255,255],[255,255],[255,255],[255,255])}
-  ];
+  {
+    "id": "worthless",
+    "name": "无用之人",
+    "difficulty": 5,
+    "ranges": {
+      "war": [
+        1,
+        1
+      ],
+      "intelligence": [
+        1,
+        1
+      ],
+      "constitution": [
+        1,
+        1
+      ],
+      "speed": [
+        1,
+        1
+      ],
+      "technique": [
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "id": "civilian",
+    "name": "老百姓",
+    "difficulty": 4,
+    "ranges": {
+      "war": [
+        16,
+        76
+      ],
+      "intelligence": [
+        16,
+        76
+      ],
+      "constitution": [
+        16,
+        76
+      ],
+      "speed": [
+        16,
+        76
+      ],
+      "technique": [
+        16,
+        76
+      ]
+    },
+    "attributeBands": [
+      {
+        "weight": 90,
+        "min": 16,
+        "max": 43
+      },
+      {
+        "weight": 10,
+        "min": 44,
+        "max": 76
+      }
+    ]
+  },
+  {
+    "id": "teacher",
+    "name": "教书先生",
+    "difficulty": 3,
+    "ranges": {
+      "war": [
+        10,
+        31
+      ],
+      "intelligence": [
+        55,
+        76
+      ],
+      "constitution": [
+        41,
+        61
+      ],
+      "speed": [
+        39,
+        59
+      ],
+      "technique": [
+        37,
+        61
+      ]
+    }
+  },
+  {
+    "id": "bully",
+    "name": "横行乡里",
+    "difficulty": 3,
+    "ranges": {
+      "war": [
+        55,
+        76
+      ],
+      "intelligence": [
+        10,
+        31
+      ],
+      "constitution": [
+        41,
+        61
+      ],
+      "speed": [
+        39,
+        59
+      ],
+      "technique": [
+        37,
+        61
+      ]
+    }
+  },
+  {
+    "id": "strategist",
+    "name": "无双谋将",
+    "difficulty": 2,
+    "ranges": {
+      "war": [
+        31,
+        55
+      ],
+      "intelligence": [
+        86,
+        98
+      ],
+      "constitution": [
+        76,
+        92
+      ],
+      "speed": [
+        69,
+        86
+      ],
+      "technique": [
+        69,
+        86
+      ]
+    }
+  },
+  {
+    "id": "warrior",
+    "name": "无双猛将",
+    "difficulty": 2,
+    "ranges": {
+      "war": [
+        86,
+        98
+      ],
+      "intelligence": [
+        31,
+        55
+      ],
+      "constitution": [
+        76,
+        92
+      ],
+      "speed": [
+        69,
+        86
+      ],
+      "technique": [
+        69,
+        86
+      ]
+    }
+  },
+  {
+    "id": "overlord",
+    "name": "龙傲天",
+    "difficulty": 1,
+    "ranges": {
+      "war": [
+        100,
+        100
+      ],
+      "intelligence": [
+        100,
+        100
+      ],
+      "constitution": [
+        100,
+        100
+      ],
+      "speed": [
+        100,
+        100
+      ],
+      "technique": [
+        100,
+        100
+      ]
+    }
+  }
+];
   const IDENTITY_PASSIVE_WEIGHTS={
     worthless:{white:100},civilian:{white:70,green:25,blue:5},
     teacher:{white:15,green:50,blue:30,gold:5},bully:{white:15,green:50,blue:30,gold:5},
@@ -25,70 +220,12 @@
     {id:'normal',name:'初出茅庐',stars:3,profiles:['teacher','bully']},
     {id:'heroic',name:'天纵之才',stars:2,profiles:['strategist','warrior']},
     {id:'protagonist',name:'主角剧本',stars:1,profiles:['overlord']}
-  ].map(d=>{const profiles=d.profiles.map(id=>IDENTITIES.find(p=>p.id===id)),bounds=profiles.flatMap(p=>Object.values(p.ranges));return {...d,passiveWeights:IDENTITY_PASSIVE_WEIGHTS[d.profiles[0]],proficiencyRange:[Math.min(...bounds.map(r=>r[0])),Math.max(...bounds.map(r=>r[1]))].map(proficiencyFromLegacy),proficiencyBands:profiles[0].attributeBands?.map(b=>({...b,min:proficiencyFromLegacy(b.min),max:proficiencyFromLegacy(b.max)}))};});
+  ].map(d=>({...d,passiveWeights:IDENTITY_PASSIVE_WEIGHTS[d.profiles[0]]}));
   const getDifficulty=id=>DIFFICULTIES.find(d=>d.id===id||d.profiles.includes(id));
-  const WEAPON_TYPES=[['blade','刀','单体重击'],['sword','剑','精准爆发'],['spear','枪','破甲控制'],['halberd','戟','群体物理'],['shield','盾','嘲讽反伤'],['staff','杖','火计输出'],['fan','扇','治疗增益'],['qin','琴','削弱控制'],['dagger','匕首','高速刺杀'],['bow','弓','持续伤害'],['crossbow','弩','狙击压制'],['needle','金针','单体急救'],['talisman','符箓','群疗抗性'],['gourd','药葫芦','持续回复']].map(([id,name,role])=>({id,name,role,skillPlanId:id}));
-  const getWeaponProficiency=(character,id)=>{const values=character?.weaponProficiencies,value=values?.[id]??(id==='talisman'?values?.['medicine-bag']:id==='qin'?values?.jade:undefined);return Number.isSafeInteger(value)&&value>=1?value:1;};
-  // 武器方案描述本作技能与效果，结算系数另行配置。
-  const skillTemplate=(id,name,kind,side,scope,effects=[])=>({id,name,kind,side,scope,effects});
-  const WEAPON_SKILL_PLANS={
-    blade:{status:'design',skills:[
-      skillTemplate('blade-cut','横刀斩','physical','enemy','single'),
-      skillTemplate('blade-burst','断岳斩','physical','enemy','single',['heavyHit']),
-      skillTemplate('blade-sweep','回旋斩','physical','enemy','all')]},
-    sword:{status:'design',skills:[
-      skillTemplate('sword-break','破甲剑','physical','enemy','all',['armorDown']),
-      skillTemplate('sword-eagle','惊鸿剑','physical','enemy','single',['precision']),
-      skillTemplate('sword-critical','孤锋绝命','physical','enemy','single',['highCritical'])]},
-    spear:{status:'design',skills:[
-      skillTemplate('spear-break','破阵枪','physical','enemy','all',['armorDown']),
-      skillTemplate('spear-stun','撞山刺','physical','enemy','single',['stun']),
-      skillTemplate('spear-burst','雷霆突','physical','enemy','single',['highCritical'])]},
-    halberd:{status:'design',skills:[
-      skillTemplate('halberd-cut','横戟击','physical','enemy','single'),
-      skillTemplate('halberd-burst','霸戟破军','physical','enemy','single',['heavyHit']),
-      skillTemplate('halberd-sweep','八方裂阵','physical','enemy','all',['primaryAttack'])]},
-    shield:{status:'design',skills:[
-      skillTemplate('shield-hit','盾击式','physical','enemy','single',['stun']),
-      skillTemplate('shield-taunt','固垒挑衅','buff','self','single',['taunt','armorUp']),
-      skillTemplate('shield-reflect','反戈怒吼','buff','self','single',['reflectDamage'])]},
-    staff:{status:'design',skills:[
-      skillTemplate('staff-fire','烈火诀','tactic','enemy','single',['burn','primaryAttack']),
-      skillTemplate('staff-flame','燎原术','tactic','enemy','all',['burn']),
-      skillTemplate('staff-focus','清心诀','heal','ally','all',['techniqueUp'])]},
-    fan:{status:'design',skills:[
-      skillTemplate('fan-fire','火攻计','tactic','enemy','single',['burn']),
-      skillTemplate('fan-frost','寒风阵','tactic','enemy','all',['speedDown']),
-      skillTemplate('fan-rain','清风化雨','heal','ally','all',['techniqueUp','primaryHeal'])]},
-    qin:{status:'design',skills:[
-      skillTemplate('qin-confusion','迷魂曲','tactic','enemy','all',['techniqueDown']),
-      skillTemplate('qin-drain','摄魂音','tactic','enemy','single',['lifesteal']),
-      skillTemplate('qin-slow','缓弦咒','tactic','enemy','single',['speedDown'])]},
-    dagger:{status:'design',skills:[
-      skillTemplate('dagger-bleed','断筋刺','physical','enemy','single',['bleed']),
-      skillTemplate('dagger-fast','无影连刺','physical','enemy','single',['fastRecovery','highCritical']),
-      skillTemplate('dagger-poison','淬毒刺','physical','enemy','single',['poison'])]},
-    bow:{status:'design',skills:[
-      skillTemplate('bow-fire','火矢贯心','physical','enemy','single',['burn']),
-      skillTemplate('bow-poison','毒矢追魂','physical','enemy','single',['poison','lifesteal']),
-      skillTemplate('bow-recover','敛息回元','heal','self','single',['speedUp'])]},
-    crossbow:{status:'design',skills:[
-      skillTemplate('crossbow-shot','穿云弩','physical','enemy','single'),
-      skillTemplate('crossbow-volley','连弩齐发','physical','enemy','all',['shortStun']),
-      skillTemplate('crossbow-snipe','狙心矢','physical','enemy','single',['ignoreTaunt'])]},
-    needle:{status:'design',skills:[
-      skillTemplate('needle-stun','截脉针','physical','enemy','single',['stun']),
-      skillTemplate('needle-heal','回天针','heal','ally','single',['armorUp']),
-      skillTemplate('needle-sacrifice','舍身护众','buff','self','single',['taunt','armorUp'])]},
-    talisman:{status:'design',skills:[
-      skillTemplate('talisman-thunder','雷符咒','tactic','enemy','single',['resistanceDown']),
-      skillTemplate('talisman-rain','太平甘霖','heal','ally','all',['resistanceUp']),
-      skillTemplate('talisman-clear','荡秽符','tactic','enemy','all')]},
-    gourd:{status:'design',skills:[
-      skillTemplate('gourd-poison','蚀骨蛊','tactic','enemy','single',['poison']),
-      skillTemplate('gourd-curse','厄运咒','tactic','enemy','single',['stun']),
-      skillTemplate('gourd-regeneration','青囊回春','heal','ally','single',['regeneration'])]}
-  };
+  const WEAPON_GROUPS=C.groups;
+  const WEAPON_TYPES=C.types.map(({id,name,role,group,ordinaryName,style})=>({id,name,role,group,ordinaryName,style,skillPlanId:id}));
+  const getWeaponProficiency=(character,id)=>{const values=character?.weaponProficiencies,value=values?.[id]??(id==='talisman'?values?.['medicine-bag']:id==='qin'?values?.jade:undefined);return Number.isSafeInteger(value)&&value>=0?value:0;};
+  const WEAPON_SKILL_PLANS=Object.fromEntries(C.types.map(t=>[t.id,{status:'ready',skills:t.skills}]));
   const QUALITIES={
     white:{name:'白色',color:'#e5e7e7',weight:42},green:{name:'绿色',color:'#87cf92',weight:31},
     blue:{name:'蓝色',color:'#72b9ed',weight:18},gold:{name:'金色',color:'#e9c371',weight:8},
@@ -96,7 +233,7 @@
   };
   const passive=(id,name,quality,description,effects={},category='特殊')=>({id,name,quality,description,effects,category,fusionOnly:quality==='rainbow'});
   const PASSIVES=[
-    passive('healthy','身强体健','white','最大兵力提高5%。',{troopsMultiplier:1.05},'兵力'),
+    passive('healthy','身强体健','white','最大生命提高5%。',{troopsMultiplier:1.05},'生命'),
     passive('steady','稳扎稳打','white','物理技能伤害提高5%。',{physicalMultiplier:1.05},'武技'),
     passive('careful','心思缜密','white','计策伤害提高5%。',{tacticMultiplier:1.05},'计策'),
     passive('lightfoot','步履轻健','white','行动读条时间缩短3%。',{intervalMultiplier:.97},'速度'),
@@ -104,7 +241,7 @@
     passive('patient','坚守本心','white','受到的伤害降低3%。',{takenMultiplier:.97},'防护'),
     passive('brave','破阵之勇','green','物理技能伤害提高10%。',{physicalMultiplier:1.1},'武技'),
     passive('planning','运筹帷幄','green','计策伤害提高10%。',{tacticMultiplier:1.1},'计策'),
-    passive('strongarmy','兵强马壮','green','最大兵力提高12%。',{troopsMultiplier:1.12},'兵力'),
+    passive('strongarmy','兵强马壮','green','最大生命提高12%。',{troopsMultiplier:1.12},'生命'),
     passive('swift','疾行如风','green','行动读条时间缩短6%。',{intervalMultiplier:.94},'速度'),
     passive('herbalist','灵丹妙手','green','治疗量提高12%。',{healingMultiplier:1.12},'治疗'),
     passive('veteran','百战余生','green','受到的伤害降低6%。',{takenMultiplier:.94},'防护'),
@@ -118,7 +255,7 @@
     passive('edge','锋芒毕露','gold','暴击率增加30个百分点。',{criticalBonus:.3},'暴击'),
     passive('surprise','攻其不备','gold','物理技能无视目标50%护甲。',{armorPierce:.5},'破甲'),
     passive('foresight','料敌先机','gold','受到物理技能时有25%概率闪避。',{physicalDodge:.25},'闪避'),
-    passive('loyal','赤胆忠心','gold','最大兵力提高35%。',{troopsMultiplier:1.35},'兵力'),
+    passive('loyal','赤胆忠心','gold','最大生命提高35%。',{troopsMultiplier:1.35},'生命'),
     passive('mastermind','神机妙算','gold','计策伤害提高40%。',{tacticMultiplier:1.4},'计策'),
     passive('miracle','回天之术','gold','治疗量提高45%。',{healingMultiplier:1.45},'治疗'),
     passive('shadow','神行无踪','gold','行动读条时间缩短22%。',{intervalMultiplier:.78},'速度'),
@@ -128,36 +265,36 @@
     passive('heavenly','经天纬地','red','计策伤害提高100%。',{tacticMultiplier:2},'计策'),
     passive('invincible','万夫莫当','red','受到的伤害降低50%。',{takenMultiplier:.5},'防护'),
     passive('renewal','枯木逢春','red','治疗量提高100%。',{healingMultiplier:2},'治疗'),
-    passive('destiny','天命所归','red','最大兵力提高75%，读条时间缩短15%。',{troopsMultiplier:1.75,intervalMultiplier:.85},'统合'),
+    passive('destiny','天命所归','red','最大生命提高75%，读条时间缩短15%。',{troopsMultiplier:1.75,intervalMultiplier:.85},'统合'),
     passive('keen','眼疾手快','white','暴击率增加3个百分点。',{criticalBonus:.03},'暴击'),
     passive('toughskin','皮糙肉厚','white','护甲提高8%。',{armorMultiplier:1.08},'护甲'),
     passive('calm','沉着应战','white','抗性提高8%。',{resistanceMultiplier:1.08},'抗性'),
     passive('bluntforce','蓄力重击','white','物理伤害提高8%，读条时间增加3%。',{physicalMultiplier:1.08,intervalMultiplier:1.03},'武技'),
     passive('mindshield','明心守志','white','受到的计策伤害降低5%。',{tacticTakenMultiplier:.95},'抗性'),
-    passive('renew','吐故纳新','white','每次行动恢复1%最大兵力。',{actionRegen:.01},'恢复'),
+    passive('renew','吐故纳新','white','每次行动恢复1%最大生命。',{actionRegen:.01},'恢复'),
     passive('ironbody','铜筋铁骨','green','护甲提高18%。',{armorMultiplier:1.18},'护甲'),
     passive('clearhead','固守心神','green','抗性提高18%。',{resistanceMultiplier:1.18},'抗性'),
     passive('sharpsense','洞察破绽','green','物理技能无视目标12%护甲。',{armorPierce:.12},'破甲'),
     passive('brightmind','攻心为上','green','计策无视目标12%抗性。',{resistancePierce:.12},'破谋'),
-    passive('smallcure','生生不息','green','每次行动恢复2.5%最大兵力。',{actionRegen:.025},'恢复'),
-    passive('assault','乘胜追击','green','攻击兵力低于30%的敌人时伤害提高15%。',{executeThreshold:.3,executeMultiplier:1.15},'追击'),
-    passive('sustain','浴血奋战','blue','物理技能恢复造成伤害8%的兵力。',{physicalLifesteal:.08},'吸血'),
+    passive('smallcure','生生不息','green','每次行动恢复2.5%最大生命。',{actionRegen:.025},'恢复'),
+    passive('assault','乘胜追击','green','攻击生命低于30%的敌人时伤害提高15%。',{executeThreshold:.3,executeMultiplier:1.15},'追击'),
+    passive('sustain','浴血奋战','blue','物理技能恢复造成伤害8%的生命。',{physicalLifesteal:.08},'吸血'),
     passive('spellpierce','奇策破阵','blue','计策无视目标25%抗性。',{resistancePierce:.25},'破谋'),
     passive('counter','以逸待劳','blue','受物理技能时15%概率反击，造成50%物理伤害。',{counterChance:.15,counterMultiplier:.5},'反击'),
-    passive('vanguard','先登夺旗','blue','开战获得相当于15%最大兵力的护盾。',{openingShield:.15},'护盾'),
-    passive('resolve','坚忍不拔','blue','自身兵力低于30%时，受到伤害降低20%。',{lowTroopsThreshold:.3,lowTroopsTakenMultiplier:.8},'绝境'),
+    passive('vanguard','先登夺旗','blue','开战获得相当于15%最大生命的护盾。',{openingShield:.15},'护盾'),
+    passive('resolve','坚忍不拔','blue','自身生命低于30%时，受到伤害降低20%。',{lowTroopsThreshold:.3,lowTroopsTakenMultiplier:.8},'绝境'),
     passive('lightning','疾风迅雷','blue','开战获得15%进度，读条时间缩短10%。',{initialProgress:.15,intervalMultiplier:.9},'先手'),
     passive('disrupt','出奇制胜','gold','计策无视目标50%抗性。',{resistancePierce:.5},'破谋'),
-    passive('resolvebreak','背水一战','gold','自身兵力低于30%时，伤害提高60%。',{lowTroopsThreshold:.3,lowTroopsDamageMultiplier:1.6},'绝境'),
+    passive('resolvebreak','背水一战','gold','自身生命低于30%时，伤害提高60%。',{lowTroopsThreshold:.3,lowTroopsDamageMultiplier:1.6},'绝境'),
     passive('guardall','固若金汤','gold','护甲与抗性提高50%。',{armorMultiplier:1.5,resistanceMultiplier:1.5},'防护'),
-    passive('bloodblade','血战到底','gold','物理技能恢复造成伤害18%的兵力。',{physicalLifesteal:.18},'吸血'),
+    passive('bloodblade','血战到底','gold','物理技能恢复造成伤害18%的生命。',{physicalLifesteal:.18},'吸血'),
     passive('shrine','悬壶济世','gold','治疗提高35%，溢出治疗的40%转为护盾。',{healingMultiplier:1.35,overhealShield:.4},'治疗'),
     passive('decisive','一击制敌','gold','暴击率增加10个百分点，暴击伤害增加50%。',{criticalBonus:.1,criticalDamageBonus:.5},'暴击'),
     passive('dominance','王者之威','red','所有伤害提高50%，护甲与抗性提高30%。',{damageMultiplier:1.5,armorMultiplier:1.3,resistanceMultiplier:1.3},'统合'),
     passive('stratagem','算无遗策','red','计策暴击率增加50个百分点，暴击伤害增加50%。',{tacticCriticalBonus:.5,tacticCriticalDamageBonus:.5},'计策'),
-    passive('rampage','修罗血煞','red','物理技能恢复造成伤害35%的兵力。',{physicalLifesteal:.35},'吸血'),
+    passive('rampage','修罗血煞','red','物理技能恢复造成伤害35%的生命。',{physicalLifesteal:.35},'吸血'),
     passive('thunderlord','雷霆万钧','red','计策无视目标全部抗性。',{ignoreResistance:true},'破谋'),
-    passive('neverfall','不屈战魂','red','自身兵力低于30%时，受到伤害降低65%。',{lowTroopsThreshold:.3,lowTroopsTakenMultiplier:.35},'绝境'),
+    passive('neverfall','不屈战魂','red','自身生命低于30%时，受到伤害降低65%。',{lowTroopsThreshold:.3,lowTroopsTakenMultiplier:.35},'绝境'),
     passive('unity','万象归一','rainbow','融合品质预留，开局不会出现。'),
     passive('reversal','逆转乾坤','rainbow','融合品质预留，开局不会出现。')
   ];
@@ -189,21 +326,22 @@
     const difficulty=getDifficulty(difficultyId);if(!difficulty)throw new TypeError('请先选择难度');
     const profileId=IDENTITIES.some(i=>i.id===difficultyId)?difficultyId:difficulty.profiles.length===1?difficulty.profiles[0]:difficulty.profiles[randomInt(0,difficulty.profiles.length-1,rng)];
     const identity=IDENTITIES.find(i=>i.id===profileId);
-    return {attributes:Object.fromEntries(ATTRIBUTES.map(([key])=>[key,rollAttribute(identity,key,rng)])),weaponProficiencies:Object.fromEntries(WEAPON_TYPES.map(type=>[type.id,rollRange(difficulty.proficiencyRange,difficulty.proficiencyBands,rng)])),passives:rollPassives(rng,3,difficulty.passiveWeights)};
+    const growth=G.characterAt({potentials:Object.fromEntries(ATTRIBUTES.map(([key])=>[key,rollAttribute(identity,key,rng)]))},1);
+    return {...growth,weaponCatalogVersion:1,weaponProficiencies:Object.fromEntries(WEAPON_TYPES.map(type=>[type.id,0])),passives:rollPassives(rng,3,difficulty.passiveWeights)};
   }
   const segments=text=>typeof Intl.Segmenter==='function'?Array.from(new Intl.Segmenter('zh',{granularity:'grapheme'}).segment(text),s=>s.segment):Array.from(text);
   const sanitizeName=value=>segments(String(value||'').replace(/[\u0000-\u001f\u007f\s]/g,'')).slice(0,4).join('');
   const heroName=value=>sanitizeName(value)||'无名氏';
   function validCharacter(c){
     return !!c&&typeof c.name==='string'&&c.name.length>0&&sanitizeName(c.name)===c.name&&!!getDifficulty(c.difficulty||c.identity)&&APPEARANCES.some(a=>a.id===c.appearance)
-      &&ATTRIBUTES.every(([key])=>Number.isSafeInteger(c.attributes?.[key])&&c.attributes[key]>=1)
-      &&(c.weaponProficiencies===undefined||!!c.weaponProficiencies&&typeof c.weaponProficiencies==='object'&&!Array.isArray(c.weaponProficiencies)&&Object.values(c.weaponProficiencies).every(value=>Number.isSafeInteger(value)&&value>=1))
+      &&G.validGrowth(c)&&ATTRIBUTES.every(([key])=>Number.isSafeInteger(c.attributes?.[key])&&c.attributes[key]>=1)
+      &&(c.weaponProficiencies===undefined||!!c.weaponProficiencies&&typeof c.weaponProficiencies==='object'&&!Array.isArray(c.weaponProficiencies)&&Object.values(c.weaponProficiencies).every(value=>Number.isSafeInteger(value)&&value>=0))
       &&Array.isArray(c.passives)&&new Set(c.passives).size===c.passives.length&&c.passives.every(id=>!!PASSIVE_MAP[id]);
   }
   const clone=value=>JSON.parse(JSON.stringify(value));
   function normalizeCharacter(character){
     if(!character||typeof character!=='object')return character;
-    const next=clone(character),difficulty=getDifficulty(next.difficulty||next.identity);if(difficulty)next.difficulty=difficulty.id;delete next.identity;
+    const next=G.normalizeCharacter(character);const difficulty=getDifficulty(next.difficulty||next.identity);if(difficulty)next.difficulty=difficulty.id;delete next.identity;
     if(next.weaponProficiencies&&typeof next.weaponProficiencies==='object'&&!Array.isArray(next.weaponProficiencies)&&Object.hasOwn(next.weaponProficiencies,'medicine-bag')){if(!Object.hasOwn(next.weaponProficiencies,'talisman'))next.weaponProficiencies.talisman=next.weaponProficiencies['medicine-bag'];delete next.weaponProficiencies['medicine-bag'];}
     if(next.weaponProficiencies&&Object.hasOwn(next.weaponProficiencies,'jade')){next.weaponProficiencies.qin??=next.weaponProficiencies.jade;delete next.weaponProficiencies.jade;}
     if(Array.isArray(next.passives))next.passives=next.passives.filter(id=>id!=='revive');return next;
@@ -213,18 +351,19 @@
     constructor(storage){this.storage=storage;this.key='pengpai-sanguo:saves:v1';this.settingsKey='pengpai-sanguo:settings:v1';}
     slots(){
       let data;try{data=JSON.parse(this.storage.getItem(this.key)||'[]');}catch{return [null,null,null];}
-      return Array.from({length:3},(_,i)=>{const slot=Array.isArray(data)?data[i]:null,character=normalizeCharacter(slot?.character);if(![1,2,3].includes(slot?.version)||!validCharacter(character)||typeof slot.savedAt!=='string'||!Number.isFinite(Date.parse(slot.savedAt)))return null;
+      return Array.from({length:3},(_,i)=>{const slot=Array.isArray(data)?data[i]:null,character=normalizeCharacter(slot?.character);if(![1,2,3,4].includes(slot?.version)||!validCharacter(character)||typeof slot.savedAt!=='string'||!Number.isFinite(Date.parse(slot.savedAt)))return null;
         if(slot.version<3&&character.weaponProficiencies)character.weaponProficiencies=Object.fromEntries(Object.entries(character.weaponProficiencies).map(([id,value])=>[id,proficiencyFromLegacy(value)]));
-        return clone({...slot,version:3,character});});
+        return clone({...slot,version:4,character});});
     }
     save(index,character,progress){
       const current=normalizeCharacter(character);if(!Number.isInteger(index)||index<0||index>2||!validCharacter(current))throw new TypeError('人物或存档位置无效');
-      const slots=this.slots();slots[index]={version:3,character:current,savedAt:new Date().toISOString(),chapter:progress?.stage==='complete'?'prologue-complete':'prologue-start',...(progress?{progress:clone(progress)}:{})};
+      const slots=this.slots();slots[index]={version:4,character:current,savedAt:new Date().toISOString(),chapter:progress?.stage==='world'?'world-map':progress?.stage==='complete'?'prologue-complete':'prologue-start',...(progress?{progress:clone(progress)}:{})};
       this.storage.setItem(this.key,JSON.stringify(slots));return clone(slots[index]);
     }
     settings(){let data;try{data=JSON.parse(this.storage.getItem(this.settingsKey)||'{}');}catch{data={};}return {screenShake:typeof data?.screenShake==='boolean'?data.screenShake:true,effects:typeof data?.effects==='boolean'?data.effects:true,menuScale:[.9,1,1.1].includes(data?.menuScale)?data.menuScale:1};}
     setSettings(settings){const next={...SETTINGS,...settings};if(typeof next.screenShake!=='boolean'||typeof next.effects!=='boolean'||![.9,1,1.1].includes(next.menuScale))throw new TypeError('设置无效');this.storage.setItem(this.settingsKey,JSON.stringify(next));return next;}
   }
-  const api={ATTRIBUTES,PROFICIENCY_BASE,DIFFICULTIES,getDifficulty,WEAPON_TYPES,WEAPON_SKILL_PLANS,getWeaponProficiency,IDENTITIES,IDENTITY_PASSIVE_WEIGHTS,QUALITIES,PASSIVES,PASSIVE_MAP,APPEARANCES,randomInt,rollPassives,rollHero,sanitizeName,heroName,nameLength:value=>segments(value).length,validCharacter,SaveStore};
+  const sortPassives=(ids,map=PASSIVE_MAP)=>ids.map((id,index)=>({id,index})).sort((a,b)=>(Object.keys(QUALITIES).indexOf(map[b.id]?.quality)-Object.keys(QUALITIES).indexOf(map[a.id]?.quality))||a.index-b.index).map(v=>v.id);
+  const api={sortPassives,PARTY_LIMIT:4,ATTRIBUTES,PROFICIENCY_BASE,DIFFICULTIES,getDifficulty,WEAPON_GROUPS,WEAPON_TYPES,WEAPON_SKILL_PLANS,getWeaponProficiency,IDENTITIES,IDENTITY_PASSIVE_WEIGHTS,QUALITIES,PASSIVES,PASSIVE_MAP,APPEARANCES,randomInt,rollPassives,rollHero,sanitizeName,heroName,nameLength:value=>segments(value).length,validCharacter,SaveStore};
   root.PengpaiRules=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

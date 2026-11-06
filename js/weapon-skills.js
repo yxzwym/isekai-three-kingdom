@@ -1,37 +1,53 @@
 (function(root){
   'use strict';
-  const R=typeof module!=='undefined'&&module.exports?require('./game-rules.js'):root.PengpaiRules;
-  const effect=(id,extra={})=>({id,...extra});
-  const effects={
-    armorDown:effect('armorDown',{chance:.4,attribute:'armor',base:3,coefficient:.25,negative:true}),
-    resistanceDown:effect('resistanceDown',{attribute:'resistance',base:3,coefficient:.25,negative:true}),
-    armorUp:effect('armorUp',{attribute:'armor',base:8,coefficient:.1,stat:'war'}),
-    resistanceUp:effect('resistanceUp',{attribute:'resistance',base:5,coefficient:.25}),
-    techniqueUp:effect('techniqueUp',{attribute:'technique',base:5,coefficient:.25}),
-    techniqueDown:effect('techniqueDown',{attribute:'technique',base:5,coefficient:.25,negative:true}),
-    bleed:effect('bleed',{chance:.8,base:1,coefficient:.25}),poison:effect('poison',{chance:.7,base:1,coefficient:.25}),burn:effect('burn',{chance:.4,base:1,coefficient:.25}),
-    stun:effect('stun',{chance:.35}),shortStun:effect('stun',{chance:.35,duration:2}),paralysis:effect('paralysis',{chance:.4}),
-    taunt:effect('taunt',{armorBase:8,armorCoefficient:.1}),speedUp:effect('speedUp'),speedDown:effect('speedDown'),
-    regeneration:effect('regeneration',{base:1,coefficient:.25}),reflectDamage:effect('reflectDamage')
+  const C=typeof module!=='undefined'&&module.exports?require('./weapon-catalog.js'):root.WeaponCatalog;
+  const equipment=typeof module!=='undefined'&&module.exports?require('./equipment.js'):root.EquipmentSlots;
+  const copy=value=>JSON.parse(JSON.stringify(value));
+  const skills=Object.fromEntries([...(C.legacyTypes||[]),...C.types].flatMap(t=>[...t.skills,...t.daySkills]).map(s=>[s.id,copy(s)]));
+  const add=(id,name,kind,side,scope,extra={})=>skills[id]={id,name,kind,side,scope,cost:0,cooldown:scope==='all'?3:1.5,scaling:{[kind==='physical'?'war':'intelligence']:1},weaponCoefficient:1,...extra};
+  add('punch','拳击','physical','enemy','single',{weaponCoefficient:0});
+  add('spear-cut','直刺','physical','enemy','single');add('spear-sweep','横扫枪','physical','enemy','all',{scaling:{war:.8}});
+  add('sword-cut','劈斩','physical','enemy','single');add('sword-sweep','横扫','physical','enemy','all',{scaling:{war:.8}});
+  // 火神杖沿用杖方向的范围和倍率，专武将火焰换成雷电与麻痹。
+  skills['staff-shock']={...JSON.parse(JSON.stringify(skills['staff-fire'])),id:'staff-shock',name:'电击',element:'thunder',effects:[{id:'paralysis',chance:.25,duration:8,speedMultiplier:.5}]};
+  skills['staff-storm']={...JSON.parse(JSON.stringify(skills['staff-flame'])),id:'staff-storm',name:'落雷阵',element:'thunder',effects:[]};
+  const specials={
+    'fire-god-staff':{id:'fire-god-staff',type:'staff',name:'火神杖',skills:['staff-shock','staff-storm']},
+    'fangtian-halberd':{id:'fangtian-halberd',type:'halberd',proficiencyType:'spear',name:'方天画戟',skills:['sword-critical','spear-break']}
   };
-  const skills={};
-  for(const [weapon,plan]of Object.entries(R.WEAPON_SKILL_PLANS))for(const template of plan.skills){
-    const tags=template.effects||[],group=template.scope==='all',skill={...template,cost:0,all:group,base:template.kind==='heal'?120:70,cooldown:group?3:1.5,effects:tags.filter(id=>effects[id]).map(id=>({...effects[id]}))};
-    if(weapon==='staff')skill.element='fire';if(weapon==='talisman'&&template.kind==='tactic')skill.element='thunder';
-    if(template.kind==='buff')skill.buff={id:template.id,name:template.name,duration:8,visual:tags.includes('taunt')?'taunt':'buff'};
-    if(tags.includes('taunt')){skill.buff={id:'taunt',name:'嘲讽',taunt:true,duration:30,visual:'taunt'};skill.cooldown=1;skill.effects=skill.effects.filter(e=>!['taunt','armorUp'].includes(e.id));skill.effects.push(effect('armorUp',{duration:30,attribute:'armor',base:8,coefficient:.1,stat:'war'}));}
-    if(tags.includes('ignoreTaunt'))skill.ignoreTaunt=true;if(tags.includes('lifesteal'))skill.lifesteal=.25;
-    if(tags.includes('heavyHit'))skill.power=1.5;if(tags.includes('highCritical'))skill.criticalBonus=.25;
-    if(tags.includes('fastRecovery'))skill.cooldown=-1.2;if(tags.includes('precision'))skill.alwaysHit=true;
-    skills[skill.id]=skill;
+  const canonical=value=>Array.isArray(value)?value.map(canonical):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(k=>[k,canonical(value[k])])):value;
+  const fingerprint=value=>{let n=2166136261;for(const c of JSON.stringify(canonical(value)))n=Math.imul(n^c.codePointAt(0),16777619);return (n>>>0).toString(36);};
+  const special=weapon=>!!weapon&&(Array.isArray(weapon.skills)||!!specials[weapon.id]||weapon.type==='staff'&&weapon.school==='thunder');
+  function resolveWeapon(weapon){if(!weapon)return null;const preset=specials[weapon.id]||(weapon.type==='staff'&&weapon.school==='thunder'?specials['fire-god-staff']:{});return {...copy(preset),...copy(weapon)};}
+  function definitionsForWeapon(weapon){
+    const resolved=resolveWeapon(weapon);if(!resolved)return [copy(skills.punch)];
+    const type=C.types.find(t=>t.id===(C.aliases[resolved.type]||resolved.type));
+    const entries=Array.isArray(resolved.skills)?resolved.skills:(type?.[resolved.tier==='day'?'daySkills':'skills'].map(s=>s.id)||['punch']);
+    return entries.map((entry,index)=>{
+      if(typeof entry==='string'){if(!skills[entry])throw new TypeError('未知武器技能：'+entry);return copy(skills[entry]);}
+      if(!entry||typeof entry!=='object')throw new TypeError('武器技能配置必须是技能ID或对象');
+      const base=entry.base?skills[entry.base]:null;if(entry.base&&!base)throw new TypeError('未知技能模板：'+entry.base);
+      const {base:baseId,...changes}=copy(entry),definition={cost:0,cooldown:0,weaponCoefficient:1,...copy(base||{}),...changes};
+      if(base?.scaling&&changes.scaling)definition.scaling={...base.scaling,...changes.scaling};
+      for(const key of ['name','kind','side','scope'])if(!definition[key])throw new TypeError('武器技能缺少字段：'+key);
+      definition.id='weapon:'+fingerprint({weapon:resolved.id||resolved.type,index,definition});if(baseId)definition.template=baseId;return definition;
+    });
   }
-  skills['spear-break'].cooldown=2.5;skills['spear-stun'].cooldown=1;
-  const add=(id,name,kind,side,scope,extra={})=>skills[id]={id,name,kind,side,scope,cost:0,all:scope==='all',cooldown:scope==='all'?3:1.5,...extra};
-  add('punch','拳击','physical','enemy','single');add('spear-cut','直刺','physical','enemy','single');add('spear-sweep','横扫枪','physical','enemy','all');add('sword-cut','劈斩','physical','enemy','single');add('sword-sweep','横扫','physical','enemy','all');
-  add('staff-shock','电击','tactic','enemy','single',{element:'thunder',base:70,effects:[effect('paralysis',{chance:.25})]});
-  add('staff-storm','落雷阵','tactic','enemy','all',{element:'thunder',base:70});
-  skills['talisman-rain'].cooldown=2;
-  const forWeapon=weapon=>weapon?.type==='staff'&&weapon.school==='thunder'?['staff-shock','staff-storm']:(R.WEAPON_SKILL_PLANS[weapon?.type]?[...R.WEAPON_SKILL_PLANS[weapon.type].skills.map(s=>s.id),...(weapon.type==='sword'?['sword-cut','sword-sweep']:weapon.type==='spear'?['spear-cut','spear-sweep']:[])]:['punch']);
-  const forEquipment=unit=>[...new Set([...forWeapon(unit.weapon),...(unit.equipment?.offhand?forWeapon(unit.equipment.offhand):[])])];
-  const api={skills,forWeapon,forEquipment,effects};root.WeaponSkills=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  function registerWeapon(weapon){const definitions=definitionsForWeapon(weapon);for(const definition of definitions)skills[definition.id]=copy(definition);return definitions.map(s=>s.id);}
+  const forWeapon=registerWeapon;
+  const forEquipment=unit=>forWeapon(unit.weapon);
+  const prioritiesFor=ids=>ids.map(id=>{const s=skills[id];if(!s)throw new TypeError('未知技能：'+id);return s.kind==='buff'?{skill:id,when:'always'}:s.kind==='heal'?{skill:id,when:'healThresholds',selfThreshold:.65,allyThreshold:.65}:s.scope==='all'?{skill:id,when:'enemyCount',threshold:2}:{skill:id,when:'always',frequency:'sometimes'};});
+  function migrateWeaponPlan(unit){
+    const out=JSON.parse(JSON.stringify(unit));out.equipment=equipment.normalize(out.equipment);
+    if(out.weaponPlanVersion!==3&&!special(out.weapon)){
+      const oldType=out.weapon?.type,nextType=C.legacyAliases[oldType]||oldType;if(out.weapon)out.weapon.type=nextType;
+      if(out.weaponProficiencies){const migrated={};for(const [id,value]of Object.entries(out.weaponProficiencies)){const key=C.legacyAliases[id]||id;migrated[key]=Math.max(migrated[key]||0,value);}out.weaponProficiencies=migrated;}
+      if(out.weapon&&C.types.some(t=>t.id===nextType)&&(!out.skills?.length||out.skills.some(id=>!['punch','spear-cut','spear-sweep','sword-cut','sword-sweep'].includes(id)))){const next=forWeapon(out.weapon);if(JSON.stringify(out.skills)!==JSON.stringify(next)){out.skills=next;out.priorities=prioritiesFor(out.skills);out.weaponPlanMigrated=true;}}
+    }
+    if(special(out.weapon)){out.skills=forWeapon(out.weapon);out.priorities=out.priorities?.every(r=>out.skills.includes(r.skill))?out.priorities:prioritiesFor(out.skills);}
+    if(out.id==='zhenji'||out.characterId==='zhenji')out.passives=[...new Set([...(out.passives||[]),'benevolent-healer','zhenji-clear-water'])];
+    if(out.id==='zhaoyun'||out.characterId==='zhaoyun')out.passives=[...new Set([...(out.passives||[]),'zhaoyun-courage','zhaoyun-seven-crossings','zhaoyun-ever-victorious','zhaoyun-loyal-guard'])];if(out.id==='zhangliang'||out.characterId==='zhangliang')out.passives=[...new Set([...(out.passives||[]),'zhangliang-might','zhangliang-hardy'])];out.weaponPlanVersion=3;return out;
+  }
+  const effects=Object.fromEntries(Object.values(skills).flatMap(s=>s.effects||[]).map(e=>[e.id,e]));
+  const api={skills,specials,special,resolveWeapon,definitionsForWeapon,registerWeapon,forWeapon,forEquipment,prioritiesFor,migrateWeaponPlan,effects};root.WeaponSkills=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

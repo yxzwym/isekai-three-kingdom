@@ -5,7 +5,7 @@ const battle=()=>new Battle({allies:[unit('a'),unit('b')],enemies:[unit('x'),uni
 const ready=u=>{u.progress=1;u.ready=true;};
 
 test('任何角色的始终嘲讽都正常读条、持续30秒、到期补放，未预设开局状态',()=>{
-  const b=battle(),u=b.unit('x');b.setPriorities(u.id,[{skill:'shield-taunt',when:'always'},{skill:'sword-cut',when:'always'}]);u.mode='auto';b.start();b.advance(2);assert.equal(u.statuses.length,0);b.advance(.6);assert.ok(u.statuses.some(s=>s.taunt));const first=b.events.find(e=>e.skill==='shield-taunt');assert.ok(first.time>=2.5);b.advance(30);assert.equal(b.events.filter(e=>e.skill==='shield-taunt').length,1);b.advance(6);assert.ok(b.events.filter(e=>e.skill==='shield-taunt').length>=2);
+  const b=battle(),u=b.unit('x');b.setPriorities(u.id,[{skill:'shield-taunt',when:'always'},{skill:'sword-cut',when:'always'}]);u.mode='auto';b.start();b.advance(2);assert.equal(u.statuses.length,0);b.advance(.6);assert.ok(u.statuses.some(s=>s.taunt));const first=b.events.find(e=>e.skill==='shield-taunt');assert.ok(first.time>=2.4);b.advance(30);assert.equal(b.events.filter(e=>e.skill==='shield-taunt').length,1);b.advance(6);assert.ok(b.events.filter(e=>e.skill==='shield-taunt').length>=2);
 });
 test('物理和计策单体只能选择嘲讽者，群体不受影响，敌人随机选择多个嘲讽者',()=>{
   const b=battle();b.start();const a=b.unit('a'),x=b.unit('x'),y=b.unit('y'),z=b.unit('z');b.addStatus(x,x,{id:'taunt'});b.addStatus(y,y,{id:'taunt'});
@@ -15,8 +15,8 @@ test('物理和计策单体只能选择嘲讽者，群体不受影响，敌人�
 });
 test('通用破甲按技巧结算、实际增加物理伤害并在8秒后恢复；免疫阻止附加',()=>{
   const b=battle();b.start();const a=b.unit('a'),x=b.unit('x'),base=physical({attacker:{...a,soldiers:a.soldiers},target:x}).amount;b.rng=()=>0;
-  b.addStatus(a,x,W.effects.armorDown,b.skills['spear-break']);assert.equal(b.effective(x).armor,32);assert.ok(physical({attacker:a,target:b.effective(x)}).amount>base);b.advance(8.02);assert.equal(b.effective(x).armor,60);
-  x.statusImmunities=['armorDown'];assert.equal(b.addStatus(a,x,W.effects.armorDown),null);
+  b.addStatus(a,x,W.skills['spear-break'].effects[0],b.skills['spear-break']);assert.equal(b.effective(x).armor,32);assert.ok(physical({attacker:a,target:b.effective(x)}).amount>base);b.advance(8.02);assert.equal(b.effective(x).armor,60);
+  x.statusImmunities=['armorDown'];assert.equal(b.addStatus(a,x,W.skills['spear-break'].effects[0]),null);
 });
 test('流血、中毒、灼烧逐秒跳伤，包含到期最后一跳，不消耗施法进度',()=>{
   for(const id of ['bleed','poison','burn']){const b=battle();b.start();const a=b.unit('a'),x=b.unit('x');b.addStatus(a,x,{id,amount:7,duration:3});b.advance(.98);assert.equal(x.soldiers,1000);b.advance(.02);assert.equal(x.soldiers,993);b.advance(2.02);assert.equal(x.soldiers,979);assert.equal(x.statuses.length,0);assert.equal(a.stats.actions,0);assert.equal(a.stats.damage,21);assert.equal(b.events.filter(e=>e.periodic).length,3);}
@@ -30,7 +30,7 @@ test('眩晕暂停原读条和施法，到期续读；麻痹降低速度但仍�
   const before=x.progress;b.addStatus(a,x,{id:'paralysis',duration:2});assert.equal(b.effective(x).speed,50);b.advance(.5);assert.ok(x.progress>=before);assert.equal(b.stunned(x),false);b.advance(2);assert.equal(b.effective(x).speed,100);
 });
 test('技能恢复由共用技能定义决定，群攻长于单体，枪有实际破甲及眩晕效果',()=>{
-  const b=battle(),u=b.unit('a');b.start();ready(u);b.manual(u.id,'sword-cut','x');const single=u.interval;ready(u);b.manual(u.id,'sword-sweep');assert.ok(u.interval>single);assert.equal(u.lastManualSkill,'sword-sweep');assert.ok(W.skills['spear-break'].effects.some(e=>e.id==='armorDown'));assert.ok(W.skills['spear-stun'].effects.some(e=>e.id==='stun'));assert.equal(W.skills['shield-taunt'].buff.duration,30);assert.equal(W.skills['shield-taunt'].cooldown,1);
+  const b=battle(),u=b.unit('a');b.start();ready(u);b.manual(u.id,'sword-cut','x');const single=u.interval;ready(u);b.manual(u.id,'sword-sweep');assert.ok(u.interval>single);assert.equal(u.lastManualSkill,'sword-sweep');assert.ok(W.skills['spear-break'].effects.some(e=>e.id==='armorDown'));assert.ok(W.skills['spear-stun'].effects.some(e=>e.id==='stun'));assert.equal(W.skills['shield-taunt'].buff.duration,30);assert.equal(W.skills['shield-taunt'].cooldown,.8);
 });
 test('技能配置关闭即保存，教学战点头像不能打开配置；状态都有图标元数据',()=>{
   const b=battle();b.start();const view={battle:b,panel:null};CanvasBattle.prototype.openTactics.call(view,b.unit('a'));view.panel.rules[0].disabled=true;CanvasBattle.prototype.commitTactics.call(view);assert.equal(view.panel,null);assert.equal(b.unit('a').priorities[0].disabled,true);

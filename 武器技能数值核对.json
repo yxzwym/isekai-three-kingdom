@@ -1,0 +1,5981 @@
+{
+  "basis": "18个普通方向，月阶LV.6为基础、日阶LV.7后期强化；停用方向模板仅保留兼容或供专武引用",
+  "attributeAliases": {
+    "力量": "武力",
+    "魔力": "智力",
+    "体质": "体质"
+  },
+  "directions": [
+    {
+      "family": "战士",
+      "direction": "剑宗",
+      "weaponId": "sword",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%88%98%E5%A3%AB",
+      "moon": [
+        {
+          "sourceName": "破甲",
+          "level": 6,
+          "skillId": "spear-break",
+          "formula": [
+            "力量×0.8+武器威力"
+          ],
+          "parameters": {
+            "id": "spear-break",
+            "name": "破甲剑",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "armorDown",
+                "duration": 8,
+                "chance": 0.65,
+                "base": 3,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "armor",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 0.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.08
+          }
+        },
+        {
+          "sourceName": "冲撞",
+          "level": 6,
+          "skillId": "spear-stun",
+          "formula": [
+            "力量×1.5+武器威力"
+          ],
+          "parameters": {
+            "id": "spear-stun",
+            "name": "剑柄冲撞",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 7,
+                "chance": 0.65,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 1.5
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.12
+          }
+        },
+        {
+          "sourceName": "杀机暴起",
+          "level": 6,
+          "skillId": "spear-burst",
+          "formula": [
+            "力量×3.2+武器威力"
+          ],
+          "parameters": {
+            "id": "spear-burst",
+            "name": "杀机暴起",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [],
+            "scaling": {
+              "war": 3.2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.25
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "破甲",
+          "level": 7,
+          "skillId": "spear-break-day",
+          "formula": [
+            "力量×0.95+武器威力"
+          ],
+          "parameters": {
+            "id": "spear-break-day",
+            "name": "破甲剑",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "armorDown",
+                "duration": 8,
+                "chance": 0.7,
+                "base": 3,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "armor",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 0.95
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.08
+          }
+        },
+        {
+          "sourceName": "冲撞",
+          "level": 7,
+          "skillId": "spear-stun-day",
+          "formula": [
+            "力量×1.8+武器威力"
+          ],
+          "parameters": {
+            "id": "spear-stun-day",
+            "name": "剑柄冲撞",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 7,
+                "chance": 0.65,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 1.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.12
+          }
+        },
+        {
+          "sourceName": "杀机暴起",
+          "level": 7,
+          "skillId": "spear-burst-day",
+          "formula": [
+            "力量×3.8+武器威力"
+          ],
+          "parameters": {
+            "id": "spear-burst-day",
+            "name": "杀机暴起",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [],
+            "scaling": {
+              "war": 3.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.35
+          }
+        }
+      ],
+      "weaponName": "剑",
+      "group": "warrior",
+      "archetype": "剑宗"
+    },
+    {
+      "family": "战士",
+      "direction": "剑豪",
+      "weaponId": "blade",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%88%98%E5%A3%AB",
+      "moon": [
+        {
+          "sourceName": "破甲",
+          "level": 6,
+          "skillId": "sword-break",
+          "formula": [
+            "力量×0.75+武器威力"
+          ],
+          "parameters": {
+            "id": "sword-break",
+            "name": "破甲刀",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "armorDown",
+                "duration": 8,
+                "chance": 0.4,
+                "base": 3,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "armor",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 0.75
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.3,
+            "criticalChance": 0.08
+          }
+        },
+        {
+          "sourceName": "鹰落斩",
+          "level": 6,
+          "skillId": "sword-eagle",
+          "formula": [
+            "力量×3.75+技巧×1+武器威力"
+          ],
+          "parameters": {
+            "id": "sword-eagle",
+            "name": "鹰落斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.4,
+            "effects": [],
+            "scaling": {
+              "war": 3.75,
+              "technique": 1
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.5,
+            "criticalChance": 0.03
+          }
+        },
+        {
+          "sourceName": "杀机暴起",
+          "level": 6,
+          "skillId": "sword-critical",
+          "formula": [
+            "力量×4.8+武器威力"
+          ],
+          "parameters": {
+            "id": "sword-critical",
+            "name": "杀机暴起",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [],
+            "scaling": {
+              "war": 4.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.25
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "破甲",
+          "level": 7,
+          "skillId": "sword-break-day",
+          "formula": [
+            "力量×0.85+武器威力"
+          ],
+          "parameters": {
+            "id": "sword-break-day",
+            "name": "破甲刀",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "armorDown",
+                "duration": 8,
+                "chance": 0.4,
+                "base": 3,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "armor",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 0.85
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.3,
+            "criticalChance": 0.08
+          }
+        },
+        {
+          "sourceName": "鹰落斩",
+          "level": 7,
+          "skillId": "sword-eagle-day",
+          "formula": [
+            "力量×4.5+技巧×1.2+武器威力"
+          ],
+          "parameters": {
+            "id": "sword-eagle-day",
+            "name": "鹰落斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.4,
+            "effects": [],
+            "scaling": {
+              "war": 4.5,
+              "technique": 1.2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.5,
+            "criticalChance": 0.03
+          }
+        },
+        {
+          "sourceName": "杀机暴起",
+          "level": 7,
+          "skillId": "sword-critical-day",
+          "formula": [
+            "力量×5.8+武器威力"
+          ],
+          "parameters": {
+            "id": "sword-critical-day",
+            "name": "杀机暴起",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [],
+            "scaling": {
+              "war": 5.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.35
+          }
+        }
+      ],
+      "weaponName": "刀",
+      "group": "warrior",
+      "archetype": "剑豪"
+    },
+    {
+      "family": "战士",
+      "direction": "圣龙将军",
+      "weaponId": "spear",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%88%98%E5%A3%AB",
+      "moon": [
+        {
+          "sourceName": "盾击",
+          "level": 6,
+          "skillId": "shield-hit",
+          "formula": [
+            "力量×2+武器威力"
+          ],
+          "parameters": {
+            "id": "shield-hit",
+            "name": "震敌枪击",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.2,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 5,
+                "chance": 0.7,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.1
+          }
+        },
+        {
+          "sourceName": "嘲讽",
+          "level": 6,
+          "skillId": "shield-taunt",
+          "formula": [],
+          "parameters": {
+            "id": "shield-taunt",
+            "name": "横枪立阵",
+            "kind": "buff",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.8,
+            "effects": [
+              {
+                "id": "armorUp",
+                "attribute": "armor",
+                "duration": 30,
+                "base": 8,
+                "stat": "war",
+                "coefficient": 0.1
+              }
+            ],
+            "buff": {
+              "id": "taunt",
+              "name": "嘲讽",
+              "taunt": true,
+              "duration": 30
+            }
+          }
+        },
+        {
+          "sourceName": "反击怒吼",
+          "level": 6,
+          "skillId": "shield-reflect",
+          "formula": [],
+          "parameters": {
+            "id": "shield-reflect",
+            "name": "回马反击",
+            "kind": "buff",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": -1,
+            "effects": [],
+            "buff": {
+              "id": "reflectDamage",
+              "name": "反伤",
+              "duration": 45,
+              "reflectFormula": {
+                "base": 0.2,
+                "stat": "technique",
+                "coefficient": 0.001
+              }
+            }
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "盾击",
+          "level": 7,
+          "skillId": "shield-hit-day",
+          "formula": [
+            "力量×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "shield-hit-day",
+            "name": "震敌枪击",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.2,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 5,
+                "chance": 0.7,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 2.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.1
+          }
+        },
+        {
+          "sourceName": "嘲讽",
+          "level": 7,
+          "skillId": "shield-taunt-day",
+          "formula": [],
+          "parameters": {
+            "id": "shield-taunt-day",
+            "name": "横枪立阵",
+            "kind": "buff",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.6,
+            "effects": [
+              {
+                "id": "armorUp",
+                "attribute": "armor",
+                "duration": 30,
+                "base": 8,
+                "stat": "war",
+                "coefficient": 0.1
+              }
+            ],
+            "buff": {
+              "id": "taunt",
+              "name": "嘲讽",
+              "taunt": true,
+              "duration": 30
+            }
+          }
+        },
+        {
+          "sourceName": "反击怒吼",
+          "level": 7,
+          "skillId": "shield-reflect-day",
+          "formula": [],
+          "parameters": {
+            "id": "shield-reflect-day",
+            "name": "回马反击",
+            "kind": "buff",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": -1,
+            "effects": [],
+            "buff": {
+              "id": "reflectDamage",
+              "name": "反伤",
+              "duration": 45,
+              "reflectFormula": {
+                "base": 0.2,
+                "stat": "technique",
+                "coefficient": 0.001
+              }
+            }
+          }
+        }
+      ],
+      "weaponName": "枪",
+      "group": "warrior",
+      "archetype": "圣龙将军"
+    },
+    {
+      "family": "战士",
+      "direction": "黑骑士",
+      "weaponId": "shield",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%88%98%E5%A3%AB",
+      "moon": [
+        {
+          "sourceName": "盾击",
+          "level": 6,
+          "skillId": "greatShield-1",
+          "formula": [
+            "力量×2+武器威力"
+          ],
+          "parameters": {
+            "id": "greatShield-1",
+            "name": "震盾击",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.2,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 5,
+                "chance": 0.7,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.1
+          }
+        },
+        {
+          "sourceName": "嘲讽",
+          "level": 6,
+          "skillId": "greatShield-2",
+          "formula": [],
+          "parameters": {
+            "id": "greatShield-2",
+            "name": "坚壁挑衅",
+            "kind": "buff",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.8,
+            "effects": [
+              {
+                "id": "armorUp",
+                "attribute": "armor",
+                "duration": 30,
+                "base": 8,
+                "stat": "constitution",
+                "coefficient": 0.25
+              }
+            ],
+            "buff": {
+              "id": "taunt",
+              "name": "嘲讽",
+              "taunt": true,
+              "duration": 30
+            }
+          }
+        },
+        {
+          "sourceName": "虚弱斩击",
+          "level": 6,
+          "skillId": "greatShield-3",
+          "formula": [
+            "力量×2.15"
+          ],
+          "parameters": {
+            "id": "greatShield-3",
+            "name": "卸力斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "warDown",
+                "duration": 8,
+                "chance": 0.7,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.5,
+                "attribute": "war",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 2.15
+            },
+            "weaponCoefficient": 0,
+            "hitChance": 0.45,
+            "criticalChance": 0.1
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "盾击",
+          "level": 7,
+          "skillId": "greatShield-1-day",
+          "formula": [
+            "力量×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "greatShield-1-day",
+            "name": "震盾击",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.2,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 5,
+                "chance": 0.7,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 2.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.1
+          }
+        },
+        {
+          "sourceName": "嘲讽",
+          "level": 7,
+          "skillId": "greatShield-2-day",
+          "formula": [],
+          "parameters": {
+            "id": "greatShield-2-day",
+            "name": "坚壁挑衅",
+            "kind": "buff",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.8,
+            "effects": [
+              {
+                "id": "armorUp",
+                "attribute": "armor",
+                "duration": 30,
+                "base": 8,
+                "stat": "constitution",
+                "coefficient": 0.25
+              }
+            ],
+            "buff": {
+              "id": "taunt",
+              "name": "嘲讽",
+              "taunt": true,
+              "duration": 30
+            }
+          }
+        },
+        {
+          "sourceName": "虚弱斩击",
+          "level": 7,
+          "skillId": "greatShield-3-day",
+          "formula": [
+            "力量×2.6+武器威力"
+          ],
+          "parameters": {
+            "id": "greatShield-3-day",
+            "name": "卸力斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "warDown",
+                "duration": 8,
+                "chance": 0.75,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.5,
+                "attribute": "war",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 2.6
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.1
+          }
+        }
+      ],
+      "weaponName": "盾",
+      "group": "warrior",
+      "archetype": "黑骑士"
+    },
+    {
+      "family": "法师",
+      "direction": "传奇法师",
+      "weaponId": "fan",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%B3%95%E5%B8%88",
+      "moon": [
+        {
+          "sourceName": "大火球术",
+          "level": 6,
+          "skillId": "fan-fire",
+          "formula": [
+            "魔力×2.45+武器威力"
+          ],
+          "parameters": {
+            "id": "fan-fire",
+            "name": "奔雷诀",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 5,
+                "chance": 0.4,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.45
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.15,
+            "raceBonuses": {
+              "spirit": 0.3
+            },
+            "element": "thunder"
+          }
+        },
+        {
+          "sourceName": "冰晶风暴",
+          "level": 6,
+          "skillId": "fan-frost",
+          "formula": [
+            "魔力×1.3+武器威力"
+          ],
+          "parameters": {
+            "id": "fan-frost",
+            "name": "惊雷阵",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "speedDown",
+                "duration": 6,
+                "chance": 0.6,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.3
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05,
+            "raceBonuses": {
+              "spirit": 0.3
+            },
+            "element": "thunder"
+          }
+        },
+        {
+          "sourceName": "凝神静气",
+          "level": 6,
+          "skillId": "fan-rain",
+          "formula": [
+            "魔力×0.6+武器威力"
+          ],
+          "parameters": {
+            "id": "fan-rain",
+            "name": "清风化雨",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "techniqueUp",
+                "duration": 15,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.3,
+                "attribute": "technique"
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.6
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "大火球术",
+          "level": 7,
+          "skillId": "fan-fire-day",
+          "formula": [
+            "魔力×2.95+武器威力"
+          ],
+          "parameters": {
+            "id": "fan-fire-day",
+            "name": "奔雷诀",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 5,
+                "chance": 0.4,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.95
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.15,
+            "raceBonuses": {
+              "spirit": 0.35
+            },
+            "element": "thunder"
+          }
+        },
+        {
+          "sourceName": "冰晶风暴",
+          "level": 7,
+          "skillId": "fan-frost-day",
+          "formula": [
+            "魔力×1.55+武器威力"
+          ],
+          "parameters": {
+            "id": "fan-frost-day",
+            "name": "惊雷阵",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "speedDown",
+                "duration": 6,
+                "chance": 0.6,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.55
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05,
+            "raceBonuses": {
+              "spirit": 0.35
+            },
+            "element": "thunder"
+          }
+        },
+        {
+          "sourceName": "凝神静气",
+          "level": 7,
+          "skillId": "fan-rain-day",
+          "formula": [
+            "魔力×0.7+武器威力"
+          ],
+          "parameters": {
+            "id": "fan-rain-day",
+            "name": "清风化雨",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "techniqueUp",
+                "duration": 15,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.3,
+                "attribute": "technique"
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.7
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ],
+      "weaponName": "扇",
+      "group": "mage",
+      "archetype": "传奇法师"
+    },
+    {
+      "family": "法师",
+      "direction": "岩浆法师",
+      "weaponId": "staff",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%B3%95%E5%B8%88",
+      "moon": [
+        {
+          "sourceName": "炎爆术",
+          "level": 6,
+          "skillId": "staff-fire",
+          "formula": [
+            "魔力×2.55+武器威力"
+          ],
+          "parameters": {
+            "id": "staff-fire",
+            "name": "烈火诀",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.8,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 6,
+                "chance": 0.5,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.55
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.17,
+            "raceBonuses": {
+              "spirit": 0.3
+            },
+            "element": "fire"
+          }
+        },
+        {
+          "sourceName": "引燃术",
+          "level": 6,
+          "skillId": "staff-flame",
+          "formula": [
+            "魔力×1.3+武器威力"
+          ],
+          "parameters": {
+            "id": "staff-flame",
+            "name": "燎原术",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 6,
+                "chance": 0.65,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.3
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05,
+            "raceBonuses": {
+              "spirit": 0.3
+            },
+            "element": "fire"
+          }
+        },
+        {
+          "sourceName": "凝神静气",
+          "level": 6,
+          "skillId": "staff-focus",
+          "formula": [
+            "魔力×0.5+武器威力"
+          ],
+          "parameters": {
+            "id": "staff-focus",
+            "name": "清心诀",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "techniqueUp",
+                "duration": 15,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "technique"
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.5
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "炎爆术",
+          "level": 7,
+          "skillId": "staff-fire-day",
+          "formula": [
+            "魔力×3.3+武器威力"
+          ],
+          "parameters": {
+            "id": "staff-fire-day",
+            "name": "烈火诀",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.8,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 6,
+                "chance": 0.7,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "intelligence": 3.3
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.17,
+            "raceBonuses": {
+              "spirit": 0.35
+            },
+            "element": "fire"
+          }
+        },
+        {
+          "sourceName": "引燃术",
+          "level": 7,
+          "skillId": "staff-flame-day",
+          "formula": [
+            "魔力×1.55+武器威力"
+          ],
+          "parameters": {
+            "id": "staff-flame-day",
+            "name": "燎原术",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 6,
+                "chance": 0.65,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.55
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05,
+            "raceBonuses": {
+              "spirit": 0.35
+            },
+            "element": "fire"
+          }
+        },
+        {
+          "sourceName": "凝神静气",
+          "level": 7,
+          "skillId": "staff-focus-day",
+          "formula": [
+            "魔力×0.6+武器威力"
+          ],
+          "parameters": {
+            "id": "staff-focus-day",
+            "name": "清心诀",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "techniqueUp",
+                "duration": 15,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "technique"
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.6
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ],
+      "weaponName": "杖",
+      "group": "mage",
+      "archetype": "岩浆法师"
+    },
+    {
+      "family": "法师",
+      "direction": "霜寒法师",
+      "weaponId": "whisk",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%B3%95%E5%B8%88",
+      "moon": [
+        {
+          "sourceName": "冰锥术",
+          "level": 6,
+          "skillId": "whisk-1",
+          "formula": [
+            "魔力×2.5+武器威力"
+          ],
+          "parameters": {
+            "id": "whisk-1",
+            "name": "凝冰咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2.2,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 6,
+                "chance": 0.65,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.5
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.15,
+            "raceBonuses": {
+              "spirit": 0.3
+            },
+            "element": "water"
+          }
+        },
+        {
+          "sourceName": "冰晶风暴",
+          "level": 6,
+          "skillId": "whisk-2",
+          "formula": [
+            "魔力×1.5+武器威力"
+          ],
+          "parameters": {
+            "id": "whisk-2",
+            "name": "寒霜阵",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "speedDown",
+                "duration": 6,
+                "chance": 0.75,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.5
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05,
+            "raceBonuses": {
+              "spirit": 0.3
+            },
+            "element": "water"
+          }
+        },
+        {
+          "sourceName": "凝神静气",
+          "level": 6,
+          "skillId": "whisk-3",
+          "formula": [
+            "魔力×0.5+武器威力"
+          ],
+          "parameters": {
+            "id": "whisk-3",
+            "name": "静心咒",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "techniqueUp",
+                "duration": 15,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "technique"
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.5
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "冰锥术",
+          "level": 7,
+          "skillId": "whisk-1-day",
+          "formula": [
+            "魔力×3+武器威力"
+          ],
+          "parameters": {
+            "id": "whisk-1-day",
+            "name": "凝冰咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.8,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 6,
+                "chance": 0.65,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 3
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.15,
+            "raceBonuses": {
+              "spirit": 0.35
+            },
+            "element": "water"
+          }
+        },
+        {
+          "sourceName": "冰晶风暴",
+          "level": 7,
+          "skillId": "whisk-2-day",
+          "formula": [
+            "魔力×1.8+武器威力"
+          ],
+          "parameters": {
+            "id": "whisk-2-day",
+            "name": "寒霜阵",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "speedDown",
+                "duration": 6,
+                "chance": 0.75,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05,
+            "raceBonuses": {
+              "spirit": 0.35
+            },
+            "element": "water"
+          }
+        },
+        {
+          "sourceName": "凝神静气",
+          "level": 7,
+          "skillId": "whisk-3-day",
+          "formula": [
+            "魔力×0.6+武器威力"
+          ],
+          "parameters": {
+            "id": "whisk-3-day",
+            "name": "静心咒",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "techniqueUp",
+                "duration": 15,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "technique"
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.6
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ],
+      "weaponName": "拂尘",
+      "group": "mage",
+      "archetype": "霜寒法师"
+    },
+    {
+      "family": "法师",
+      "direction": "血法师",
+      "weaponId": "banner",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%B3%95%E5%B8%88",
+      "moon": [
+        {
+          "sourceName": "蛛网术",
+          "level": 6,
+          "skillId": "banner-1",
+          "formula": [
+            "魔力×2+武器威力"
+          ],
+          "parameters": {
+            "id": "banner-1",
+            "name": "缚影咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.3,
+            "effects": [
+              {
+                "id": "speedDown",
+                "duration": 10,
+                "chance": 0.7,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.5,
+            "criticalChance": 0.05,
+            "element": "wood"
+          }
+        },
+        {
+          "sourceName": "炫光术",
+          "level": 6,
+          "skillId": "banner-2",
+          "formula": [
+            "魔力×1.3+武器威力"
+          ],
+          "parameters": {
+            "id": "banner-2",
+            "name": "乱神咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [
+              {
+                "id": "techniqueDown",
+                "duration": 6,
+                "chance": 0.75,
+                "base": 10,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "technique",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.3
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05,
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "生命交换",
+          "level": 6,
+          "skillId": "banner-3",
+          "formula": [
+            "魔力×1.9+武器威力"
+          ],
+          "parameters": {
+            "id": "banner-3",
+            "name": "血引术",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "bleed",
+                "duration": 6,
+                "chance": 0.7,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.9
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.1,
+            "lifesteal": 0.75,
+            "element": "earth"
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "蛛网术",
+          "level": 7,
+          "skillId": "banner-1-day",
+          "formula": [
+            "魔力×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "banner-1-day",
+            "name": "缚影咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.3,
+            "effects": [
+              {
+                "id": "speedDown",
+                "duration": 10,
+                "chance": 0.7,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.5,
+            "criticalChance": 0.05,
+            "element": "wood"
+          }
+        },
+        {
+          "sourceName": "炫光术",
+          "level": 7,
+          "skillId": "banner-2-day",
+          "formula": [
+            "魔力×1.55+武器威力"
+          ],
+          "parameters": {
+            "id": "banner-2-day",
+            "name": "乱神咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [
+              {
+                "id": "techniqueDown",
+                "duration": 6,
+                "chance": 0.75,
+                "base": 10,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "technique",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.55
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05,
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "生命交换",
+          "level": 7,
+          "skillId": "banner-3-day",
+          "formula": [
+            "魔力×2.3+武器威力"
+          ],
+          "parameters": {
+            "id": "banner-3-day",
+            "name": "血引术",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "bleed",
+                "duration": 6,
+                "chance": 0.7,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.3
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.1,
+            "lifesteal": 0.75,
+            "element": "earth"
+          }
+        }
+      ],
+      "weaponName": "法幡",
+      "group": "mage",
+      "archetype": "血法师"
+    },
+    {
+      "family": "法师",
+      "direction": "大巫医",
+      "weaponId": "gourd",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%B3%95%E5%B8%88",
+      "moon": [
+        {
+          "sourceName": "蛊毒术",
+          "level": 6,
+          "skillId": "gourd-poison",
+          "formula": [
+            "魔力×1.75+武器威力"
+          ],
+          "parameters": {
+            "id": "gourd-poison",
+            "name": "蚀骨蛊",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "plague",
+                "duration": 8,
+                "chance": 0.75,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.75
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.1,
+            "element": "wood"
+          }
+        },
+        {
+          "sourceName": "诅咒人偶",
+          "level": 6,
+          "skillId": "gourd-curse",
+          "formula": [
+            "魔力×2+武器威力"
+          ],
+          "parameters": {
+            "id": "gourd-curse",
+            "name": "厄运咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 5,
+                "chance": 0.6,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.1,
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "回春术",
+          "level": 6,
+          "skillId": "gourd-regeneration",
+          "formula": [
+            "魔力×0.75+武器威力"
+          ],
+          "parameters": {
+            "id": "gourd-regeneration",
+            "name": "青囊回春",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "regeneration",
+                "duration": 12,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.5,
+                "period": 1,
+                "healing": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.75
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "蛊毒术",
+          "level": 7,
+          "skillId": "gourd-poison-day",
+          "formula": [
+            "魔力×2.1+武器威力"
+          ],
+          "parameters": {
+            "id": "gourd-poison-day",
+            "name": "蚀骨蛊",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "plague",
+                "duration": 8,
+                "chance": 0.75,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.1
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.1,
+            "element": "wood"
+          }
+        },
+        {
+          "sourceName": "诅咒人偶",
+          "level": 7,
+          "skillId": "gourd-curse-day",
+          "formula": [
+            "魔力×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "gourd-curse-day",
+            "name": "厄运咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 5,
+                "chance": 0.6,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.1,
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "回春术",
+          "level": 7,
+          "skillId": "gourd-regeneration-day",
+          "formula": [
+            "魔力×0.9+武器威力"
+          ],
+          "parameters": {
+            "id": "gourd-regeneration-day",
+            "name": "青囊回春",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "regeneration",
+                "duration": 12,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.5,
+                "period": 1,
+                "healing": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.9
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ],
+      "weaponName": "药葫芦",
+      "group": "mage",
+      "archetype": "巫医"
+    },
+    {
+      "family": "圣职",
+      "direction": "教宗",
+      "weaponId": "scripture",
+      "source": "https://wiki.biligame.com/dxcb2/%E5%9C%A3%E8%81%8C",
+      "moon": [
+        {
+          "sourceName": "天神裁决",
+          "level": 6,
+          "skillId": "scripture-1",
+          "formula": [
+            "魔力×0.75+武器威力"
+          ],
+          "parameters": {
+            "id": "scripture-1",
+            "name": "破邪章",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "resistanceDown",
+                "duration": 8,
+                "chance": 0.55,
+                "base": 3,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "resistance",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.75
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.05,
+            "element": "thunder"
+          }
+        },
+        {
+          "sourceName": "圣疗术",
+          "level": 6,
+          "skillId": "scripture-2",
+          "formula": [
+            "魔力×0.85+武器威力"
+          ],
+          "parameters": {
+            "id": "scripture-2",
+            "name": "济世章",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3.5,
+            "effects": [
+              {
+                "id": "resistanceUp",
+                "duration": 7,
+                "base": 2,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "resistance"
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.85
+            },
+            "weaponCoefficient": 1
+          }
+        },
+        {
+          "sourceName": "神圣打击",
+          "level": 6,
+          "skillId": "scripture-3",
+          "formula": [
+            "魔力×1.75+武器威力"
+          ],
+          "parameters": {
+            "id": "scripture-3",
+            "name": "诛邪章",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "intelligence": 1.75
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.38,
+            "criticalChance": 0.15,
+            "raceBonuses": {
+              "dark": 0.3
+            },
+            "element": "earth"
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "天神裁决",
+          "level": 7,
+          "skillId": "scripture-1-day",
+          "formula": [
+            "魔力×0.9+武器威力"
+          ],
+          "parameters": {
+            "id": "scripture-1-day",
+            "name": "破邪章",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "resistanceDown",
+                "duration": 8,
+                "chance": 0.6,
+                "base": 3,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "resistance",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.9
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.05,
+            "element": "thunder"
+          }
+        },
+        {
+          "sourceName": "圣疗术",
+          "level": 7,
+          "skillId": "scripture-2-day",
+          "formula": [
+            "魔力×1+武器威力"
+          ],
+          "parameters": {
+            "id": "scripture-2-day",
+            "name": "济世章",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3.5,
+            "effects": [
+              {
+                "id": "resistanceUp",
+                "duration": 7,
+                "base": 2,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "resistance"
+              }
+            ],
+            "scaling": {
+              "intelligence": 1
+            },
+            "weaponCoefficient": 1
+          }
+        },
+        {
+          "sourceName": "神圣打击",
+          "level": 7,
+          "skillId": "scripture-3-day",
+          "formula": [
+            "魔力×2.1+武器威力"
+          ],
+          "parameters": {
+            "id": "scripture-3-day",
+            "name": "诛邪章",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "intelligence": 2.1
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.38,
+            "criticalChance": 0.15,
+            "raceBonuses": {
+              "dark": 0.3
+            },
+            "element": "earth"
+          }
+        }
+      ],
+      "weaponName": "经卷",
+      "group": "healer",
+      "archetype": "教宗"
+    },
+    {
+      "family": "圣职",
+      "direction": "神官骑士",
+      "weaponId": "needle",
+      "source": "https://wiki.biligame.com/dxcb2/%E5%9C%A3%E8%81%8C",
+      "moon": [
+        {
+          "sourceName": "重击",
+          "level": 6,
+          "skillId": "needle-stun",
+          "formula": [
+            "力量×1.25+魔力×0.85+武器威力"
+          ],
+          "parameters": {
+            "id": "needle-stun",
+            "name": "截脉针",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.3,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 7,
+                "chance": 0.5,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 1.25,
+              "intelligence": 0.85
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.47,
+            "criticalChance": 0.08,
+            "raceBonuses": {
+              "dark": 0.4
+            }
+          }
+        },
+        {
+          "sourceName": "治疗术",
+          "level": 6,
+          "skillId": "needle-heal",
+          "formula": [
+            "魔力×1.5+武器威力"
+          ],
+          "parameters": {
+            "id": "needle-heal",
+            "name": "回天针",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.8,
+            "effects": [
+              {
+                "id": "armorUp",
+                "duration": 8,
+                "base": 2,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "armor"
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.5
+            },
+            "weaponCoefficient": 1
+          }
+        },
+        {
+          "sourceName": "牺牲",
+          "level": 6,
+          "skillId": "needle-sacrifice",
+          "formula": [],
+          "parameters": {
+            "id": "needle-sacrifice",
+            "name": "舍身护众",
+            "kind": "buff",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.6,
+            "effects": [
+              {
+                "id": "armorUp",
+                "attribute": "armor",
+                "duration": 30,
+                "base": 8,
+                "stat": "war",
+                "coefficient": 0.1
+              }
+            ],
+            "buff": {
+              "id": "taunt",
+              "name": "嘲讽",
+              "taunt": true,
+              "duration": 30
+            }
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "重击",
+          "level": 7,
+          "skillId": "needle-stun-day",
+          "formula": [
+            "力量×1.5+魔力×1+武器威力"
+          ],
+          "parameters": {
+            "id": "needle-stun-day",
+            "name": "截脉针",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.3,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 7,
+                "chance": 0.5,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 1.5,
+              "intelligence": 1
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.47,
+            "criticalChance": 0.08,
+            "raceBonuses": {
+              "dark": 0.4
+            }
+          }
+        },
+        {
+          "sourceName": "治疗术",
+          "level": 7,
+          "skillId": "needle-heal-day",
+          "formula": [
+            "魔力×1.8+武器威力"
+          ],
+          "parameters": {
+            "id": "needle-heal-day",
+            "name": "回天针",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.8,
+            "effects": [
+              {
+                "id": "armorUp",
+                "duration": 8,
+                "base": 2,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "armor"
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.8
+            },
+            "weaponCoefficient": 1
+          }
+        },
+        {
+          "sourceName": "牺牲",
+          "level": 7,
+          "skillId": "needle-sacrifice-day",
+          "formula": [],
+          "parameters": {
+            "id": "needle-sacrifice-day",
+            "name": "舍身护众",
+            "kind": "buff",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.6,
+            "effects": [
+              {
+                "id": "armorUp",
+                "attribute": "armor",
+                "duration": 30,
+                "base": 8,
+                "stat": "war",
+                "coefficient": 0.1
+              }
+            ],
+            "buff": {
+              "id": "taunt",
+              "name": "嘲讽",
+              "taunt": true,
+              "duration": 30
+            }
+          }
+        }
+      ],
+      "weaponName": "金针",
+      "group": "healer",
+      "archetype": "神官骑士"
+    },
+    {
+      "family": "潜行者",
+      "direction": "夜莺",
+      "weaponId": "dagger",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%BD%9C%E8%A1%8C%E8%80%85",
+      "moon": [
+        {
+          "sourceName": "撕裂",
+          "level": 6,
+          "skillId": "hook-1",
+          "formula": [
+            "力量×1.55+武器威力"
+          ],
+          "parameters": {
+            "id": "hook-1",
+            "name": "裂伤刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "bleed",
+                "duration": 8,
+                "chance": 0.95,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.45,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 1.55
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.42,
+            "criticalChance": 0.18
+          }
+        },
+        {
+          "sourceName": "连击",
+          "level": 6,
+          "skillId": "hook-2",
+          "formula": [
+            "力量×0.7+武器威力"
+          ],
+          "parameters": {
+            "id": "hook-2",
+            "name": "疾连刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": -1,
+            "effects": [],
+            "scaling": {
+              "war": 0.7
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.26
+          }
+        },
+        {
+          "sourceName": "淬毒猛击",
+          "level": 6,
+          "skillId": "hook-3",
+          "formula": [
+            "力量×1.6+武器威力"
+          ],
+          "parameters": {
+            "id": "hook-3",
+            "name": "淬毒刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.6,
+            "effects": [
+              {
+                "id": "plague",
+                "duration": 8,
+                "chance": 0.85,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.45,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 1.6
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.15
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "撕裂",
+          "level": 7,
+          "skillId": "hook-1-day",
+          "formula": [
+            "力量×1.85+武器威力"
+          ],
+          "parameters": {
+            "id": "hook-1-day",
+            "name": "裂伤刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "bleed",
+                "duration": 8,
+                "chance": 0.95,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.6,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 1.85
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.18
+          }
+        },
+        {
+          "sourceName": "连击",
+          "level": 7,
+          "skillId": "hook-2-day",
+          "formula": [
+            "力量×0.85+武器威力"
+          ],
+          "parameters": {
+            "id": "hook-2-day",
+            "name": "疾连刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": -1,
+            "effects": [],
+            "scaling": {
+              "war": 0.85
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.26
+          }
+        },
+        {
+          "sourceName": "淬毒猛击",
+          "level": 7,
+          "skillId": "hook-3-day",
+          "formula": [
+            "力量×1.9+武器威力"
+          ],
+          "parameters": {
+            "id": "hook-3-day",
+            "name": "淬毒刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.6,
+            "effects": [
+              {
+                "id": "plague",
+                "duration": 8,
+                "chance": 0.9,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.6,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 1.9
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.15
+          }
+        }
+      ],
+      "weaponName": "匕首",
+      "group": "assassin",
+      "archetype": "夜莺"
+    },
+    {
+      "family": "潜行者",
+      "direction": "夜魇",
+      "weaponId": "shortBlade",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%BD%9C%E8%A1%8C%E8%80%85",
+      "moon": [
+        {
+          "sourceName": "撕裂",
+          "level": 6,
+          "skillId": "dagger-bleed",
+          "formula": [
+            "力量×1.5+武器威力"
+          ],
+          "parameters": {
+            "id": "dagger-bleed",
+            "name": "断筋刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.5,
+            "effects": [
+              {
+                "id": "bleed",
+                "duration": 8,
+                "chance": 0.8,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 1.5
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.42,
+            "criticalChance": 0.18
+          }
+        },
+        {
+          "sourceName": "幻影连击",
+          "level": 6,
+          "skillId": "dagger-fast",
+          "formula": [
+            "力量×0.8+武器威力"
+          ],
+          "parameters": {
+            "id": "dagger-fast",
+            "name": "无影连刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": -1.2,
+            "effects": [],
+            "scaling": {
+              "war": 0.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.4
+          }
+        },
+        {
+          "sourceName": "淬毒猛击",
+          "level": 6,
+          "skillId": "dagger-poison",
+          "formula": [
+            "力量×1.55+武器威力"
+          ],
+          "parameters": {
+            "id": "dagger-poison",
+            "name": "淬毒刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.6,
+            "effects": [
+              {
+                "id": "plague",
+                "duration": 8,
+                "chance": 0.7,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 1.55
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.42,
+            "criticalChance": 0.15
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "撕裂",
+          "level": 7,
+          "skillId": "dagger-bleed-day",
+          "formula": [
+            "力量×1.8+武器威力"
+          ],
+          "parameters": {
+            "id": "dagger-bleed-day",
+            "name": "断筋刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.5,
+            "effects": [
+              {
+                "id": "bleed",
+                "duration": 8,
+                "chance": 0.8,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 1.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.42,
+            "criticalChance": 0.18
+          }
+        },
+        {
+          "sourceName": "幻影连击",
+          "level": 7,
+          "skillId": "dagger-fast-day",
+          "formula": [
+            "力量×0.95+速度×0.05+武器威力"
+          ],
+          "parameters": {
+            "id": "dagger-fast-day",
+            "name": "无影连刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": -1.2,
+            "effects": [],
+            "scaling": {
+              "war": 0.95,
+              "speed": 0.05
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.4
+          }
+        },
+        {
+          "sourceName": "淬毒猛击",
+          "level": 7,
+          "skillId": "dagger-poison-day",
+          "formula": [
+            "力量×1.85+武器威力"
+          ],
+          "parameters": {
+            "id": "dagger-poison-day",
+            "name": "淬毒刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.6,
+            "effects": [
+              {
+                "id": "plague",
+                "duration": 8,
+                "chance": 0.7,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 1.85
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.42,
+            "criticalChance": 0.15
+          }
+        }
+      ],
+      "weaponName": "短刃",
+      "group": "assassin",
+      "archetype": "夜魇"
+    },
+    {
+      "family": "火枪手",
+      "direction": "圣枪侠",
+      "weaponId": "bow",
+      "source": "https://wiki.biligame.com/dxcb2/%E7%81%AB%E6%9E%AA%E6%89%8B",
+      "moon": [
+        {
+          "sourceName": "射击",
+          "level": 6,
+          "skillId": "crossbow-shot",
+          "formula": [
+            "力量×1.25+技巧×0.8+武器威力"
+          ],
+          "parameters": {
+            "id": "crossbow-shot",
+            "name": "穿云箭",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [],
+            "scaling": {
+              "war": 1.25,
+              "technique": 0.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.43,
+            "criticalChance": 0.08,
+            "raceBonuses": {
+              "humanoid": 2
+            }
+          }
+        },
+        {
+          "sourceName": "弹幕",
+          "level": 6,
+          "skillId": "crossbow-volley",
+          "formula": [
+            "力量×0.85+技巧×0.55+武器威力"
+          ],
+          "parameters": {
+            "id": "crossbow-volley",
+            "name": "连珠箭",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 0.5,
+                "chance": 0.55,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 0.85,
+              "technique": 0.55
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.38,
+            "criticalChance": 0.1,
+            "raceBonuses": {
+              "humanoid": 0.3
+            }
+          }
+        },
+        {
+          "sourceName": "狙击",
+          "level": 6,
+          "skillId": "crossbow-snipe",
+          "formula": [
+            "力量×1.55+技巧×1.05+武器威力"
+          ],
+          "parameters": {
+            "id": "crossbow-snipe",
+            "name": "狙心矢",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [],
+            "scaling": {
+              "war": 1.55,
+              "technique": 1.05
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.43,
+            "criticalChance": 0.15,
+            "ignoreTaunt": true,
+            "raceBonuses": {
+              "humanoid": 0.3
+            }
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "射击",
+          "level": 7,
+          "skillId": "crossbow-shot-day",
+          "formula": [
+            "力量×1.5+技巧×0.95+武器威力"
+          ],
+          "parameters": {
+            "id": "crossbow-shot-day",
+            "name": "穿云箭",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [],
+            "scaling": {
+              "war": 1.5,
+              "technique": 0.95
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.43,
+            "criticalChance": 0.08,
+            "raceBonuses": {
+              "humanoid": 2
+            }
+          }
+        },
+        {
+          "sourceName": "弹幕",
+          "level": 7,
+          "skillId": "crossbow-volley-day",
+          "formula": [
+            "力量×1+技巧×0.65+武器威力"
+          ],
+          "parameters": {
+            "id": "crossbow-volley-day",
+            "name": "连珠箭",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 1,
+                "chance": 0.55,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 1,
+              "technique": 0.65
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.38,
+            "criticalChance": 0.1,
+            "raceBonuses": {
+              "humanoid": 0.35
+            }
+          }
+        },
+        {
+          "sourceName": "狙击",
+          "level": 7,
+          "skillId": "crossbow-snipe-day",
+          "formula": [
+            "力量×1.85+技巧×1.25+武器威力"
+          ],
+          "parameters": {
+            "id": "crossbow-snipe-day",
+            "name": "狙心矢",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [],
+            "scaling": {
+              "war": 1.85,
+              "technique": 1.25
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.43,
+            "criticalChance": 0.15,
+            "ignoreTaunt": true,
+            "raceBonuses": {
+              "humanoid": 0.35
+            }
+          }
+        }
+      ],
+      "weaponName": "弓",
+      "group": "ranger",
+      "archetype": "圣枪侠"
+    },
+    {
+      "family": "火枪手",
+      "direction": "烈枪侠",
+      "weaponId": "cannon",
+      "source": "https://wiki.biligame.com/dxcb2/%E7%81%AB%E6%9E%AA%E6%89%8B",
+      "moon": [
+        {
+          "sourceName": "射击",
+          "level": 6,
+          "skillId": "repeatingCrossbow-1",
+          "formula": [
+            "力量×2.05+武器威力"
+          ],
+          "parameters": {
+            "id": "repeatingCrossbow-1",
+            "name": "穿阵炮",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [],
+            "scaling": {
+              "war": 2.05
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.43,
+            "criticalChance": 0.08
+          }
+        },
+        {
+          "sourceName": "流弹",
+          "level": 6,
+          "skillId": "repeatingCrossbow-2",
+          "formula": [
+            "力量×1.35+武器威力"
+          ],
+          "parameters": {
+            "id": "repeatingCrossbow-2",
+            "name": "霰火轰",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "war": 1.35
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.1
+          }
+        },
+        {
+          "sourceName": "破甲狙击",
+          "level": 6,
+          "skillId": "repeatingCrossbow-3",
+          "formula": [
+            "力量×2.7+武器威力"
+          ],
+          "parameters": {
+            "id": "repeatingCrossbow-3",
+            "name": "破甲炮",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2.3,
+            "effects": [
+              {
+                "id": "armorDown",
+                "duration": 9,
+                "chance": 0.8,
+                "base": 3,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "armor",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 2.7
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.43,
+            "criticalChance": 0.15,
+            "ignoreTaunt": true,
+            "raceBonuses": {
+              "humanoid": 0.3
+            }
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "射击",
+          "level": 6,
+          "skillId": "repeatingCrossbow-1-day",
+          "formula": [
+            "力量×2.45+武器威力"
+          ],
+          "parameters": {
+            "id": "repeatingCrossbow-1-day",
+            "name": "穿阵炮",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [],
+            "scaling": {
+              "war": 2.45
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.43,
+            "criticalChance": 0.08
+          }
+        },
+        {
+          "sourceName": "流弹",
+          "level": 6,
+          "skillId": "repeatingCrossbow-2-day",
+          "formula": [
+            "力量×1.6+武器威力"
+          ],
+          "parameters": {
+            "id": "repeatingCrossbow-2-day",
+            "name": "霰火轰",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "war": 1.6
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.1
+          }
+        },
+        {
+          "sourceName": "破甲狙击",
+          "level": 6,
+          "skillId": "repeatingCrossbow-3-day",
+          "formula": [
+            "力量×3.2+武器威力"
+          ],
+          "parameters": {
+            "id": "repeatingCrossbow-3-day",
+            "name": "破甲炮",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2.3,
+            "effects": [
+              {
+                "id": "armorDown",
+                "duration": 9,
+                "chance": 0.8,
+                "base": 3,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "armor",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 3.2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.43,
+            "criticalChance": 0.15,
+            "ignoreTaunt": true,
+            "raceBonuses": {
+              "humanoid": 0.3
+            }
+          }
+        }
+      ],
+      "weaponName": "炮",
+      "group": "ranger",
+      "archetype": "烈枪侠"
+    },
+    {
+      "family": "火枪手",
+      "direction": "传奇猎人",
+      "weaponId": "crossbow",
+      "source": "https://wiki.biligame.com/dxcb2/%E7%81%AB%E6%9E%AA%E6%89%8B",
+      "moon": [
+        {
+          "sourceName": "黑火药",
+          "level": 6,
+          "skillId": "bow-fire",
+          "formula": [
+            "力量×2.2+武器威力"
+          ],
+          "parameters": {
+            "id": "bow-fire",
+            "name": "火矢贯心",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 8,
+                "chance": 0.75,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 2.2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.08,
+            "raceBonuses": {
+              "beast": 2
+            },
+            "element": "fire"
+          }
+        },
+        {
+          "sourceName": "涂毒弹药",
+          "level": 6,
+          "skillId": "bow-poison",
+          "formula": [
+            "力量×2+武器威力"
+          ],
+          "parameters": {
+            "id": "bow-poison",
+            "name": "毒矢追魂",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "plague",
+                "duration": 8,
+                "chance": 0.7,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.43,
+            "criticalChance": 0.06,
+            "lifesteal": 0.3
+          }
+        },
+        {
+          "sourceName": "急救",
+          "level": 6,
+          "skillId": "bow-recover",
+          "formula": [
+            "魔力×2+武器威力"
+          ],
+          "parameters": {
+            "id": "bow-recover",
+            "name": "敛息回元",
+            "kind": "heal",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "speedUp",
+                "duration": 12,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed"
+              }
+            ],
+            "scaling": {
+              "intelligence": 2
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "黑火药",
+          "level": 7,
+          "skillId": "bow-fire-day",
+          "formula": [
+            "力量×2.65+武器威力"
+          ],
+          "parameters": {
+            "id": "bow-fire-day",
+            "name": "火矢贯心",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 8,
+                "chance": 0.8,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 2.65
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.08,
+            "raceBonuses": {
+              "beast": 2
+            },
+            "element": "fire"
+          }
+        },
+        {
+          "sourceName": "涂毒弹药",
+          "level": 7,
+          "skillId": "bow-poison-day",
+          "formula": [
+            "力量×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "bow-poison-day",
+            "name": "毒矢追魂",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "plague",
+                "duration": 8,
+                "chance": 0.75,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 2.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.43,
+            "criticalChance": 0.06,
+            "lifesteal": 0.3
+          }
+        },
+        {
+          "sourceName": "急救",
+          "level": 7,
+          "skillId": "bow-recover-day",
+          "formula": [
+            "魔力×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "bow-recover-day",
+            "name": "敛息回元",
+            "kind": "heal",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "speedUp",
+                "duration": 12,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed"
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.4
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ],
+      "weaponName": "弩",
+      "group": "ranger",
+      "archetype": "传奇猎人"
+    },
+    {
+      "family": "野蛮人",
+      "direction": "狂战神",
+      "weaponId": "axe",
+      "source": "https://wiki.biligame.com/dxcb2/%E9%87%8E%E8%9B%AE%E4%BA%BA",
+      "moon": [
+        {
+          "sourceName": "挥击",
+          "level": 6,
+          "skillId": "blade-cut",
+          "formula": [
+            "力量×2+武器威力"
+          ],
+          "parameters": {
+            "id": "blade-cut",
+            "name": "横斧斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "war": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.08
+          }
+        },
+        {
+          "sourceName": "乾坤一击",
+          "level": 6,
+          "skillId": "blade-burst",
+          "formula": [
+            "力量×5+武器威力"
+          ],
+          "parameters": {
+            "id": "blade-burst",
+            "name": "乾坤一击",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.8,
+            "effects": [],
+            "scaling": {
+              "war": 5
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.3,
+            "criticalChance": 0.15,
+            "raceBonuses": {
+              "humanoid": 0.1
+            }
+          }
+        },
+        {
+          "sourceName": "狂野之舞",
+          "level": 6,
+          "skillId": "blade-sweep",
+          "formula": [
+            "力量×1.55+武器威力"
+          ],
+          "parameters": {
+            "id": "blade-sweep",
+            "name": "回旋斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [],
+            "scaling": {
+              "war": 1.55
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.3,
+            "criticalChance": 0.1
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "挥击",
+          "level": 7,
+          "skillId": "blade-cut-day",
+          "formula": [
+            "力量×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "blade-cut-day",
+            "name": "横斧斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "war": 2.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.08
+          }
+        },
+        {
+          "sourceName": "乾坤一击",
+          "level": 7,
+          "skillId": "blade-burst-day",
+          "formula": [
+            "力量×6+武器威力"
+          ],
+          "parameters": {
+            "id": "blade-burst-day",
+            "name": "乾坤一击",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.8,
+            "effects": [],
+            "scaling": {
+              "war": 6
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.3,
+            "criticalChance": 0.15,
+            "raceBonuses": {
+              "humanoid": 0.1
+            }
+          }
+        },
+        {
+          "sourceName": "狂野之舞",
+          "level": 7,
+          "skillId": "blade-sweep-day",
+          "formula": [
+            "力量×1.8+武器威力"
+          ],
+          "parameters": {
+            "id": "blade-sweep-day",
+            "name": "回旋斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [],
+            "scaling": {
+              "war": 1.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.3,
+            "criticalChance": 0.1
+          }
+        }
+      ],
+      "weaponName": "斧",
+      "group": "berserker",
+      "archetype": "狂战神"
+    },
+    {
+      "family": "野蛮人",
+      "direction": "火刑官",
+      "weaponId": "hammer",
+      "source": "https://wiki.biligame.com/dxcb2/%E9%87%8E%E8%9B%AE%E4%BA%BA",
+      "moon": [
+        {
+          "sourceName": "收割",
+          "level": 6,
+          "skillId": "hammer-1",
+          "formula": [
+            "力量×2.2+武器威力"
+          ],
+          "parameters": {
+            "id": "hammer-1",
+            "name": "夺生锤",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [],
+            "scaling": {
+              "war": 2.2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.1,
+            "lifesteal": 0.5
+          }
+        },
+        {
+          "sourceName": "火怒斩",
+          "level": 6,
+          "skillId": "hammer-2",
+          "formula": [
+            "力量×2+武器威力"
+          ],
+          "parameters": {
+            "id": "hammer-2",
+            "name": "怒焰锤",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 8,
+                "chance": 0.8,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.3,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.07,
+            "raceBonuses": {
+              "dark": 1.6
+            },
+            "element": "fire"
+          }
+        },
+        {
+          "sourceName": "烈焰之舞",
+          "level": 6,
+          "skillId": "hammer-3",
+          "formula": [
+            "力量×1.6+武器威力"
+          ],
+          "parameters": {
+            "id": "hammer-3",
+            "name": "烈焰舞",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 6,
+                "chance": 0.8,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.3,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 1.6
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.1,
+            "raceBonuses": {
+              "dark": 1.6
+            },
+            "element": "fire"
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "收割",
+          "level": 7,
+          "skillId": "hammer-1-day",
+          "formula": [
+            "力量×2.65+武器威力"
+          ],
+          "parameters": {
+            "id": "hammer-1-day",
+            "name": "夺生锤",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [],
+            "scaling": {
+              "war": 2.65
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.08,
+            "lifesteal": 0.5
+          }
+        },
+        {
+          "sourceName": "火怒斩",
+          "level": 7,
+          "skillId": "hammer-2-day",
+          "formula": [
+            "力量×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "hammer-2-day",
+            "name": "怒焰锤",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 8,
+                "chance": 0.85,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.3,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 2.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.07,
+            "raceBonuses": {
+              "dark": 1.6
+            },
+            "element": "fire"
+          }
+        },
+        {
+          "sourceName": "烈焰之舞",
+          "level": 7,
+          "skillId": "hammer-3-day",
+          "formula": [
+            "力量×1.9+武器威力"
+          ],
+          "parameters": {
+            "id": "hammer-3-day",
+            "name": "烈焰舞",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 6,
+                "chance": 0.85,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.3,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 1.9
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.1,
+            "raceBonuses": {
+              "dark": 1.6
+            },
+            "element": "fire"
+          }
+        }
+      ],
+      "weaponName": "锤",
+      "group": "berserker",
+      "archetype": "火刑官"
+    }
+  ],
+  "retiredDirections": [
+    {
+      "family": "战士",
+      "direction": "剑魔",
+      "weaponId": "dualSword",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%88%98%E5%A3%AB",
+      "moon": [
+        {
+          "sourceName": "雷剑术",
+          "level": 6,
+          "skillId": "dualSword-1",
+          "formula": [
+            "力量×2.6+魔力×1+武器威力"
+          ],
+          "parameters": {
+            "id": "dualSword-1",
+            "name": "奔雷斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "speedDown",
+                "duration": 6,
+                "chance": 0.7,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 2.6,
+              "intelligence": 1
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.08
+          }
+        },
+        {
+          "sourceName": "风剑术",
+          "level": 6,
+          "skillId": "dualSword-2",
+          "formula": [
+            "力量×3+魔力×1.5+武器威力"
+          ],
+          "parameters": {
+            "id": "dualSword-2",
+            "name": "引风斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [
+              {
+                "id": "intelligenceUp",
+                "duration": 10,
+                "chance": 1,
+                "base": 0,
+                "stat": "technique",
+                "coefficient": 0.5,
+                "attribute": "intelligence",
+                "recipient": "self"
+              }
+            ],
+            "scaling": {
+              "war": 3,
+              "intelligence": 1.5
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.12,
+            "ignoreTaunt": true,
+            "lifesteal": 0.5
+          }
+        },
+        {
+          "sourceName": "烈焰斩击",
+          "level": 6,
+          "skillId": "dualSword-3",
+          "formula": [
+            "力量×1.5+魔力×1.1+武器威力"
+          ],
+          "parameters": {
+            "id": "dualSword-3",
+            "name": "烈焰斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 8,
+                "chance": 0.8,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 1.5,
+              "intelligence": 1.1
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.1,
+            "element": "fire"
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "雷剑术",
+          "level": 7,
+          "skillId": "dualSword-1-day",
+          "formula": [
+            "力量×3.2+魔力×1.25+武器威力"
+          ],
+          "parameters": {
+            "id": "dualSword-1-day",
+            "name": "奔雷斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "speedDown",
+                "duration": 6,
+                "chance": 0.75,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 3.2,
+              "intelligence": 1.25
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.08
+          }
+        },
+        {
+          "sourceName": "风剑术",
+          "level": 7,
+          "skillId": "dualSword-2-day",
+          "formula": [
+            "力量×3.5+魔力×2+武器威力"
+          ],
+          "parameters": {
+            "id": "dualSword-2-day",
+            "name": "引风斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [
+              {
+                "id": "intelligenceUp",
+                "duration": 10,
+                "chance": 1,
+                "base": 0,
+                "stat": "technique",
+                "coefficient": 0.5,
+                "attribute": "intelligence",
+                "recipient": "self"
+              }
+            ],
+            "scaling": {
+              "war": 3.5,
+              "intelligence": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.12,
+            "ignoreTaunt": true,
+            "lifesteal": 0.5
+          }
+        },
+        {
+          "sourceName": "烈焰斩击",
+          "level": 7,
+          "skillId": "dualSword-3-day",
+          "formula": [
+            "力量×1.8+魔力×1.3+武器威力"
+          ],
+          "parameters": {
+            "id": "dualSword-3-day",
+            "name": "烈焰斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 8,
+                "chance": 0.8,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 1.8,
+              "intelligence": 1.3
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.1,
+            "element": "fire"
+          }
+        }
+      ]
+    },
+    {
+      "family": "法师",
+      "direction": "幻境先知",
+      "weaponId": "qin",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%B3%95%E5%B8%88",
+      "moon": [
+        {
+          "sourceName": "强眩光术",
+          "level": 6,
+          "skillId": "qin-confusion",
+          "formula": [
+            "魔力×1.55+武器威力"
+          ],
+          "parameters": {
+            "id": "qin-confusion",
+            "name": "迷魂曲",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [
+              {
+                "id": "techniqueDown",
+                "duration": 6,
+                "chance": 0.75,
+                "base": 10,
+                "stat": "technique",
+                "coefficient": 0.3,
+                "attribute": "technique",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.55
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05,
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "生命交换",
+          "level": 6,
+          "skillId": "qin-drain",
+          "formula": [
+            "魔力×1.8+武器威力"
+          ],
+          "parameters": {
+            "id": "qin-drain",
+            "name": "摄魂音",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "intelligence": 1.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.06,
+            "lifesteal": 0.5,
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "狩魔蛛网术",
+          "level": 6,
+          "skillId": "qin-slow",
+          "formula": [
+            "魔力×2+武器威力"
+          ],
+          "parameters": {
+            "id": "qin-slow",
+            "name": "缓弦咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.3,
+            "effects": [
+              {
+                "id": "speedDown",
+                "duration": 10,
+                "chance": 0.8,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.75,
+                "attribute": "speed",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.5,
+            "criticalChance": 0.05,
+            "element": "wood"
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "强眩光术",
+          "level": 7,
+          "skillId": "qin-confusion-day",
+          "formula": [
+            "魔力×1.85+武器威力"
+          ],
+          "parameters": {
+            "id": "qin-confusion-day",
+            "name": "迷魂曲",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [
+              {
+                "id": "techniqueDown",
+                "duration": 6,
+                "chance": 0.75,
+                "base": 10,
+                "stat": "technique",
+                "coefficient": 0.3,
+                "attribute": "technique",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.85
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05,
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "生命虹吸",
+          "level": 7,
+          "skillId": "qin-drain-day",
+          "formula": [
+            "魔力×2.15+武器威力"
+          ],
+          "parameters": {
+            "id": "qin-drain-day",
+            "name": "摄魂音",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "intelligence": 2.15
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.06,
+            "lifesteal": 0.5,
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "狩魔蛛网术",
+          "level": 7,
+          "skillId": "qin-slow-day",
+          "formula": [
+            "魔力×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "qin-slow-day",
+            "name": "缓弦咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.3,
+            "effects": [
+              {
+                "id": "speedDown",
+                "duration": 10,
+                "chance": 0.8,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.75,
+                "attribute": "speed",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.5,
+            "criticalChance": 0.05,
+            "element": "wood"
+          }
+        }
+      ]
+    },
+    {
+      "family": "法师",
+      "direction": "虚空法师",
+      "weaponId": "bell",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%B3%95%E5%B8%88",
+      "moon": [
+        {
+          "sourceName": "虚弱",
+          "level": 6,
+          "skillId": "bell-1",
+          "formula": [
+            "魔力×2+武器威力"
+          ],
+          "parameters": {
+            "id": "bell-1",
+            "name": "卸力咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "warDown",
+                "duration": 10,
+                "chance": 0.8,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.7,
+                "attribute": "war",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.5,
+            "criticalChance": 0.08,
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "炫光术",
+          "level": 6,
+          "skillId": "bell-2",
+          "formula": [
+            "魔力×1.3+武器威力"
+          ],
+          "parameters": {
+            "id": "bell-2",
+            "name": "惑心咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [
+              {
+                "id": "techniqueDown",
+                "duration": 6,
+                "chance": 0.75,
+                "base": 10,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "technique",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.3
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05,
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "生命虹吸",
+          "level": 6,
+          "skillId": "bell-3",
+          "formula": [
+            "魔力×1.8"
+          ],
+          "parameters": {
+            "id": "bell-3",
+            "name": "夺生咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "intelligence": 1.8
+            },
+            "weaponCoefficient": 0,
+            "hitChance": 0.45,
+            "criticalChance": 0.06,
+            "lifesteal": 0.5,
+            "element": "earth"
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "虚弱",
+          "level": 7,
+          "skillId": "bell-1-day",
+          "formula": [
+            "魔力×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "bell-1-day",
+            "name": "卸力咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "warDown",
+                "duration": 10,
+                "chance": 0.8,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.7,
+                "attribute": "war",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.5,
+            "criticalChance": 0.08,
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "炫光术",
+          "level": 7,
+          "skillId": "bell-2-day",
+          "formula": [
+            "魔力×1.55+武器威力"
+          ],
+          "parameters": {
+            "id": "bell-2-day",
+            "name": "惑心咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [
+              {
+                "id": "techniqueDown",
+                "duration": 6,
+                "chance": 0.75,
+                "base": 10,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "technique",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.55
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05,
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "生命虹吸",
+          "level": 7,
+          "skillId": "bell-3-day",
+          "formula": [
+            "魔力×2.15+武器威力"
+          ],
+          "parameters": {
+            "id": "bell-3-day",
+            "name": "夺生咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "intelligence": 2.15
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.06,
+            "lifesteal": 0.5,
+            "element": "earth"
+          }
+        }
+      ]
+    },
+    {
+      "family": "法师",
+      "direction": "灵魂贤者",
+      "weaponId": "drum",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%B3%95%E5%B8%88",
+      "moon": [
+        {
+          "sourceName": "蛊毒术",
+          "level": 6,
+          "skillId": "drum-1",
+          "formula": [
+            "魔力×1.9+武器威力"
+          ],
+          "parameters": {
+            "id": "drum-1",
+            "name": "疫毒咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "plague",
+                "duration": 8,
+                "chance": 0.7,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.9
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.1,
+            "element": "wood"
+          }
+        },
+        {
+          "sourceName": "摄魂术",
+          "level": 6,
+          "skillId": "drum-2",
+          "formula": [
+            "魔力×1.85+武器威力"
+          ],
+          "parameters": {
+            "id": "drum-2",
+            "name": "摄魂咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "intelligenceDown",
+                "duration": 5,
+                "chance": 0.75,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.65,
+                "attribute": "intelligence",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.85
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.1,
+            "lifesteal": 0.3,
+            "raceBonuses": {
+              "humanoid": 0.3
+            },
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "回春术",
+          "level": 6,
+          "skillId": "drum-3",
+          "formula": [
+            "魔力×0.65+武器威力"
+          ],
+          "parameters": {
+            "id": "drum-3",
+            "name": "回生咒",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "regeneration",
+                "duration": 8,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.35,
+                "period": 1,
+                "healing": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.65
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "蛊毒术",
+          "level": 7,
+          "skillId": "drum-1-day",
+          "formula": [
+            "魔力×2.3+武器威力"
+          ],
+          "parameters": {
+            "id": "drum-1-day",
+            "name": "疫毒咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "plague",
+                "duration": 8,
+                "chance": 0.7,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.3
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.1,
+            "element": "wood"
+          }
+        },
+        {
+          "sourceName": "摄魂术",
+          "level": 7,
+          "skillId": "drum-2-day",
+          "formula": [
+            "魔力×2.2+武器威力"
+          ],
+          "parameters": {
+            "id": "drum-2-day",
+            "name": "摄魂咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "intelligenceDown",
+                "duration": 8,
+                "chance": 0.75,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.65,
+                "attribute": "intelligence",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.1,
+            "lifesteal": 0.3,
+            "raceBonuses": {
+              "humanoid": 0.35
+            },
+            "element": "earth"
+          }
+        },
+        {
+          "sourceName": "回春术",
+          "level": 7,
+          "skillId": "drum-3-day",
+          "formula": [
+            "魔力×0.8+武器威力"
+          ],
+          "parameters": {
+            "id": "drum-3-day",
+            "name": "回生咒",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 3,
+            "effects": [
+              {
+                "id": "regeneration",
+                "duration": 8,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.35,
+                "period": 1,
+                "healing": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.8
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ]
+    },
+    {
+      "family": "圣职",
+      "direction": "圣光贤者",
+      "weaponId": "talisman",
+      "source": "https://wiki.biligame.com/dxcb2/%E5%9C%A3%E8%81%8C",
+      "moon": [
+        {
+          "sourceName": "裁决之雷",
+          "level": 6,
+          "skillId": "talisman-thunder",
+          "formula": [
+            "魔力×1.65+武器威力"
+          ],
+          "parameters": {
+            "id": "talisman-thunder",
+            "name": "雷符咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "resistanceDown",
+                "duration": 14,
+                "chance": 0.8,
+                "base": 3,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "resistance",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.65
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.05,
+            "element": "thunder"
+          }
+        },
+        {
+          "sourceName": "圣疗术",
+          "level": 6,
+          "skillId": "talisman-rain",
+          "formula": [
+            "魔力×0.85+武器威力"
+          ],
+          "parameters": {
+            "id": "talisman-rain",
+            "name": "太平甘霖",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3.5,
+            "effects": [
+              {
+                "id": "resistanceUp",
+                "duration": 7,
+                "base": 2,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "resistance"
+              }
+            ],
+            "scaling": {
+              "intelligence": 0.85
+            },
+            "weaponCoefficient": 1
+          }
+        },
+        {
+          "sourceName": "神圣净化",
+          "level": 6,
+          "skillId": "talisman-clear",
+          "formula": [
+            "魔力×1.1+武器威力"
+          ],
+          "parameters": {
+            "id": "talisman-clear",
+            "name": "荡秽符",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "intelligence": 1.1
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.38,
+            "criticalChance": 0.15,
+            "raceBonuses": {
+              "dark": 1.6
+            },
+            "element": "earth"
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "裁决之雷",
+          "level": 7,
+          "skillId": "talisman-thunder-day",
+          "formula": [
+            "魔力×2+武器威力"
+          ],
+          "parameters": {
+            "id": "talisman-thunder-day",
+            "name": "雷符咒",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "resistanceDown",
+                "duration": 14,
+                "chance": 0.8,
+                "base": 3,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "resistance",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "intelligence": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.05,
+            "element": "thunder"
+          }
+        },
+        {
+          "sourceName": "圣疗术",
+          "level": 7,
+          "skillId": "talisman-rain-day",
+          "formula": [
+            "魔力×1+武器威力"
+          ],
+          "parameters": {
+            "id": "talisman-rain-day",
+            "name": "太平甘霖",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 3.5,
+            "effects": [
+              {
+                "id": "resistanceUp",
+                "duration": 7,
+                "base": 2,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "resistance"
+              }
+            ],
+            "scaling": {
+              "intelligence": 1
+            },
+            "weaponCoefficient": 1
+          }
+        },
+        {
+          "sourceName": "神圣净化",
+          "level": 7,
+          "skillId": "talisman-clear-day",
+          "formula": [
+            "魔力×1.3+武器威力"
+          ],
+          "parameters": {
+            "id": "talisman-clear-day",
+            "name": "荡秽符",
+            "kind": "tactic",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "intelligence": 1.3
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.38,
+            "criticalChance": 0.15,
+            "raceBonuses": {
+              "dark": 1.6
+            },
+            "element": "earth"
+          }
+        }
+      ]
+    },
+    {
+      "family": "圣职",
+      "direction": "圣殿骑士",
+      "weaponId": "club",
+      "source": "https://wiki.biligame.com/dxcb2/%E5%9C%A3%E8%81%8C",
+      "moon": [
+        {
+          "sourceName": "忏悔重击",
+          "level": 6,
+          "skillId": "club-1",
+          "formula": [
+            "力量×1.35+魔力×0.9+武器威力"
+          ],
+          "parameters": {
+            "id": "club-1",
+            "name": "镇邪击",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.3,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 7,
+                "chance": 0.7,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 1.35,
+              "intelligence": 0.9
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.5,
+            "criticalChance": 0.08,
+            "raceBonuses": {
+              "dark": 1.6
+            }
+          }
+        },
+        {
+          "sourceName": "治疗术",
+          "level": 6,
+          "skillId": "club-2",
+          "formula": [
+            "魔力×1.4+武器威力"
+          ],
+          "parameters": {
+            "id": "club-2",
+            "name": "扶伤术",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "armorUp",
+                "duration": 8,
+                "base": 2,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "armor"
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.4
+            },
+            "weaponCoefficient": 1
+          }
+        },
+        {
+          "sourceName": "牺牲",
+          "level": 6,
+          "skillId": "club-3",
+          "formula": [],
+          "parameters": {
+            "id": "club-3",
+            "name": "舍身护众",
+            "kind": "buff",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.6,
+            "effects": [
+              {
+                "id": "armorUp",
+                "attribute": "armor",
+                "duration": 30,
+                "base": 8,
+                "stat": "war",
+                "coefficient": 0.1
+              }
+            ],
+            "buff": {
+              "id": "taunt",
+              "name": "嘲讽",
+              "taunt": true,
+              "duration": 30
+            }
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "忏悔重击",
+          "level": 7,
+          "skillId": "club-1-day",
+          "formula": [
+            "力量×1.6+魔力×1.1+武器威力"
+          ],
+          "parameters": {
+            "id": "club-1-day",
+            "name": "镇邪击",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.3,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 7,
+                "chance": 0.7,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 1.6,
+              "intelligence": 1.1
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.5,
+            "criticalChance": 0.08,
+            "raceBonuses": {
+              "dark": 1.6
+            }
+          }
+        },
+        {
+          "sourceName": "治疗术",
+          "level": 7,
+          "skillId": "club-2-day",
+          "formula": [
+            "魔力×1.7+武器威力"
+          ],
+          "parameters": {
+            "id": "club-2-day",
+            "name": "扶伤术",
+            "kind": "heal",
+            "side": "ally",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [
+              {
+                "id": "armorUp",
+                "duration": 8,
+                "base": 2,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "armor"
+              }
+            ],
+            "scaling": {
+              "intelligence": 1.7
+            },
+            "weaponCoefficient": 1
+          }
+        },
+        {
+          "sourceName": "牺牲",
+          "level": 7,
+          "skillId": "club-3-day",
+          "formula": [],
+          "parameters": {
+            "id": "club-3-day",
+            "name": "舍身护众",
+            "kind": "buff",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.6,
+            "effects": [
+              {
+                "id": "armorUp",
+                "attribute": "armor",
+                "duration": 30,
+                "base": 8,
+                "stat": "war",
+                "coefficient": 0.1
+              }
+            ],
+            "buff": {
+              "id": "taunt",
+              "name": "嘲讽",
+              "taunt": true,
+              "duration": 30
+            }
+          }
+        }
+      ]
+    },
+    {
+      "family": "潜行者",
+      "direction": "诡术大师",
+      "weaponId": "throwingKnife",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%BD%9C%E8%A1%8C%E8%80%85",
+      "moon": [
+        {
+          "sourceName": "偷袭",
+          "level": 6,
+          "skillId": "throwingKnife-1",
+          "formula": [
+            "力量×1.75+武器威力"
+          ],
+          "parameters": {
+            "id": "throwingKnife-1",
+            "name": "暗影袭",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.3,
+            "effects": [],
+            "scaling": {
+              "war": 1.75
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.08,
+            "ignoreTaunt": true
+          }
+        },
+        {
+          "sourceName": "飞刀杂耍",
+          "level": 6,
+          "skillId": "throwingKnife-2",
+          "formula": [
+            "力量×1.4+武器威力"
+          ],
+          "parameters": {
+            "id": "throwingKnife-2",
+            "name": "飞刃舞",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "speedUp",
+                "duration": 5,
+                "chance": 1,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed",
+                "recipient": "self"
+              }
+            ],
+            "scaling": {
+              "war": 1.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.3,
+            "criticalChance": 0.15
+          }
+        },
+        {
+          "sourceName": "烟幕弹",
+          "level": 6,
+          "skillId": "throwingKnife-3",
+          "formula": [
+            "力量×1.4+武器威力"
+          ],
+          "parameters": {
+            "id": "throwingKnife-3",
+            "name": "迷烟刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "techniqueDown",
+                "duration": 7,
+                "chance": 0.8,
+                "base": 10,
+                "stat": "technique",
+                "coefficient": 0.65,
+                "attribute": "technique",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 1.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.05,
+            "ignoreTaunt": true
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "偷袭",
+          "level": 7,
+          "skillId": "throwingKnife-1-day",
+          "formula": [
+            "力量×2.1+武器威力"
+          ],
+          "parameters": {
+            "id": "throwingKnife-1-day",
+            "name": "暗影袭",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.3,
+            "effects": [],
+            "scaling": {
+              "war": 2.1
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.08,
+            "ignoreTaunt": true
+          }
+        },
+        {
+          "sourceName": "飞刀杂耍",
+          "level": 7,
+          "skillId": "throwingKnife-2-day",
+          "formula": [
+            "力量×1.7+武器威力"
+          ],
+          "parameters": {
+            "id": "throwingKnife-2-day",
+            "name": "飞刃舞",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "speedUp",
+                "duration": 7,
+                "chance": 1,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed",
+                "recipient": "self"
+              }
+            ],
+            "scaling": {
+              "war": 1.7
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.15
+          }
+        },
+        {
+          "sourceName": "烟幕弹",
+          "level": 7,
+          "skillId": "throwingKnife-3-day",
+          "formula": [
+            "力量×1.7+武器威力"
+          ],
+          "parameters": {
+            "id": "throwingKnife-3-day",
+            "name": "迷烟刺",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "techniqueDown",
+                "duration": 7,
+                "chance": 0.85,
+                "base": 10,
+                "stat": "technique",
+                "coefficient": 0.65,
+                "attribute": "technique",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 1.7
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.05,
+            "ignoreTaunt": true
+          }
+        }
+      ]
+    },
+    {
+      "family": "潜行者",
+      "direction": "幻术刺客",
+      "weaponId": "dart",
+      "source": "https://wiki.biligame.com/dxcb2/%E6%BD%9C%E8%A1%8C%E8%80%85",
+      "moon": [
+        {
+          "sourceName": "狡击",
+          "level": 6,
+          "skillId": "dart-1",
+          "formula": [
+            "力量×1.65+魔力×1.3+武器威力"
+          ],
+          "parameters": {
+            "id": "dart-1",
+            "name": "诡影袭",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.3,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 1.5,
+                "chance": 0.8,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 1.65,
+              "intelligence": 1.3
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.08,
+            "ignoreTaunt": true,
+            "raceBonuses": {
+              "humanoid": 0.5
+            }
+          }
+        },
+        {
+          "sourceName": "飞刀杂耍",
+          "level": 6,
+          "skillId": "dart-2",
+          "formula": [
+            "力量×1.25+魔力×1+武器威力"
+          ],
+          "parameters": {
+            "id": "dart-2",
+            "name": "流星镖",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "speedUp",
+                "duration": 7,
+                "chance": 1,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed",
+                "recipient": "self"
+              }
+            ],
+            "scaling": {
+              "war": 1.25,
+              "intelligence": 1
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.15
+          }
+        },
+        {
+          "sourceName": "烟幕弹",
+          "level": 6,
+          "skillId": "dart-3",
+          "formula": [
+            "力量×1.25+魔力×1+武器威力"
+          ],
+          "parameters": {
+            "id": "dart-3",
+            "name": "烟影镖",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "techniqueDown",
+                "duration": 8,
+                "chance": 0.8,
+                "base": 10,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "technique",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 1.25,
+              "intelligence": 1
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "狡击",
+          "level": 7,
+          "skillId": "dart-1-day",
+          "formula": [
+            "力量×2+魔力×1.55+武器威力"
+          ],
+          "parameters": {
+            "id": "dart-1-day",
+            "name": "诡影袭",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 0.3,
+            "effects": [
+              {
+                "id": "stun",
+                "duration": 1.5,
+                "chance": 0.85,
+                "stun": true
+              }
+            ],
+            "scaling": {
+              "war": 2,
+              "intelligence": 1.55
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.08,
+            "ignoreTaunt": true,
+            "raceBonuses": {
+              "humanoid": 0.5
+            }
+          }
+        },
+        {
+          "sourceName": "飞刀杂耍",
+          "level": 7,
+          "skillId": "dart-2-day",
+          "formula": [
+            "力量×1.5+魔力×1.2+武器威力"
+          ],
+          "parameters": {
+            "id": "dart-2-day",
+            "name": "流星镖",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "speedUp",
+                "duration": 7,
+                "chance": 1,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed",
+                "recipient": "self"
+              }
+            ],
+            "scaling": {
+              "war": 1.5,
+              "intelligence": 1.2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.15
+          }
+        },
+        {
+          "sourceName": "烟幕弹",
+          "level": 7,
+          "skillId": "dart-3-day",
+          "formula": [
+            "力量×1.5+魔力×1.2+武器威力"
+          ],
+          "parameters": {
+            "id": "dart-3-day",
+            "name": "烟影镖",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "techniqueDown",
+                "duration": 8,
+                "chance": 0.8,
+                "base": 10,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "technique",
+                "negative": true
+              }
+            ],
+            "scaling": {
+              "war": 1.5,
+              "intelligence": 1.2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.05
+          }
+        }
+      ]
+    },
+    {
+      "family": "火枪手",
+      "direction": "巨龙猎人",
+      "weaponId": "greatBow",
+      "source": "https://wiki.biligame.com/dxcb2/%E7%81%AB%E6%9E%AA%E6%89%8B",
+      "moon": [
+        {
+          "sourceName": "灼烧弹药",
+          "level": 6,
+          "skillId": "greatBow-1",
+          "formula": [
+            "力量×2.1+武器威力"
+          ],
+          "parameters": {
+            "id": "greatBow-1",
+            "name": "灼骨矢",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 8,
+                "chance": 0.7,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 2.1
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.43,
+            "criticalChance": 0.08,
+            "raceBonuses": {
+              "beast": 0.4
+            },
+            "element": "fire"
+          }
+        },
+        {
+          "sourceName": "猎龙弹",
+          "level": 6,
+          "skillId": "greatBow-2",
+          "formula": [
+            "力量×2.15+武器威力"
+          ],
+          "parameters": {
+            "id": "greatBow-2",
+            "name": "猎龙矢",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.3,
+            "effects": [
+              {
+                "id": "plague",
+                "duration": 8,
+                "chance": 0.75,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 2.15
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.06,
+            "lifesteal": 0.25,
+            "raceBonuses": {
+              "dragon": 2
+            }
+          }
+        },
+        {
+          "sourceName": "急救",
+          "level": 6,
+          "skillId": "greatBow-3",
+          "formula": [
+            "魔力×2+武器威力"
+          ],
+          "parameters": {
+            "id": "greatBow-3",
+            "name": "急救术",
+            "kind": "heal",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "speedUp",
+                "duration": 12,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed"
+              }
+            ],
+            "scaling": {
+              "intelligence": 2
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "灼烧弹药",
+          "level": 7,
+          "skillId": "greatBow-1-day",
+          "formula": [
+            "力量×2.5+武器威力"
+          ],
+          "parameters": {
+            "id": "greatBow-1-day",
+            "name": "灼骨矢",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 8,
+                "chance": 0.7,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 2.5
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.43,
+            "criticalChance": 0.08,
+            "raceBonuses": {
+              "beast": 0.4
+            },
+            "element": "fire"
+          }
+        },
+        {
+          "sourceName": "猎龙弹",
+          "level": 7,
+          "skillId": "greatBow-2-day",
+          "formula": [
+            "力量×2.6+武器威力"
+          ],
+          "parameters": {
+            "id": "greatBow-2-day",
+            "name": "猎龙矢",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.3,
+            "effects": [
+              {
+                "id": "plague",
+                "duration": 8,
+                "chance": 0.75,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 2.6
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.45,
+            "criticalChance": 0.06,
+            "lifesteal": 0.25,
+            "raceBonuses": {
+              "dragon": 2
+            }
+          }
+        },
+        {
+          "sourceName": "急救",
+          "level": 7,
+          "skillId": "greatBow-3-day",
+          "formula": [
+            "魔力×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "greatBow-3-day",
+            "name": "急救术",
+            "kind": "heal",
+            "side": "self",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "speedUp",
+                "duration": 12,
+                "base": 5,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "attribute": "speed"
+              }
+            ],
+            "scaling": {
+              "intelligence": 2.4
+            },
+            "weaponCoefficient": 1
+          }
+        }
+      ]
+    },
+    {
+      "family": "野蛮人",
+      "direction": "蛮荒之王",
+      "weaponId": "halberd",
+      "source": "https://wiki.biligame.com/dxcb2/%E9%87%8E%E8%9B%AE%E4%BA%BA",
+      "moon": [
+        {
+          "sourceName": "挥击",
+          "level": 6,
+          "skillId": "halberd-cut",
+          "formula": [
+            "力量×2+武器威力"
+          ],
+          "parameters": {
+            "id": "halberd-cut",
+            "name": "横戟击",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "war": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.08
+          }
+        },
+        {
+          "sourceName": "乾坤一击",
+          "level": 6,
+          "skillId": "halberd-burst",
+          "formula": [
+            "力量×3.8+武器威力"
+          ],
+          "parameters": {
+            "id": "halberd-burst",
+            "name": "霸戟破军",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [],
+            "scaling": {
+              "war": 3.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.25,
+            "criticalChance": 0.12
+          }
+        },
+        {
+          "sourceName": "狂野之舞",
+          "level": 6,
+          "skillId": "halberd-sweep",
+          "formula": [
+            "力量×2.35+武器威力"
+          ],
+          "parameters": {
+            "id": "halberd-sweep",
+            "name": "八方裂阵",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [],
+            "scaling": {
+              "war": 2.35
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.13
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "挥击",
+          "level": 7,
+          "skillId": "halberd-cut-day",
+          "formula": [
+            "力量×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "halberd-cut-day",
+            "name": "横戟击",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [],
+            "scaling": {
+              "war": 2.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.08
+          }
+        },
+        {
+          "sourceName": "乾坤一击",
+          "level": 7,
+          "skillId": "halberd-burst-day",
+          "formula": [
+            "力量×4.5+武器威力"
+          ],
+          "parameters": {
+            "id": "halberd-burst-day",
+            "name": "霸戟破军",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [],
+            "scaling": {
+              "war": 4.5
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.25,
+            "criticalChance": 0.12
+          }
+        },
+        {
+          "sourceName": "狂野之舞",
+          "level": 7,
+          "skillId": "halberd-sweep-day",
+          "formula": [
+            "力量×2.8+武器威力"
+          ],
+          "parameters": {
+            "id": "halberd-sweep-day",
+            "name": "八方裂阵",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2,
+            "effects": [],
+            "scaling": {
+              "war": 2.8
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.13
+          }
+        }
+      ]
+    },
+    {
+      "family": "野蛮人",
+      "direction": "毁灭者",
+      "weaponId": "axe",
+      "source": "https://wiki.biligame.com/dxcb2/%E9%87%8E%E8%9B%AE%E4%BA%BA",
+      "moon": [
+        {
+          "sourceName": "收割",
+          "level": 6,
+          "skillId": "axe-1",
+          "formula": [
+            "力量×2.2+武器威力"
+          ],
+          "parameters": {
+            "id": "axe-1",
+            "name": "摄生斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [],
+            "scaling": {
+              "war": 2.2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.08,
+            "lifesteal": 0.65
+          }
+        },
+        {
+          "sourceName": "火怒斩",
+          "level": 6,
+          "skillId": "axe-2",
+          "formula": [
+            "力量×2+武器威力"
+          ],
+          "parameters": {
+            "id": "axe-2",
+            "name": "焚骨斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 8,
+                "chance": 0.8,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 2
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.07,
+            "element": "fire"
+          }
+        },
+        {
+          "sourceName": "猩红之舞",
+          "level": 6,
+          "skillId": "axe-3",
+          "formula": [
+            "力量×1.6+武器威力"
+          ],
+          "parameters": {
+            "id": "axe-3",
+            "name": "血旋斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [],
+            "scaling": {
+              "war": 1.6
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.1,
+            "lifesteal": 0.5
+          }
+        }
+      ],
+      "day": [
+        {
+          "sourceName": "收割",
+          "level": 7,
+          "skillId": "axe-1-day",
+          "formula": [
+            "力量×2.65+武器威力"
+          ],
+          "parameters": {
+            "id": "axe-1-day",
+            "name": "摄生斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1,
+            "effects": [],
+            "scaling": {
+              "war": 2.65
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.4,
+            "criticalChance": 0.1,
+            "lifesteal": 0.7
+          }
+        },
+        {
+          "sourceName": "火怒斩",
+          "level": 7,
+          "skillId": "axe-2-day",
+          "formula": [
+            "力量×2.4+武器威力"
+          ],
+          "parameters": {
+            "id": "axe-2-day",
+            "name": "焚骨斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "single",
+            "cost": 0,
+            "cooldown": 1.5,
+            "effects": [
+              {
+                "id": "burn",
+                "duration": 8,
+                "chance": 0.8,
+                "base": 1,
+                "stat": "technique",
+                "coefficient": 0.25,
+                "period": 1,
+                "healing": false
+              }
+            ],
+            "scaling": {
+              "war": 2.4
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.07,
+            "element": "fire"
+          }
+        },
+        {
+          "sourceName": "猩红之舞",
+          "level": 7,
+          "skillId": "axe-3-day",
+          "formula": [
+            "力量×1.9+武器威力"
+          ],
+          "parameters": {
+            "id": "axe-3-day",
+            "name": "血旋斩",
+            "kind": "physical",
+            "side": "enemy",
+            "scope": "all",
+            "cost": 0,
+            "cooldown": 2.5,
+            "effects": [],
+            "scaling": {
+              "war": 1.9
+            },
+            "weaponCoefficient": 1,
+            "hitChance": 0.35,
+            "criticalChance": 0.1,
+            "lifesteal": 0.55
+          }
+        }
+      ]
+    }
+  ]
+}

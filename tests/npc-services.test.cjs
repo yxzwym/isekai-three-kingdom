@@ -1,0 +1,9 @@
+const test=require('node:test'),assert=require('node:assert/strict'),{World}=require('../js/world.js'),R=require('../js/game-rules.js'),N=require('../js/nearby-content.js');require('../js/ui-theme.js');const {CanvasWorld}=require('../js/canvas-world.js');
+test('乡医对白没有硬编码费用，价格按钮及扣款统一读取服务配置',()=>{
+ const npc=N.npcs.find(n=>n.id==='changshan-doctor');assert.ok(npc.lines.every(s=>!/[0-9]|八文/.test(s)));const saved=N.services.healing.price;N.services.healing.price=13;
+ try{const model=new World({name:'行客',...R.rollHero('normal',()=>.4)},{nodeId:'changshan',money:200}),v=Object.assign(Object.create(CanvasWorld.prototype),{model,character:model.character,panel:null,dialogue:null,save(){},notify(){}});model.state.troops.hero=1;v.speak(npc);assert.ok(!v.dialogue.lines.join('').includes('13'));const action=v.dialogue.choices.find(c=>c.label==='疗伤 · 13文');assert.ok(action);action.action();assert.equal(model.state.money,187);assert.equal(model.members()[0].startSoldiers,model.members()[0].maxSoldiers);assert.ok(!v.dialogue.lines.join('').includes('13'));}finally{N.services.healing.price=saved;}
+});
+test('商贩分别提供购买与出售入口，打开对应交易模式',()=>{
+ const npc=N.npcs.find(n=>n.id==='road-merchant'),model=new World({name:'行客',...R.rollHero('normal',()=>.4)},{nodeId:'zhongshan'}),v=Object.assign(Object.create(CanvasWorld.prototype),{model,character:model.character,panel:null,dialogue:null,save(){},notify(){}});
+ v.speak(npc);assert.ok(v.dialogue.choices.some(c=>c.label==='购买'));assert.ok(v.dialogue.choices.some(c=>c.label==='出售'));v.dialogue.choices.find(c=>c.label==='购买').action();assert.equal(v.panel.type,'shop');assert.equal(v.panel.shopMode,'buy');assert.equal(v.dialogue,null);v.speak(npc);v.dialogue.choices.find(c=>c.label==='出售').action();assert.equal(v.panel.shopMode,'sell');assert.equal(v.dialogue,null);
+});

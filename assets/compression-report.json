@@ -301,6 +301,201 @@
       ],
       "quality": 90,
       "transparent": false
+    },
+    "./assets/characters/nanhua/celestial/fullbody.png": {
+      "src": "./assets/characters/nanhua/celestial/fullbody.webp",
+      "originalBytes": 2897703,
+      "bytes": 471160,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
+    },
+    "./assets/characters/yuji/celestial/fullbody.png": {
+      "src": "./assets/characters/yuji/celestial/fullbody.webp",
+      "originalBytes": 2672614,
+      "bytes": 418396,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
+    },
+    "./assets/characters/zuoci/celestial/fullbody.png": {
+      "src": "./assets/characters/zuoci/celestial/fullbody.webp",
+      "originalBytes": 2794996,
+      "bytes": 417736,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
+    },
+    "./assets/characters/yellow-militia/classic/fullbody.png": {
+      "src": "./assets/characters/yellow-militia/classic/fullbody.webp",
+      "originalBytes": 2080867,
+      "bytes": 252446,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
+    },
+    "./assets/characters/zhaoyun/classic/fullbody.png": {
+      "src": "./assets/characters/zhaoyun/classic/fullbody.webp",
+      "originalBytes": 2623655,
+      "bytes": 371108,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
+    },
+    "./assets/characters/village-maiden/classic/fullbody.png": {
+      "src": "./assets/characters/village-maiden/classic/fullbody.webp",
+      "originalBytes": 2124406,
+      "bytes": 233036,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
+    },
+    "./assets/characters/villager/classic/fullbody.png": {
+      "src": "./assets/characters/villager/classic/fullbody.webp",
+      "originalBytes": 2023365,
+      "bytes": 215974,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
+    },
+    "./assets/characters/laborer/classic/fullbody.png": {
+      "src": "./assets/characters/laborer/classic/fullbody.webp",
+      "originalBytes": 2144063,
+      "bytes": 252128,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
+    },
+    "./assets/characters/thief/classic/fullbody.png": {
+      "src": "./assets/characters/thief/classic/fullbody.webp",
+      "originalBytes": 2105660,
+      "bytes": 247716,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
+    },
+    "./assets/characters/river-bandit/classic/fullbody.png": {
+      "src": "./assets/characters/river-bandit/classic/fullbody.webp",
+      "originalBytes": 2226304,
+      "bytes": 279574,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
+    },
+    "./assets/characters/mountain-bandit/classic/fullbody.png": {
+      "src": "./assets/characters/mountain-bandit/classic/fullbody.webp",
+      "originalBytes": 2367854,
+      "bytes": 315816,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
+    },
+    "./assets/characters/brigand/classic/fullbody.png": {
+      "src": "./assets/characters/brigand/classic/fullbody.webp",
+      "originalBytes": 2423628,
+      "bytes": 331146,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
+    },
+    "./assets/characters/zhenji/classic/fullbody.png": {
+      "src": "./assets/characters/zhenji/classic/fullbody.webp",
+      "originalBytes": 2506007,
+      "bytes": 372620,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 90,
+      "transparent": true
     }
   }
 }

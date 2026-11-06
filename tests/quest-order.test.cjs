@@ -1,0 +1,8 @@
+const test=require('node:test'),assert=require('node:assert/strict'),R=require('../js/game-rules.js'),N=require('../js/nearby-content.js'),{World}=require('../js/world.js');
+const create=()=>new World({name:'行客',...R.rollHero('normal',()=>.5)}),finish=(w,id)=>{const q=N.sideQuests.find(q=>q.id===id);w.arrive(q.giverPlace);w.acceptSide(id);w.state.quests.side[id].wins=q.rounds;assert.ok(w.turnInSide(id));w.state.pendingReward=null;};
+test('未完成排在前面，完成任务按完成先后倒序，最早完成者位于最底部',()=>{
+ const w=create();finish(w,'trade-road');finish(w,'clear-mountain');let list=w.quests().filter(q=>q.category==='side');assert.deepEqual(list.map(q=>q.id),['grain-escort','clear-mountain','trade-road']);finish(w,'grain-escort');list=w.quests().filter(q=>q.category==='side');assert.deepEqual(list.map(q=>q.id),['grain-escort','clear-mountain','trade-road']);const saved=w.snapshot(),loaded=new World(w.character,saved);assert.deepEqual(loaded.quests(),w.quests());assert.deepEqual(loaded.state.questCompletions,saved.questCompletions);const before=loaded.state.questCompletionSerial;loaded.markQuestComplete('trade-road');assert.equal(loaded.state.questCompletionSerial,before);
+});
+test('新野初始目标只写查探消息并提供地点，已完成旧档补充稳定顺序且不重新发奖',()=>{
+ const w=new World(create().character,{quests:{changshan:{stage:'complete'},side:{'trade-road':{paid:true,wins:5,rounds:5}}},questProgressVersion:2});const q=w.quests().find(q=>q.id==='ganning');assert.equal(q.objective,'前往新野查探消息');assert.equal(q.target,'xinye');assert.equal(q.accepted,true);assert.ok(!q.objective.includes('甘宁'));const money=w.state.money,loaded=new World(w.character,w.snapshot());assert.equal(loaded.state.money,money);assert.deepEqual(loaded.state.questCompletions,w.state.questCompletions);
+});

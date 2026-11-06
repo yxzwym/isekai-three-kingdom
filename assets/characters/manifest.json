@@ -61,19 +61,19 @@
         "classic": {
           "label": "基础形象",
           "fullbody": {
-            "status": "pending-generation",
-            "plannedSrc": "./assets/characters/ganning/classic/fullbody.png",
-            "width": 2048,
-            "height": 3072
+            "status": "ready",
+            "src": "./assets/characters/ganning/classic/fullbody.webp",
+            "width": 1024,
+            "height": 1536
           },
           "portrait": {
-            "status": "legacy",
-            "src": "./assets/legacy/generals-v1.webp",
+            "status": "ready",
+            "src": "./assets/characters/ganning/classic/fullbody.webp",
             "crop": {
-              "x": 512.0,
-              "y": 55.0,
-              "width": 256.0,
-              "height": 440.0
+              "x": 410,
+              "y": 10,
+              "width": 370,
+              "height": 430
             }
           }
         }
@@ -438,6 +438,388 @@
               "y": 45.0,
               "width": 354.0,
               "height": 410.0
+            }
+          }
+        }
+      }
+    },
+    "nanhua": {
+      "id": "nanhua",
+      "name": "南华",
+      "defaultVariant": "celestial",
+      "variants": {
+        "celestial": {
+          "label": "仙人形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/nanhua/celestial/fullbody.webp",
+            "width": 1024,
+            "height": 1536,
+            "dialogueCrop": {
+              "x": 0,
+              "y": 0,
+              "width": 1024,
+              "height": 880.0
+            }
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/nanhua/celestial/fullbody.webp",
+            "crop": {
+              "x": 335.0,
+              "y": 45.0,
+              "width": 354.0,
+              "height": 410.0
+            }
+          }
+        }
+      }
+    },
+    "zuoci": {
+      "id": "zuoci",
+      "name": "左慈",
+      "defaultVariant": "celestial",
+      "variants": {
+        "celestial": {
+          "label": "仙人形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/zuoci/celestial/fullbody.webp",
+            "width": 1024,
+            "height": 1536,
+            "dialogueCrop": {
+              "x": 0,
+              "y": 0,
+              "width": 1024,
+              "height": 880.0
+            }
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/zuoci/celestial/fullbody.webp",
+            "crop": {
+              "x": 335.0,
+              "y": 45.0,
+              "width": 354.0,
+              "height": 410.0
+            }
+          }
+        }
+      }
+    },
+    "yuji": {
+      "id": "yuji",
+      "name": "于吉",
+      "defaultVariant": "celestial",
+      "variants": {
+        "celestial": {
+          "label": "仙人形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/yuji/celestial/fullbody.webp",
+            "width": 1024,
+            "height": 1536,
+            "dialogueCrop": {
+              "x": 0,
+              "y": 0,
+              "width": 1024,
+              "height": 880.0
+            }
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/yuji/celestial/fullbody.webp",
+            "crop": {
+              "x": 335.0,
+              "y": 45.0,
+              "width": 354.0,
+              "height": 410.0
+            }
+          }
+        }
+      }
+    },
+    "yellow-militia": {
+      "id": "yellow-militia",
+      "name": "黄巾军",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/yellow-militia/classic/fullbody.webp",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/yellow-militia/classic/fullbody.webp",
+            "crop": {
+              "x": 398,
+              "y": 74,
+              "width": 300,
+              "height": 348
+            }
+          }
+        }
+      }
+    },
+    "zhaoyun": {
+      "id": "zhaoyun",
+      "name": "赵云",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/zhaoyun/classic/fullbody.webp",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/zhaoyun/classic/fullbody.webp",
+            "crop": {
+              "x": 335,
+              "y": 35,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
+    },
+    "village-maiden": {
+      "id": "village-maiden",
+      "name": "村姑",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/village-maiden/classic/fullbody.webp",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/village-maiden/classic/fullbody.webp",
+            "crop": {
+              "x": 335,
+              "y": 35,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
+    },
+    "villager": {
+      "id": "villager",
+      "name": "村民",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/villager/classic/fullbody.webp",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/villager/classic/fullbody.webp",
+            "crop": {
+              "x": 335,
+              "y": 35,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
+    },
+    "laborer": {
+      "id": "laborer",
+      "name": "劳工",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/laborer/classic/fullbody.webp",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/laborer/classic/fullbody.webp",
+            "crop": {
+              "x": 335,
+              "y": 35,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
+    },
+    "thief": {
+      "id": "thief",
+      "name": "盗贼",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/thief/classic/fullbody.webp",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/thief/classic/fullbody.webp",
+            "crop": {
+              "x": 335,
+              "y": 35,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
+    },
+    "river-bandit": {
+      "id": "river-bandit",
+      "name": "水贼",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/river-bandit/classic/fullbody.webp",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/river-bandit/classic/fullbody.webp",
+            "crop": {
+              "x": 335,
+              "y": 35,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
+    },
+    "mountain-bandit": {
+      "id": "mountain-bandit",
+      "name": "山贼",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/mountain-bandit/classic/fullbody.webp",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/mountain-bandit/classic/fullbody.webp",
+            "crop": {
+              "x": 335,
+              "y": 35,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
+    },
+    "brigand": {
+      "id": "brigand",
+      "name": "强盗",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/brigand/classic/fullbody.webp",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/brigand/classic/fullbody.webp",
+            "crop": {
+              "x": 335,
+              "y": 35,
+              "width": 354,
+              "height": 410
+            }
+          }
+        }
+      }
+    },
+    "zhenji": {
+      "id": "zhenji",
+      "name": "甄姬",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/zhenji/classic/fullbody.webp",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/zhenji/classic/fullbody.webp",
+            "crop": {
+              "x": 330,
+              "y": 10,
+              "width": 380,
+              "height": 440
+            }
+          }
+        }
+      }
+    },
+    "maid": {
+      "id": "maid",
+      "name": "侍女",
+      "defaultVariant": "classic",
+      "variants": {
+        "classic": {
+          "label": "基础形象",
+          "fullbody": {
+            "status": "ready",
+            "src": "./assets/characters/maid/classic/fullbody.webp",
+            "width": 1024,
+            "height": 1536
+          },
+          "portrait": {
+            "status": "ready",
+            "src": "./assets/characters/maid/classic/fullbody.webp",
+            "crop": {
+              "x": 335,
+              "y": 28,
+              "width": 360,
+              "height": 420
             }
           }
         }

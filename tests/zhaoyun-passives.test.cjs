@@ -1,0 +1,40 @@
+const test=require('node:test'),assert=require('node:assert/strict');
+const E=require('../js/engine.js'),P=require('../js/passives.js'),W=require('../js/weapon-skills.js'),C=require('../js/weapon-catalog.js'),EQ=require('../js/equipment.js'),{World}=require('../js/world.js'),R=require('../js/game-rules.js'),I=require('../js/skill-info.js');
+const ids=['zhaoyun-courage','zhaoyun-seven-crossings'];
+const unit=(id,more={})=>({id,name:id,war:100,intelligence:100,constitution:40,speed:100,technique:100,maxSoldiers:400,attack:0,armor:0,resistance:0,initialMode:'manual',priorities:[],skills:['hit','heal'],...more});
+const hit=(amount,extra={})=>({id:'hit',name:'测试伤害',kind:'physical',side:'enemy',scope:'single',cost:0,cooldown:0,scaling:{},flat:amount,weaponCoefficient:0,alwaysHit:true,...extra});
+const heal=amount=>({id:'heal',name:'测试治疗',kind:'heal',side:'ally',scope:'single',cost:0,cooldown:0,scaling:{},flat:amount,weaponCoefficient:0});
+const create=(more={},skill=hit(100))=>new E.Battle({allies:[unit('zhao',{passives:ids,...more}),unit('healer')],enemies:[unit('enemy',{maxSoldiers:5000})],skills:{hit:skill,heal:heal(100)},rules:{hit:false,critical:false}});
+const ready=u=>{u.ready=true;u.progress=1;u.progressStamp=1;u.waitTime=u.interval;};
+const spend=(b,id,skill,target)=>{const u=b.unit(id);ready(u);return b.act(id,skill,target);};
+test('枪与盾采用守御反击、铁壁削弱方向，基础倍率、状态和冷却不变',()=>{
+ const spear=C.types.find(t=>t.id==='spear'),shield=C.types.find(t=>t.id==='shield');assert.deepEqual(W.forWeapon({type:'spear'}),['shield-hit','shield-taunt','shield-reflect']);assert.deepEqual(W.forWeapon({type:'shield'}),['greatShield-1','greatShield-2','greatShield-3']);assert.ok(spear.skills.some(s=>s.buff?.taunt));assert.ok(spear.skills.some(s=>s.buff?.reflectFormula));assert.ok(shield.skills.some(s=>s.effects.some(e=>e.id==='warDown')));assert.equal(spear.skills[0].scaling.war,2);assert.equal(spear.skills[0].effects[0].chance,.7);assert.equal(spear.skills[1].cooldown,.8);assert.equal(spear.skills[2].cooldown,-1);assert.equal(spear.daySkills[0].scaling.war,2.4);
+});
+test('四个装备位置为武器、盔甲、饰品、饰品，副手不再额外提供技能',()=>{
+ assert.deepEqual(EQ.slots.map(s=>s.label),['武器','盔甲','饰品','饰品']);const eq=EQ.normalize({armor:'布衣',accessories:['玉佩',{name:'护符'}],offhand:{type:'shield',name:'盾'}});assert.deepEqual(Object.keys(eq),['armor','accessory1','accessory2']);assert.equal(eq.accessory1.name,'玉佩');assert.equal(eq.accessory2.name,'护符');assert.deepEqual(W.forEquipment({weapon:{type:'spear'},equipment:{offhand:{type:'shield'}}}),W.forWeapon({type:'spear'}));
+});
+test('赵云拥有两个红色专属被动，武器改变不会移除被动，旧存档同步新枪技能并保留成长',()=>{
+ const hero={name:'行客',appearance:'scholar',difficulty:'normal',...R.rollHero('normal',()=>.4)},w=new World(hero,{nodeId:'changshan',inside:true,weaponType:'spear',tactics:{hero:{priorities:[{skill:'spear-break',when:'always'}]}}});assert.ok(w.startChangshan());const z=w.members().find(u=>u.id==='zhaoyun');assert.deepEqual(z.passives,[...ids,'zhaoyun-ever-victorious','zhaoyun-loyal-guard']);assert.deepEqual(z.skills,W.forWeapon(z.weapon));for(const id of ids){assert.equal(P.definitions[id].quality,'red');assert.equal(P.definitions[id].exclusive,true);assert.ok(!R.PASSIVE_MAP[id]);}assert.ok(w.members()[0].priorities.every(r=>w.members()[0].skills.includes(r.skill)));
+ const saved=w.snapshot(),old=saved.companions[0];delete old.weaponPlanVersion;old.passives=[];old.skills=['spear-break','spear-stun','spear-burst'];old.priorities=[{skill:'spear-break',when:'enemyCount',threshold:2}];saved.tactics.zhaoyun={initialMode:'manual',priorities:old.priorities};const loaded=new World(w.character,saved),next=loaded.members().find(u=>u.id==='zhaoyun');assert.equal(next.level,5);assert.deepEqual(next.potentials,z.potentials);assert.deepEqual(next.passives,[...ids,'zhaoyun-ever-victorious','zhaoyun-loyal-guard']);assert.deepEqual(next.skills,W.forWeapon({type:'spear'}));assert.ok(next.priorities.every(r=>next.skills.includes(r.skill)));assert.equal(next.initialMode,'manual');
+ saved.companions=[];saved.activeIds=['hero'];saved.residents={zhaoyun:{...old,homeNode:'chengdu'}};const resting=new World(w.character,saved);resting.arrive('chengdu');assert.ok(resting.inviteResident('zhaoyun'));const invited=resting.members().find(u=>u.id==='zhaoyun');assert.ok(invited.priorities.every(r=>invited.skills.includes(r.skill)));assert.equal(invited.weaponPlanMigrated,undefined);
+});
+test('一身是胆按已损生命线性增伤，上限50%，不提高治疗',()=>{
+ const b=create(),u=b.unit('zhao');for(const [hp,expected]of [[400,1],[300,1.125],[200,1.25],[100,1.375],[1,1.49875]]){u.soldiers=hp;assert.equal(b.effective(u).damageMultiplier,expected);assert.equal(E.calculate({attacker:b.effective(u),skill:hit(100)}).amount,Math.floor(100*expected));assert.equal(E.calculate({attacker:b.effective(u),skill:heal(100)}).amount,100);}u.soldiers=0;assert.equal(b.effective(u).damageMultiplier,1.5);
+});
+test('受伤与治疗过线立即读满，精确阈值往返触发，未跨线与满血治疗不触发',()=>{
+ const b=create(),u=b.unit('zhao');b.start();spend(b,'enemy','hit','zhao');assert.equal(u.soldiers,300);assert.equal(u.progress,1);assert.equal(u.ready,true);assert.deepEqual(b.events.find(e=>e.type==='passive').thresholds,[.75]);spend(b,'zhao','hit','enemy');assert.equal(u.progress,0);spend(b,'healer','heal','zhao');assert.equal(u.soldiers,400);assert.equal(u.ready,true);assert.equal(b.events.filter(e=>e.type==='passive').length,2);u.progress=0;u.ready=false;b.healthChanged(u,400,400);assert.equal(u.progress,0);assert.equal(b.events.filter(e=>e.type==='passive').length,2);
+ u.soldiers=200;b.healthChanged(u,201,200);assert.deepEqual(b.events.at(-1).thresholds,[.5]);u.soldiers=201;b.healthChanged(u,200,201);assert.deepEqual(b.events.at(-1).thresholds,[.5]);
+});
+test('一次跨多线只充满一条，不囤积行动；致死不读满、不复活',()=>{
+ const b=create({},hit(320)),u=b.unit('zhao');b.start();spend(b,'enemy','hit','zhao');assert.equal(u.soldiers,80);const events=b.events.filter(e=>e.type==='passive');assert.equal(events.length,1);assert.deepEqual(events[0].thresholds,[.25,.5,.75]);assert.equal(u.stats.actions,0);spend(b,'zhao','hit','enemy');assert.equal(u.progress,0);assert.equal(u.ready,false);spend(b,'enemy','hit','zhao');assert.equal(u.soldiers,0);assert.equal(u.ready,false);assert.equal(b.events.filter(e=>e.type==='passive').length,1);
+});
+test('自己吸血跨线的读满不会被本次技能重置，下一次仍可手动出手',()=>{
+ const b=create({startSoldiers:190},hit(100,{lifesteal:1})),u=b.unit('zhao');b.start();spend(b,'zhao','hit','enemy');assert.ok(u.soldiers>200);assert.equal(u.ready,true);assert.equal(u.progress,1);assert.ok(b.manual('zhao','hit','enemy').ok);assert.equal(u.stats.actions,2);
+});
+test('持续伤害、持续治疗和反伤也触发生命过线，反伤享受一身是胆但不递归反击',()=>{
+ const b=create({startSoldiers:301}),u=b.unit('zhao');b.start();b.addStatus(b.unit('enemy'),u,{id:'bleed',amount:5,period:1,duration:2});b.addStatus(u,u,{id:'regeneration',amount:20,healing:true,period:1,duration:2});b.advance(1);assert.equal(b.events.filter(e=>e.type==='passive').length,2);assert.equal(u.ready,true);
+ const reflected=create(),z=reflected.unit('zhao');reflected.start();reflected.addStatus(z,z,{...W.skills['shield-reflect'].buff},W.skills['shield-reflect']);spend(reflected,'enemy','hit','zhao');const result=reflected.events.find(e=>e.skill==='status-reflect').results[0];assert.equal(result.damageType,'true');assert.equal(result.amount,Math.floor(100*.3*1.125));assert.equal(reflected.events.filter(e=>e.skill==='status-reflect').length,1);
+});
+test('眩晕中可以因过线读满但不能出手，解除后保留读满；技能详情显示增伤后的正确算式',()=>{
+ const b=create(),u=b.unit('zhao');b.start();b.addStatus(b.unit('enemy'),u,{id:'stun',duration:1,stun:true});spend(b,'enemy','hit','zhao');assert.equal(u.ready,true);assert.equal(b.manual('zhao','hit','enemy').ok,false);b.advance(1.1);assert.equal(u.ready,true);assert.ok(b.manual('zhao','hit','enemy').ok);u.soldiers=200;const lines=I.describe(b,u,hit(100)).lines;assert.ok(lines.some(line=>line.includes('125')&&line.includes('×1.25')));
+});

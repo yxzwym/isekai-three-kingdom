@@ -1,31 +1,32 @@
 (function (root) {
   'use strict';
-  const convert = value => Math.max(1, Math.round(value * 255 / 100));
+  const G=typeof module!=='undefined'&&module.exports?require('./character-growth.js'):root.CharacterGrowth;
   const { SKILLS } = typeof module !== 'undefined' && module.exports ? require('./rules.js') : root.BattleRules;
   const CharacterAssets = typeof module !== 'undefined' && module.exports ? require('./character-assets.js') : root.CharacterAssets;
   const rule = (skill, when, threshold, scope = 'single') => ({ skill, when, threshold, scope });
-  function general(id, name, title, side, w, i, l, s, t, attack, armor, skills, priorities, extra = {}) {
-    return { id, characterId:id, name, title, side, war: convert(w), intelligence: convert(i), leadership: convert(l), speed: convert(s), technique: convert(t), attack, armor, resistance:0, skills, priorities, enemySp: 24, ...extra };
+  function general(id, name, title, side, attack, armor, skills, priorities, extra = {}) {
+    const {level,...growth}=G.create(id);return { id, characterId:id, name, title, side, ...growth, attack, armor, resistance:0, skills, priorities, enemySp: 24, ...extra };
   }
   const ALLIES = [
-    general('zhouyu', '周瑜', '大都督', 'ally', 71, 96, 97, 84, 88, 85, 150, ['huoshen', 'dare', 'strike'], [rule('huoshen', 'enemyCount', 3, 'all'), rule('dare','always',0), rule('strike','always',0)]),
-    general('huanggai', '黄盖', '破浪先锋', 'ally', 83, 69, 80, 68, 78, 105, 165, ['dare', 'strike'], [rule('dare', 'enemyCount', 4, 'all'), rule('strike','always',0)]),
-    general('ganning', '甘宁', '锦帆将军', 'ally', 94, 76, 90, 92, 92, 115, 135, ['luoshi', 'strike'], [rule('luoshi','always',0), rule('strike','always',0)]),
-    general('lusu', '鲁肃', '赞军校尉', 'ally', 56, 92, 88, 70, 74, 60, 155, ['yinxian', 'hongshui', 'strike'], [rule('yinxian', 'allyBelow', .55), { ...rule('hongshui', 'enemyCount', 4, 'all'), disabled: true }, {...rule('strike','always',0),frequency:'sometimes'}]),
-    general('zhugeliang', '诸葛亮', '卧龙', 'ally', 38, 100, 92, 86, 90, 60, 140, ['yinxian', 'huoshen', 'strike'], [rule('yinxian', 'allyBelow', .45), { ...rule('huoshen', 'enemyCount', 3, 'all'), disabled: true }, {...rule('strike','always',0),frequency:'sometimes'}], { passives:['bagua'],passive: '八卦阵 · 物理技能50%闪避', dodge: .5 })
+    general('zhouyu', '周瑜', '大都督', 'ally', 85, 150, ['huoshen', 'dare', 'strike'], [rule('huoshen', 'enemyCount', 3, 'all'), rule('dare','always',0), rule('strike','always',0)]),
+    general('huanggai', '黄盖', '破浪先锋', 'ally', 105, 165, ['dare', 'strike'], [rule('dare', 'enemyCount', 4, 'all'), rule('strike','always',0)]),
+    general('ganning', '甘宁', '锦帆将军', 'ally', 115, 135, ['luoshi', 'strike'], [rule('luoshi','always',0), rule('strike','always',0)]),
+    general('lusu', '鲁肃', '赞军校尉', 'ally', 60, 155, ['yinxian', 'hongshui', 'strike'], [rule('yinxian', 'allyBelow', .55), { ...rule('hongshui', 'enemyCount', 4, 'all'), disabled: true }, {...rule('strike','always',0),frequency:'sometimes'}]),
+    general('zhugeliang', '诸葛亮', '卧龙', 'ally', 60, 140, ['yinxian', 'huoshen', 'strike'], [rule('yinxian', 'allyBelow', .45), { ...rule('huoshen', 'enemyCount', 3, 'all'), disabled: true }, {...rule('strike','always',0),frequency:'sometimes'}], { passives:['bagua'],passive: '八卦阵 · 物理技能50%闪避', dodge: .5 })
   ];
   const ENEMIES = [
-    general('caocao', '曹操', '北军主帅', 'enemy', 72, 91, 100, 80, 87, 100, 190, ['yinxian', 'dare', 'strike'], [rule('yinxian', 'allyBelow', .4), {...rule('dare','always',0),frequency:'sometimes'}, {...rule('strike','always',0),frequency:'sometimes'}], { enemySp: 30 }),
-    general('zhangliao', '张辽', '前军都督', 'enemy', 92, 78, 95, 88, 90, 120, 160, ['luoshi', 'strike'], [rule('luoshi','always',0), rule('strike','always',0)]),
-    general('xuhuang', '徐晃', '长驱将军', 'enemy', 90, 72, 90, 76, 85, 125, 165, ['luoshi', 'strike'], [rule('luoshi','always',0), rule('strike','always',0)]),
-    general('yujin', '于禁', '水军都督', 'enemy', 78, 76, 92, 72, 80, 100, 180, ['tongxian', 'hongshui', 'strike'], [rule('tongxian', 'allyBelow', .45), rule('hongshui', 'enemyCount', 4, 'all'), {...rule('strike','always',0),frequency:'sometimes'}]),
-    general('caoren', '曹仁', '铁壁中军', 'enemy', 86, 64, 89, 60, 72, 110, 200, ['dare', 'strike'], [rule('dare','always',0), rule('strike','always',0)])
+    general('caocao', '曹操', '北军主帅', 'enemy', 100, 190, ['yinxian', 'dare', 'strike'], [rule('yinxian', 'allyBelow', .4), {...rule('dare','always',0),frequency:'sometimes'}, {...rule('strike','always',0),frequency:'sometimes'}], { enemySp: 30 }),
+    general('zhangliao', '张辽', '前军都督', 'enemy', 120, 160, ['luoshi', 'strike'], [rule('luoshi','always',0), rule('strike','always',0)]),
+    general('xuhuang', '徐晃', '长驱将军', 'enemy', 125, 165, ['luoshi', 'strike'], [rule('luoshi','always',0), rule('strike','always',0)]),
+    general('yujin', '于禁', '水军都督', 'enemy', 100, 180, ['tongxian', 'hongshui', 'strike'], [rule('tongxian', 'allyBelow', .45), rule('hongshui', 'enemyCount', 4, 'all'), {...rule('strike','always',0),frequency:'sometimes'}]),
+    general('caoren', '曹仁', '铁壁中军', 'enemy', 110, 200, ['dare', 'strike'], [rule('dare','always',0), rule('strike','always',0)])
   ];
   const REINFORCEMENTS = [
-    general('sunquan', '孙权', '剧情援军', 'ally', 67, 80, 94, 75, 78, 95, 175, ['tongxian', 'dare', 'strike'], [rule('tongxian', 'allyBelow', .5), rule('dare', 'enemyCount', 3, 'all'), {...rule('strike','always',0),frequency:'sometimes'}]),
-    general('lvbu', '吕布', '跨时空校验', 'ally', 100, 26, 87, 85, 95, 145, 170, ['strike'], [rule('strike','always',0)], { passives:['guishen','pojun'],passive: '鬼神无双 · 破军绝阵', guaranteedCritical: true, ignoreArmor: true })
+    general('sunquan', '孙权', '剧情援军', 'ally', 95, 175, ['tongxian', 'dare', 'strike'], [rule('tongxian', 'allyBelow', .5), rule('dare', 'enemyCount', 3, 'all'), {...rule('strike','always',0),frequency:'sometimes'}]),
+    general('lvbu', '吕布', '跨时空校验', 'ally', 145, 170, ['strike'], [rule('strike','always',0)], { passives:['guishen','pojun'],passive: '鬼神无双 · 破军绝阵', guaranteedCritical: true, ignoreArmor: true })
   ];
-  const DEFAULTS = { seed: '赤壁-208', level: 40, enemyLevel: 60, allySp: 64, random: true, critical: true, hit: true, criticalSource: 'technique', physicalRandom: 'list', timing: 'classic', skillDelays: { huoshen: 1, dare: .6, hongshui: .8, luoshi: .4, yinxian: .5, tongxian: .3 }, reinforcements: [], rosterOverrides: {} };
+  const DEFAULTS = { seed: '赤壁-208', level: 40, enemyLevel: 60, allySp: 64, random: true, critical: true, hit: true, criticalSource: 'technique', physicalRandom: 'list', timing: 'classic', skillDelays: {}, reinforcements: [], rosterOverrides: {} };
+  function fixed(u){const out={...u};delete out.potentials;delete out.baseAttributes;return out;}
   function appearance(u) {
     const art=CharacterAssets.resolve(u.characterId || u.id,u.artVariant);
     return {...u,artVariant:art.variant,portrait:u.portrait || art.portrait,fullbody:u.fullbody || art.fullbody};
@@ -33,13 +34,13 @@
   function createChibi(rules = {}) {
     const config = {...DEFAULTS,...rules};
     const allies = [...ALLIES, ...REINFORCEMENTS.filter(u=>(config.reinforcements||[]).includes(u.id))].map(appearance);
-    return {id:'chibi-demo',title:'赤壁之战',allies,enemies:ENEMIES.map(appearance),rules:config,allowRetreat:false,scene:{background:'./assets/chibi-night.webp',color:'#081d27',allowedElements:['fire','water','stone']}};
+    return {id:'chibi-demo',title:'赤壁之战',allies,enemies:ENEMIES.map(appearance),rules:config,allowRetreat:false,scene:{background:'./assets/chibi-night.webp',color:'#081d27',allowedElements:['fire','water','earth']}};
   }
   function createFormationPreview(){
-    const scenario=createChibi();scenario.id='formation-preview';scenario.title='全身立绘验证';scenario.allies=scenario.allies.map(u=>({...u,initialMode:'manual'}));scenario.enemies=[appearance({...ALLIES[0],id:'opponent-zhouyu',characterId:'zhouyu',attack:1,armor:99999,resistance:99999,leadership:1020,skills:['strike'],priorities:[rule('strike','always',0)]})];return scenario;
+    const scenario=createChibi();scenario.id='formation-preview';scenario.title='全身立绘验证';scenario.allies=scenario.allies.map(u=>({...u,initialMode:'manual'}));scenario.enemies=[appearance({...fixed(ALLIES[0]),id:'opponent-zhouyu',characterId:'zhouyu',attack:1,armor:99999,resistance:99999,constitution:1020,skills:['strike'],priorities:[rule('strike','always',0)]})];return scenario;
   }
   function createEncounter() {
-    return {id:'road-encounter',title:'道旁遇袭',allies:[appearance({...ALLIES[2],id:'traveler',name:'旅人',skills:['luoshi','strike'],priorities:[rule('luoshi','always',0),rule('strike','always',0)]})],enemies:[appearance({...ENEMIES[1],id:'raider',name:'盗匪',skills:['strike'],priorities:[rule('strike','always',0)]})],rules:{...DEFAULTS,level:10,enemyLevel:10,seed:'road-1',allySp:12},allowRetreat:true,scene:{color:'#25352d',allowedElements:['fire','stone']}};
+    return {id:'road-encounter',title:'道旁遇袭',allies:[appearance({...ALLIES[2],id:'traveler',name:'旅人',skills:['luoshi','strike'],priorities:[rule('luoshi','always',0),rule('strike','always',0)]})],enemies:[appearance({...ENEMIES[1],id:'raider',name:'盗匪',skills:['strike'],priorities:[rule('strike','always',0)]})],rules:{...DEFAULTS,level:10,enemyLevel:10,seed:'road-1',allySp:12},allowRetreat:true,scene:{color:'#25352d',allowedElements:['fire','earth']}};
   }
   // Diagnostic fixture only: the engine/rendering code contains no fixture IDs.
   function createEffectsPreview() {
@@ -53,16 +54,16 @@
     };
     const slots=[['fx_fire','fx_fire_all','strike'],['fx_thunder','fx_taunt'],['fx_wood','fx_boost'],['fx_water','fx_heal'],['fx_earth','fx_heal_all','fx_weaken']];
     return {id:'effects-preview',title:'特效与操作验证',skills,
-      allies:ALLIES.map((u,i)=>appearance({...u,initialMode:'manual',leadership:510,startSoldiers:6000,attack:1000,armor:999,resistance:100,skills:slots[i],priorities:[rule(slots[i][0],'always',0)],guaranteedCritical:true})),
-      enemies:ENEMIES.map(u=>appearance({...u,leadership:1020,attack:1,speed:1,armor:999,resistance:100,skills:['strike'],priorities:[rule('strike','always',0)],guaranteedCritical:true})),
+      allies:ALLIES.map((u,i)=>appearance({...fixed(u),initialMode:'manual',constitution:510,startSoldiers:6000,attack:1000,armor:999,resistance:100,skills:slots[i],priorities:[rule(slots[i][0],'always',0)],guaranteedCritical:true})),
+      enemies:ENEMIES.map(u=>appearance({...fixed(u),constitution:1020,attack:1,speed:1,armor:999,resistance:100,skills:['strike'],priorities:[rule('strike','always',0)],guaranteedCritical:true})),
       rules:{...DEFAULTS,level:80,enemyLevel:80,allySp:64,random:false,hit:false},scene:{background:'./assets/chibi-night.webp'},allowRetreat:false};
   }
   function createStress(){
     const burst={...SKILLS.huoshen,id:'stress_burst',name:'火攻',cost:0};
-    const unit=u=>appearance({...u,war:200,speed:200,leadership:1020,armor:100000,resistance:100000,skills:['stress_burst'],priorities:[rule('stress_burst','always',0)],enemySp:99999});
+    const unit=u=>appearance({...fixed(u),war:200,speed:200,constitution:1020,armor:100000,resistance:100000,skills:['stress_burst'],priorities:[rule('stress_burst','always',0)],enemySp:99999});
     return{id:'stress',title:'同步施法压力验证',allies:ALLIES.map(unit),enemies:ENEMIES.map(unit),skills:{stress_burst:burst},rules:{...DEFAULTS,level:99,enemyLevel:99,allySp:99999,random:false,critical:false,hit:false},scene:{background:'./assets/chibi-night.webp'}};
   }
-  const api = { SKILLS, ALLIES, ENEMIES, REINFORCEMENTS, DEFAULTS, convert, createChibi, createEncounter, createEffectsPreview, createStress,createFormationPreview };
+  const api = { SKILLS, ALLIES, ENEMIES, REINFORCEMENTS, DEFAULTS, createChibi, createEncounter, createEffectsPreview, createStress,createFormationPreview };
   root.BattleScenarios = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(globalThis);

@@ -35,6 +35,8 @@ def update_manifest(value, converted):
                 result[key] = entry["size"][axis]
         if isinstance(result.get("crop"), dict):
             result["crop"] = scale_crop(result["crop"], entry)
+        if isinstance(result.get("dialogueCrop"), dict):
+            result["dialogueCrop"] = scale_crop(result["dialogueCrop"], entry)
         if isinstance(result.get("portrait"), dict) and "src" not in result["portrait"]:
             result["portrait"] = scale_crop(result["portrait"], entry)
     return result

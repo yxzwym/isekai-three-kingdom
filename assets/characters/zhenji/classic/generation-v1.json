@@ -1,0 +1,12 @@
+{
+  "mode": "built-in image_gen",
+  "useCase": "stylized-concept",
+  "reference": "assets/characters/zhaoyun/classic/fullbody.webp",
+  "prompt": "Use case: stylized-concept. Asset type: production-ready full-body transparent character illustration for the Chinese Three Kingdoms RPG 异界三国. Subject: 甄姬, unmistakably adult Chinese woman age 24, extraordinarily beautiful, refined youthful face, elegant expressive eyes, graceful believable proportions. Art direction: premium realistic Chinese historical-fantasy game key art, painterly realism and elaborate textile details, the polished beautiful aesthetic of a high-budget Three Kingdoms character illustration; coordinate with the supplied Zhao Yun style reference, but create a distinct female healer. Costume: lightweight pale blue and ivory Han-inspired silk dress with tasteful off-shoulder neckline, visible shoulders and a little midriff, long translucent outer sleeves and flowing ribbons, layered skirt with a modest side slit, embroidered lotus details, delicate silver hair ornaments and dark flowing half-up hair. Airy, beautiful, and alluring while fully clothed, dignified, no modern bikini or underwear. Healer identity: one small elegant acupuncture needle case held gently at waist, other hand relaxed; no sword, armor or staff. Composition: exactly one complete standing woman, head to shoes entirely visible with generous clear margins, facing mostly forward in relaxed graceful three-quarter stance, grounded feet, face sharp and lovely even when cropped as a portrait. Soft luminous cinematic light; clear readable silhouette. Real alpha-transparent background with no backdrop, floor, scenery, rectangular aura, text, watermark, UI or other people. The reference is for rendering quality only, do not copy the male character or armor.",
+  "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-d74f2e30-df27-41a5-82ef-46b85048a530.png",
+  "runtime": "assets/characters/zhenji/classic/fullbody.webp",
+  "quality": 90,
+  "resize": false,
+  "selected": true,
+  "selectionNote": "现行采用最初的华丽蓝白古风长裙，不采用清凉版；其他角色保持原图。"
+}
