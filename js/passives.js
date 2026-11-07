@@ -105,6 +105,25 @@
     return [...new Set([...existing,...(heroDefaults[unit.characterId||unit.id]||[])])];
   }
   function complete(unit){return {...unit,passives:forUnit(unit)};}
-  const api={skills,definitions,heroDefaults,forUnit,complete};root.BattlePassives=api;
+  // 随机天赋和武将天赋共用同一份战斗定义；浏览器在规则表加载后首次取用。
+  let randomInstalled=false;
+  function allDefinitions(){
+    const rules=typeof module!=='undefined'&&module.exports?require('./game-rules.js'):root.PengpaiRules;
+    if(!randomInstalled&&rules){for(const p of rules.PASSIVES){const stats={...p.effects};if(stats.troopsMultiplier!=null){stats.healthMultiplier=stats.troopsMultiplier;delete stats.troopsMultiplier;}if(stats.physicalDodge!=null){stats.physicalDodgeBonus=stats.physicalDodge;delete stats.physicalDodge;}definitions[p.id]={id:p.id,name:p.name,quality:p.quality,description:p.description,stats,triggers:[]};}randomInstalled=true;}
+    return definitions;
+  }
+  function statsFor(unit,table=allDefinitions()){
+    const key=(unit.passives||[]).join('|');if(unit._passiveStats?.key===key&&unit._passiveStats.table===table)return unit._passiveStats.value;
+    const value={};for(const id of unit.passives||[])for(const [stat,n]of Object.entries(table[id]?.stats||{})){
+      if(typeof n==='boolean')value[stat]=value[stat]||n;
+      else if(stat.endsWith('Multiplier'))value[stat]=(value[stat]??1)*n;
+      else if(stat.endsWith('Pierce'))value[stat]=1-(1-(value[stat]||0))*(1-n);
+      else value[stat]=(value[stat]||0)+n;
+    }
+    // 缓存仅为运行时数据，不能写入存档或参战阵容。
+    Object.defineProperty(unit,'_passiveStats',{value:{key,table,value},configurable:true,writable:true,enumerable:false});return value;
+  }
+  const healthMultiplier=unit=>statsFor(unit).healthMultiplier||1;
+  const api={skills,get definitions(){return allDefinitions();},heroDefaults,forUnit,complete,statsFor,healthMultiplier};root.BattlePassives=api;
   if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

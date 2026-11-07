@@ -11,7 +11,7 @@
  function character(){
   const p=this.panel,members=this.model.members(),u=p.unit||members.find(u=>u.id===p.unitId);
   if(!u){this.closeWorldPanel();return;}
-  const previewKey=JSON.stringify(u);if(p.previewKey!==previewKey){p.previewKey=previewKey;p.previewCache=this.memberPreview(u);}const preview=p.previewCache,actor=preview.unit(u.id),ids=actor.skills,passives=root.PengpaiRules.sortPassives(actor.passives,preview.passives),c=this.ctx;
+  const previewKey=JSON.stringify(u);if(p.previewKey!==previewKey){p.previewKey=previewKey;p.previewCache=this.memberPreview(u);}const preview=p.previewCache,actor=preview.unit(u.id),current=preview.effective(actor),ids=actor.skills,passives=root.PengpaiRules.sortPassives(actor.passives,preview.passives),c=this.ctx;
   const showPotential=!!u.potentials&&(!p.readonly||root.CharacterGrowth.isGeneral(u)),statsH=108,showExperience=members.some(member=>member.id===u.id);
   const compact=this.h<640,width=Math.min(560,this.w-16),inner=width-28,headerH=compact?44:48,skillSize=compact?48:52,skillRowH=compact?60:64,footerH=compact?42:46,barH=showExperience?(compact?32:36):17,skillCols=Math.min(3,Math.max(1,ids.length)),skillRows=Math.ceil(ids.length/skillCols),passiveCols=4,passiveRows=Math.ceil(passives.length/passiveCols);
   const fixed=headerH+skillRows*skillRowH+passiveRows*24+statsH+4+barH+footerH,modelH=clamp(Math.min(440,inner*1.18,this.h-16-fixed),180,440),contentH=modelH+skillRows*skillRowH+passiveRows*24+statsH+4+barH;
@@ -41,7 +41,7 @@
   y+=passiveRows*24;
   const gap=12,cw=(inner-gap)/2,pairs=[['war','武力','constitution','体质'],['intelligence','智力','armor','护甲'],['technique','技巧','resistance','抗性'],['speed','速度',...(u.statusImmunities?.includes('stun')?['stunProtection','抗晕']:[])]];
   this.box(left,y,inner,statsH,'#091d26','#37545e',3);
-  pairs.forEach((row,i)=>{const yy=y+i*27+13.5;for(let col=0;col<row.length/2;col++){const x=left+col*(cw+gap),key=row[col*2],label=row[col*2+1],potential=showPotential?u.potentials?.[key]:null;if(potential!=null){this.text(label+' '+u[key],x+6,yy,14,'#eddfc0');this.text(potential+'(+'+Number(root.CharacterGrowth.growthPerLevel(potential).toFixed(2))+')',x+cw-6,yy,14,'#d6bb8b','right');}else{this.text(label,x+6,yy,14,'#a9bec3');this.text(key==='stunProtection'?'抵抗':u[key],x+cw-6,yy,16,'#eddfc0','right');}}});
+  pairs.forEach((row,i)=>{const yy=y+i*27+13.5;for(let col=0;col<row.length/2;col++){const x=left+col*(cw+gap),key=row[col*2],label=row[col*2+1],potential=showPotential?u.potentials?.[key]:null;if(potential!=null){this.text(label+' '+Number(current[key].toFixed(2)),x+6,yy,14,'#eddfc0');this.text(potential+'(+'+Number(root.CharacterGrowth.growthPerLevel(potential).toFixed(2))+')',x+cw-6,yy,14,'#d6bb8b','right');}else{this.text(label,x+6,yy,14,'#a9bec3');this.text(key==='stunProtection'?'抵抗':Number(current[key].toFixed(2)),x+cw-6,yy,16,'#eddfc0','right');}}});
   y+=statsH+4;const hp=u.startSoldiers??u.soldiers??u.maxSoldiers;bar(this,left,y,inner,17,hp/u.maxSoldiers,'#ba222c');this.text(u.dead?'濒死':hp===0?'重伤':hp+' / '+u.maxSoldiers,f.x+f.w/2,y+8.5,14,'#fff0e5','center');
   if(showExperience){y+=compact?19:20;const required=X.required(u.level);bar(this,left,y,inner,13,required===Infinity?1:(u.experience||0)/required,'#b39751');this.text((u.experience||0)+' / '+(required===Infinity?'—':required),f.x+f.w/2,y+6.5,14,'#f4e2b7','center');}
   c.restore();this.hits=this.hits.filter((hit,i)=>i<headerHits||hit.y>=top&&hit.y+hit.h<=bottom);
@@ -52,15 +52,15 @@
  }
  function details(){
   const p=this.panel,u=p.unit||this.model.members().find(u=>u.id===p.unitId);if(!u){this.closeWorldPanel();return;}
-  const showPotential=!p.readonly||root.CharacterGrowth.isGeneral(u);
+  const previewKey=JSON.stringify(u);if(p.previewKey!==previewKey){p.previewKey=previewKey;p.previewCache=this.memberPreview(u);}const current=p.previewCache.effective(p.previewCache.unit(u.id)),showPotential=!p.readonly||root.CharacterGrowth.isGeneral(u);
   const groups=C.groupedTypes(),columns=Math.min(3,Math.max(2,Math.floor((Math.min(460,this.w-28)-32)/100))),canLeave=!p.readonly&&u.id!=='hero'&&!u.guest,contentH=28+root.PengpaiRules.ATTRIBUTES.length*30+12+24+60+12+24+groups.reduce((n,g)=>n+28+Math.ceil(g.types.length/columns)*38+12,0);
   const f=this.frame(u.name+' · 详细属性',58+contentH+(canLeave?54:18)),left=f.x+20,w=f.w-40,top=f.y+58,bottom=f.y+f.h-(canLeave?54:18),c=this.ctx;
   p.maxScroll=Math.max(0,contentH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);let y=top-p.scroll;const beforeHits=this.hits.length;
   c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
   this.text('属性',left,y+10,14,'#aec5ce');this.text('当前',left+w*(showPotential ? .58 : 1),y+10,14,'#aec5ce','right');if(showPotential)this.text('潜力(每级)',left+w,y+10,14,'#d6bb8b','right');y+=28;
-  for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.box(left,y,w,27,'#15313b',null);this.text(label,left+8,y+13.5,14);this.text(u[key],left+w*(showPotential ? .58 : 1)-(showPotential?0:8),y+13.5,16,'#f4e0b3','right');if(showPotential)this.text(u.potentials?.[key]!=null?u.potentials[key]+'('+Number(root.CharacterGrowth.growthPerLevel(u.potentials[key]).toFixed(2))+')':'—',left+w-8,y+13.5,14,'#d6bb8b','right');y+=30;}
+  for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.box(left,y,w,27,'#15313b',null);this.text(label,left+8,y+13.5,14);this.text(Number(current[key].toFixed(2)),left+w*(showPotential ? .58 : 1)-(showPotential?0:8),y+13.5,16,'#f4e0b3','right');if(showPotential)this.text(u.potentials?.[key]!=null?u.potentials[key]+'('+Number(root.CharacterGrowth.growthPerLevel(u.potentials[key]).toFixed(2))+')':'—',left+w-8,y+13.5,14,'#d6bb8b','right');y+=30;}
   y+=12;this.text('防护',left,y+10,14,'#aec5ce');this.text('当前',left+w*.58,y+10,14,'#aec5ce','right');this.text('对应减伤',left+w,y+10,14,'#aec5ce','right');y+=24;
-  for(const [label,value,kind]of [['护甲',u.armor,'物理'],['抗性',u.resistance,'计策']]){
+  for(const [label,value,kind]of [['护甲',current.armor,'物理'],['抗性',current.resistance,'计策']]){
    const percent=((1-E.mitigation(value))*100).toFixed(2).replace(/\.?0+$/,'');
    this.box(left,y,w,27,'#15313b',null);this.text(label,left+8,y+13.5,14,'#b8cbd0');this.text(value,left+w*.58,y+13.5,16,'#f4e0b3','right');this.text(kind+' '+percent+'%',left+w-8,y+13.5,14,'#e0cf9f','right');y+=30;
   }

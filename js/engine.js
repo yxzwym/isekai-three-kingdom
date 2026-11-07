@@ -25,7 +25,7 @@
   // Compatibility alias for existing scenario/save fields; life no longer depends on level.
   const maxSoldiers=(level,constitution)=>maxHealth(constitution);
   function ratio(war,speed,unload=0){return Math.floor(Math.min(3,Math.max(1,(Number(war)||0)-(Number(unload)||0))/(Math.max(0,Number(speed)||0)+1))*10)/10;}
-  function interval(unit,config=DEFAULTS,skillDelay=0){return Math.max(.5,1.5+ratio(unit.war,unit.speed,unit.unload)+(Number(skillDelay)||0));}
+  function interval(unit,config=DEFAULTS,skillDelay=0){return Math.max(.5,(1.5+ratio(unit.war,unit.speed,unit.unload)+(Number(skillDelay)||0))*(unit.intervalMultiplier??1));}
   function mitigation(value,scale=50){return 50/(50+Math.max(0,Number(value)||0));}
   function skillValue(actor,skill={}){
     const scaling=skill.scaling||{[skill.kind==='physical'?'war':'intelligence']:Number(skill.power)||1};
@@ -33,13 +33,13 @@
   }
   function raceMultiplier(skill,target){const tags=new Set([target?.species||'humanoid',...(target?.tags||[])]);return 1+Object.entries(skill.raceBonuses||{}).reduce((n,[tag,value])=>n+(tags.has(tag)?value:0),0);}
   function calculate({attacker={},target={},skill={},critical=1,damageType=skill.damageType||skill.kind||'physical'}){
-    if(attacker.soldiers<=0)return {raw:0,amount:0,factors:[]};const healing=skill.kind==='heal',physical=damageType==='physical',protectionValue=healing||damageType==='true'||(physical&&attacker.ignoreArmor)?0:Math.max(0,Number(target[physical?'armor':'resistance'])||0)-Math.max(0,Number(attacker[physical?'armorPenetration':'resistancePenetration'])||0);
-    const base=skillValue(attacker,skill),bonus=healing?(1+(Number(attacker.healingBonus)||0)):(1+(Number(attacker[physical?'physicalBonus':'tacticBonus'])||0)),beforeMitigation=Math.max(0,base*bonus*(healing?1:Math.max(0,Number(attacker.damageMultiplier??1)))*(healing?1:critical)*raceMultiplier(skill,target)),protection=healing?1:mitigation(protectionValue)*(damageType==='true'?1:clamp(1-(Number(target[physical?'physicalReduction':'tacticReduction'])||0),0,1)),raw=beforeMitigation*protection;
+    if(attacker.soldiers<=0)return {raw:0,amount:0,factors:[]};const healing=skill.kind==='heal',physical=damageType==='physical',protectionValue=healing||damageType==='true'||(physical&&attacker.ignoreArmor)||(!physical&&attacker.ignoreResistance)?0:Math.max(0,Number(target[physical?'armor':'resistance'])||0)*(1-clamp(Number(attacker[physical?'armorPierce':'resistancePierce'])||0,0,1))-Math.max(0,Number(attacker[physical?'armorPenetration':'resistancePenetration'])||0);
+    const base=skillValue(attacker,skill),bonus=healing?(1+(Number(attacker.healingBonus)||0)):(1+(Number(attacker[physical?'physicalBonus':'tacticBonus'])||0)),beforeMitigation=Math.max(0,base*bonus*(healing?1:Math.max(0,Number(attacker.damageMultiplier??1)))*(healing?1:critical)*raceMultiplier(skill,target)*(healing?1:(skill.kind==='physical'||skill.kind==='tactic')&&attacker.executeThreshold&&target.soldiers/target.maxSoldiers<=attacker.executeThreshold?(attacker.executeMultiplier||1):1)),protection=healing?1:mitigation(protectionValue)*(damageType==='true'?1:clamp(1-(Number(target[physical?'physicalReduction':'tacticReduction'])||0),0,1)),raw=beforeMitigation*protection;
     return {raw,amount:Math.max(1,Math.floor(raw)),damageType,armor:physical?Math.max(0,protectionValue):undefined,resistance:physical?undefined:Math.max(0,protectionValue),beforeMitigation,mitigation:protection,factors:[['技能面板',base],['效果加成',bonus],...(!healing&&attacker.damageMultiplier!==undefined&&attacker.damageMultiplier!==1?[['被动增伤',attacker.damageMultiplier]]:[]),['暴击倍率',healing?1:critical],['减伤后倍率',protection]],formula:healing?'技能治疗量':damageType==='true'?'真实伤害':'技能伤害 × 50÷(50＋减伤属性)'};
   }
   function physical(options){return calculate({...options,skill:options.skill||{kind:'physical',scaling:{war:1},weaponCoefficient:1},damageType:options.damageType||'physical'});}
   function tactic(options){return calculate({...options,attacker:options.attacker||{intelligence:attr(options.intelligence),attack:0},skill:options.skill,damageType:options.skill.damageType||options.skill.kind});}
-  function criticalChance(unit,config,skill={}){return unit.guaranteedCritical?1:clamp((Number(skill.criticalChance)||0)+(Number(skill.criticalBonus)||0)+(Number(unit.criticalBonus)||0)+Math.max(0,Number(unit.technique)||0)/2000,0,1);}
+  function criticalChance(unit,config,skill={}){return unit.guaranteedCritical?1:clamp((Number(skill.criticalChance)||0)+(Number(skill.criticalBonus)||0)+(Number(unit.criticalBonus)||0)+(skill.kind==='tactic'?(Number(unit.tacticCriticalBonus)||0):0)+Math.max(0,Number(unit.technique)||0)/2000,0,1);}
   function hitChance(actor,target,skill,dodge=0){return skill.alwaysHit?1:clamp((skill.hitChance??.4)+(Number(actor.hitBonus)||0)+(Math.max(0,Number(actor.technique)||0)/Math.max(1,Number(target.speed)||0))*.3-dodge,0,1);}
   function normalizeRule(rule,skill){
     const r=copy(rule);if(!skill)return r;
@@ -78,13 +78,13 @@
         if(u.side==='enemy'&&u.statusImmunities?.includes('stun'))u.passives=[...new Set([...u.passives,'enemy-stun-resistance'])];
         u.priorities = Array.isArray(u.priorities) ? u.priorities.map(r=>normalizeRule(r,this.skills[r.skill])) : [];
         u.targetRule=u.targetRule||(u.side==='enemy'?'random':'lowestCurrent');u.lastSingleSkill=null;u.lastManualSkill=null;
-        u.maxSoldiers = u.healthOverride!=null?attr(u.healthOverride):u.potentials&&u.baseAttributes?maxHealth(u.constitution):u.maxSoldiers == null ? maxHealth(u.constitution) : attr(u.maxSoldiers);
-        u.maxSoldiers=Math.max(1,Math.floor(u.maxSoldiers*u.passives.reduce((n,id)=>n*(Number(this.passives[id]?.stats?.healthMultiplier)||1),1)));
+        u.maxSoldiers=u.healthOverride!=null?attr(u.healthOverride):Math.max(1,Math.floor(u.baseMaxHealth*(PASSIVES.statsFor(u,this.passives).healthMultiplier||1)));
         u.soldiers = clamp(Math.floor(Number(u.startSoldiers ?? u.maxSoldiers)), 0, u.maxSoldiers);
         u.woundsEnabled=u.side==='ally'&&(u.woundsEnabled??this.config.wounds!==false);u.dead=!!u.dead||u.condition==='dead'||u.soldiers===0&&!u.woundsEnabled;u.wounded=!u.dead&&u.soldiers===0&&u.woundsEnabled;
         u.sp = Math.max(0, Number(u.enemySp) || 0); u.initialSp = u.sp;
-        u.interval = interval(u, this.config); u.progress = clamp(Number(u.initialProgress)||0,0,1); u.ready = u.progress>=1; u.readyTick=u.ready?0:null; u.mode = u.initialMode==='manual'||(u.side==='ally'&&this.scenario.control.manualOnly)?'manual':'auto'; u.queued = null;
+        u.interval = interval(u, this.config); u.progress = clamp((Number(u.initialProgress)||0)+(PASSIVES.statsFor(u,this.passives).initialProgress||0),0,1); u.ready = u.progress>=1; u.readyTick=u.ready?0:null; u.mode = u.initialMode==='manual'||(u.side==='ally'&&this.scenario.control.manualOnly)?'manual':'auto'; u.queued = null;
         u.statuses = [];u.lastSkillDelay=0;u.waitTime=u.progress*u.interval;u.progressStamp=u.progress;u.autoCheckedRevision=-1; u.criticalChain = 0; u.order = order;
+        u.interval=interval(this.effective(u),this.config);u.waitTime=u.progress*u.interval;
         u.stats = { damage: 0, healing: 0, received: 0, actions: 0, kills: 0, tactics: 0, dodges: 0 };
         return u;
       });
@@ -99,7 +99,7 @@
     availableSp(unit) { return unit.side === 'ally' ? this.allySp : unit.sp; }
     invalidateAI(){this.revision++;}
     emit(type, detail) { this.revision++;const event = { id: ++this.sequence, tick: this.tick, time: this.time, type, ...detail }; this.events.push(event); return event; }
-    start() { if (this.status === 'ready') { this.status = 'running'; this.emit('system', { text: '战鼓已响，两军交锋。' }); this.checkEnd(); } }
+    start() { if (this.status === 'ready') { this.status = 'running';for(const u of this.units){const amount=Math.floor(u.maxSoldiers*(PASSIVES.statsFor(u,this.passives).openingShield||0));if(amount>0)this.gainShield(u,u,amount);} this.emit('system', { text: '战鼓已响，两军交锋。' }); this.checkEnd(); } }
     advance(seconds,stopWhen) {
       if (this.status !== 'running') return;
       if(stopWhen?.()){this.accumulator=0;return;}
@@ -125,10 +125,19 @@
       }
     }
     effective(u){
-      const out={...u};for(const key of ['war','intelligence','constitution','speed','technique','attack','armor','resistance']){
-        const passiveAdd=u.passives.reduce((n,id)=>n+(Number(this.passives[id]?.stats?.[key+'Bonus'])||0),0),passiveMult=u.passives.reduce((n,id)=>n*(Number(this.passives[id]?.stats?.[key+'Multiplier'])||1),1);const add=u.statuses.reduce((n,s)=>n+(s.attribute===key?(Number(s.amount)||0)*(s.stacks||1):0),0),mult=u.statuses.reduce((n,s)=>n*(Number(s[key+'Multiplier'])||1),1);out[key]=Math.max(key==='constitution'?1:0,(u[key]+add+passiveAdd)*mult*passiveMult);
-      }for(const stat of ['healingBonus','physicalBonus','tacticBonus','physicalReduction','tacticReduction','hitBonus','criticalBonus','armorPenetration','resistancePenetration'])out[stat]=(Number(u[stat])||0)+u.passives.reduce((n,id)=>n+(Number(this.passives[id]?.stats?.[stat])||0),0);out.damageMultiplier=Number(u.damageMultiplier??1);for(const id of u.passives){if(this.passives[id]?.stats?.guaranteedCritical)out.guaranteedCritical=true;if(this.passives[id]?.stats?.ignoreArmor)out.ignoreArmor=true;const maximum=Number(this.passives[id]?.stats?.missingHealthDamageBonus)||0;if(maximum>0)out.damageMultiplier*=1+maximum*clamp(1-u.soldiers/u.maxSoldiers,0,1);}
-      out.weaponPower=PROFICIENCY.power(out.attack,u);return out;
+      const out={...u},p=PASSIVES.statsFor(u,this.passives);
+      for(const key of ['war','intelligence','constitution','speed','technique','attack','armor','resistance']){
+        const add=(u.statuses||[]).reduce((n,s)=>n+(s.attribute===key?(Number(s.amount)||0)*(s.stacks||1):0),0),mult=(u.statuses||[]).reduce((n,s)=>n*(Number(s[key+'Multiplier'])||1),1);out[key]=Math.max(key==='constitution'?1:0,(u[key]+add+(p[key+'Bonus']||0))*mult*(p[key+'Multiplier']||1));
+      }
+      for(const stat of ['healingBonus','physicalBonus','tacticBonus','physicalReduction','tacticReduction','hitBonus','criticalBonus','armorPenetration','resistancePenetration','armorPierce','resistancePierce','criticalDamageBonus','tacticCriticalBonus','tacticCriticalDamageBonus','physicalLifesteal','executeThreshold'])out[stat]=(Number(u[stat])||0)+(p[stat]||0);
+      for(const stat of ['intervalMultiplier','executeMultiplier'])out[stat]=(Number(u[stat])||1)*(p[stat]||1);
+      for(const [kind,mult]of [['physical','physicalMultiplier'],['tactic','tacticMultiplier'],['healing','healingMultiplier']])if(p[mult]!==undefined)out[kind+'Bonus']=(1+out[kind+'Bonus'])*p[mult]-1;
+      out.damageMultiplier=Number(u.damageMultiplier??1)*(p.damageMultiplier||1);out.guaranteedCritical=!!(u.guaranteedCritical||p.guaranteedCritical);out.ignoreArmor=!!(u.ignoreArmor||p.ignoreArmor);out.ignoreResistance=!!(u.ignoreResistance||p.ignoreResistance);
+      let taken=p.takenMultiplier||1;for(const id of u.passives){const stats=this.passives[id]?.stats||{},maximum=Number(stats.missingHealthDamageBonus)||0;if(maximum>0)out.damageMultiplier*=1+maximum*clamp(1-u.soldiers/u.maxSoldiers,0,1);if(stats.lowTroopsThreshold&&u.soldiers/u.maxSoldiers<=stats.lowTroopsThreshold){out.damageMultiplier*=stats.lowTroopsDamageMultiplier||1;taken*=stats.lowTroopsTakenMultiplier||1;}}
+      if(taken!==1)out.physicalReduction=1-(1-out.physicalReduction)*taken;if(taken!==1||p.tacticTakenMultiplier!==undefined)out.tacticReduction=1-(1-out.tacticReduction)*taken*(p.tacticTakenMultiplier||1);out.weaponPower=PROFICIENCY.power(out.attack,u);return out;
+    }
+    gainShield(source,target,amount){
+      if(amount<=0||target.dead)return;let status=target.statuses.find(s=>s.id==='passiveShield');if(status)status.amount+=amount;else{status={id:'passiveShield',name:'护盾',shield:true,amount,source:source.id,permanent:true,expiresAt:Infinity};target.statuses.push(status);}this.emit('status',{actor:source.id,target:target.id,status:copy(status)});
     }
     healingPassives(owner,target){
       for(const id of owner.passives)for(const trigger of this.passives[id]?.triggers||[]){
@@ -152,7 +161,7 @@
       if(target.dead||(target.soldiers<=0&&!(target.wounded&&definition.period&&!definition.healing))||((target.statusImmunities||[]).includes(id)||definition.stun&&(target.statusImmunities||[]).includes('stun')))return null;
       if(definition.chance!==undefined){const chance=clamp(Number(definition.chance)-(source.side!==target.side?this.effective(target).resistance/1000:0),0,1);if(this.rng()>=chance)return null;}
       const owner=this.effective(source),coefficient=Number(definition.coefficient)||0;
-      let amount=Number(definition.amount??((Number(definition.base)||0)+coefficient*(owner[definition.stat||'technique']??0)))||0;if(definition.negative)amount=-Math.abs(amount);
+      let amount=Number(definition.amount??((Number(definition.base)||0)+coefficient*(owner[definition.stat||'technique']??0)))||0;if(definition.healing&&definition.period)amount*=1+(owner.healingBonus||0);if(definition.negative)amount=-Math.abs(amount);
       const previous=target.statuses.find(s=>s.id===id),origin=skill.id||id,maxStacks=Math.max(1,Number(definition.maxStacks)||1),same=previous?.origin===origin;
       const status={...definition,id,name:definition.name||skill.name||id,source:source.id,origin,amount,...(definition.reflectFormula?{reflect:(Number(definition.reflectFormula.base)||0)+(Number(definition.reflectFormula.coefficient)||0)*(owner[definition.reflectFormula.stat||'technique']??0)}:{}),stacks:same?Math.min(maxStacks,(previous.stacks||1)+1):1,expiresAt:this.time+Math.max(.02,Number(definition.duration)||5),nextTick:this.time+(Number(definition.period)||1)};
       target.statuses=target.statuses.filter(s=>s.id!==id);target.statuses.push(status);this.emit('status',{actor:source.id,target:target.id,status:copy(status)});return status;
@@ -161,18 +170,20 @@
     healUnit(source,target,amount){
       const before=target.soldiers;if(target.dead)return {before,after:before,actual:0};
       const actual=Math.min(Math.max(0,Math.floor(amount)),target.maxSoldiers-before),recovered=!!target.wounded&&actual>0;target.soldiers+=actual;source.stats.healing+=actual;
+      const shieldRate=PASSIVES.statsFor(source,this.passives).overhealShield||0;if(shieldRate>0)this.gainShield(source,target,Math.floor(Math.max(0,amount-actual)*shieldRate));
       if(recovered){target.wounded=false;target.condition='healthy';this.resetProgress(target);target.lastSkillDelay=0;target.interval=interval(this.effective(target),this.config,0);}
       return {before,after:target.soldiers,actual,recovered};
     }
     damageUnit(source,target,amount,{periodic=false,ignoreWounds=false}={}){
       const before=target.soldiers;if(target.dead)return {before,after:before,actual:0,dead:true};
       if(target.wounded&&!ignoreWounds&&this.rng()<.5){target.stats.dodges++;return {before,after:before,actual:0,miss:'闪避',woundDodge:true};}
-      const actual=Math.min(before,Math.max(0,Math.floor(amount)));target.soldiers-=actual;source.stats.damage+=actual;target.stats.received+=actual;const after=target.soldiers,restored=this.survive(target);
+      let remaining=Math.max(0,Math.floor(amount)),absorbed=0;for(const shield of target.statuses.filter(s=>s.shield)){const used=Math.min(shield.amount,remaining);shield.amount-=used;remaining-=used;absorbed+=used;}target.statuses=target.statuses.filter(s=>!s.shield||s.amount>0);
+      const actual=Math.min(before,remaining);target.soldiers-=actual;source.stats.damage+=actual;target.stats.received+=actual;const after=target.soldiers,restored=this.survive(target);
       if(target.soldiers===0){
         target.dead=!!(target.wounded||!target.woundsEnabled||ignoreWounds||(periodic&&this.rng()>=.5));target.wounded=!target.dead;target.condition=target.dead?'dead':'wounded';this.resetProgress(target);
         if(target.dead){source.stats.kills++;target.statuses=[];}
       }
-      return {before,after,actual,restored,defeated:target.soldiers===0,wounded:target.wounded,dead:target.dead};
+      return {before,after,actual,absorbed,restored,defeated:target.soldiers===0,wounded:target.wounded,dead:target.dead};
     }
     tickStatuses(u){
       if(u.dead)return;
@@ -306,7 +317,7 @@
       u.stats.actions++; this.actionCount++;
       if (skill.kind === 'tactic' || skill.kind === 'heal') u.stats.tactics++;
       const event = { actor: id, actorName: u.name, side: u.side, skill: skillId, skillName: skill.name, scope, cost: skill.cost, spBefore: beforeSp, spAfter: this.availableSp(u), attackerSoldiers: u.soldiers, results: [] };
-      const dodged=[],restores=[],reflections=[],healthChanges=[];let drain=0;
+      const dodged=[],restores=[],reflections=[],counters=[],healthChanges=[];let drain=0;
       for (const target of targets) {
         const before = target.soldiers;
         if (skill.kind === 'buff') {
@@ -318,24 +329,26 @@
         if(!healingSkill&&!target.wounded&&this.config.hit&&!skill.alwaysHit){const dodge=this.dodgeChance(target,skill.kind),hit=hitChance(actor,victim,skill,dodge),roll=this.rng();if(roll>=hit){miss=dodge>0&&roll<hitChance(actor,victim,skill,0)?'闪避':'未命中';if(miss==='闪避'){target.stats.dodges++;dodged.push(target);}}}
         // Explicit dodge passives still function in deterministic tutorial scenarios.
         else if(!healingSkill&&!target.wounded&&this.dodgeChance(target,skill.kind)>0&&this.rng()<this.dodgeChance(target,skill.kind)){miss='闪避';target.stats.dodges++;dodged.push(target);}
-        if(!miss&&!healingSkill){critical=!!u.guaranteedCritical||(this.config.critical&&this.rng()<criticalChance(actor,this.config,skill));multiplier=critical?1.5:1;}
+        if(!miss&&!healingSkill){critical=!!actor.guaranteedCritical||(this.config.critical&&this.rng()<criticalChance(actor,this.config,skill));multiplier=critical?1.5+(actor.criticalDamageBonus||0)+(skill.kind==='tactic'?(actor.tacticCriticalDamageBonus||0):0):1;}
         calc=miss?{raw:0,amount:0,factors:[],formula:miss}:calculate({attacker:actor,target:victim,skill,critical:multiplier});
         const healing = skill.kind === 'heal';
         const result=miss?{before,after:before,actual:0}:healing?this.healUnit(u,target,calc.amount):this.damageUnit(u,target,calc.amount,{ignoreWounds:!!skill.ignoreWounds});
         const {restored,...detail}=result;if(restored)restores.push(restored);if(result.miss)miss=result.miss;healthChanges.push({unit:target,before,after:target.soldiers});
-        if(!healing&&!miss){drain+=Math.floor(calc.amount*(Number(skill.lifesteal)||0));const reflect=target.soldiers>0?target.statuses.reduce((n,s)=>n+(Number(s.reflect)||0),0):0;if(reflect>0)reflections.push({source:target,amount:Math.floor(result.actual*reflect*this.effective(target).damageMultiplier)});}
+        if(!healing&&!miss){drain+=Math.floor(calc.amount*((Number(skill.lifesteal)||0)+(skill.kind==='physical'?(actor.physicalLifesteal||0):0)));const reflect=target.soldiers>0?target.statuses.reduce((n,s)=>n+(Number(s.reflect)||0),0):0;if(skill.kind==='physical'&&target.soldiers>0){const p=PASSIVES.statsFor(target,this.passives);if(p.counterChance&&this.rng()<p.counterChance)counters.push({source:target,multiplier:p.counterMultiplier||.5});}if(reflect>0)reflections.push({source:target,amount:Math.floor(result.actual*reflect*this.effective(target).damageMultiplier)});}
         if(!miss&&!target.dead)for(const effect of skill.effects||[])if(effect.recipient!=='self')this.addStatus(u,target,effect,skill);
         event.results.push({target:target.id,targetName:target.name,...detail,healing,miss,critical:!miss&&critical,multiplier,random,...calc});
       }
       for(const effect of skill.effects||[])if(effect.recipient==='self')this.addStatus(u,u,effect,skill);
       if (skill.element === 'fire') this.fireCount++;
       if(drain>0&&u.soldiers>0){const before=u.soldiers,actual=Math.min(drain,u.maxSoldiers-before);u.soldiers+=actual;u.stats.healing+=actual;healthChanges.push({unit:u,before,after:u.soldiers});event.results.push({target:u.id,targetName:u.name,before,after:u.soldiers,actual,healing:true,raw:drain,amount:drain,factors:[],formula:'吸血回复'});}
+      const regen=Math.floor(u.maxSoldiers*(PASSIVES.statsFor(u,this.passives).actionRegen||0));if(regen>0&&u.soldiers>0){const result=this.healUnit(u,u,regen);event.results.push({target:u.id,targetName:u.name,...result,healing:true,raw:regen,amount:regen,formula:'行动回复'});healthChanges.push({unit:u,before:result.before,after:result.after});}
       const delay=this.config.skillDelays?.[skillId]??skill.cooldown??0;
       u.progress = 0;u.progressStamp=0;u.waitTime=0;u.lastSkillDelay=Number(delay)||0; u.ready = false; u.readyTick=null; u.interval = interval(this.effective(u), this.config, delay);
       event.skillDelay = Number(delay) || 0;
       event.nextInterval = u.interval;
       this.emit('action', event);for(const change of healthChanges)this.healthChanged(change.unit,change.before,change.after);for(const restored of restores)this.restoredHealth(restored);for(const target of dodged)this.reactions('dodge',target,u);if(skill.kind==='heal')for(const result of event.results)if(result.healing&&result.actual>0)this.healingPassives(u,this.unit(result.target));
       for(const reflect of reflections)if(!u.dead&&reflect.amount>0){const result=this.damageUnit(reflect.source,u,reflect.amount),{restored,...detail}=result;this.emit('action',{actor:reflect.source.id,actorName:reflect.source.name,side:reflect.source.side,skill:'status-reflect',skillName:'反伤',reaction:true,scope:'single',cost:0,results:[{target:u.id,targetName:u.name,...detail,damageType:'true',raw:reflect.amount,amount:reflect.amount,healing:false,factors:[],formula:'已承受伤害 × 反伤比例'}]});this.healthChanged(u,result.before,result.after);this.restoredHealth(restored);}
+      for(const counter of counters)if(u.soldiers>0&&counter.source.soldiers>0){const calc=physical({attacker:this.effective(counter.source),target:this.effective(u),skill:{kind:'physical',scaling:{war:counter.multiplier},weaponCoefficient:counter.multiplier}}),result=this.damageUnit(counter.source,u,calc.amount),{restored,...detail}=result;this.emit('action',{actor:counter.source.id,actorName:counter.source.name,side:counter.source.side,skill:'passive-counter',skillName:'以逸待劳',reaction:true,scope:'single',cost:0,results:[{target:u.id,targetName:u.name,...detail,...calc,healing:false}]});this.healthChanged(u,result.before,result.after);this.restoredHealth(restored);}
       this.checkEnd();
       return { ok: true };
     }

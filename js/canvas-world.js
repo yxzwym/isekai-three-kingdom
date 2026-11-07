@@ -55,8 +55,8 @@
       const talks=this.model.state.npcTalks[npc.id]||0;this.model.state.npcTalks[npc.id]=talks+1;const choices=[];
       if(npc.role==='healer'){const service=N.services.healing;choices.push({label:'疗伤 · '+service.price+service.currency,action:()=>{if(this.model.state.money>=service.price){this.model.state.money-=service.price;this.model.rest();this.save();this.speak(npc,{lines:['伤口都清理好了，你慢慢站起来试试。今天先别跑得太急，刚包扎的地方很容易又裂开，实在不舒服就回来找我。']});}else this.notify('铜钱不够，可以回黄巾营地找张宝治疗。');}});}
       if(npc.role==='merchant')for(const mode of ['buy','sell'])choices.push({label:mode==='buy'?'购买':'出售',action:()=>{this.dialogue=null;this.panel={type:'shop',shopMode:mode,scroll:0};}});
-      for(const data of N.sideQuests.filter(t=>t.giver===npc.id)){const side=this.model.state.quests.side[data.id];if(!side.accepted)choices.push({label:'委托 · '+data.title,action:()=>{this.model.acceptSide(data.id);this.save();this.speak(npc,{lines:[data.accept+' 他们就在'+D.placeMap[data.place].name+'那边。']});}});else if(side.wins<data.rounds)choices.push({label:'询问'+data.title,action:()=>this.speak(npc,{lines:['他们还在'+D.placeMap[data.place].name+'那边。到了以后找找拦路的那伙人，把路上的麻烦处理好，再回来跟我说一声，我也好通知大家可以走了。']})});else if(!side.paid)choices.push({label:'交付委托',action:()=>{const reward=this.model.turnInSide(data.id);if(reward){this.dialogue=null;this.save();this.showReward(reward);}}});else choices.push({label:'聊聊近况',action:()=>this.speak(npc,{lines:['这几天已经有人敢出门做事了，前阵子可是谁都不放心。你们替大家清了路，乡亲们一直惦记着这件事。']})});}
-      if(choices.length)choices.push({label:'聊聊近况',action:()=>this.speak(npc,{lines:[lines[(talks+1)%lines.length]]})},{label:'告辞',action:()=>this.closeDialogue()});
+      for(const data of N.sideQuests.filter(t=>t.giver===npc.id)){const side=this.model.state.quests.side[data.id];if(!side.accepted)choices.push({label:'委托 · '+data.title,action:()=>{this.model.acceptSide(data.id);this.save();this.speak(npc,{lines:[data.accept+' 他们就在'+D.placeMap[data.place].name+'那边。']});}});else if(side.wins<data.rounds)choices.push({label:'询问'+data.title,action:()=>this.speak(npc,{lines:['他们还在'+D.placeMap[data.place].name+'那边。到了以后找找拦路的那伙人，把路上的麻烦处理好，再回来跟我说一声，我也好通知大家可以走了。']})});else if(!side.paid)choices.push({label:'交付委托',action:()=>{const reward=this.model.turnInSide(data.id);if(reward){this.dialogue=null;this.save();this.showReward(reward);}}});else if(!choices.some(c=>c.label==='聊聊近况'))choices.push({label:'聊聊近况',action:()=>this.speak(npc,{lines:['这几天已经有人敢出门做事了，前阵子可是谁都不放心。你们替大家清了路，乡亲们一直惦记着这件事。']})});}
+      if(choices.length){if(!choices.some(c=>c.label==='聊聊近况'))choices.push({label:'聊聊近况',action:()=>this.speak(npc,{lines:[lines[(talks+1)%lines.length]]})});choices.push({label:'告辞',action:()=>this.closeDialogue()});}
       this.save();this.speak(npc,{lines:[lines[talks%lines.length]],choices:choices.length?choices:undefined});return true;
     }
     image(src){return root.GameAssetLoader?.get(src)||null;}
@@ -131,7 +131,7 @@
         const pad=192,anchor=this.mapAnchor(),key=JSON.stringify([this.w,this.h,this.dpr,this.zoom,anchor.x,anchor.y,this.model.state.nodeId,this.selected,this.model.state.routeTarget,marks.map(m=>[m.place,m.taskStatus])]);
         let layer=this.mapLayer,dx=layer?(layer.camera.x-this.camera.x)*this.zoom:0,dy=layer?(layer.camera.y-this.camera.y)*this.zoom:0;
         if(!layer||layer.key!==key||Math.abs(dx)>pad-48||Math.abs(dy)>pad-48){
-          const canvas=layer?.canvas||document.createElement('canvas'),w=this.w+pad*2,h=this.h+pad*2,dpr=this.dpr||1;canvas.width=Math.ceil(w*dpr);canvas.height=Math.ceil(h*dpr);const lc=canvas.getContext('2d');lc.setTransform(dpr,0,0,dpr,pad*dpr,pad*dpr);const previous=this.ctx;this.ctx=lc;
+          const canvas=layer?.canvas||document.createElement('canvas'),w=this.w+pad*2,h=this.h+pad*2,dpr=this.dpr||1,pw=Math.ceil(w*dpr),ph=Math.ceil(h*dpr);if(canvas.width!==pw||canvas.height!==ph){canvas.width=pw;canvas.height=ph;}const lc=canvas.getContext('2d');lc.setTransform(1,0,0,1,0,0);lc.clearRect(0,0,pw,ph);lc.setTransform(dpr,0,0,dpr,pad*dpr,pad*dpr);const previous=this.ctx;this.ctx=lc;
           try{entries=this.drawMapRegion({x:-pad,y:-pad,w,h},marks);}finally{this.ctx=previous;}
           layer=this.mapLayer={canvas,key,camera:{...this.camera},entries,w,h};this.mapLayerBuilds=(this.mapLayerBuilds||0)+1;dx=dy=0;
         }
@@ -213,7 +213,7 @@
     }
     tryEnter(){
       if(this.battle||this.dialogue)return;
-      if(this.model.enter()){this.dialogue=null;this.selected=null;this.save();if(this.model.state.nodeId==='changshan'&&['available','entry'].includes(this.model.state.quests.changshan.stage))this.startChangshanArrival();else if(this.model.state.nodeId==='changshan'&&this.model.state.quests.changshan.stage==='escort')this.startEscortArrival();else if(!this.resumeForcedHeroScene()){const npc=this.model.entryQuestNpc();if(npc)this.interact(npc);}return;}
+      if(this.model.enter()){this.dialogue=null;this.selected=null;this.save();if(this.model.state.nodeId==='changshan'&&['available','entry'].includes(this.model.state.quests.changshan.stage))this.startChangshanArrival();else if(this.model.state.nodeId==='changshan'&&this.model.state.quests.changshan.stage==='escort')this.startEscortArrival();else if(!this.resumeForcedHeroScene()){const npc=this.model.entryQuestNpc();if(npc)this.interact(npc.heroQuest?{...npc,selectedQuest:true}:npc);}return;}
       const node=this.model.location(),text=node.kind==='village'?'村里正在查问外来的人，今天不许进去。你们先到路边等着，别把门口堵住，有了吩咐再说。':'你们有通行文书吗？没有就先退开，现在不放人进城。别一直站在这里，再拦着路，我就叫人把你们赶出去。';this.speak(D.gateGuard,{lines:[text]});
     }
     questDialogue(npc){
@@ -305,7 +305,7 @@
         if(!ruler.ready){this.speak(npc,{lines:ruler.before,choices:[{label:'我再去打听人选',action:()=>this.courtDialogue(npc)}]});return;}
         const q=this.model.state.heroQuests[ruler.id];q.accepted=true;this.save();const at=root.HeroQuests.place(ruler.id,q);if(at===this.model.state.nodeId)this.heroQuestDialogue({...root.HeroQuests.npc(ruler.id,q),selectedQuest:true});else this.speak(npc,{lines:['你们上次说的事，我已经让人去安排了。眼下的线索还在'+D.placeMap[at].name+'，先去那里看看。要是路上受了伤，就回来歇一歇，不必硬撑着赶路。'],choices:[{label:'那我们先去看看',action:()=>this.closeDialogue()}]});
       }});
-      if(topics.length)choices.push({label:'商议要事',action:()=>this.speak(npc,{lines:['这几件事情，你们想先了解哪一件？我把知道的情况都告诉你们。'],choices:[...topics,{label:'告辞',dismiss:true,action:()=>this.closeDialogue()}]})});
+      if(topics.length)choices.unshift(...topics);
       if(this.model.state.residents[npc.id])choices.push({label:'请你同行',action:()=>{if(this.model.inviteResident(npc.id)){this.save();this.closeDialogue();}else this.notify(this.model.lastRecruitError);}});
       choices.push({label:'打听消息',action:()=>{const rumor=this.model.nearbyRumor();if(rumor)this.model.hearRumor(rumor.id);this.save();this.speak(npc,{lines:rumor?[rumor.text]:['最近还没有收到新的消息。你们要是准备出门，可以去附近的村子多问问，过路的人常在那里歇脚，说不定有人知道。']});}},{label:'告辞',dismiss:true,action:()=>this.closeDialogue()});
       this.save();this.speak(npc,{lines,choices});

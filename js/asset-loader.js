@@ -77,7 +77,7 @@
     }
     function resize(){const view=Viewport.resize(canvas,ctx);width=view.w;height=view.h;dpr=view.dpr;draw();}
     function destroy(){disposed=true;observer.disconnect();canvas.removeEventListener('pointerup',click);canvas.removeEventListener('keydown',key);}
-    async function run(){error=false;draw();try{await loader.preload(files,{onProgress:value=>{state=value;draw();}});}catch(cause){if(disposed)return;error=true;draw();console.error(cause);return;}if(disposed)return;destroy();onReady();}
+    async function run(){error=false;draw();try{await loader.preload(files,{onProgress:value=>{state=value;draw();}});if(!disposed&&root.WorldMapArt?.prepare&&root.WorldData){await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));if(!disposed)root.WorldMapArt.prepare(root.WorldData,loader.get);}}catch(cause){if(disposed)return;error=true;draw();console.error(cause);return;}if(disposed)return;destroy();onReady();}
     function click(event){if(!error)return;const {x,y}=Viewport.point(canvas.getBoundingClientRect(),event);if(x>=retry.x&&x<=retry.x+retry.w&&y>=retry.y&&y<=retry.y+retry.h)run();}
     function key(event){if(error&&event.key==='Enter'){event.preventDefault();run();}}
     const observer=new ResizeObserver(resize);observer.observe(canvas);canvas.addEventListener('pointerup',click);canvas.addEventListener('keydown',key);resize();run();return {destroy};

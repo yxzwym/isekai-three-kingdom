@@ -182,7 +182,7 @@
       this.statusTextures||=new Map();const id=status.id;if(this.statusTextures.has(id))return this.statusTextures.get(id);
       const canvas=document.createElement('canvas');canvas.width=64;canvas.height=64;const c=canvas.getContext('2d'),base=root.BattleStatuses.definitions[id]||status;
       c.beginPath();c.roundRect(1,1,62,62,6);c.fillStyle='#10242bed';c.fill();c.strokeStyle=base.color||'#88a49b';c.lineWidth=2;c.stroke();
-      const painted=root.RpgIcons.draw(c,status.taunt?'taunt':id,3,3,58,{image:src=>this.image(src)});if(!painted)root.RpgIcons.draw(c,status.negative?'resistanceDown':'resistanceUp',3,3,58,{image:src=>this.image(src)});
+      const painted=root.RpgIcons.draw(c,status.taunt||status.shield?'taunt':id,3,3,58,{image:src=>this.image(src)});if(!painted)root.RpgIcons.draw(c,status.negative?'resistanceDown':'resistanceUp',3,3,58,{image:src=>this.image(src)});
       this.statusTextures.set(id,canvas);return canvas;
     }
     drawStatuses(u,r){
@@ -217,7 +217,7 @@
       const all=skill.scope==='all';
       if(skill.kind==='heal')return all?'群体治疗':'单体治疗';
       if(skill.kind==='buff')return skill.buff?.taunt?'嘲讽':skill.buff?.reflect||skill.buff?.reflectFormula?'反伤':skill.side==='enemy'?(all?'群体削弱':'单体削弱'):skill.side==='self'?'自身增益':all?'群体增益':'单体增益';
-      return (all?'群体':'单体')+(skill.kind==='physical'?'物理伤害':'魔法伤害');
+      return (all?'群体':'单体')+(skill.kind==='physical'?'物理伤害':'计策伤害');
     }
     manualPauseEnabled(){return this.options?.manualPause!==false;}
     manualReadyActors(){return this.battle.units.filter(u=>u.side==='ally'&&u.soldiers>0&&u.mode==='manual'&&u.ready&&!u.queued&&!this.battle.stunned(u)&&u.skills.some(id=>{const skill=this.battle.skills[id];return skill&&this.battle.availableSp(u)>=skill.cost&&this.battle.targetPool(u,skill).length;})).sort((a,b)=>(a.readyTick??Infinity)-(b.readyTick??Infinity)||a.order-b.order);}
@@ -403,7 +403,7 @@
       const notice=this.notice;if(!notice||notice.until<=now)return;
       if(notice.statusId){
         const current=this.battle.unit(notice.unitId)?.statuses.find(s=>s.id===notice.statusId),remaining=current?Math.max(0,Math.ceil(current.expiresAt-this.battle.time-1e-6)):0;
-        this.box(20,this.h/2-34,this.w-40,68,'#112d36f5','#728d8d');this.text(current?.name||notice.statusName,this.w/2,this.h/2-11,16,'#e8d7aa');this.text(`剩余${remaining}秒`,this.w/2,this.h/2+15,14,'#c5dade');
+        this.box(20,this.h/2-34,this.w-40,68,'#112d36f5','#728d8d');this.text(current?.name||notice.statusName,this.w/2,this.h/2-11,16,'#e8d7aa');this.text(current?.shield?`可吸收${Math.floor(current.amount)}点伤害`:`剩余${remaining}秒`,this.w/2,this.h/2+15,14,'#c5dade');
       }else {this.box(20,this.h/2-22,this.w-40,44,'#112d36f5','#728d8d');this.text(notice.text,this.w/2,this.h/2,14,'#e8d7aa');}
     }
     click(e){const r=this.canvas.getBoundingClientRect(),x=(e.clientX-r.left)*this.w/r.width,y=(e.clientY-r.top)*this.h/r.height;const hit=[...this.hits].reverse().find(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h);this.focus=-1;if(hit)hit.action?.();}

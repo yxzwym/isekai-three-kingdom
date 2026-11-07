@@ -15,7 +15,7 @@ test('官兵装备长枪且从零读条，不同武力速度自然错开首次�
 test('群疗按智力与武器威力计算，每人按熟练度后的武器威力恢复生命，不会一次回满',()=>{
   const b=battle(),u=b.unit('zhangbao'),skill=b.skills['scripture-2'];b.start();
   for(const ally of b.living('ally'))ally.soldiers=100;
-  const value=E.skillValue(b.effective(u),skill),amount=E.calculate({attacker:b.effective(u),skill}).amount,info=I.describe(b,u,skill);assert.ok(info.lines.some(l=>l.startsWith('为我方全体回复'+amount+'（智力×0.85＋武器威力×')));
+  const value=E.skillValue(b.effective(u),skill),amount=E.calculate({attacker:b.effective(u),skill}).amount,info=I.describe(b,u,skill);assert.ok(info.lines.some(l=>l.startsWith('为我方全体回复'+amount+'（（智力×0.85＋武器威力×')&&l.includes('）×1.15）点生命')));
   b.setMode(u.id,'manual');ready(u);assert.ok(b.manual(u.id,skill.id).ok);
   const event=b.events.find(e=>e.type==='action'&&e.skill===skill.id);
   assert.deepEqual(event.results.map(r=>r.actual),[amount,amount,amount]);assert.ok(b.living('ally').every(a=>a.soldiers===100+amount));
@@ -42,3 +42,4 @@ test('队长与普通官兵同档输出，仅耐久和通用嘲讽形成主要�
   const damage=u=>E.physical({attacker:u,target:{armor:0},level:1}).amount;
   assert.ok(damage(captain)<=damage(standard)*1.25);assert.ok(captain.skills.includes('shield-taunt'));
 });
+test('技能详情把被动的实际增伤增疗计入括号算法，计策名称统一',()=>{const u={id:'hero',name:'行客',war:100,intelligence:100,constitution:100,speed:100,technique:10,passives:['renewal','heavenly'],skills:['heal','spell']},skills={heal:{id:'heal',name:'疗伤',kind:'heal',scope:'single',side:'ally',scaling:{intelligence:1},weaponCoefficient:0},spell:{id:'spell',name:'电击',kind:'tactic',scope:'single',side:'enemy',scaling:{intelligence:1},weaponCoefficient:0}},b=new E.Battle({allies:[u],enemies:[],skills});for(const id of ['heal','spell'])assert.match(I.describe(b,b.unit('hero'),b.skills[id]).lines[1],/200（（智力×1）×2）/);assert.equal(I.describe(b,b.unit('hero'),b.skills.spell).role,'单体计策伤害');assert.ok(I.describe(b,b.unit('hero'),b.skills.spell).lines[1].endsWith('点计策伤害。'));});

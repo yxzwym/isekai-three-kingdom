@@ -12,7 +12,7 @@ test('剑豪、剑宗、火术和治疗各自按原始系数加武器威力计�
 test('命中使用技巧速度比，暴击使用每20技巧1%，不再使用旧阵营概率',()=>{
  const a=unit('a'),target=unit('e');assert.equal(E.hitChance(a,target,{hitChance:.4}),1);assert.equal(E.hitChance({...a,technique:80},target,{hitChance:.4}),.7);assert.ok(Math.abs(E.hitChance({...a,technique:80},target,{hitChance:.4},.2)-.5)<1e-12);assert.equal(E.criticalChance(a,{},W.skills['spear-break']),.18);assert.equal(E.criticalChance({...a,technique:2000},{},W.skills['spear-break']),1);
 });
-test('物理和魔法暴击均为固定1.5倍，治疗不会暴击',()=>{
+test('物理和计策暴击均为固定1.5倍，治疗不会暴击',()=>{
  for(const id of ['spear-stun','staff-fire']){const b=battle([id]);b.unit('a').guaranteedCritical=true;b.start();ready(b.unit('a'));b.manual('a',id,'e0');const result=b.events.find(e=>e.type==='action').results[0],base=E.skillValue(b.unit('a'),b.skills[id]);assert.equal(result.multiplier,1.5);assert.equal(result.amount,Math.floor(base*1.5));}
 });
 test('夜莺流血与瘟疫独立跳伤，夜魇不会借用夜莺的高持续系数',()=>{
@@ -24,7 +24,7 @@ test('群攻附加自身加速只作用于施法者一次，不给敌人加速',
 test('黑骑方向嘲讽使用体质；武力智力衰减按实际属性参与后续伤害',()=>{
  const id=W.forWeapon({type:'greatShield'})[1],b=battle([id]);b.start();ready(b.unit('a'));b.manual('a',id);assert.equal(b.effective(b.unit('a')).armor,258);b.addStatus(b.unit('e0'),b.unit('a'),{id:'intelligenceDown',attribute:'intelligence',amount:-20,duration:5});assert.equal(E.skillValue(b.effective(b.unit('a')),W.skills['staff-fire']),96.5);
 });
-test('反伤动态使用技巧比例，对物理和魔法生效且以真实伤害返回',()=>{
+test('反伤动态使用技巧比例，对物理和计策生效且以真实伤害返回',()=>{
  const b=battle(['sword-cut','staff-fire']);b.start();const a=b.unit('a'),target=b.unit('e0');b.addStatus(target,target,{...W.skills['shield-reflect'].buff},W.skills['shield-reflect']);assert.equal(target.statuses[0].reflect,.4);for(const id of a.skills){ready(a);b.manual(a.id,id,target.id);const event=b.events.filter(e=>e.skill==='status-reflect').at(-1);assert.equal(event.results[0].damageType,'true');assert.equal(event.results[0].amount,Math.floor(Math.floor(E.skillValue(a,b.skills[id]))*.4));}
 });
 test('种族加成有真实标签判定，普通人型不会获得猎龙加成',()=>{

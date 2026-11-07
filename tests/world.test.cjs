@@ -8,7 +8,7 @@ test('大陆全部地标沿路连通，单段移动仍受相邻限制，没有�
  const w=world(),before=w.snapshot();assert.equal(w.move('chengdu',{eventRoll:.8}).ok,false);assert.deepEqual(w.snapshot(),before);assert.equal(w.move('julu',{eventRoll:.8}).ok,true);assert.equal(w.state.nodeId,'julu');for(const key of ['stamina','fare','gold'])assert.equal(w.state[key],undefined);
 });
 test('出营按体质恢复正常生命，主角独行，18类武器均有1至3个可用技能',()=>{
- for(const difficulty of R.DIFFICULTIES){const c=character(difficulty.id),w=new World(c);assert.deepEqual(w.state.activeIds,['hero']);assert.equal(w.state.companions.length,0);assert.equal(w.members()[0].startSoldiers,E.maxHealth(c.attributes.constitution));
+ for(const difficulty of R.DIFFICULTIES){const c={...character(difficulty.id),passives:[]},w=new World(c);assert.deepEqual(w.state.activeIds,['hero']);assert.equal(w.state.companions.length,0);assert.equal(w.members()[0].startSoldiers,E.maxHealth(c.attributes.constitution));
   for(const type of R.WEAPON_TYPES){assert.equal(w.chooseWeapon(type.id),true);const u=w.members()[0];assert.equal(u.weapon.type,type.id);assert.ok(u.skills.length>=1&&u.skills.length<=3);assert.ok(u.skills.some(id=>['physical','tactic'].includes(require('../js/weapon-skills.js').skills[id].kind)));}}
 });
 test('路遇战复用通用战斗，敌人默认随机，战前保持正常未满读条与可配置模式',()=>{

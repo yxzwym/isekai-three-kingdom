@@ -1,6 +1,7 @@
 (function(root){
   'use strict';
   const definitions={
+    passiveShield:{name:'护盾',icon:'盾',color:'#93c9e5',shield:true},
     taunt:{name:'嘲讽',icon:'盾',color:'#e5b45e',duration:30,taunt:true},
     armorDown:{name:'破甲',icon:'裂',color:'#d7a27c',duration:8},
     resistanceDown:{name:'破抗',icon:'蚀',color:'#bc97dd',duration:8},
@@ -25,5 +26,6 @@
   };
   const skills=Object.fromEntries(Object.entries(definitions).filter(([,s])=>s.period).map(([id,s])=>['status-'+id,{id:'status-'+id,name:s.name,kind:s.healing?'heal':'tactic',side:s.healing?'ally':'enemy',scope:'single',cost:0,reactionOnly:true,vfx:s.healing?'heal':id==='burn'?'fire':['poison','plague'].includes(id)?'wood':'physical'}]));
   skills['status-reflect']={id:'status-reflect',name:'反伤',kind:'physical',damageType:'true',side:'enemy',scope:'single',cost:0,reactionOnly:true};
+  skills['passive-counter']={id:'passive-counter',name:'以逸待劳',kind:'physical',side:'enemy',scope:'single',cost:0,reactionOnly:true};
   const api={definitions,skills};root.BattleStatuses=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

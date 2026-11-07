@@ -19,20 +19,21 @@ canvas.menu-notice-layer{position:fixed;z-index:20;max-width:none;pointer-events
 <script>
 (function(root){
  'use strict';
- const width=360,height=640,maxRasterScale=4;
+ const width=540,height=960,maxPixelWidth=1440;
+ function logicalSize(rect){return rect.width<480?{w:405,h:720}:{w:width,h:height};}
  function measure(rect,deviceRatio=1,maxDpr=2){
-  const scale=Math.max(.001,Math.min(Math.max(1,Number(rect.width)||1)/width,Math.max(1,Number(rect.height)||1)/height));
-  const ratio=Math.max(.1,Math.min(Number(deviceRatio)||1,Number(maxDpr)||2)),dpr=Math.min(maxRasterScale,scale*ratio);
-  return {w:width,h:height,scale,dpr,pixelWidth:Math.max(1,Math.round(width*dpr)),pixelHeight:Math.max(1,Math.round(height*dpr))};
+  const {w,h}=logicalSize(rect),scale=Math.max(.001,Math.min(Math.max(1,Number(rect.width)||1)/w,Math.max(1,Number(rect.height)||1)/h));
+  const ratio=Math.max(.1,Math.min(Number(deviceRatio)||1,Number(maxDpr)||2)),dpr=Math.min(maxPixelWidth/w,scale*ratio);
+  return {w,h,scale,dpr,pixelWidth:Math.max(1,Math.round(w*dpr)),pixelHeight:Math.max(1,Math.round(h*dpr))};
  }
  function resize(canvas,ctx,{maxDpr=2}={}){
   const view=measure(canvas.getBoundingClientRect(),root.devicePixelRatio||root.window?.devicePixelRatio||1,maxDpr);
   if(canvas.width!==view.pixelWidth)canvas.width=view.pixelWidth;if(canvas.height!==view.pixelHeight)canvas.height=view.pixelHeight;
   ctx.setTransform(view.dpr,0,0,view.dpr,0,0);return view;
  }
- function clientRect(bounds,rect){const scaleX=bounds.width/width,scaleY=bounds.height/height;return {left:bounds.left+rect.x*scaleX,top:bounds.top+rect.y*scaleY,width:rect.w*scaleX,height:rect.h*scaleY,scaleX,scaleY};}
- function point(bounds,event){return {x:(event.clientX-bounds.left)*width/bounds.width,y:(event.clientY-bounds.top)*height/bounds.height};}
- const api={width,height,measure,resize,clientRect,point};root.CanvasViewport=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+ function clientRect(bounds,rect){const {w,h}=logicalSize(bounds),scaleX=bounds.width/w,scaleY=bounds.height/h;return {left:bounds.left+rect.x*scaleX,top:bounds.top+rect.y*scaleY,width:rect.w*scaleX,height:rect.h*scaleY,scaleX,scaleY};}
+ function point(bounds,event){const {w,h}=logicalSize(bounds);return {x:(event.clientX-bounds.left)*w/bounds.width,y:(event.clientY-bounds.top)*h/bounds.height};}
+ const api={width,height,logicalSize,measure,resize,clientRect,point};root.CanvasViewport=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
 
 </script>
@@ -418,7 +419,26 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     return [...new Set([...existing,...(heroDefaults[unit.characterId||unit.id]||[])])];
   }
   function complete(unit){return {...unit,passives:forUnit(unit)};}
-  const api={skills,definitions,heroDefaults,forUnit,complete};root.BattlePassives=api;
+  // 随机天赋和武将天赋共用同一份战斗定义；浏览器在规则表加载后首次取用。
+  let randomInstalled=false;
+  function allDefinitions(){
+    const rules=typeof module!=='undefined'&&module.exports?require('./game-rules.js'):root.PengpaiRules;
+    if(!randomInstalled&&rules){for(const p of rules.PASSIVES){const stats={...p.effects};if(stats.troopsMultiplier!=null){stats.healthMultiplier=stats.troopsMultiplier;delete stats.troopsMultiplier;}if(stats.physicalDodge!=null){stats.physicalDodgeBonus=stats.physicalDodge;delete stats.physicalDodge;}definitions[p.id]={id:p.id,name:p.name,quality:p.quality,description:p.description,stats,triggers:[]};}randomInstalled=true;}
+    return definitions;
+  }
+  function statsFor(unit,table=allDefinitions()){
+    const key=(unit.passives||[]).join('|');if(unit._passiveStats?.key===key&&unit._passiveStats.table===table)return unit._passiveStats.value;
+    const value={};for(const id of unit.passives||[])for(const [stat,n]of Object.entries(table[id]?.stats||{})){
+      if(typeof n==='boolean')value[stat]=value[stat]||n;
+      else if(stat.endsWith('Multiplier'))value[stat]=(value[stat]??1)*n;
+      else if(stat.endsWith('Pierce'))value[stat]=1-(1-(value[stat]||0))*(1-n);
+      else value[stat]=(value[stat]||0)+n;
+    }
+    // 缓存仅为运行时数据，不能写入存档或参战阵容。
+    Object.defineProperty(unit,'_passiveStats',{value:{key,table,value},configurable:true,writable:true,enumerable:false});return value;
+  }
+  const healthMultiplier=unit=>statsFor(unit).healthMultiplier||1;
+  const api={skills,get definitions(){return allDefinitions();},heroDefaults,forUnit,complete,statsFor,healthMultiplier};root.BattlePassives=api;
   if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
 
@@ -5441,6 +5461,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
 (function(root){
   'use strict';
   const definitions={
+    passiveShield:{name:'护盾',icon:'盾',color:'#93c9e5',shield:true},
     taunt:{name:'嘲讽',icon:'盾',color:'#e5b45e',duration:30,taunt:true},
     armorDown:{name:'破甲',icon:'裂',color:'#d7a27c',duration:8},
     resistanceDown:{name:'破抗',icon:'蚀',color:'#bc97dd',duration:8},
@@ -5465,6 +5486,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   };
   const skills=Object.fromEntries(Object.entries(definitions).filter(([,s])=>s.period).map(([id,s])=>['status-'+id,{id:'status-'+id,name:s.name,kind:s.healing?'heal':'tactic',side:s.healing?'ally':'enemy',scope:'single',cost:0,reactionOnly:true,vfx:s.healing?'heal':id==='burn'?'fire':['poison','plague'].includes(id)?'wood':'physical'}]));
   skills['status-reflect']={id:'status-reflect',name:'反伤',kind:'physical',damageType:'true',side:'enemy',scope:'single',cost:0,reactionOnly:true};
+  skills['passive-counter']={id:'passive-counter',name:'以逸待劳',kind:'physical',side:'enemy',scope:'single',cost:0,reactionOnly:true};
   const api={definitions,skills};root.BattleStatuses=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
 
@@ -5537,7 +5559,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
 <script>
 (function(root){
  'use strict';
- const node=typeof module!=='undefined'&&module.exports,C=node?require('./weapon-catalog.js'):root.WeaponCatalog,G=node?require('./character-growth.js'):root.CharacterGrowth;
+ const node=typeof module!=='undefined'&&module.exports,C=node?require('./weapon-catalog.js'):root.WeaponCatalog,G=node?require('./character-growth.js'):root.CharacterGrowth,P=node?require('./passives.js'):root.BattlePassives;
  const copy=x=>JSON.parse(JSON.stringify(x)),keys=['war','intelligence','constitution','speed','technique'];
  const qualities={white:{name:'普通',color:'#d5dedf',multiplier:1},green:{name:'精良',color:'#72ce8c',multiplier:1.35},blue:{name:'稀有',color:'#6aaff1',multiplier:1.8},orange:{name:'珍奇',color:'#f1a45e',multiplier:2.5},red:{name:'传世',color:'#ef747c',multiplier:3.4}};
  const names={sword:'长剑',blade:'朴刀',spear:'长枪',shield:'木盾',fan:'羽扇',staff:'木杖',whisk:'拂尘',banner:'布幡',gourd:'药葫芦',scripture:'医经',needle:'金针',dagger:'匕首',shortBlade:'短刃',bow:'短弓',cannon:'轻炮',crossbow:'轻弩',axe:'短斧',hammer:'铜锤'};
@@ -5547,7 +5569,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
  const compatible=(item,slot)=>item?.slot===(slot.startsWith('accessory')?'accessory':slot);
  function weaponRecord(item,fallback){if(!item)return null;const next=copy(item);if(next.power==null&&next.attack==null)next.power=Math.max(0,Number(next.attack??fallback??templates['weapon-'+next.type]?.power??10)||0);return next;}
  function bonuses(u){const result={};for(const item of [u.weapon,...Object.values(u.equipment||{})])for(const [key,value]of Object.entries(item?.attributes||{}))result[key]=(result[key]||0)+(Number(value)||0);return result;}
- function apply(u){const out={...u},b=bonuses(u),intrinsic=u.baseAttributes&&u.potentials?G.attributesAt(u.baseAttributes,u.potentials,u.level):u.equipmentBase||Object.fromEntries(keys.map(k=>[k,Number(u[k])||1]));out.equipmentBase=copy(intrinsic);out.statusImmunities=[...new Set([...(u.statusImmunities||[]),...[u.weapon,...Object.values(u.equipment||{})].flatMap(item=>item?.statusImmunities||[])])];out.baseArmor=u.baseArmor??(Number(u.armor)||0);out.baseResistance=u.baseResistance??(Number(u.resistance)||0);for(const key of keys)out[key]=Math.max(1,intrinsic[key]+(b[key]||0));out.armor=Math.max(0,out.baseArmor+(b.armor||0));out.resistance=Math.max(0,out.baseResistance+(b.resistance||0));if(out.weapon){out.weapon=weaponRecord(out.weapon,out.attack);out.attack=Number(out.weapon.power??out.weapon.attack??out.attack)||0;}if(out.healthOverride==null&&out.baseAttributes&&out.potentials)out.maxSoldiers=out.constitution*10;return out;}
+ function apply(u){const out={...u},b=bonuses(u),intrinsic=u.baseAttributes&&u.potentials?G.attributesAt(u.baseAttributes,u.potentials,u.level):u.equipmentBase||Object.fromEntries(keys.map(k=>[k,Number(u[k])||1]));out.equipmentBase=copy(intrinsic);out.statusImmunities=[...new Set([...(u.statusImmunities||[]),...[u.weapon,...Object.values(u.equipment||{})].flatMap(item=>item?.statusImmunities||[])])];out.baseArmor=u.baseArmor??(Number(u.armor)||0);out.baseResistance=u.baseResistance??(Number(u.resistance)||0);for(const key of keys)out[key]=Math.max(1,intrinsic[key]+(b[key]||0));out.armor=Math.max(0,out.baseArmor+(b.armor||0));out.resistance=Math.max(0,out.baseResistance+(b.resistance||0));if(out.weapon){out.weapon=weaponRecord(out.weapon,out.attack);out.attack=Number(out.weapon.power??out.weapon.attack??out.attack)||0;}out.baseMaxHealth=out.baseAttributes&&out.potentials?out.constitution*10:(u.baseMaxHealth??u.maxSoldiers??out.constitution*10);out.maxSoldiers=out.healthOverride!=null?Math.max(1,Math.floor(out.healthOverride)):Math.max(1,Math.floor(out.baseMaxHealth*P.healthMultiplier(out)));return out;}
  function loot(enemies,rng){const money=(enemies||[]).reduce((n,e)=>n+Math.max(3,(Number(e.level)||1)*3+2+Math.floor(rng()*5)),0),items=[];for(const e of enemies||[])if(rng()<.42){const pool=[...Object.keys(templates)],key=pool[Math.floor(rng()*pool.length)],quality=rng()<.22?'green':'white';items.push({templateId:key,quality});}return {money,items};}
  const sellPrice=item=>Math.max(1,Math.floor((Number(item?.price)||10)*.2));
  function select(items,options={}){
@@ -5736,7 +5758,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   // Compatibility alias for existing scenario/save fields; life no longer depends on level.
   const maxSoldiers=(level,constitution)=>maxHealth(constitution);
   function ratio(war,speed,unload=0){return Math.floor(Math.min(3,Math.max(1,(Number(war)||0)-(Number(unload)||0))/(Math.max(0,Number(speed)||0)+1))*10)/10;}
-  function interval(unit,config=DEFAULTS,skillDelay=0){return Math.max(.5,1.5+ratio(unit.war,unit.speed,unit.unload)+(Number(skillDelay)||0));}
+  function interval(unit,config=DEFAULTS,skillDelay=0){return Math.max(.5,(1.5+ratio(unit.war,unit.speed,unit.unload)+(Number(skillDelay)||0))*(unit.intervalMultiplier??1));}
   function mitigation(value,scale=50){return 50/(50+Math.max(0,Number(value)||0));}
   function skillValue(actor,skill={}){
     const scaling=skill.scaling||{[skill.kind==='physical'?'war':'intelligence']:Number(skill.power)||1};
@@ -5744,13 +5766,13 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   }
   function raceMultiplier(skill,target){const tags=new Set([target?.species||'humanoid',...(target?.tags||[])]);return 1+Object.entries(skill.raceBonuses||{}).reduce((n,[tag,value])=>n+(tags.has(tag)?value:0),0);}
   function calculate({attacker={},target={},skill={},critical=1,damageType=skill.damageType||skill.kind||'physical'}){
-    if(attacker.soldiers<=0)return {raw:0,amount:0,factors:[]};const healing=skill.kind==='heal',physical=damageType==='physical',protectionValue=healing||damageType==='true'||(physical&&attacker.ignoreArmor)?0:Math.max(0,Number(target[physical?'armor':'resistance'])||0)-Math.max(0,Number(attacker[physical?'armorPenetration':'resistancePenetration'])||0);
-    const base=skillValue(attacker,skill),bonus=healing?(1+(Number(attacker.healingBonus)||0)):(1+(Number(attacker[physical?'physicalBonus':'tacticBonus'])||0)),beforeMitigation=Math.max(0,base*bonus*(healing?1:Math.max(0,Number(attacker.damageMultiplier??1)))*(healing?1:critical)*raceMultiplier(skill,target)),protection=healing?1:mitigation(protectionValue)*(damageType==='true'?1:clamp(1-(Number(target[physical?'physicalReduction':'tacticReduction'])||0),0,1)),raw=beforeMitigation*protection;
+    if(attacker.soldiers<=0)return {raw:0,amount:0,factors:[]};const healing=skill.kind==='heal',physical=damageType==='physical',protectionValue=healing||damageType==='true'||(physical&&attacker.ignoreArmor)||(!physical&&attacker.ignoreResistance)?0:Math.max(0,Number(target[physical?'armor':'resistance'])||0)*(1-clamp(Number(attacker[physical?'armorPierce':'resistancePierce'])||0,0,1))-Math.max(0,Number(attacker[physical?'armorPenetration':'resistancePenetration'])||0);
+    const base=skillValue(attacker,skill),bonus=healing?(1+(Number(attacker.healingBonus)||0)):(1+(Number(attacker[physical?'physicalBonus':'tacticBonus'])||0)),beforeMitigation=Math.max(0,base*bonus*(healing?1:Math.max(0,Number(attacker.damageMultiplier??1)))*(healing?1:critical)*raceMultiplier(skill,target)*(healing?1:(skill.kind==='physical'||skill.kind==='tactic')&&attacker.executeThreshold&&target.soldiers/target.maxSoldiers<=attacker.executeThreshold?(attacker.executeMultiplier||1):1)),protection=healing?1:mitigation(protectionValue)*(damageType==='true'?1:clamp(1-(Number(target[physical?'physicalReduction':'tacticReduction'])||0),0,1)),raw=beforeMitigation*protection;
     return {raw,amount:Math.max(1,Math.floor(raw)),damageType,armor:physical?Math.max(0,protectionValue):undefined,resistance:physical?undefined:Math.max(0,protectionValue),beforeMitigation,mitigation:protection,factors:[['技能面板',base],['效果加成',bonus],...(!healing&&attacker.damageMultiplier!==undefined&&attacker.damageMultiplier!==1?[['被动增伤',attacker.damageMultiplier]]:[]),['暴击倍率',healing?1:critical],['减伤后倍率',protection]],formula:healing?'技能治疗量':damageType==='true'?'真实伤害':'技能伤害 × 50÷(50＋减伤属性)'};
   }
   function physical(options){return calculate({...options,skill:options.skill||{kind:'physical',scaling:{war:1},weaponCoefficient:1},damageType:options.damageType||'physical'});}
   function tactic(options){return calculate({...options,attacker:options.attacker||{intelligence:attr(options.intelligence),attack:0},skill:options.skill,damageType:options.skill.damageType||options.skill.kind});}
-  function criticalChance(unit,config,skill={}){return unit.guaranteedCritical?1:clamp((Number(skill.criticalChance)||0)+(Number(skill.criticalBonus)||0)+(Number(unit.criticalBonus)||0)+Math.max(0,Number(unit.technique)||0)/2000,0,1);}
+  function criticalChance(unit,config,skill={}){return unit.guaranteedCritical?1:clamp((Number(skill.criticalChance)||0)+(Number(skill.criticalBonus)||0)+(Number(unit.criticalBonus)||0)+(skill.kind==='tactic'?(Number(unit.tacticCriticalBonus)||0):0)+Math.max(0,Number(unit.technique)||0)/2000,0,1);}
   function hitChance(actor,target,skill,dodge=0){return skill.alwaysHit?1:clamp((skill.hitChance??.4)+(Number(actor.hitBonus)||0)+(Math.max(0,Number(actor.technique)||0)/Math.max(1,Number(target.speed)||0))*.3-dodge,0,1);}
   function normalizeRule(rule,skill){
     const r=copy(rule);if(!skill)return r;
@@ -5789,13 +5811,13 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
         if(u.side==='enemy'&&u.statusImmunities?.includes('stun'))u.passives=[...new Set([...u.passives,'enemy-stun-resistance'])];
         u.priorities = Array.isArray(u.priorities) ? u.priorities.map(r=>normalizeRule(r,this.skills[r.skill])) : [];
         u.targetRule=u.targetRule||(u.side==='enemy'?'random':'lowestCurrent');u.lastSingleSkill=null;u.lastManualSkill=null;
-        u.maxSoldiers = u.healthOverride!=null?attr(u.healthOverride):u.potentials&&u.baseAttributes?maxHealth(u.constitution):u.maxSoldiers == null ? maxHealth(u.constitution) : attr(u.maxSoldiers);
-        u.maxSoldiers=Math.max(1,Math.floor(u.maxSoldiers*u.passives.reduce((n,id)=>n*(Number(this.passives[id]?.stats?.healthMultiplier)||1),1)));
+        u.maxSoldiers=u.healthOverride!=null?attr(u.healthOverride):Math.max(1,Math.floor(u.baseMaxHealth*(PASSIVES.statsFor(u,this.passives).healthMultiplier||1)));
         u.soldiers = clamp(Math.floor(Number(u.startSoldiers ?? u.maxSoldiers)), 0, u.maxSoldiers);
         u.woundsEnabled=u.side==='ally'&&(u.woundsEnabled??this.config.wounds!==false);u.dead=!!u.dead||u.condition==='dead'||u.soldiers===0&&!u.woundsEnabled;u.wounded=!u.dead&&u.soldiers===0&&u.woundsEnabled;
         u.sp = Math.max(0, Number(u.enemySp) || 0); u.initialSp = u.sp;
-        u.interval = interval(u, this.config); u.progress = clamp(Number(u.initialProgress)||0,0,1); u.ready = u.progress>=1; u.readyTick=u.ready?0:null; u.mode = u.initialMode==='manual'||(u.side==='ally'&&this.scenario.control.manualOnly)?'manual':'auto'; u.queued = null;
+        u.interval = interval(u, this.config); u.progress = clamp((Number(u.initialProgress)||0)+(PASSIVES.statsFor(u,this.passives).initialProgress||0),0,1); u.ready = u.progress>=1; u.readyTick=u.ready?0:null; u.mode = u.initialMode==='manual'||(u.side==='ally'&&this.scenario.control.manualOnly)?'manual':'auto'; u.queued = null;
         u.statuses = [];u.lastSkillDelay=0;u.waitTime=u.progress*u.interval;u.progressStamp=u.progress;u.autoCheckedRevision=-1; u.criticalChain = 0; u.order = order;
+        u.interval=interval(this.effective(u),this.config);u.waitTime=u.progress*u.interval;
         u.stats = { damage: 0, healing: 0, received: 0, actions: 0, kills: 0, tactics: 0, dodges: 0 };
         return u;
       });
@@ -5810,7 +5832,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     availableSp(unit) { return unit.side === 'ally' ? this.allySp : unit.sp; }
     invalidateAI(){this.revision++;}
     emit(type, detail) { this.revision++;const event = { id: ++this.sequence, tick: this.tick, time: this.time, type, ...detail }; this.events.push(event); return event; }
-    start() { if (this.status === 'ready') { this.status = 'running'; this.emit('system', { text: '战鼓已响，两军交锋。' }); this.checkEnd(); } }
+    start() { if (this.status === 'ready') { this.status = 'running';for(const u of this.units){const amount=Math.floor(u.maxSoldiers*(PASSIVES.statsFor(u,this.passives).openingShield||0));if(amount>0)this.gainShield(u,u,amount);} this.emit('system', { text: '战鼓已响，两军交锋。' }); this.checkEnd(); } }
     advance(seconds,stopWhen) {
       if (this.status !== 'running') return;
       if(stopWhen?.()){this.accumulator=0;return;}
@@ -5836,10 +5858,19 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
       }
     }
     effective(u){
-      const out={...u};for(const key of ['war','intelligence','constitution','speed','technique','attack','armor','resistance']){
-        const passiveAdd=u.passives.reduce((n,id)=>n+(Number(this.passives[id]?.stats?.[key+'Bonus'])||0),0),passiveMult=u.passives.reduce((n,id)=>n*(Number(this.passives[id]?.stats?.[key+'Multiplier'])||1),1);const add=u.statuses.reduce((n,s)=>n+(s.attribute===key?(Number(s.amount)||0)*(s.stacks||1):0),0),mult=u.statuses.reduce((n,s)=>n*(Number(s[key+'Multiplier'])||1),1);out[key]=Math.max(key==='constitution'?1:0,(u[key]+add+passiveAdd)*mult*passiveMult);
-      }for(const stat of ['healingBonus','physicalBonus','tacticBonus','physicalReduction','tacticReduction','hitBonus','criticalBonus','armorPenetration','resistancePenetration'])out[stat]=(Number(u[stat])||0)+u.passives.reduce((n,id)=>n+(Number(this.passives[id]?.stats?.[stat])||0),0);out.damageMultiplier=Number(u.damageMultiplier??1);for(const id of u.passives){if(this.passives[id]?.stats?.guaranteedCritical)out.guaranteedCritical=true;if(this.passives[id]?.stats?.ignoreArmor)out.ignoreArmor=true;const maximum=Number(this.passives[id]?.stats?.missingHealthDamageBonus)||0;if(maximum>0)out.damageMultiplier*=1+maximum*clamp(1-u.soldiers/u.maxSoldiers,0,1);}
-      out.weaponPower=PROFICIENCY.power(out.attack,u);return out;
+      const out={...u},p=PASSIVES.statsFor(u,this.passives);
+      for(const key of ['war','intelligence','constitution','speed','technique','attack','armor','resistance']){
+        const add=(u.statuses||[]).reduce((n,s)=>n+(s.attribute===key?(Number(s.amount)||0)*(s.stacks||1):0),0),mult=(u.statuses||[]).reduce((n,s)=>n*(Number(s[key+'Multiplier'])||1),1);out[key]=Math.max(key==='constitution'?1:0,(u[key]+add+(p[key+'Bonus']||0))*mult*(p[key+'Multiplier']||1));
+      }
+      for(const stat of ['healingBonus','physicalBonus','tacticBonus','physicalReduction','tacticReduction','hitBonus','criticalBonus','armorPenetration','resistancePenetration','armorPierce','resistancePierce','criticalDamageBonus','tacticCriticalBonus','tacticCriticalDamageBonus','physicalLifesteal','executeThreshold'])out[stat]=(Number(u[stat])||0)+(p[stat]||0);
+      for(const stat of ['intervalMultiplier','executeMultiplier'])out[stat]=(Number(u[stat])||1)*(p[stat]||1);
+      for(const [kind,mult]of [['physical','physicalMultiplier'],['tactic','tacticMultiplier'],['healing','healingMultiplier']])if(p[mult]!==undefined)out[kind+'Bonus']=(1+out[kind+'Bonus'])*p[mult]-1;
+      out.damageMultiplier=Number(u.damageMultiplier??1)*(p.damageMultiplier||1);out.guaranteedCritical=!!(u.guaranteedCritical||p.guaranteedCritical);out.ignoreArmor=!!(u.ignoreArmor||p.ignoreArmor);out.ignoreResistance=!!(u.ignoreResistance||p.ignoreResistance);
+      let taken=p.takenMultiplier||1;for(const id of u.passives){const stats=this.passives[id]?.stats||{},maximum=Number(stats.missingHealthDamageBonus)||0;if(maximum>0)out.damageMultiplier*=1+maximum*clamp(1-u.soldiers/u.maxSoldiers,0,1);if(stats.lowTroopsThreshold&&u.soldiers/u.maxSoldiers<=stats.lowTroopsThreshold){out.damageMultiplier*=stats.lowTroopsDamageMultiplier||1;taken*=stats.lowTroopsTakenMultiplier||1;}}
+      if(taken!==1)out.physicalReduction=1-(1-out.physicalReduction)*taken;if(taken!==1||p.tacticTakenMultiplier!==undefined)out.tacticReduction=1-(1-out.tacticReduction)*taken*(p.tacticTakenMultiplier||1);out.weaponPower=PROFICIENCY.power(out.attack,u);return out;
+    }
+    gainShield(source,target,amount){
+      if(amount<=0||target.dead)return;let status=target.statuses.find(s=>s.id==='passiveShield');if(status)status.amount+=amount;else{status={id:'passiveShield',name:'护盾',shield:true,amount,source:source.id,permanent:true,expiresAt:Infinity};target.statuses.push(status);}this.emit('status',{actor:source.id,target:target.id,status:copy(status)});
     }
     healingPassives(owner,target){
       for(const id of owner.passives)for(const trigger of this.passives[id]?.triggers||[]){
@@ -5863,7 +5894,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
       if(target.dead||(target.soldiers<=0&&!(target.wounded&&definition.period&&!definition.healing))||((target.statusImmunities||[]).includes(id)||definition.stun&&(target.statusImmunities||[]).includes('stun')))return null;
       if(definition.chance!==undefined){const chance=clamp(Number(definition.chance)-(source.side!==target.side?this.effective(target).resistance/1000:0),0,1);if(this.rng()>=chance)return null;}
       const owner=this.effective(source),coefficient=Number(definition.coefficient)||0;
-      let amount=Number(definition.amount??((Number(definition.base)||0)+coefficient*(owner[definition.stat||'technique']??0)))||0;if(definition.negative)amount=-Math.abs(amount);
+      let amount=Number(definition.amount??((Number(definition.base)||0)+coefficient*(owner[definition.stat||'technique']??0)))||0;if(definition.healing&&definition.period)amount*=1+(owner.healingBonus||0);if(definition.negative)amount=-Math.abs(amount);
       const previous=target.statuses.find(s=>s.id===id),origin=skill.id||id,maxStacks=Math.max(1,Number(definition.maxStacks)||1),same=previous?.origin===origin;
       const status={...definition,id,name:definition.name||skill.name||id,source:source.id,origin,amount,...(definition.reflectFormula?{reflect:(Number(definition.reflectFormula.base)||0)+(Number(definition.reflectFormula.coefficient)||0)*(owner[definition.reflectFormula.stat||'technique']??0)}:{}),stacks:same?Math.min(maxStacks,(previous.stacks||1)+1):1,expiresAt:this.time+Math.max(.02,Number(definition.duration)||5),nextTick:this.time+(Number(definition.period)||1)};
       target.statuses=target.statuses.filter(s=>s.id!==id);target.statuses.push(status);this.emit('status',{actor:source.id,target:target.id,status:copy(status)});return status;
@@ -5872,18 +5903,20 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     healUnit(source,target,amount){
       const before=target.soldiers;if(target.dead)return {before,after:before,actual:0};
       const actual=Math.min(Math.max(0,Math.floor(amount)),target.maxSoldiers-before),recovered=!!target.wounded&&actual>0;target.soldiers+=actual;source.stats.healing+=actual;
+      const shieldRate=PASSIVES.statsFor(source,this.passives).overhealShield||0;if(shieldRate>0)this.gainShield(source,target,Math.floor(Math.max(0,amount-actual)*shieldRate));
       if(recovered){target.wounded=false;target.condition='healthy';this.resetProgress(target);target.lastSkillDelay=0;target.interval=interval(this.effective(target),this.config,0);}
       return {before,after:target.soldiers,actual,recovered};
     }
     damageUnit(source,target,amount,{periodic=false,ignoreWounds=false}={}){
       const before=target.soldiers;if(target.dead)return {before,after:before,actual:0,dead:true};
       if(target.wounded&&!ignoreWounds&&this.rng()<.5){target.stats.dodges++;return {before,after:before,actual:0,miss:'闪避',woundDodge:true};}
-      const actual=Math.min(before,Math.max(0,Math.floor(amount)));target.soldiers-=actual;source.stats.damage+=actual;target.stats.received+=actual;const after=target.soldiers,restored=this.survive(target);
+      let remaining=Math.max(0,Math.floor(amount)),absorbed=0;for(const shield of target.statuses.filter(s=>s.shield)){const used=Math.min(shield.amount,remaining);shield.amount-=used;remaining-=used;absorbed+=used;}target.statuses=target.statuses.filter(s=>!s.shield||s.amount>0);
+      const actual=Math.min(before,remaining);target.soldiers-=actual;source.stats.damage+=actual;target.stats.received+=actual;const after=target.soldiers,restored=this.survive(target);
       if(target.soldiers===0){
         target.dead=!!(target.wounded||!target.woundsEnabled||ignoreWounds||(periodic&&this.rng()>=.5));target.wounded=!target.dead;target.condition=target.dead?'dead':'wounded';this.resetProgress(target);
         if(target.dead){source.stats.kills++;target.statuses=[];}
       }
-      return {before,after,actual,restored,defeated:target.soldiers===0,wounded:target.wounded,dead:target.dead};
+      return {before,after,actual,absorbed,restored,defeated:target.soldiers===0,wounded:target.wounded,dead:target.dead};
     }
     tickStatuses(u){
       if(u.dead)return;
@@ -6017,7 +6050,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
       u.stats.actions++; this.actionCount++;
       if (skill.kind === 'tactic' || skill.kind === 'heal') u.stats.tactics++;
       const event = { actor: id, actorName: u.name, side: u.side, skill: skillId, skillName: skill.name, scope, cost: skill.cost, spBefore: beforeSp, spAfter: this.availableSp(u), attackerSoldiers: u.soldiers, results: [] };
-      const dodged=[],restores=[],reflections=[],healthChanges=[];let drain=0;
+      const dodged=[],restores=[],reflections=[],counters=[],healthChanges=[];let drain=0;
       for (const target of targets) {
         const before = target.soldiers;
         if (skill.kind === 'buff') {
@@ -6029,24 +6062,26 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
         if(!healingSkill&&!target.wounded&&this.config.hit&&!skill.alwaysHit){const dodge=this.dodgeChance(target,skill.kind),hit=hitChance(actor,victim,skill,dodge),roll=this.rng();if(roll>=hit){miss=dodge>0&&roll<hitChance(actor,victim,skill,0)?'闪避':'未命中';if(miss==='闪避'){target.stats.dodges++;dodged.push(target);}}}
         // Explicit dodge passives still function in deterministic tutorial scenarios.
         else if(!healingSkill&&!target.wounded&&this.dodgeChance(target,skill.kind)>0&&this.rng()<this.dodgeChance(target,skill.kind)){miss='闪避';target.stats.dodges++;dodged.push(target);}
-        if(!miss&&!healingSkill){critical=!!u.guaranteedCritical||(this.config.critical&&this.rng()<criticalChance(actor,this.config,skill));multiplier=critical?1.5:1;}
+        if(!miss&&!healingSkill){critical=!!actor.guaranteedCritical||(this.config.critical&&this.rng()<criticalChance(actor,this.config,skill));multiplier=critical?1.5+(actor.criticalDamageBonus||0)+(skill.kind==='tactic'?(actor.tacticCriticalDamageBonus||0):0):1;}
         calc=miss?{raw:0,amount:0,factors:[],formula:miss}:calculate({attacker:actor,target:victim,skill,critical:multiplier});
         const healing = skill.kind === 'heal';
         const result=miss?{before,after:before,actual:0}:healing?this.healUnit(u,target,calc.amount):this.damageUnit(u,target,calc.amount,{ignoreWounds:!!skill.ignoreWounds});
         const {restored,...detail}=result;if(restored)restores.push(restored);if(result.miss)miss=result.miss;healthChanges.push({unit:target,before,after:target.soldiers});
-        if(!healing&&!miss){drain+=Math.floor(calc.amount*(Number(skill.lifesteal)||0));const reflect=target.soldiers>0?target.statuses.reduce((n,s)=>n+(Number(s.reflect)||0),0):0;if(reflect>0)reflections.push({source:target,amount:Math.floor(result.actual*reflect*this.effective(target).damageMultiplier)});}
+        if(!healing&&!miss){drain+=Math.floor(calc.amount*((Number(skill.lifesteal)||0)+(skill.kind==='physical'?(actor.physicalLifesteal||0):0)));const reflect=target.soldiers>0?target.statuses.reduce((n,s)=>n+(Number(s.reflect)||0),0):0;if(skill.kind==='physical'&&target.soldiers>0){const p=PASSIVES.statsFor(target,this.passives);if(p.counterChance&&this.rng()<p.counterChance)counters.push({source:target,multiplier:p.counterMultiplier||.5});}if(reflect>0)reflections.push({source:target,amount:Math.floor(result.actual*reflect*this.effective(target).damageMultiplier)});}
         if(!miss&&!target.dead)for(const effect of skill.effects||[])if(effect.recipient!=='self')this.addStatus(u,target,effect,skill);
         event.results.push({target:target.id,targetName:target.name,...detail,healing,miss,critical:!miss&&critical,multiplier,random,...calc});
       }
       for(const effect of skill.effects||[])if(effect.recipient==='self')this.addStatus(u,u,effect,skill);
       if (skill.element === 'fire') this.fireCount++;
       if(drain>0&&u.soldiers>0){const before=u.soldiers,actual=Math.min(drain,u.maxSoldiers-before);u.soldiers+=actual;u.stats.healing+=actual;healthChanges.push({unit:u,before,after:u.soldiers});event.results.push({target:u.id,targetName:u.name,before,after:u.soldiers,actual,healing:true,raw:drain,amount:drain,factors:[],formula:'吸血回复'});}
+      const regen=Math.floor(u.maxSoldiers*(PASSIVES.statsFor(u,this.passives).actionRegen||0));if(regen>0&&u.soldiers>0){const result=this.healUnit(u,u,regen);event.results.push({target:u.id,targetName:u.name,...result,healing:true,raw:regen,amount:regen,formula:'行动回复'});healthChanges.push({unit:u,before:result.before,after:result.after});}
       const delay=this.config.skillDelays?.[skillId]??skill.cooldown??0;
       u.progress = 0;u.progressStamp=0;u.waitTime=0;u.lastSkillDelay=Number(delay)||0; u.ready = false; u.readyTick=null; u.interval = interval(this.effective(u), this.config, delay);
       event.skillDelay = Number(delay) || 0;
       event.nextInterval = u.interval;
       this.emit('action', event);for(const change of healthChanges)this.healthChanged(change.unit,change.before,change.after);for(const restored of restores)this.restoredHealth(restored);for(const target of dodged)this.reactions('dodge',target,u);if(skill.kind==='heal')for(const result of event.results)if(result.healing&&result.actual>0)this.healingPassives(u,this.unit(result.target));
       for(const reflect of reflections)if(!u.dead&&reflect.amount>0){const result=this.damageUnit(reflect.source,u,reflect.amount),{restored,...detail}=result;this.emit('action',{actor:reflect.source.id,actorName:reflect.source.name,side:reflect.source.side,skill:'status-reflect',skillName:'反伤',reaction:true,scope:'single',cost:0,results:[{target:u.id,targetName:u.name,...detail,damageType:'true',raw:reflect.amount,amount:reflect.amount,healing:false,factors:[],formula:'已承受伤害 × 反伤比例'}]});this.healthChanged(u,result.before,result.after);this.restoredHealth(restored);}
+      for(const counter of counters)if(u.soldiers>0&&counter.source.soldiers>0){const calc=physical({attacker:this.effective(counter.source),target:this.effective(u),skill:{kind:'physical',scaling:{war:counter.multiplier},weaponCoefficient:counter.multiplier}}),result=this.damageUnit(counter.source,u,calc.amount),{restored,...detail}=result;this.emit('action',{actor:counter.source.id,actorName:counter.source.name,side:counter.source.side,skill:'passive-counter',skillName:'以逸待劳',reaction:true,scope:'single',cost:0,results:[{target:u.id,targetName:u.name,...detail,...calc,healing:false}]});this.healthChanged(u,result.before,result.after);this.restoredHealth(restored);}
       this.checkEnd();
       return { ok: true };
     }
@@ -6232,7 +6267,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     }
     function resize(){const view=Viewport.resize(canvas,ctx);width=view.w;height=view.h;dpr=view.dpr;draw();}
     function destroy(){disposed=true;observer.disconnect();canvas.removeEventListener('pointerup',click);canvas.removeEventListener('keydown',key);}
-    async function run(){error=false;draw();try{await loader.preload(files,{onProgress:value=>{state=value;draw();}});}catch(cause){if(disposed)return;error=true;draw();console.error(cause);return;}if(disposed)return;destroy();onReady();}
+    async function run(){error=false;draw();try{await loader.preload(files,{onProgress:value=>{state=value;draw();}});if(!disposed&&root.WorldMapArt?.prepare&&root.WorldData){await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));if(!disposed)root.WorldMapArt.prepare(root.WorldData,loader.get);}}catch(cause){if(disposed)return;error=true;draw();console.error(cause);return;}if(disposed)return;destroy();onReady();}
     function click(event){if(!error)return;const {x,y}=Viewport.point(canvas.getBoundingClientRect(),event);if(x>=retry.x&&x<=retry.x+retry.w&&y>=retry.y&&y<=retry.y+retry.h)run();}
     function key(event){if(error&&event.key==='Enter'){event.preventDefault();run();}}
     const observer=new ResizeObserver(resize);observer.observe(canvas);canvas.addEventListener('pointerup',click);canvas.addEventListener('keydown',key);resize();run();return {destroy};
@@ -6379,9 +6414,9 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   const calculated=(value,formula)=>n(value)+(formula?'（'+formula+'）':'');
   function statusText(effect,actor){
     const s={...S.definitions[effect.id],...effect},name=s.name||effect.id;
-    const amount=Math.abs(Number(s.amount??((s.base||0)+(s.coefficient||0)*(actor[s.stat||'technique']??0)))),duration=s.duration?'，持续'+n(s.duration)+'秒':'',multipliers=Object.keys(attributes).filter(key=>s[key+'Multiplier']!==undefined);
+    const healingFactor=s.healing&&s.period?1+(actor.healingBonus||0):1,amount=Math.abs(Number(s.amount??((s.base||0)+(s.coefficient||0)*(actor[s.stat||'technique']??0))))*healingFactor,duration=s.duration?'，持续'+n(s.duration)+'秒':'',multipliers=Object.keys(attributes).filter(key=>s[key+'Multiplier']!==undefined);
     let detail='';
-    if(s.period)detail='每'+n(s.period)+'秒'+(s.healing?'回复':'损失')+calculated(Math.max(1,Math.floor(amount)),effectFormula(s))+'点生命';
+    if(s.period)detail='每'+n(s.period)+'秒'+(s.healing?'回复':'损失')+calculated(Math.max(1,Math.floor(amount)),healingFactor===1?effectFormula(s):'（'+(effectFormula(s)||n(amount/healingFactor))+'）×'+n(healingFactor))+'点生命';
     else if(s.stun)detail='使目标无法行动';
     else if(s.attribute)detail=(s.negative||s.amount<0?'减少':'提升')+'目标'+calculated(amount,effectFormula(s))+'点'+(attributes[s.attribute]||s.attribute);
     else if(multipliers.length)detail=multipliers.map(key=>{const value=s[key+'Multiplier'];return(value<1?'降低':'提升')+'目标'+n(Math.abs(value-1)*100)+'%'+attributes[key];}).join('，');
@@ -6389,7 +6424,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     return name+'：'+(detail||'附加此状态')+duration+'。';
   }
   function describe(b,u,skill){
-    const actor=b.effective(u),all=skill.scope==='all',heal=skill.kind==='heal',buff=skill.kind==='buff',role=buff?(skill.buff?.taunt?'嘲讽':skill.buff?.reflect||skill.buff?.reflectFormula?'反伤':skill.side==='enemy'?'削弱状态':'增益状态'):(all?'群体':'单体')+(heal?'治疗':skill.kind==='physical'?'物理伤害':'魔法伤害'),lines=[role];
+    const actor=b.effective(u),all=skill.scope==='all',heal=skill.kind==='heal',buff=skill.kind==='buff',role=buff?(skill.buff?.taunt?'嘲讽':skill.buff?.reflect||skill.buff?.reflectFormula?'反伤':skill.side==='enemy'?'削弱状态':'增益状态'):(all?'群体':'单体')+(heal?'治疗':skill.kind==='physical'?'物理伤害':'计策伤害'),lines=[role];
     const effects=[...(skill.effects||[])];
     if(skill.buff&&!skill.buff.taunt&&(skill.buff.attribute||skill.buff.reflect||skill.buff.reflectFormula||Object.keys(attributes).some(key=>skill.buff[key+'Multiplier']!==undefined)))effects.unshift(skill.buff);
     const target=skill.side==='self'?'自身':(skill.side==='enemy'?'敌方':'我方')+(all?'全体':'单体');
@@ -6397,7 +6432,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     if(buff)action='对'+target+'施放'+(skill.buff?.name||skill.name);
     else {
       const value=E.calculate({attacker:actor,target:{armor:0,resistance:0,species:'none'},skill}).amount;
-      const factor=heal?1:actor.damageMultiplier??1,formula=skillFormula(skill).replace('武器威力',actor.weaponPower!==undefined&&actor.weaponPower!==actor.attack?'武器威力×'+n(actor.weaponPower/Math.max(1,actor.attack)):'武器威力'),displayed=calculated(value,factor===1?formula:'（'+formula+'）×'+n(factor));action=heal?'为'+target+'回复'+displayed+'点生命':'对'+target+'造成'+displayed+'点'+(skill.kind==='physical'?'物理':'魔法')+'伤害';
+      const factor=heal?1+(actor.healingBonus||0):(1+(actor[skill.kind==='physical'?'physicalBonus':'tacticBonus']||0))*(actor.damageMultiplier??1),formula=skillFormula(skill).replace('武器威力',actor.weaponPower!==undefined&&actor.weaponPower!==actor.attack?'武器威力×'+n(actor.weaponPower/Math.max(1,actor.attack)):'武器威力'),displayed=calculated(value,factor===1?formula:'（'+formula+'）×'+n(factor));action=heal?'为'+target+'回复'+displayed+'点生命':'对'+target+'造成'+displayed+'点'+(skill.kind==='physical'?'物理':'计策')+'伤害';
     }
     const attached=effects.filter(e=>e.id!==skill.buff?.id).map(e=>(e.chance===undefined?'附加':n(e.chance*100)+'%几率附加')+(S.definitions[e.id]?.name||e.name||e.id));
     lines.push(action+(attached.length?'，'+attached.join('，'):'')+'。');
@@ -6600,7 +6635,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
       this.statusTextures||=new Map();const id=status.id;if(this.statusTextures.has(id))return this.statusTextures.get(id);
       const canvas=document.createElement('canvas');canvas.width=64;canvas.height=64;const c=canvas.getContext('2d'),base=root.BattleStatuses.definitions[id]||status;
       c.beginPath();c.roundRect(1,1,62,62,6);c.fillStyle='#10242bed';c.fill();c.strokeStyle=base.color||'#88a49b';c.lineWidth=2;c.stroke();
-      const painted=root.RpgIcons.draw(c,status.taunt?'taunt':id,3,3,58,{image:src=>this.image(src)});if(!painted)root.RpgIcons.draw(c,status.negative?'resistanceDown':'resistanceUp',3,3,58,{image:src=>this.image(src)});
+      const painted=root.RpgIcons.draw(c,status.taunt||status.shield?'taunt':id,3,3,58,{image:src=>this.image(src)});if(!painted)root.RpgIcons.draw(c,status.negative?'resistanceDown':'resistanceUp',3,3,58,{image:src=>this.image(src)});
       this.statusTextures.set(id,canvas);return canvas;
     }
     drawStatuses(u,r){
@@ -6635,7 +6670,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
       const all=skill.scope==='all';
       if(skill.kind==='heal')return all?'群体治疗':'单体治疗';
       if(skill.kind==='buff')return skill.buff?.taunt?'嘲讽':skill.buff?.reflect||skill.buff?.reflectFormula?'反伤':skill.side==='enemy'?(all?'群体削弱':'单体削弱'):skill.side==='self'?'自身增益':all?'群体增益':'单体增益';
-      return (all?'群体':'单体')+(skill.kind==='physical'?'物理伤害':'魔法伤害');
+      return (all?'群体':'单体')+(skill.kind==='physical'?'物理伤害':'计策伤害');
     }
     manualPauseEnabled(){return this.options?.manualPause!==false;}
     manualReadyActors(){return this.battle.units.filter(u=>u.side==='ally'&&u.soldiers>0&&u.mode==='manual'&&u.ready&&!u.queued&&!this.battle.stunned(u)&&u.skills.some(id=>{const skill=this.battle.skills[id];return skill&&this.battle.availableSp(u)>=skill.cost&&this.battle.targetPool(u,skill).length;})).sort((a,b)=>(a.readyTick??Infinity)-(b.readyTick??Infinity)||a.order-b.order);}
@@ -6821,7 +6856,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
       const notice=this.notice;if(!notice||notice.until<=now)return;
       if(notice.statusId){
         const current=this.battle.unit(notice.unitId)?.statuses.find(s=>s.id===notice.statusId),remaining=current?Math.max(0,Math.ceil(current.expiresAt-this.battle.time-1e-6)):0;
-        this.box(20,this.h/2-34,this.w-40,68,'#112d36f5','#728d8d');this.text(current?.name||notice.statusName,this.w/2,this.h/2-11,16,'#e8d7aa');this.text(`剩余${remaining}秒`,this.w/2,this.h/2+15,14,'#c5dade');
+        this.box(20,this.h/2-34,this.w-40,68,'#112d36f5','#728d8d');this.text(current?.name||notice.statusName,this.w/2,this.h/2-11,16,'#e8d7aa');this.text(current?.shield?`可吸收${Math.floor(current.amount)}点伤害`:`剩余${remaining}秒`,this.w/2,this.h/2+15,14,'#c5dade');
       }else {this.box(20,this.h/2-22,this.w-40,44,'#112d36f5','#728d8d');this.text(notice.text,this.w/2,this.h/2,14,'#e8d7aa');}
     }
     click(e){const r=this.canvas.getBoundingClientRect(),x=(e.clientX-r.left)*this.w/r.width,y=(e.clientY-r.top)*this.h/r.height;const hit=[...this.hits].reverse().find(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h);this.focus=-1;if(hit)hit.action?.();}
@@ -6929,7 +6964,7 @@ globalThis.PengpaiAssets={"background":"./assets/game/main-menu.webp","protagoni
     modalFrame(title,height){const w=Math.min(420,this.w-28),h=Math.min(this.h-28,height),x=(this.w-w)/2,y=(this.h-h)/2;this.ctx.fillStyle='#020d16bb';this.ctx.fillRect(0,0,this.w,this.h);this.box(x,y,w,h,'#0c1c24fa','#8e836c',6);this.hits=[];this.text(title,x+18,y+27,20,GOLD,'left',true);this.button('×',x+w-45,y+10,31,31,()=>{this.modal=null;},{plain:true});return{x,y,w,h};}
     drawModal(){const modal=this.modal;
       if(modal.type==='difficulty'){const f=this.modalFrame('选择难度',350),row=(f.h-76)/R.DIFFICULTIES.length;R.DIFFICULTIES.forEach((id,i)=>{const x=f.x+16,y=f.y+57+i*row,w=f.w-32,active=id.id===this.draft.difficulty;this.box(x,y,w,row-4,active?'#513b26db':'#102128df',active?GOLD:'#46534f');this.text(id.name,x+12,y+(row-4)*.31,16,active?GOLD:WHITE,'left',true);this.text('难度',x+12,y+(row-4)*.75,10,MUTED,'left');this.difficultyStars(id.stars,x+50+id.stars*19,y+(row-4)*.75);this.hits.push({x,y,w,h:row-4,label:`${id.name} 难度${id.stars}星`,action:()=>this.chooseDifficulty(id.id)});});return;}
-if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y=f.y+70;y=this.wrap('一场穿越三国的旅程。以生命交锋，以计策破局，亲历史书之外的乱世。',f.x+22,y,f.w-44,14,WHITE,26);y=this.wrap('人物与存档保存在当前浏览器。',f.x+22,y+18,f.w-44,12,MUTED,22);this.wrap('美术素材由 AI 生成。',f.x+22,y+8,f.w-44,12,MUTED,22);return;}
+if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y=f.y+70;y=this.wrap('一场意外把你带进了三国。熟悉的人物都在，发生的事却和史书不同。走访各地，结识同伴，一起想办法结束这场乱世。',f.x+22,y,f.w-44,14,WHITE,26);y=this.wrap('人物与存档保存在当前浏览器。',f.x+22,y+18,f.w-44,12,MUTED,22);this.wrap('美术素材由 AI 生成。',f.x+22,y+8,f.w-44,12,MUTED,22);return;}
       if(modal.type==='passive'){const p=R.PASSIVE_MAP[modal.id],q=R.QUALITIES[p.quality],f=this.modalFrame(p.name,218);this.text(`${q.name} · ${p.category} · 被动`,f.x+22,f.y+69,13,q.color,'left');this.wrap(p.description,f.x+22,f.y+107,f.w-44,15,WHITE,27);return;}
       if(modal.type==='settings'){const f=this.modalFrame('设置',365);for(const [i,[key,label]]of[['screenShake','屏幕震动'],['effects','战斗特效'],['manualPause','手动时停']].entries()){const y=f.y+66+i*57;this.text(label,f.x+22,y+16,15,WHITE,'left');this.button(this.settings[key]?'开启':'关闭',f.x+f.w-102,y,79,32,()=>{this.settings[key]=!this.settings[key];this.saveSettings();},{active:this.settings[key]});}const y=f.y+251;this.text('菜单字号',f.x+22,y+10,14,WHITE,'left');const choices=[['小',.9],['标准',1],['大',1.1]],bw=(f.w-56)/3;choices.forEach(([label,value],i)=>this.button(label,f.x+22+i*(bw+6),y+34,bw,34,()=>{this.settings.menuScale=value;this.saveSettings();},{active:this.settings.menuScale===value}));return;}
       if(modal.type==='save'){const f=this.modalFrame('选择存档位',340),slots=this.store.slots();slots.forEach((slot,i)=>{const y=f.y+62+i*79;this.box(f.x+17,y,f.w-34,65,'#14252a',slot?'#927954':'#586c60');this.text(slot?`存档${i+1} · ${slot.character.name}`:`存档${i+1} · 空`,f.x+34,y+21,16,slot?GOLD:WHITE,'left');this.text(slot?'选择后确认覆盖':'保存这段新旅程',f.x+34,y+45,11,MUTED,'left');this.hits.push({x:f.x+17,y,w:f.w-34,h:65,label:`存档${i+1}`,action:()=>{if(slot)this.modal={type:'overwrite',index:i,name:slot.character.name};else this.saveCharacter(i);}});});return;}
@@ -8586,8 +8621,6 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     character=G.characterAt(character);const stats=Object.fromEntries(R.ATTRIBUTES.map(([key])=>[key,E.attr(character.attributes?.[key])])),weapon=state.weapon?W.resolveWeapon(state.weapon):state.weaponType?{type:state.weaponType,name:D.weaponNames[state.weaponType],attack:10}:null;
     const unit={...character,id:'hero',name:character.name,...stats,level:character.level,weapon,weaponProficiencies:copy(character.weaponProficiencies||{}),equipment:copy(state.heroEquipment||{armor:{name:'布衣'}}),attack:weapon?10:0,armor:0,resistance:0,maxSoldiers:E.maxHealth(stats.constitution),skills:W.forWeapon(weapon),passives:[...(character.passives||[])],...safeObject(state.tactics?.hero)};
     Object.assign(unit,I.apply(unit));unit.condition=state.conditions?.hero;unit.dead=unit.condition==='dead';unit.startSoldiers=Math.max(0,Math.min(unit.maxSoldiers,Number(state.troops?.hero??unit.maxSoldiers)));unit.priorities=unit.priorities?.length&&unit.priorities.every(r=>unit.skills.includes(r.skill))?unit.priorities:W.prioritiesFor(unit.skills);
-    const effects=(character.passives||[]).map(id=>R.PASSIVE_MAP[id]?.effects||{});
-    for(const effect of effects){if(effect.guaranteedCritical)unit.guaranteedCritical=true;if(effect.ignoreArmor)unit.ignoreArmor=true;if(effect.physicalDodge)unit.dodge=(unit.dodge||0)+effect.physicalDodge;}
     if(root.PengpaiAssets?.protagonists[character.appearance]){const art=root.PengpaiAssets.protagonists[character.appearance];unit.fullbody={src:art.src};unit.portrait={src:art.src,crop:art.portrait};}
     return unit;
   }
@@ -8627,7 +8660,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
 
     const resumed=s.resolvedLeg;state.resolvedLeg=resumed&&resumed.from===state.nodeId&&neighbors(state.nodeId).includes(resumed.to)?{from:resumed.from,to:resumed.to}:null;
     const target=placeId(s.routeTarget);state.routeTarget=target!==state.nodeId&&shortestRoute(state.nodeId,target)?target:null;
-    state.troops.hero=Math.max(0,Math.min(E.maxHealth(character.attributes?.constitution),Number.isFinite(Number(state.troops.hero))?Number(state.troops.hero):E.maxHealth(character.attributes?.constitution)));return state;
+    const hero=heroUnit(character,state),max=hero.maxSoldiers;let health=Number(state.troops.hero);if(s.passiveEffectsVersion!==1&&Number.isFinite(health)&&max!==hero.baseMaxHealth)health=Math.floor(Math.max(0,Math.min(1,health/hero.baseMaxHealth))*max);state.passiveEffectsVersion=1;state.troops.hero=Math.max(0,Math.min(max,Number.isFinite(health)?health:max));return state;
   }
   class World{
     constructor(character,saved){this.character=X.normalizeRecord(G.normalizeCharacter(character));if(this.character.weaponCatalogVersion!==1){const C=node?require('./weapon-catalog.js'):root.WeaponCatalog,values={};for(const [id,value]of Object.entries(this.character.weaponProficiencies||{})){const key=C.legacyAliases[id]||id;values[key]=Math.max(values[key]||0,value);}this.character.weaponProficiencies=values;this.character.weaponCatalogVersion=1;}this.state=normalize(this.character,saved);this.syncCompanionLevels();if(this.state.weaponType&&!this.state.weapon)this.state.weapon=I.create('weapon-'+this.state.weaponType,'white','initial-weapon');this.pending=null;this.journey=this.state.resolvedLeg?{...this.state.resolvedLeg,checkpoint:this.snapshot(),event:{kind:'quiet'},checked:true}:null;this.lastReward=null;}
@@ -8740,8 +8773,8 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     }
     npcQuestIds(npc){const stage=this.state.quests.changshan.stage,ids=[...(npc.relatedQuests||[])];if(npc.role==='chapter')ids.push('chapter-one');if(npc.role==='court')ids.push('report-'+npc.country);if(npc.questId)ids.push(npc.questId);if(npc.heroQuest)for(const d of Object.values(H.definitions))if(H.place(d.id,this.state.heroQuests[d.id])===this.state.nodeId&&H.npc(d.id,this.state.heroQuests[d.id])?.id===npc.id)ids.push(d.id);for(const data of N.sideQuests)if(data.giver===npc.id)ids.push(data.id);if(npc.id==='zhaoyun'&&!['return','complete'].includes(stage)&&npc.role!=='companion'||npc.id==='changshan-elder'&&stage==='return'||npc.id==='grain-steward'&&stage==='supplies'||npc.id==='refugee-laborer'&&stage==='rescue')ids.push('changshan');return [...new Set(ids)];}
     npcQuestStatus(npc){const ids=this.npcQuestIds(npc),statuses=this.quests().filter(q=>ids.includes(q.id)).map(q=>q.taskStatus);return ['ready','available','active'].find(status=>statuses.includes(status))||null;}
-    questNpc(id){const listed=this.sceneNpcs().find(n=>this.npcQuestIds(n).includes(id));if(listed)return listed;const d=H.definitions[id],q=this.state.heroQuests[id];return d&&q&&this.heroQuestVisible(d,q)&&q.accepted&&H.place(id,q)===this.state.nodeId?H.npc(id,q):null;}
-    entryQuestNpc(){const npcs=this.sceneNpcs(),here=this.state.nodeId,currentTasks=new Set(this.questMarkers().filter(mark=>mark.place===here).map(mark=>mark.questId)),progress=new Map(),offers=new Map();for(const q of this.quests()){const npc=npcs.find(n=>this.npcQuestIds(n).includes(q.id))||this.questNpc(q.id);if(!npc)continue;if(q.taskStatus==='available')offers.set(q.id,npc);else if(q.taskStatus==='ready'||q.taskStatus==='active'&&currentTasks.has(q.id))progress.set(q.id,npc);}const candidates=progress.size?progress:offers;return candidates.size===1?[...candidates.values()][0]:null;}
+    questNpc(id){const d=H.definitions[id],q=this.state.heroQuests[id];if(d&&q&&this.heroQuestVisible(d,q)&&q.accepted&&H.place(id,q)===this.state.nodeId&&H.npc(id,q))return {...H.npc(id,q),selectedQuest:true};return this.sceneNpcs().find(n=>this.npcQuestIds(n).includes(id))||null;}
+    entryQuestNpc(){const npcs=this.sceneNpcs(),here=this.state.nodeId,currentTasks=new Set(this.questMarkers().filter(mark=>mark.place===here).map(mark=>mark.questId)),progress=new Map(),offers=new Map();for(const q of this.quests()){const npc=npcs.find(n=>this.npcQuestIds(n).includes(q.id))||this.questNpc(q.id);if(!npc)continue;if(q.taskStatus==='available')offers.set(q.id,npc);else if(q.taskStatus==='ready'||q.taskStatus==='active'&&currentTasks.has(q.id))progress.set(q.id,npc);}const candidates=progress.size?progress:offers;if(candidates.size!==1)return null;const [id,npc]=[...candidates][0];return H.definitions[id]?{...H.npc(id,this.state.heroQuests[id]),selectedQuest:true}:npc;}
     questDestination(){const q=this.state.quests.changshan;if(q.zhaoInvitation)return 'changshan';if(q.healerDecision)return 'zhongshan';if(q.stage==='complete'){const d=Object.values(H.definitions).find(d=>!['locked','complete'].includes(this.state.heroQuests[d.id].stage)&&this.state.heroQuests[d.id].accepted);return d?H.place(d.id,this.state.heroQuests[d.id]):null;}return {available:'changshan',entry:'changshan',supplies:'zhongshan',rescue:'zhongshan-county',escort:'changshan',return:'changshan',decision:'changshan'}[this.state.quests.changshan.stage]||null;}
     questMarkers(){
       const cacheKey=this.questStateKey()+'|'+this.state.nodeId;if(this.markerCache?.key===cacheKey)return this.markerCache.markers;const nearHere=new Set([this.state.nodeId,...neighbors(this.state.nodeId)]),markers=Object.values(H.definitions).filter(d=>this.heroQuestVisible(d)&&!['locked','complete'].includes(this.state.heroQuests[d.id].stage)&&(this.state.heroQuests[d.id].accepted||this.state.heroQuests[d.id].heard||nearHere.has(H.place(d.id,this.state.heroQuests[d.id])))).map(d=>({place:H.place(d.id,this.state.heroQuests[d.id]),questId:d.id,category:'story',title:d.title,accepted:!!this.state.heroQuests[d.id].accepted})),near=new Set([this.state.nodeId,...neighbors(this.state.nodeId)]),destination=this.questDestination(),started=this.state.quests.changshan.stage!=='available';
@@ -8924,7 +8957,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     saveTactics(unit){this.state.tactics[unit.id]={initialMode:unit.mode,priorities:copy(unit.priorities),targetRule:unit.targetRule};if(this.pending)this.pending.checkpoint.tactics=copy(this.state.tactics);if(this.journey)this.journey.checkpoint.tactics=copy(this.state.tactics);}
   }
   const clampTroops=(value,max)=>Math.max(0,Math.min(max,Number.isFinite(Number(value))?Number(value):max));
-  const heroPassives=()=>Object.fromEntries(R.PASSIVES.map(p=>[p.id,{id:p.id,name:p.name,quality:p.quality,description:p.description,stats:{dodgeBonus:p.effects?.dodgeBonus||0},triggers:[]}]));
+  const heroPassives=()=>Object.fromEntries(R.PASSIVES.map(p=>[p.id,(node?require('./passives.js'):root.BattlePassives).definitions[p.id]]));
   const api={World,normalize,neighbors,shortestRoute,heroUnit,heroPassives,countries};root.WorldModel=api;if(node)module.exports=api;
 })(globalThis);
 
@@ -8943,7 +8976,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  function character(){
   const p=this.panel,members=this.model.members(),u=p.unit||members.find(u=>u.id===p.unitId);
   if(!u){this.closeWorldPanel();return;}
-  const previewKey=JSON.stringify(u);if(p.previewKey!==previewKey){p.previewKey=previewKey;p.previewCache=this.memberPreview(u);}const preview=p.previewCache,actor=preview.unit(u.id),ids=actor.skills,passives=root.PengpaiRules.sortPassives(actor.passives,preview.passives),c=this.ctx;
+  const previewKey=JSON.stringify(u);if(p.previewKey!==previewKey){p.previewKey=previewKey;p.previewCache=this.memberPreview(u);}const preview=p.previewCache,actor=preview.unit(u.id),current=preview.effective(actor),ids=actor.skills,passives=root.PengpaiRules.sortPassives(actor.passives,preview.passives),c=this.ctx;
   const showPotential=!!u.potentials&&(!p.readonly||root.CharacterGrowth.isGeneral(u)),statsH=108,showExperience=members.some(member=>member.id===u.id);
   const compact=this.h<640,width=Math.min(560,this.w-16),inner=width-28,headerH=compact?44:48,skillSize=compact?48:52,skillRowH=compact?60:64,footerH=compact?42:46,barH=showExperience?(compact?32:36):17,skillCols=Math.min(3,Math.max(1,ids.length)),skillRows=Math.ceil(ids.length/skillCols),passiveCols=4,passiveRows=Math.ceil(passives.length/passiveCols);
   const fixed=headerH+skillRows*skillRowH+passiveRows*24+statsH+4+barH+footerH,modelH=clamp(Math.min(440,inner*1.18,this.h-16-fixed),180,440),contentH=modelH+skillRows*skillRowH+passiveRows*24+statsH+4+barH;
@@ -8973,7 +9006,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   y+=passiveRows*24;
   const gap=12,cw=(inner-gap)/2,pairs=[['war','武力','constitution','体质'],['intelligence','智力','armor','护甲'],['technique','技巧','resistance','抗性'],['speed','速度',...(u.statusImmunities?.includes('stun')?['stunProtection','抗晕']:[])]];
   this.box(left,y,inner,statsH,'#091d26','#37545e',3);
-  pairs.forEach((row,i)=>{const yy=y+i*27+13.5;for(let col=0;col<row.length/2;col++){const x=left+col*(cw+gap),key=row[col*2],label=row[col*2+1],potential=showPotential?u.potentials?.[key]:null;if(potential!=null){this.text(label+' '+u[key],x+6,yy,14,'#eddfc0');this.text(potential+'(+'+Number(root.CharacterGrowth.growthPerLevel(potential).toFixed(2))+')',x+cw-6,yy,14,'#d6bb8b','right');}else{this.text(label,x+6,yy,14,'#a9bec3');this.text(key==='stunProtection'?'抵抗':u[key],x+cw-6,yy,16,'#eddfc0','right');}}});
+  pairs.forEach((row,i)=>{const yy=y+i*27+13.5;for(let col=0;col<row.length/2;col++){const x=left+col*(cw+gap),key=row[col*2],label=row[col*2+1],potential=showPotential?u.potentials?.[key]:null;if(potential!=null){this.text(label+' '+Number(current[key].toFixed(2)),x+6,yy,14,'#eddfc0');this.text(potential+'(+'+Number(root.CharacterGrowth.growthPerLevel(potential).toFixed(2))+')',x+cw-6,yy,14,'#d6bb8b','right');}else{this.text(label,x+6,yy,14,'#a9bec3');this.text(key==='stunProtection'?'抵抗':Number(current[key].toFixed(2)),x+cw-6,yy,16,'#eddfc0','right');}}});
   y+=statsH+4;const hp=u.startSoldiers??u.soldiers??u.maxSoldiers;bar(this,left,y,inner,17,hp/u.maxSoldiers,'#ba222c');this.text(u.dead?'濒死':hp===0?'重伤':hp+' / '+u.maxSoldiers,f.x+f.w/2,y+8.5,14,'#fff0e5','center');
   if(showExperience){y+=compact?19:20;const required=X.required(u.level);bar(this,left,y,inner,13,required===Infinity?1:(u.experience||0)/required,'#b39751');this.text((u.experience||0)+' / '+(required===Infinity?'—':required),f.x+f.w/2,y+6.5,14,'#f4e2b7','center');}
   c.restore();this.hits=this.hits.filter((hit,i)=>i<headerHits||hit.y>=top&&hit.y+hit.h<=bottom);
@@ -8984,15 +9017,15 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  }
  function details(){
   const p=this.panel,u=p.unit||this.model.members().find(u=>u.id===p.unitId);if(!u){this.closeWorldPanel();return;}
-  const showPotential=!p.readonly||root.CharacterGrowth.isGeneral(u);
+  const previewKey=JSON.stringify(u);if(p.previewKey!==previewKey){p.previewKey=previewKey;p.previewCache=this.memberPreview(u);}const current=p.previewCache.effective(p.previewCache.unit(u.id)),showPotential=!p.readonly||root.CharacterGrowth.isGeneral(u);
   const groups=C.groupedTypes(),columns=Math.min(3,Math.max(2,Math.floor((Math.min(460,this.w-28)-32)/100))),canLeave=!p.readonly&&u.id!=='hero'&&!u.guest,contentH=28+root.PengpaiRules.ATTRIBUTES.length*30+12+24+60+12+24+groups.reduce((n,g)=>n+28+Math.ceil(g.types.length/columns)*38+12,0);
   const f=this.frame(u.name+' · 详细属性',58+contentH+(canLeave?54:18)),left=f.x+20,w=f.w-40,top=f.y+58,bottom=f.y+f.h-(canLeave?54:18),c=this.ctx;
   p.maxScroll=Math.max(0,contentH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);let y=top-p.scroll;const beforeHits=this.hits.length;
   c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
   this.text('属性',left,y+10,14,'#aec5ce');this.text('当前',left+w*(showPotential ? .58 : 1),y+10,14,'#aec5ce','right');if(showPotential)this.text('潜力(每级)',left+w,y+10,14,'#d6bb8b','right');y+=28;
-  for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.box(left,y,w,27,'#15313b',null);this.text(label,left+8,y+13.5,14);this.text(u[key],left+w*(showPotential ? .58 : 1)-(showPotential?0:8),y+13.5,16,'#f4e0b3','right');if(showPotential)this.text(u.potentials?.[key]!=null?u.potentials[key]+'('+Number(root.CharacterGrowth.growthPerLevel(u.potentials[key]).toFixed(2))+')':'—',left+w-8,y+13.5,14,'#d6bb8b','right');y+=30;}
+  for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.box(left,y,w,27,'#15313b',null);this.text(label,left+8,y+13.5,14);this.text(Number(current[key].toFixed(2)),left+w*(showPotential ? .58 : 1)-(showPotential?0:8),y+13.5,16,'#f4e0b3','right');if(showPotential)this.text(u.potentials?.[key]!=null?u.potentials[key]+'('+Number(root.CharacterGrowth.growthPerLevel(u.potentials[key]).toFixed(2))+')':'—',left+w-8,y+13.5,14,'#d6bb8b','right');y+=30;}
   y+=12;this.text('防护',left,y+10,14,'#aec5ce');this.text('当前',left+w*.58,y+10,14,'#aec5ce','right');this.text('对应减伤',left+w,y+10,14,'#aec5ce','right');y+=24;
-  for(const [label,value,kind]of [['护甲',u.armor,'物理'],['抗性',u.resistance,'计策']]){
+  for(const [label,value,kind]of [['护甲',current.armor,'物理'],['抗性',current.resistance,'计策']]){
    const percent=((1-E.mitigation(value))*100).toFixed(2).replace(/\.?0+$/,'');
    this.box(left,y,w,27,'#15313b',null);this.text(label,left+8,y+13.5,14,'#b8cbd0');this.text(value,left+w*.58,y+13.5,16,'#f4e0b3','right');this.text(kind+' '+percent+'%',left+w-8,y+13.5,14,'#e0cf9f','right');y+=30;
   }
@@ -9167,11 +9200,11 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
 <script>
 (function(root){
  'use strict';
- const textureSource='./assets/map/terrain-v1.webp',buildingSource='./assets/map/settlements-v1.webp';
+ const textureSource='./assets/map/terrain-v1.webp',buildingSource='./assets/map/settlements-v1.webp';let sharedTerrain=null;
  function texture(atlas,index,size=512){const tile=document.createElement('canvas');tile.width=tile.height=size;const c=tile.getContext('2d'),half=size/2;for(let row=0;row<2;row++)for(let col=0;col<2;col++){c.save();c.translate(col?size:0,row?size:0);c.scale(col?-1:1,row?-1:1);c.drawImage(atlas,index%3*atlas.naturalWidth/3,Math.floor(index/3)*atlas.naturalHeight/2,atlas.naturalWidth/3,atlas.naturalHeight/2,0,0,half,half);c.restore();}return tile;}
  function ocean(view,region={x:0,y:0,w:view.w,h:view.h}){const atlas=view.image(textureSource),c=view.ctx;if(!atlas)return;c.save();const tile=view.oceanTile||(view.oceanTile=texture(atlas,5)),origin=view.screen({x:0,y:0});c.translate(origin.x,origin.y);c.scale(view.zoom,view.zoom);c.fillStyle=c.createPattern(tile,'repeat');c.fillRect((region.x-origin.x)/view.zoom,(region.y-origin.y)/view.zoom,region.w/view.zoom,region.h/view.zoom);c.restore();}
  function terrain(view,D){
-  if(view.terrainCache)return view.terrainCache;const atlas=view.image(textureSource),scale=D.geography.rasterScale,canvas=document.createElement('canvas');canvas.width=D.bounds.width*scale;canvas.height=D.bounds.height*scale;const c=canvas.getContext('2d');c.scale(scale,scale);
+  if(view.terrainCache)return view.terrainCache;const atlas=view.image(textureSource),scale=D.geography.rasterScale;if(sharedTerrain?.data===D&&sharedTerrain.atlas===atlas)return view.terrainCache=sharedTerrain.canvas;const canvas=document.createElement('canvas');canvas.width=D.bounds.width*scale;canvas.height=D.bounds.height*scale;const c=canvas.getContext('2d');c.scale(scale,scale);
   if(!atlas){c.fillStyle='#345f62';c.fillRect(0,0,D.bounds.width,D.bounds.height);return canvas;}
   const tiles=Array.from({length:6},(_,i)=>texture(atlas,i)),patterns=tiles.map(t=>c.createPattern(t,'repeat')),land=()=>{c.beginPath();for(const mass of D.geography.landmasses){mass.points.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.closePath();}};
   c.fillStyle=patterns[5];c.fillRect(0,0,D.bounds.width,D.bounds.height);
@@ -9184,18 +9217,24 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   patch(1,107,26,800,.65);patch(1,115,27,1000,.7);patch(1,121,30,600,.5);patch(1,128,39,600,.6);patch(1,135,35,850,.65);patch(1,140,39,800,.7);
   patch(3,115,46,1200);patch(3,124,45,900);patch(3,143,44,650,.8);
   for(const river of D.geography.rivers){const points=river.points.map(p=>D.geography.project(...p));c.beginPath();points.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.lineJoin=c.lineCap='round';c.save();c.shadowBlur=5;c.shadowColor='#182d28';c.strokeStyle='#777e5b90';c.lineWidth=river.name==='Yangtze'?9:6;c.stroke();c.restore();c.strokeStyle='#527d7e';c.lineWidth=river.name==='Yangtze'?4.5:2.5;c.stroke();}
-  c.restore();view.terrainCache=canvas;return canvas;
+  c.restore();sharedTerrain={data:D,atlas,canvas};view.terrainCache=canvas;return canvas;
  }
  function settlement(view,node,p,{current,selected,available,suggested,size=36}){
   const c=view.ctx,img=view.image(buildingSource),index=node.kind==='city'?0:node.kind==='camp'?3:node.kind==='pass'?4:node.kind==='port'?5:node.kind==='village'?2:1,x=p.x-size/2,y=p.y-size;
   if(current||selected||available){c.save();const g=c.createRadialGradient(p.x,p.y-3,0,p.x,p.y-3,size*.7);g.addColorStop(0,current?'#ffda7c80':selected?'#d0b5ed80':'#f8e2a94d');g.addColorStop(1,'#ffda7c00');c.fillStyle=g;c.fillRect(x-size*.25,y-size*.1,size*1.5,size*1.5);c.restore();}
-  if(img)c.drawImage(img,index%4*img.naturalWidth/4,Math.floor(index/4)*img.naturalHeight/2,img.naturalWidth/4,img.naturalHeight/2,x,y,size,size);
+  if(img){
+   // 建筑图集只缩放一次；拖动地图时直接复用对应尺寸的贴图。
+   const dpr=view.dpr||1,key=[index,size,dpr].join('|');view.settlementSprites||=new Map();let sprite=view.settlementSprites.get(key);
+   if(!sprite){sprite=document.createElement('canvas');sprite.width=sprite.height=Math.max(1,Math.ceil(size*dpr));const sc=sprite.getContext('2d');sc.imageSmoothingQuality='high';sc.drawImage(img,index%4*img.naturalWidth/4,Math.floor(index/4)*img.naturalHeight/2,img.naturalWidth/4,img.naturalHeight/2,0,0,sprite.width,sprite.height);if(view.settlementSprites.size>=64)view.settlementSprites.delete(view.settlementSprites.keys().next().value);view.settlementSprites.set(key,sprite);}
+   c.drawImage(sprite,x,y,size,size);
+  }
  }
  function locator(view,p,now){
   if(!view.locatorSprite){const canvas=document.createElement('canvas');canvas.width=160;canvas.height=176;const c=canvas.getContext('2d');c.scale(2,2);c.translate(40,72);const glow=c.createRadialGradient(0,0,2,0,0,30);glow.addColorStop(0,'#ffe2a075');glow.addColorStop(1,'#ffe2a000');c.fillStyle=glow;c.fillRect(-32,-32,64,64);c.strokeStyle='#172b2b';c.lineWidth=5;c.beginPath();c.ellipse(0,0,24,9,0,0,Math.PI*2);c.stroke();c.strokeStyle='#f9d886';c.lineWidth=2;c.stroke();c.strokeStyle='#fff0b9';c.lineWidth=1;c.beginPath();c.ellipse(0,0,18,6,0,0,Math.PI*2);c.stroke();for(const angle of [0,Math.PI/2,Math.PI,Math.PI*1.5]){c.beginPath();c.moveTo(Math.cos(angle)*25,Math.sin(angle)*9);c.lineTo(Math.cos(angle)*30,Math.sin(angle)*12);c.stroke();}c.translate(0,-64);c.shadowColor='#fff0aa';c.shadowBlur=8;c.fillStyle='#ffe3a0';c.strokeStyle='#122b31';c.lineWidth=2;c.beginPath();c.moveTo(0,8);c.lineTo(-8,-3);c.lineTo(0,0);c.lineTo(8,-3);c.closePath();c.fill();c.stroke();view.locatorSprite=canvas;}
   const c=view.ctx;c.save();c.globalAlpha=.82+.15*Math.sin(now*.003);c.drawImage(view.locatorSprite,p.x-40,p.y-72,80,88);c.restore();
  }
- const api={textureSource,buildingSource,terrain,settlement,ocean,locator};root.WorldMapArt=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+ const prepare=(data,image)=>terrain({image},data);
+ const api={textureSource,buildingSource,terrain,prepare,settlement,ocean,locator};root.WorldMapArt=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
 
 </script>
@@ -9280,8 +9319,8 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
       const talks=this.model.state.npcTalks[npc.id]||0;this.model.state.npcTalks[npc.id]=talks+1;const choices=[];
       if(npc.role==='healer'){const service=N.services.healing;choices.push({label:'疗伤 · '+service.price+service.currency,action:()=>{if(this.model.state.money>=service.price){this.model.state.money-=service.price;this.model.rest();this.save();this.speak(npc,{lines:['伤口都清理好了，你慢慢站起来试试。今天先别跑得太急，刚包扎的地方很容易又裂开，实在不舒服就回来找我。']});}else this.notify('铜钱不够，可以回黄巾营地找张宝治疗。');}});}
       if(npc.role==='merchant')for(const mode of ['buy','sell'])choices.push({label:mode==='buy'?'购买':'出售',action:()=>{this.dialogue=null;this.panel={type:'shop',shopMode:mode,scroll:0};}});
-      for(const data of N.sideQuests.filter(t=>t.giver===npc.id)){const side=this.model.state.quests.side[data.id];if(!side.accepted)choices.push({label:'委托 · '+data.title,action:()=>{this.model.acceptSide(data.id);this.save();this.speak(npc,{lines:[data.accept+' 他们就在'+D.placeMap[data.place].name+'那边。']});}});else if(side.wins<data.rounds)choices.push({label:'询问'+data.title,action:()=>this.speak(npc,{lines:['他们还在'+D.placeMap[data.place].name+'那边。到了以后找找拦路的那伙人，把路上的麻烦处理好，再回来跟我说一声，我也好通知大家可以走了。']})});else if(!side.paid)choices.push({label:'交付委托',action:()=>{const reward=this.model.turnInSide(data.id);if(reward){this.dialogue=null;this.save();this.showReward(reward);}}});else choices.push({label:'聊聊近况',action:()=>this.speak(npc,{lines:['这几天已经有人敢出门做事了，前阵子可是谁都不放心。你们替大家清了路，乡亲们一直惦记着这件事。']})});}
-      if(choices.length)choices.push({label:'聊聊近况',action:()=>this.speak(npc,{lines:[lines[(talks+1)%lines.length]]})},{label:'告辞',action:()=>this.closeDialogue()});
+      for(const data of N.sideQuests.filter(t=>t.giver===npc.id)){const side=this.model.state.quests.side[data.id];if(!side.accepted)choices.push({label:'委托 · '+data.title,action:()=>{this.model.acceptSide(data.id);this.save();this.speak(npc,{lines:[data.accept+' 他们就在'+D.placeMap[data.place].name+'那边。']});}});else if(side.wins<data.rounds)choices.push({label:'询问'+data.title,action:()=>this.speak(npc,{lines:['他们还在'+D.placeMap[data.place].name+'那边。到了以后找找拦路的那伙人，把路上的麻烦处理好，再回来跟我说一声，我也好通知大家可以走了。']})});else if(!side.paid)choices.push({label:'交付委托',action:()=>{const reward=this.model.turnInSide(data.id);if(reward){this.dialogue=null;this.save();this.showReward(reward);}}});else if(!choices.some(c=>c.label==='聊聊近况'))choices.push({label:'聊聊近况',action:()=>this.speak(npc,{lines:['这几天已经有人敢出门做事了，前阵子可是谁都不放心。你们替大家清了路，乡亲们一直惦记着这件事。']})});}
+      if(choices.length){if(!choices.some(c=>c.label==='聊聊近况'))choices.push({label:'聊聊近况',action:()=>this.speak(npc,{lines:[lines[(talks+1)%lines.length]]})});choices.push({label:'告辞',action:()=>this.closeDialogue()});}
       this.save();this.speak(npc,{lines:[lines[talks%lines.length]],choices:choices.length?choices:undefined});return true;
     }
     image(src){return root.GameAssetLoader?.get(src)||null;}
@@ -9356,7 +9395,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
         const pad=192,anchor=this.mapAnchor(),key=JSON.stringify([this.w,this.h,this.dpr,this.zoom,anchor.x,anchor.y,this.model.state.nodeId,this.selected,this.model.state.routeTarget,marks.map(m=>[m.place,m.taskStatus])]);
         let layer=this.mapLayer,dx=layer?(layer.camera.x-this.camera.x)*this.zoom:0,dy=layer?(layer.camera.y-this.camera.y)*this.zoom:0;
         if(!layer||layer.key!==key||Math.abs(dx)>pad-48||Math.abs(dy)>pad-48){
-          const canvas=layer?.canvas||document.createElement('canvas'),w=this.w+pad*2,h=this.h+pad*2,dpr=this.dpr||1;canvas.width=Math.ceil(w*dpr);canvas.height=Math.ceil(h*dpr);const lc=canvas.getContext('2d');lc.setTransform(dpr,0,0,dpr,pad*dpr,pad*dpr);const previous=this.ctx;this.ctx=lc;
+          const canvas=layer?.canvas||document.createElement('canvas'),w=this.w+pad*2,h=this.h+pad*2,dpr=this.dpr||1,pw=Math.ceil(w*dpr),ph=Math.ceil(h*dpr);if(canvas.width!==pw||canvas.height!==ph){canvas.width=pw;canvas.height=ph;}const lc=canvas.getContext('2d');lc.setTransform(1,0,0,1,0,0);lc.clearRect(0,0,pw,ph);lc.setTransform(dpr,0,0,dpr,pad*dpr,pad*dpr);const previous=this.ctx;this.ctx=lc;
           try{entries=this.drawMapRegion({x:-pad,y:-pad,w,h},marks);}finally{this.ctx=previous;}
           layer=this.mapLayer={canvas,key,camera:{...this.camera},entries,w,h};this.mapLayerBuilds=(this.mapLayerBuilds||0)+1;dx=dy=0;
         }
@@ -9438,7 +9477,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     }
     tryEnter(){
       if(this.battle||this.dialogue)return;
-      if(this.model.enter()){this.dialogue=null;this.selected=null;this.save();if(this.model.state.nodeId==='changshan'&&['available','entry'].includes(this.model.state.quests.changshan.stage))this.startChangshanArrival();else if(this.model.state.nodeId==='changshan'&&this.model.state.quests.changshan.stage==='escort')this.startEscortArrival();else if(!this.resumeForcedHeroScene()){const npc=this.model.entryQuestNpc();if(npc)this.interact(npc);}return;}
+      if(this.model.enter()){this.dialogue=null;this.selected=null;this.save();if(this.model.state.nodeId==='changshan'&&['available','entry'].includes(this.model.state.quests.changshan.stage))this.startChangshanArrival();else if(this.model.state.nodeId==='changshan'&&this.model.state.quests.changshan.stage==='escort')this.startEscortArrival();else if(!this.resumeForcedHeroScene()){const npc=this.model.entryQuestNpc();if(npc)this.interact(npc.heroQuest?{...npc,selectedQuest:true}:npc);}return;}
       const node=this.model.location(),text=node.kind==='village'?'村里正在查问外来的人，今天不许进去。你们先到路边等着，别把门口堵住，有了吩咐再说。':'你们有通行文书吗？没有就先退开，现在不放人进城。别一直站在这里，再拦着路，我就叫人把你们赶出去。';this.speak(D.gateGuard,{lines:[text]});
     }
     questDialogue(npc){
@@ -9530,7 +9569,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
         if(!ruler.ready){this.speak(npc,{lines:ruler.before,choices:[{label:'我再去打听人选',action:()=>this.courtDialogue(npc)}]});return;}
         const q=this.model.state.heroQuests[ruler.id];q.accepted=true;this.save();const at=root.HeroQuests.place(ruler.id,q);if(at===this.model.state.nodeId)this.heroQuestDialogue({...root.HeroQuests.npc(ruler.id,q),selectedQuest:true});else this.speak(npc,{lines:['你们上次说的事，我已经让人去安排了。眼下的线索还在'+D.placeMap[at].name+'，先去那里看看。要是路上受了伤，就回来歇一歇，不必硬撑着赶路。'],choices:[{label:'那我们先去看看',action:()=>this.closeDialogue()}]});
       }});
-      if(topics.length)choices.push({label:'商议要事',action:()=>this.speak(npc,{lines:['这几件事情，你们想先了解哪一件？我把知道的情况都告诉你们。'],choices:[...topics,{label:'告辞',dismiss:true,action:()=>this.closeDialogue()}]})});
+      if(topics.length)choices.unshift(...topics);
       if(this.model.state.residents[npc.id])choices.push({label:'请你同行',action:()=>{if(this.model.inviteResident(npc.id)){this.save();this.closeDialogue();}else this.notify(this.model.lastRecruitError);}});
       choices.push({label:'打听消息',action:()=>{const rumor=this.model.nearbyRumor();if(rumor)this.model.hearRumor(rumor.id);this.save();this.speak(npc,{lines:rumor?[rumor.text]:['最近还没有收到新的消息。你们要是准备出门，可以去附近的村子多问问，过路的人常在那里歇脚，说不定有人知道。']});}},{label:'告辞',dismiss:true,action:()=>this.closeDialogue()});
       this.save();this.speak(npc,{lines,choices});
