@@ -23,7 +23,7 @@ test('致命物理和计策飘字显示减伤后完整伤害，扣兵和统计�
   for(const skill of ['spear-cut','staff-shock']){const b=make(),a=b.unit('a'),e=b.unit('e');e.soldiers=2;b.start();ready(a);b.act(a.id,skill,e.id);const r=b.events.find(e=>e.type==='action').results[0];assert.ok(r.amount>2);assert.equal(r.actual,2);assert.equal(e.soldiers,0);assert.equal(a.stats.damage,2);assert.equal(e.stats.received,2);assert.equal(floatsFor(b)[0].text,'−'+r.amount);}
 });
 test('吸血按命中后的完整伤害计算，敌人残血不削减吸血，回复受最大兵力限制',()=>{
-  for(const missing of [200,1]){const b=make(),a=b.unit('a'),e=b.unit('e');a.soldiers=a.maxSoldiers-missing;e.soldiers=2;b.skills['spear-cut'].lifesteal=.5;b.start();ready(a);const before=a.soldiers;b.act(a.id,'spear-cut',e.id);const [hit,heal]=b.events.find(e=>e.type==='action').results;assert.equal(hit.actual,2);assert.ok(hit.amount>2);assert.equal(heal.amount,Math.floor(hit.amount*.5));assert.equal(heal.actual,Math.min(missing,heal.amount));assert.equal(a.soldiers,before+heal.actual);assert.equal(floatsFor(b).find(f=>f.id===a.id).text,'+'+heal.actual);}
+  for(const missing of [200,1]){const b=make(),a=b.unit('a'),e=b.unit('e');a.soldiers=a.maxSoldiers-missing;e.soldiers=2;b.skills['spear-cut'].lifesteal=.5;b.start();ready(a);const before=a.soldiers;b.act(a.id,'spear-cut',e.id);const [hit,heal]=b.events.find(e=>e.type==='action').results;assert.equal(hit.actual,2);assert.ok(hit.amount>2);assert.equal(heal.amount,Math.floor(hit.amount*.5));assert.equal(heal.actual,Math.min(missing,heal.amount));assert.equal(a.soldiers,before+heal.actual);assert.equal(floatsFor(b).find(f=>f.id===a.id).text,'+'+heal.amount);}
   const b=make(),a=b.unit('a');a.soldiers=800;b.unit('e').dodge=1;b.skills['spear-cut'].lifesteal=.5;b.start();ready(a);b.act(a.id,'spear-cut','e');assert.equal(a.soldiers,800);assert.equal(b.events.find(e=>e.type==='action').results.length,1);
 });
 test('持续伤害、闪避电击和真实反伤在致命时同样保留完整伤害飘字',()=>{
@@ -38,3 +38,8 @@ test('持续伤害只更新生命与飘字，不产生受击、施法、闪红�
 test('我方受击未命中显示闪避，敌方受击未命中显示未命中，不改变底层闪避判定',()=>{
  const b=make();b.start();for(const [target,miss]of [['a','未命中'],['a','闪避'],['e','未命中'],['e','闪避']])b.events.push({type:'action',actor:target==='a'?'e':'a',skill:'spear-cut',skillName:'直刺',results:[{target,miss,actual:0}]});const v={battle:b,seen:0,floats:[],options:{},ended:false,vfx:{action(){}},health:new Map()};CanvasBattle.prototype.processEvents.call(v,100);assert.deepEqual(v.floats.filter(f=>f.type!=='skill').map(f=>f.text),['闪避','闪避','未命中','未命中']);
 });
+
+test('满血及部分溢出的单体、群体治疗都显示完整治疗量，实际回复与统计仍封顶',()=>{
+ for(const id of ['needle-heal','fan-rain'])for(const missing of [0,2]){const b=make(),a=b.unit('a');a.skills=[id];b.start();a.soldiers-=missing;ready(a);assert.ok(b.act(a.id,id,a.id).ok);const r=b.events.find(e=>e.type==='action').results.find(r=>r.target===a.id);assert.ok(r.amount>missing);assert.equal(r.actual,missing);assert.equal(a.stats.healing,missing);assert.equal(a.soldiers,a.maxSoldiers);assert.equal(floatsFor(b).find(f=>f.id===a.id).text,'+'+r.amount);}
+});
+test('满血的持续治疗仍显示每跳治疗量，零有效回复不计入治疗统计',()=>{const b=make(),a=b.unit('a');b.start();b.addStatus(a,a,{id:'regeneration',amount:20,duration:3});b.advance(1);const event=b.events.find(e=>e.periodic),r=event.results[0];assert.equal(r.amount,20);assert.equal(r.actual,0);assert.equal(a.soldiers,a.maxSoldiers);assert.equal(a.stats.healing,0);assert.equal(floatsFor(b).find(f=>f.id===a.id).text,'+20');});

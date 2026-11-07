@@ -6,6 +6,7 @@
     'thunder-renewal':{id:'thunder-renewal',name:'雷公助我',scope:'single',kind:'heal',cost:0,side:'self',reactionOnly:true}
   };
   const definitions={
+    'enemy-stun-resistance':{id:'enemy-stun-resistance',name:'眩晕抵抗',quality:'white',enemyOnly:true,temporary:true,description:'免疫眩晕。',stats:{},triggers:[]},
     'xuchu-tiger':{id:'xuchu-tiger',name:'虎痴悍勇',quality:'gold',description:'物理伤害提高12%。',stats:{physicalBonus:.12},triggers:[]},
     'dianwei-guard':{id:'dianwei-guard',name:'恶来护主',quality:'gold',description:'受到的物理伤害减少12%。',stats:{physicalReduction:.12},triggers:[]},
     'huangzhong-veteran':{id:'huangzhong-veteran',name:'老当益壮',quality:'gold',description:'物理伤害提高12%。',stats:{physicalBonus:.12},triggers:[]},
@@ -98,7 +99,7 @@
   };
   for(const [hero,rows]of Object.entries(additions))for(const [suffix,name,quality,description,stats]of rows){const id=hero+'-'+suffix;definitions[id]={id,name,quality,description,stats,triggers:[]};}
   function forUnit(unit){
-    const existing=Array.isArray(unit.passives)?unit.passives:[];
+    const existing=Array.isArray(unit.passives)?unit.passives.filter(id=>!definitions[id]?.enemyOnly||unit.side==='enemy'):[];
     // 教学专用的不败版本不叠加正式英雄天赋，避免改变新手战的节奏。
     if(existing.some(id=>definitions[id]?.tutorialOnly))return [...new Set(existing)];
     return [...new Set([...existing,...(heroDefaults[unit.characterId||unit.id]||[])])];

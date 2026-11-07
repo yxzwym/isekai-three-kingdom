@@ -6,6 +6,7 @@
   const clamp = (n,a,b) => Math.max(a,Math.min(b,n));
   const clock = time => `${String(Math.floor(time/60)).padStart(2,'0')}:${String(Math.floor(time%60)).padStart(2,'0')}`;
   const Presentation=typeof module!=='undefined'&&module.exports?require('./presentation.js'):root.BattlePresentation;
+  const Scenes=typeof module!=='undefined'&&module.exports?require('./battle-scenes.js'):root.BattleScenes;
   const number=Presentation.formatNumber;
   function fitImage(sourceWidth,sourceHeight,box) {
     const scale=Math.min(box.w/sourceWidth,box.h/sourceHeight);
@@ -19,9 +20,9 @@
     const rects=[],gap=3,groupWidth=Math.min(width-12,640);
     const indices=formation?[...(formation.back||[]),...(formation.front||[])]:[];
     const validFormation=indices.length===enemies&&new Set(indices).size===enemies&&indices.every(i=>Number.isInteger(i)&&i>=0&&i<enemies);
-    if(!validFormation&&enemies>=4&&enemies<=6){const split=Math.floor(enemies/2);formation={back:Array.from({length:split},(_,i)=>i),front:Array.from({length:enemies-split},(_,i)=>i+split)};}
+    if(!validFormation)formation=Scenes.defaultFormation(enemies);
     for(const [side,count]of[['ally',allies],['enemy',enemies]]){
-      if(!count)continue;const columns=side==='ally'?allyColumns:Math.min(3,count),cardWidth=((side==='ally'?Math.min(width-32,640):groupWidth)-gap*(columns-1))/columns,rows=Math.ceil(count/columns),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),startEnemy=enemies===1?Math.min(110,height*.13):enemies<=3?Math.min(76,height*.13):Math.min(170,height*.22),partyRatio=height<650&&height>width&&rows===1?.23:.33,ch=side==='ally'?Math.min((height*partyRatio-gap*(rows-1))/rows,cardWidth*440/256+54):Math.max(30,Math.min((allyTop-112-startEnemy-gap*(rows-1))/rows,cardWidth*440/256+90)),start=side==='ally'?height-14-rows*ch-gap*(rows-1):startEnemy;
+      if(!count)continue;const columns=side==='ally'?allyColumns:count===4?4:Math.min(3,count),cardWidth=((side==='ally'?Math.min(width-32,640):groupWidth)-gap*(columns-1))/columns,rows=Math.ceil(count/columns),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),startEnemy=enemies===1?Math.min(110,height*.13):enemies<=3?Math.min(76,height*.13):Math.min(170,height*.22),partyRatio=height<650&&height>width&&rows===1?.23:.33,ch=side==='ally'?Math.min((height*partyRatio-gap*(rows-1))/rows,cardWidth*440/256+54):Math.max(30,Math.min((allyTop-112-startEnemy-gap*(rows-1))/rows,cardWidth*440/256+90)),start=side==='ally'?height-14-rows*ch-gap*(rows-1):startEnemy;
       for(let i=0;i<count;i++){const row=Math.floor(i/columns),col=i%columns,n=Math.min(columns,count-row*columns),rowWidth=n*cardWidth+(n-1)*gap;rects.push({side,index:i,row,column:col,x:(width-rowWidth)/2+col*(cardWidth+gap),y:start+row*(ch+gap),w:cardWidth,h:ch});}
     }
     if(enemies===1){const r=rects.find(r=>r.side==='enemy'),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y));r.x=16;r.y=Math.min(110,height*.13);r.w=width-32;r.h=Math.max(54,allyTop-116-r.y);r.boss=true;}
@@ -104,7 +105,7 @@
       const b=this.battle,events=b.events,totals=new Map(),health=new Map();
       for(let i=this.seen;i<events.length;i++){const e=events[i];if(e.type==='modeblocked')Presentation.addFloat(this.floats,{id:e.actor,text:e.text,color:'#f1dfae',born:now,type:'skill'});if(e.type==='passive'){Presentation.addFloat(this.floats,{id:e.actor,text:e.skillName,color:UI.passiveColor(b.passives[e.passive]||{}),born:now,type:'skill'});this.vfx.addEffect(e.target||e.actor,e.effect==='cleanse'?'heal':'buff',now,650,false);}if(e.type!=='action')continue;const skill=b.skills[e.skill];this.vfx.action(e,skill,now);
         if(!e.periodic)Presentation.addFloat(this.floats,{id:e.actor,text:e.skillName,color:root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]||'#ead8a5',born:now,type:'skill'});
-        for(const r of e.results){if(r.buff)continue;if(!r.miss)health.set(r.target,r.after);const damageType=r.damageType||skill?.damageType||skill?.kind||'physical',displayAmount=r.healing?r.actual:r.amount??r.actual,key=r.target+':'+(r.miss||(r.healing?'heal':damageType)),old=totals.get(key);if(old){old.actual+=r.actual;old.displayAmount+=displayAmount;old.critical=old.critical||r.critical;}else totals.set(key,{...r,damageType,displayAmount});}
+        for(const r of e.results){if(r.buff)continue;if(!r.miss)health.set(r.target,r.after);const damageType=r.damageType||skill?.damageType||skill?.kind||'physical',displayAmount=r.amount??r.actual,key=r.target+':'+(r.miss||(r.healing?'heal':damageType)),old=totals.get(key);if(old){old.actual+=r.actual;old.displayAmount+=displayAmount;old.critical=old.critical||r.critical;}else totals.set(key,{...r,damageType,displayAmount});}
         this.options.onAction?.(e,this);if(this.battle!==b)return;
       }this.seen=events.length;
       for(const [id,value]of health){this.health.get(id)?.set(value,now);const u=b.unit(id);if(u?.side==='enemy'){if(u.soldiers<=0&&!this.enemyDefeats.has(id))this.enemyDefeats.set(id,now);else if(u.soldiers>0)this.enemyDefeats.delete(id);}}
@@ -265,7 +266,7 @@
       const potential=root.CharacterGrowth.isGeneral(u)&&u.potentials,{x,y,w,h}=this.panelFrame(u.name+' · 属性',u.side==='enemy'&&!potential?440:620),left=x+22,right=x+w-22,start=y+54,bottom=y+h-14,c=this.ctx,headerHits=this.hits.length;let row=start+12-(p.scroll||0);
       c.save();c.beginPath();c.rect(x,start,w,bottom-start);c.clip();
       const pairs=[['生命',number(u.soldiers)+' / '+number(u.maxSoldiers)],['等级',number(u.level)],...(!potential?root.PengpaiRules.ATTRIBUTES.map(([key,label])=>[label,number(u[key])]):[]),['护甲',number(this.battle.effective(u).armor)],['抗性',number(this.battle.effective(u).resistance)]];
-      if(u.statusImmunities?.includes('stun'))pairs.push(['状态','抵抗眩晕']);
+      if(u.statusImmunities?.includes('stun')&&!u.passives.includes('enemy-stun-resistance'))pairs.push(['状态','抵抗眩晕']);
       for(let i=0;i<pairs.length;i++){const xx=left+(i%2)*(w-44)/2,yy=row+Math.floor(i/2)*26;this.text(pairs[i][0],xx,yy,14,'#acbec2','left');this.text(pairs[i][1],xx+(w-44)/2-10,yy,14,'#eddfbd','right');}
       row+=Math.ceil(pairs.length/2)*26+13;
       if(potential){this.text('属性',left,row,14,'#acbec2','left');this.text('当前',left+(w-44)*.55,row,14,'#acbec2','right');this.text('潜力',right,row,14,'#d8bc8b','right');row+=27;for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.text(label,left,row,14,'#c5d3d5','left');this.text(u[key],left+(w-44)*.55,row,14,'#e4e2d4','right');this.text(u.potentials[key],right,row,14,'#ddc393','right');row+=27;}row+=14;}
@@ -313,7 +314,7 @@
     drawLog() {
       const p=this.panel,events=this.battle.events.filter(e=>e.type==='action').slice().reverse(),{x,y:top,w,h}=this.panelFrame('战报',this.h*.75),perPage=Math.max(1,Math.floor((h-110)/56));
       let y=top+55;const rows=events.slice(p.page*perPage,(p.page+1)*perPage);
-      rows.forEach(e=>{this.button(`${clock(e.time)} ${e.actorName} · ${e.skillName}`,x+12,y,w-24,27,()=>{this.panel={type:'rules',event:e,page:p.page};});this.text(e.results.map(r=>`${r.targetName}${r.miss||`${r.healing?'+':'−'}${r.actual}`}`).join('  '),x+16,y+41,10,'#a7bcbb','left');y+=56;});
+      rows.forEach(e=>{this.button(`${clock(e.time)} ${e.actorName} · ${e.skillName}`,x+12,y,w-24,27,()=>{this.panel={type:'rules',event:e,page:p.page};});this.text(e.results.map(r=>`${r.targetName}${r.miss||`${r.healing?'+':'−'}${r.amount??r.actual}`}`).join('  '),x+16,y+41,10,'#a7bcbb','left');y+=56;});
       this.button('上一页',x+12,top+h-44,84,32,()=>{p.page=Math.max(0,p.page-1);},false,p.page===0);this.button('下一页',x+w-96,top+h-44,84,32,()=>{p.page++;},false,(p.page+1)*perPage>=events.length);
     }
     drawRules() {

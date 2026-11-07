@@ -38,10 +38,10 @@ test('头像以原比例等比缩放，宽屏、窄屏均不拉伸',()=>{
 test('己方一到四人都占相同四分之一槽宽，阵容水平居中',()=>{
   for(const [w,h]of[[320,568],[390,844],[640,900]]){const full=layout(w,h,4,1).filter(r=>r.side==='ally');for(let n=1;n<=4;n++){const cards=layout(w,h,n,1).filter(r=>r.side==='ally');assert.ok(cards.every(r=>r.w===full[0].w));assert.ok(Math.abs((cards[0].x+cards.at(-1).x+cards.at(-1).w)/2-w/2)<.01);}}
 });
-test('四至六名敌人默认前后分排，五人为后二前三，超员继续换行且不截掉',()=>{
+test('三、五名敌人前一后多，四人横排，超员继续换行且不截掉',()=>{
   for(const [w,h]of[[320,568],[375,667],[640,900],[844,390]]){
     const enemies=layout(w,h,5,5).filter(r=>r.side==='enemy');assert.equal(enemies.length,5);
-    assert.equal(new Set(enemies.map(r=>r.y)).size,2);assert.equal(enemies.filter(r=>r.row===0).length,2);assert.equal(enemies.filter(r=>r.row===1).length,3);assert.deepEqual(enemies.map(r=>r.index),[0,1,2,3,4]);
+    assert.equal(new Set(enemies.map(r=>r.y)).size,2);assert.equal(enemies.filter(r=>r.row===0).length,4);assert.equal(enemies.filter(r=>r.row===1).length,1);assert.deepEqual(enemies.map(r=>r.index),[1,2,3,4,0]);
     for(const count of[1,3,5,9,12]){
       const cards=layout(w,h,5,count).filter(r=>r.side==='enemy');assert.equal(cards.length,count);
       for(const [i,r]of cards.entries()){
@@ -51,10 +51,10 @@ test('四至六名敌人默认前后分排，五人为后二前三，超员继�
     }
   }
 });
-test('两三名敌人按实际人数左右展开，多人分排后模型仍有足够空间',()=>{
+test('两名敌人左右展开，多人分排后模型仍有足够空间',()=>{
   for(const [w,h]of [[320,568],[375,667],[390,844],[640,800]]){
     const five=layout(w,h,4,5).filter(r=>r.side==='enemy');
-    for(const count of [2,3]){
+    for(const count of [2]){
       const cards=layout(w,h,4,count).filter(r=>r.side==='enemy');
       assert.equal(cards.length,count);assert.equal(new Set(cards.map(r=>r.y)).size,1);
       assert.ok(cards.every(r=>r.w>=(w-18)/3));
@@ -74,7 +74,7 @@ test('默认分排保留阵容顺序，旧字段或战斗拖动不改变位置�
     input.scene.enemyRows=[['caocao'],['yujin','zhangliao'],['xuhuang','caoren']];
     const source=JSON.stringify(input),b=new Battle(input);b.start();b.advance(2);
     const view={battle:b,scenario:input,w:375,h:667,point:e=>e,updateLayout:CanvasBattle.prototype.updateLayout};
-    view.updateLayout();const before=b.export(),expected=input.enemies.map(u=>u.id);
+    view.updateLayout();const before=b.export(),expected=[...input.enemies.slice(1),input.enemies[0]].map(u=>u.id);
     assert.deepEqual(view.rects.filter(r=>r.side==='enemy').map(r=>r.id),expected);
     const fixed=view.rects.map(r=>({id:r.id,x:r.x,y:r.y})),r=view.rectMap.get('caocao');view.press={x:r.x+10,y:r.y+10,hit:{...r,kind:'unit',unitId:'caocao'}};
     CanvasBattle.prototype.move.call(view,{x:r.x+55,y:r.y+30});assert.deepEqual(view.rects.map(r=>({id:r.id,x:r.x,y:r.y})),fixed);

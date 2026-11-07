@@ -18,8 +18,16 @@
   'county-prison':{id:'county-prison',name:'县衙牢房',background:'./assets/battles/county-prison-v1.webp',color:'#544e42'}
  };
  function get(id){if(!definitions[id])throw new TypeError('未登记的战斗场景：'+id);return {...definitions[id]};}
- function arrange(scene,enemies){if(scene.enemyFormation||enemies.length<2)return scene;const front=[],back=[];enemies.forEach((unit,index)=>(unit.formationRow==='front'?front:back).push(index));return front.length&&back.length?{...scene,enemyFormation:{front,back}}:scene;}
+ function defaultFormation(count,leader=0){if(count===3||count===5)return {front:[leader],back:Array.from({length:count},(_,i)=>i).filter(i=>i!==leader)};if(count===6)return {front:[3,4,5],back:[0,1,2]};return null;}
+ function arrange(scene,enemies){
+  if(scene.enemyFormation||enemies.length<2)return scene;
+  // 两人和四人直接横排，单位身上的前后排标记不拆散小队。
+  if(enemies.length===2||enemies.length===4)return scene;
+  const front=[],back=[];enemies.forEach((unit,index)=>(unit.formationRow==='front'?front:back).push(index));
+  const formation=enemies.length===3||enemies.length===5?defaultFormation(enemies.length,front[0]??0):front.length&&back.length?{front,back}:defaultFormation(enemies.length);
+  return formation?{...scene,enemyFormation:formation}:scene;
+ }
  const capitals={xuchang:'capital-wei',chengdu:'capital-shu',jianye:'capital-wu'};
  const town=node=>get(capitals[node.id]||(node.lon<110&&node.lat>=33.5?'city-frontier':node.lon<109&&node.lat<33.5?'city-shu':node.lat<33.8?'city-river':'city-north'));
- const api={definitions,get,arrange,town};root.BattleScenes=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+ const api={definitions,get,arrange,town,defaultFormation};root.BattleScenes=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

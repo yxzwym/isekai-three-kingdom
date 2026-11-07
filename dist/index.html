@@ -299,6 +299,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     'thunder-renewal':{id:'thunder-renewal',name:'雷公助我',scope:'single',kind:'heal',cost:0,side:'self',reactionOnly:true}
   };
   const definitions={
+    'enemy-stun-resistance':{id:'enemy-stun-resistance',name:'眩晕抵抗',quality:'white',enemyOnly:true,temporary:true,description:'免疫眩晕。',stats:{},triggers:[]},
     'xuchu-tiger':{id:'xuchu-tiger',name:'虎痴悍勇',quality:'gold',description:'物理伤害提高12%。',stats:{physicalBonus:.12},triggers:[]},
     'dianwei-guard':{id:'dianwei-guard',name:'恶来护主',quality:'gold',description:'受到的物理伤害减少12%。',stats:{physicalReduction:.12},triggers:[]},
     'huangzhong-veteran':{id:'huangzhong-veteran',name:'老当益壮',quality:'gold',description:'物理伤害提高12%。',stats:{physicalBonus:.12},triggers:[]},
@@ -391,7 +392,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   };
   for(const [hero,rows]of Object.entries(additions))for(const [suffix,name,quality,description,stats]of rows){const id=hero+'-'+suffix;definitions[id]={id,name,quality,description,stats,triggers:[]};}
   function forUnit(unit){
-    const existing=Array.isArray(unit.passives)?unit.passives:[];
+    const existing=Array.isArray(unit.passives)?unit.passives.filter(id=>!definitions[id]?.enemyOnly||unit.side==='enemy'):[];
     // 教学专用的不败版本不叠加正式英雄天赋，避免改变新手战的节奏。
     if(existing.some(id=>definitions[id]?.tutorialOnly))return [...new Set(existing)];
     return [...new Set([...existing,...(heroDefaults[unit.characterId||unit.id]||[])])];
@@ -5672,10 +5673,18 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   'county-prison':{id:'county-prison',name:'县衙牢房',background:'./assets/battles/county-prison-v1.webp',color:'#544e42'}
  };
  function get(id){if(!definitions[id])throw new TypeError('未登记的战斗场景：'+id);return {...definitions[id]};}
- function arrange(scene,enemies){if(scene.enemyFormation||enemies.length<2)return scene;const front=[],back=[];enemies.forEach((unit,index)=>(unit.formationRow==='front'?front:back).push(index));return front.length&&back.length?{...scene,enemyFormation:{front,back}}:scene;}
+ function defaultFormation(count,leader=0){if(count===3||count===5)return {front:[leader],back:Array.from({length:count},(_,i)=>i).filter(i=>i!==leader)};if(count===6)return {front:[3,4,5],back:[0,1,2]};return null;}
+ function arrange(scene,enemies){
+  if(scene.enemyFormation||enemies.length<2)return scene;
+  // 两人和四人直接横排，单位身上的前后排标记不拆散小队。
+  if(enemies.length===2||enemies.length===4)return scene;
+  const front=[],back=[];enemies.forEach((unit,index)=>(unit.formationRow==='front'?front:back).push(index));
+  const formation=enemies.length===3||enemies.length===5?defaultFormation(enemies.length,front[0]??0):front.length&&back.length?{front,back}:defaultFormation(enemies.length);
+  return formation?{...scene,enemyFormation:formation}:scene;
+ }
  const capitals={xuchang:'capital-wei',chengdu:'capital-shu',jianye:'capital-wu'};
  const town=node=>get(capitals[node.id]||(node.lon<110&&node.lat>=33.5?'city-frontier':node.lon<109&&node.lat<33.5?'city-shu':node.lat<33.8?'city-river':'city-north'));
- const api={definitions,get,arrange,town};root.BattleScenes=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+ const api={definitions,get,arrange,town,defaultFormation};root.BattleScenes=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
 
 </script>
@@ -5753,10 +5762,11 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
         for (const key of ['war', 'intelligence', 'constitution', 'speed', 'technique']) u[key] = attr(u[key]);
         Object.assign(u,ITEMS.apply(u));
         u.attack = Math.max(0, Math.floor(Number(u.weapon?.power??u.weapon?.attack??u.attack) || 0)); u.armor = Math.max(0,Math.floor(Number(u.armor)||0));u.resistance=Math.max(0,Math.floor(Number(u.resistance)||0));
-        if(u.side==='enemy'&&(this.config.bossBattle||u.boss))u.statusImmunities=[...new Set([...(u.statusImmunities||[]),'stun'])];
+        if(u.side==='enemy'&&(this.config.bossBattle||u.boss||u.passives?.includes('enemy-stun-resistance')))u.statusImmunities=[...new Set([...(u.statusImmunities||[]),'stun'])];
         u.level = attr(u.level ?? (u.side === 'enemy' ? this.config.enemyLevel || this.config.level : this.config.level));
         u.skills = Array.isArray(u.skills) ? u.skills.filter(id=>this.skills[id]&&!this.skills[id].reactionOnly) : [];
-        u.passives = Array.isArray(u.passives) ? [...new Set(u.passives)].filter(id=>this.passives[id]) : [];
+        u.passives = Array.isArray(u.passives) ? [...new Set(u.passives)].filter(id=>this.passives[id]&&(!this.passives[id].enemyOnly||u.side==='enemy')) : [];
+        if(u.side==='enemy'&&u.statusImmunities?.includes('stun'))u.passives=[...new Set([...u.passives,'enemy-stun-resistance'])];
         u.priorities = Array.isArray(u.priorities) ? u.priorities.map(r=>normalizeRule(r,this.skills[r.skill])) : [];
         u.targetRule=u.targetRule||(u.side==='enemy'?'random':'lowestCurrent');u.lastSingleSkill=null;u.lastManualSkill=null;
         u.maxSoldiers = u.healthOverride!=null?attr(u.healthOverride):u.potentials&&u.baseAttributes?maxHealth(u.constitution):u.maxSoldiers == null ? maxHealth(u.constitution) : attr(u.maxSoldiers);
@@ -5916,7 +5926,6 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
       if (!targets.length || targets.some(t => !t || t.side !== side || t.dead || (t.soldiers <= 0&&!t.wounded))) return { ok: false, reason: '目标已倒下或阵营不符' };
       if(skill.kind==='buff'&&targets.some(t=>t.wounded))return {ok:false,reason:'需要先治疗重伤目标'};
       if(scope==='single'&&skill.side==='enemy'&&!this.targetPool(u,skill,scope).some(t=>t.id===targetId))return {ok:false,reason:'只能选择嘲讽目标'};
-      if (skill.kind === 'heal' && targets.every(t => t.soldiers >= t.maxSoldiers)) return { ok: false, reason: '目标生命已满' };
       return { ok: true, skill, targets };
     }
     autoCommand(u) {
@@ -5936,6 +5945,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
         }else enabled=r.when==='always'||(r.when==='allyBelow'&&weakestFriend.soldiers/weakestFriend.maxSoldiers<=threshold)||(r.when==='selfBelow'&&u.soldiers/u.maxSoldiers<=threshold)||(r.when==='enemyCount'&&foes.length>=threshold)||(r.when==='enemyBelow'&&weakestFoe.soldiers/weakestFoe.maxSoldiers<=threshold);
         if(!enabled)continue;
         const scope=skill.scope||(skill.all?r.scope||'single':'single');
+        if(skill.kind==='heal'&&(scope==='all'?friends:[target]).every(t=>t.soldiers>=t.maxSoldiers))continue;
         if(skill.kind==='buff'){const id=skill.buff?.id||skill.id,pool=skill.side==='self'?[u]:skill.side==='ally'?friends:sortedFoes,missing=pool.filter(t=>!t.wounded&&!t.statuses.some(s=>s.id===id&&s.expiresAt>this.time));if(!missing.length)continue;if(scope==='single')target=missing[0];}
         if(skill.side==='enemy'&&scope==='single'&&skill.kind!=='buff'){const pool=this.targetPool(u,skill,scope),sorted=sortedFoes.filter(t=>pool.includes(t));target=sorted[0];}
         if(target&&this.validate(u,skill.id,target.id,scope).ok)candidates.push({skill:skill.id,target:target.id,scope,kind:skill.kind,always,frequency:r.frequency});
@@ -6393,6 +6403,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   const clamp = (n,a,b) => Math.max(a,Math.min(b,n));
   const clock = time => `${String(Math.floor(time/60)).padStart(2,'0')}:${String(Math.floor(time%60)).padStart(2,'0')}`;
   const Presentation=typeof module!=='undefined'&&module.exports?require('./presentation.js'):root.BattlePresentation;
+  const Scenes=typeof module!=='undefined'&&module.exports?require('./battle-scenes.js'):root.BattleScenes;
   const number=Presentation.formatNumber;
   function fitImage(sourceWidth,sourceHeight,box) {
     const scale=Math.min(box.w/sourceWidth,box.h/sourceHeight);
@@ -6406,9 +6417,9 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     const rects=[],gap=3,groupWidth=Math.min(width-12,640);
     const indices=formation?[...(formation.back||[]),...(formation.front||[])]:[];
     const validFormation=indices.length===enemies&&new Set(indices).size===enemies&&indices.every(i=>Number.isInteger(i)&&i>=0&&i<enemies);
-    if(!validFormation&&enemies>=4&&enemies<=6){const split=Math.floor(enemies/2);formation={back:Array.from({length:split},(_,i)=>i),front:Array.from({length:enemies-split},(_,i)=>i+split)};}
+    if(!validFormation)formation=Scenes.defaultFormation(enemies);
     for(const [side,count]of[['ally',allies],['enemy',enemies]]){
-      if(!count)continue;const columns=side==='ally'?allyColumns:Math.min(3,count),cardWidth=((side==='ally'?Math.min(width-32,640):groupWidth)-gap*(columns-1))/columns,rows=Math.ceil(count/columns),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),startEnemy=enemies===1?Math.min(110,height*.13):enemies<=3?Math.min(76,height*.13):Math.min(170,height*.22),partyRatio=height<650&&height>width&&rows===1?.23:.33,ch=side==='ally'?Math.min((height*partyRatio-gap*(rows-1))/rows,cardWidth*440/256+54):Math.max(30,Math.min((allyTop-112-startEnemy-gap*(rows-1))/rows,cardWidth*440/256+90)),start=side==='ally'?height-14-rows*ch-gap*(rows-1):startEnemy;
+      if(!count)continue;const columns=side==='ally'?allyColumns:count===4?4:Math.min(3,count),cardWidth=((side==='ally'?Math.min(width-32,640):groupWidth)-gap*(columns-1))/columns,rows=Math.ceil(count/columns),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),startEnemy=enemies===1?Math.min(110,height*.13):enemies<=3?Math.min(76,height*.13):Math.min(170,height*.22),partyRatio=height<650&&height>width&&rows===1?.23:.33,ch=side==='ally'?Math.min((height*partyRatio-gap*(rows-1))/rows,cardWidth*440/256+54):Math.max(30,Math.min((allyTop-112-startEnemy-gap*(rows-1))/rows,cardWidth*440/256+90)),start=side==='ally'?height-14-rows*ch-gap*(rows-1):startEnemy;
       for(let i=0;i<count;i++){const row=Math.floor(i/columns),col=i%columns,n=Math.min(columns,count-row*columns),rowWidth=n*cardWidth+(n-1)*gap;rects.push({side,index:i,row,column:col,x:(width-rowWidth)/2+col*(cardWidth+gap),y:start+row*(ch+gap),w:cardWidth,h:ch});}
     }
     if(enemies===1){const r=rects.find(r=>r.side==='enemy'),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y));r.x=16;r.y=Math.min(110,height*.13);r.w=width-32;r.h=Math.max(54,allyTop-116-r.y);r.boss=true;}
@@ -6491,7 +6502,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
       const b=this.battle,events=b.events,totals=new Map(),health=new Map();
       for(let i=this.seen;i<events.length;i++){const e=events[i];if(e.type==='modeblocked')Presentation.addFloat(this.floats,{id:e.actor,text:e.text,color:'#f1dfae',born:now,type:'skill'});if(e.type==='passive'){Presentation.addFloat(this.floats,{id:e.actor,text:e.skillName,color:UI.passiveColor(b.passives[e.passive]||{}),born:now,type:'skill'});this.vfx.addEffect(e.target||e.actor,e.effect==='cleanse'?'heal':'buff',now,650,false);}if(e.type!=='action')continue;const skill=b.skills[e.skill];this.vfx.action(e,skill,now);
         if(!e.periodic)Presentation.addFloat(this.floats,{id:e.actor,text:e.skillName,color:root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]||'#ead8a5',born:now,type:'skill'});
-        for(const r of e.results){if(r.buff)continue;if(!r.miss)health.set(r.target,r.after);const damageType=r.damageType||skill?.damageType||skill?.kind||'physical',displayAmount=r.healing?r.actual:r.amount??r.actual,key=r.target+':'+(r.miss||(r.healing?'heal':damageType)),old=totals.get(key);if(old){old.actual+=r.actual;old.displayAmount+=displayAmount;old.critical=old.critical||r.critical;}else totals.set(key,{...r,damageType,displayAmount});}
+        for(const r of e.results){if(r.buff)continue;if(!r.miss)health.set(r.target,r.after);const damageType=r.damageType||skill?.damageType||skill?.kind||'physical',displayAmount=r.amount??r.actual,key=r.target+':'+(r.miss||(r.healing?'heal':damageType)),old=totals.get(key);if(old){old.actual+=r.actual;old.displayAmount+=displayAmount;old.critical=old.critical||r.critical;}else totals.set(key,{...r,damageType,displayAmount});}
         this.options.onAction?.(e,this);if(this.battle!==b)return;
       }this.seen=events.length;
       for(const [id,value]of health){this.health.get(id)?.set(value,now);const u=b.unit(id);if(u?.side==='enemy'){if(u.soldiers<=0&&!this.enemyDefeats.has(id))this.enemyDefeats.set(id,now);else if(u.soldiers>0)this.enemyDefeats.delete(id);}}
@@ -6652,7 +6663,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
       const potential=root.CharacterGrowth.isGeneral(u)&&u.potentials,{x,y,w,h}=this.panelFrame(u.name+' · 属性',u.side==='enemy'&&!potential?440:620),left=x+22,right=x+w-22,start=y+54,bottom=y+h-14,c=this.ctx,headerHits=this.hits.length;let row=start+12-(p.scroll||0);
       c.save();c.beginPath();c.rect(x,start,w,bottom-start);c.clip();
       const pairs=[['生命',number(u.soldiers)+' / '+number(u.maxSoldiers)],['等级',number(u.level)],...(!potential?root.PengpaiRules.ATTRIBUTES.map(([key,label])=>[label,number(u[key])]):[]),['护甲',number(this.battle.effective(u).armor)],['抗性',number(this.battle.effective(u).resistance)]];
-      if(u.statusImmunities?.includes('stun'))pairs.push(['状态','抵抗眩晕']);
+      if(u.statusImmunities?.includes('stun')&&!u.passives.includes('enemy-stun-resistance'))pairs.push(['状态','抵抗眩晕']);
       for(let i=0;i<pairs.length;i++){const xx=left+(i%2)*(w-44)/2,yy=row+Math.floor(i/2)*26;this.text(pairs[i][0],xx,yy,14,'#acbec2','left');this.text(pairs[i][1],xx+(w-44)/2-10,yy,14,'#eddfbd','right');}
       row+=Math.ceil(pairs.length/2)*26+13;
       if(potential){this.text('属性',left,row,14,'#acbec2','left');this.text('当前',left+(w-44)*.55,row,14,'#acbec2','right');this.text('潜力',right,row,14,'#d8bc8b','right');row+=27;for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.text(label,left,row,14,'#c5d3d5','left');this.text(u[key],left+(w-44)*.55,row,14,'#e4e2d4','right');this.text(u.potentials[key],right,row,14,'#ddc393','right');row+=27;}row+=14;}
@@ -6700,7 +6711,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     drawLog() {
       const p=this.panel,events=this.battle.events.filter(e=>e.type==='action').slice().reverse(),{x,y:top,w,h}=this.panelFrame('战报',this.h*.75),perPage=Math.max(1,Math.floor((h-110)/56));
       let y=top+55;const rows=events.slice(p.page*perPage,(p.page+1)*perPage);
-      rows.forEach(e=>{this.button(`${clock(e.time)} ${e.actorName} · ${e.skillName}`,x+12,y,w-24,27,()=>{this.panel={type:'rules',event:e,page:p.page};});this.text(e.results.map(r=>`${r.targetName}${r.miss||`${r.healing?'+':'−'}${r.actual}`}`).join('  '),x+16,y+41,10,'#a7bcbb','left');y+=56;});
+      rows.forEach(e=>{this.button(`${clock(e.time)} ${e.actorName} · ${e.skillName}`,x+12,y,w-24,27,()=>{this.panel={type:'rules',event:e,page:p.page};});this.text(e.results.map(r=>`${r.targetName}${r.miss||`${r.healing?'+':'−'}${r.amount??r.actual}`}`).join('  '),x+16,y+41,10,'#a7bcbb','left');y+=56;});
       this.button('上一页',x+12,top+h-44,84,32,()=>{p.page=Math.max(0,p.page-1);},false,p.page===0);this.button('下一页',x+w-96,top+h-44,84,32,()=>{p.page++;},false,(p.page+1)*perPage>=events.length);
     }
     drawRules() {
@@ -7316,6 +7327,32 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
 </script>
 <script>
 (function(root){
+ 'use strict';
+ const D=typeof module!=='undefined'&&module.exports?require('./world-data.js'):root.WorldData;
+ let levels;
+ function regionLevel(id){
+  if(!levels){
+   const edges=new Map(D.places.map(p=>[p.id,[]]));
+   for(const [a,b]of D.roads){if(D.placeMap[a].requiresWater||D.placeMap[b].requiresWater)continue;const length=D.roadLength(a,b);edges.get(a).push([b,length]);edges.get(b).push([a,length]);}
+   const distances=new Map([['camp',0]]),open=new Set(['camp']);
+   while(open.size){const current=[...open].reduce((a,b)=>distances.get(a)<=distances.get(b)?a:b);open.delete(current);for(const [next,length]of edges.get(current)){const value=distances.get(current)+length;if(value<(distances.get(next)??Infinity)){distances.set(next,value);open.add(next);}}}
+   // 以最远的三国都城为十级距离，沿可行陆路从营地的三级线性递增。
+   const far=Math.max(...['xuchang','chengdu','jianye'].map(id=>distances.get(id))),near=D.roadLength('camp','changshan')*3;
+   levels=new Map([...distances].map(([id,distance])=>[id,Math.min(10,3+Math.round(7*Math.max(0,distance-near)/(far-near)))]));
+  }
+  return levels.get(D.placeAliases[id]||id)??10;
+ }
+ function recommended(task,stage){
+  if(stage?.recommendedLevel!=null)return stage.recommendedLevel;
+  if(task.bossId||task.rulerCountry||task.id==='ganning'||task.recommendedLevel>10)return task.recommendedLevel;
+  return Math.max(...[task.giverPlace,task.place].filter(Boolean).map(regionLevel),3);
+ }
+ const api={regionLevel,recommended};root.QuestProgression=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(globalThis);
+
+</script>
+<script>
+(function(root){
   'use strict';
   function choicesFor(event){
     let choices=Array.isArray(event.choices)&&event.choices.length?event.choices.map((c,i)=>({...c,id:String(c.id||'choice-'+i)})):[{id:event.kind==='battle'?'battle':'continue',label:event.kind==='battle'?'迎战':'继续赶路',action:event.kind==='battle'?'battle':'continue'}];
@@ -7560,7 +7597,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  for(const [id,rows]of Object.entries(conclusions))H.definitions[id].stages.freed.npc.turns=rows.map(([speaker,text])=>({speaker,text}));
  const factories=new Map();
  function companion(id,currentLevel){if(factories.has(id))return root.BattlePassives.complete(factories.get(id)(currentLevel));const d=H.definitions[id];if(id==='ganning')return root.BattlePassives.complete(H.companion(currentLevel??1));const weapon=I.create('weapon-'+d.type,'green',id+'-weapon'),skills=W.forWeapon(weapon);return {...G.create(id,currentLevel??d.level??10),id,name:d.name,characterId:id,unitType:'general',homeNode:d.home,experience:0,experienceVersion:2,weaponPlanVersion:3,defaultLoadoutVersion:2,weapon,skills,priorities:W.prioritiesFor(skills),equipment:{armor:I.create('leather-armor','white',id+'-armor'),accessory1:null,accessory2:null},armor:3,resistance:3,weaponProficiencies:{[d.type]:60},passives:root.BattlePassives.forUnit({id,passives:d.passives||[]})};}
- function buildEnemies(id,phase,currentLevel){const d=H.definitions[id],f=d.battles[phase];if(f.roster)return f.roster();if(f.duel){let u=companion(f.duel,f.scaleToHero?Math.min(10,currentLevel||10):f.level);if(f.trainingWeapon){const weapon={...I.create('weapon-'+u.weapon.type,'white','duel-training'),id:'training-'+f.duel,name:f.trainingWeapon,skills:f.trainingSkills||[{base:'sword-cut',name:'试招'}]},skills=W.forWeapon(weapon);u={...u,weapon,skills,priorities:W.prioritiesFor(skills),weaponProficiencies:{[u.weapon.type]:40}};}return [{...u,id:'duel-'+f.duel,experienceWeight:1}];}if(!f.enemyKind)return H.enemies(f.count);return N.bandits(f.scaleEnemies?Math.max(1,Math.min(10,currentLevel||1)):f.level||10,f.count,true).map((u,i)=>({...u,id:id+'-foe-'+i,name:i===0&&f.leaderName?f.leaderName:f.enemyKind==='retainer'?(i?'家丁':'家丁头目'):u.name,...(i===0&&f.leaderArt?{characterId:f.leaderArt}:{})}));}
+ function buildEnemies(id,phase,currentLevel){const d=H.definitions[id],f=d.battles[phase];if(f.roster)return f.roster();if(f.duel){let u=companion(f.duel,f.scaleToHero?Math.min(10,currentLevel||10):f.level);if(f.trainingWeapon){const weapon={...I.create('weapon-'+u.weapon.type,'white','duel-training'),id:'training-'+f.duel,name:f.trainingWeapon,skills:f.trainingSkills||[{base:'sword-cut',name:'试招'}]},skills=W.forWeapon(weapon);u={...u,weapon,skills,priorities:W.prioritiesFor(skills),weaponProficiencies:{[u.weapon.type]:40}};}return [{...u,id:'duel-'+f.duel,experienceWeight:1}];}if(!f.enemyKind)return H.enemies(f.count);return N.bandits(f.scaleEnemies||!f.boss&&!f.fixedLevel?Math.max(1,Math.min(10,currentLevel||1)):f.level||10,f.count,true).map((u,i)=>({...u,id:id+'-foe-'+i,name:i===0&&f.leaderName?f.leaderName:f.enemyKind==='retainer'?(i?'家丁':'家丁头目'):u.name,...(i===0&&f.leaderArt?{characterId:f.leaderArt}:{})}));}
  function enemies(id,phase,currentLevel){const f=H.definitions[id].battles[phase],boss=f.boss||f.duel||f.named||f.roster;return buildEnemies(id,phase,currentLevel).map(u=>boss?{...u,boss:true,statusImmunities:[...new Set([...(u.statusImmunities||[]),'stun'])]}:u);}
  // 城镇日常人物长期保留；线索只指出当前需要前往的地点。
  const Scenes=node?require('./battle-scenes.js'):root.BattleScenes;
@@ -8440,6 +8477,9 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  // 君主任务的可见入口与人数条件共用同一份数据。
  for(const [id,country]of [['caocao','wei'],['liubei','shu'],['sunquan','wu']]){const d=H.definitions[id];d.visibility={recruits:{[country]:5}};d.rulerCountry=country;}
  H.definitions.taishici.battles['jianye-duel'].failureLines=['先停，你肩上已经见血了。你那几下出手够重，可一急就顾不上准头，反倒给我留了空。回去把招式用稳些，改天我们再比。'];H.definitions.lvbu.battles.trial.friendly=true;
+ // 通常冲突以三人以下的小队为主，劫狱外院等明确配置保留四人。
+ for(const d of Object.values(H.definitions))for(const f of Object.values(d.battles))if(d.id!=='ganning'&&f.count===4&&!f.boss&&!f.duel&&!f.roster&&!f.named)f.count=3;
+ N.storyBattles.escort.count=3;
  const api={version:1};root.RecruitmentChallenges=api;if(node)module.exports=api;
 })(globalThis);
 
@@ -8509,6 +8549,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   const Courts=node?require('./courts.js'):root.FactionCourts;
   const Story=node?require('./story-rules.js'):root.StoryRules;
   const Chapter=node?require('./chapter-one.js'):root.ChapterOne;
+  const Progression=node?require('./quest-progression.js'):root.QuestProgression;
   const X=node?require('./experience.js'):root.CharacterExperience,Q=node?require('./timed-choice.js'):root.TimedChoice;
   const copy=x=>JSON.parse(JSON.stringify(x)),countries=['wei','shu','wu'],recruitCountries=[...countries,'other','yellow'],placeId=id=>Object.hasOwn(D.placeAliases,id)?D.placeAliases[id]:id,neighbors=id=>D.roads.flatMap(([a,b])=>a===id?[b]:b===id?[a]:[]),safeObject=value=>value&&typeof value==='object'&&!Array.isArray(value)?value:{};
   function shortestRoute(from,to){
@@ -8594,6 +8635,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     equipWeapon(weapon){if(!weapon||!weapon.type)return false;const resolved=W.resolveWeapon(weapon);W.forWeapon(resolved);this.state.weapon=copy(resolved);this.state.weaponType=resolved.type;this.state.outfitted=true;delete this.state.tactics.hero;return true;}
     prepareRecruit(raw){
       const u=copy(raw),id=u.characterId||u.id;
+      if(u.passives?.includes('enemy-stun-resistance')){u.passives=u.passives.filter(id=>id!=='enemy-stun-resistance');u.statusImmunities=u.statusImmunities?.filter(id=>id!=='stun');}
       if(id==='zhaoyun'||!u.baseAttributes||!u.potentials)return u;
       const old=I.apply(u),attributes=G.attributesAt(u.baseAttributes,u.potentials,this.character.level),ratio=u.startSoldiers==null?1:clampTroops(u.startSoldiers,old.maxSoldiers)/old.maxSoldiers;
       Object.assign(u,{level:this.character.level,experience:0,experienceVersion:2,attributes,recruitLevelVersion:1},attributes);delete u.maxSoldiers;delete u.equipmentBase;
@@ -8668,10 +8710,10 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     rest(){for(const u of this.members()){this.state.troops[u.id]=u.maxSoldiers;delete this.state.conditions[u.id];}}
     quests(){
       const cacheKey=this.questStateKey()+'|'+this.state.nodeId;if(this.questListCache?.key===cacheKey)return this.questListCache.list;const q=this.state.quests.changshan,at=id=>this.state.nodeId===id,objectives={available:'前往常山，查看村口的动静',entry:'与赵云合力击退村口盗匪',supplies:q.healerJoined?(at('zhongshan')?'夺回中山粮仓':'前往中山夺回粮仓')+' · '+q.grainWins*50+'%':at('zhongshan')?'向仓守打听粮车下落':'前往中山打听粮车下落',rescue:at('zhongshan-county')?'救出被扣押的甄家医者':'前往毋极寻找甄家医者',escort:'护送粮车返回常山',return:'向常山里正复命',decision:'与赵云商议去留',complete:'常山的乡民已安顿妥当'};
-      const list=[...D.questDefinitions.map(t=>({...t,complete:t.id==='changshan'?q.stage==='complete':this.coalitionReady(),taskStatus:t.id==='changshan'?(q.stage==='complete'?null:q.stage==='available'?'available':['return','decision'].includes(q.stage)?'ready':'active'):(this.coalitionReady()?null:'active'),objective:t.id==='changshan'?(q.zhaoInvitation?'与赵云商议中山之行':q.healerDecision?'与甄姑娘商议去留':objectives[q.stage]):'为魏、蜀、吴招募英雄'})),...Object.values(H.definitions).filter(d=>this.state.heroQuests[d.id].stage!=='locked'&&this.heroQuestVisible(d)).map(d=>({...d,recommendedLevel:d.stages[this.state.heroQuests[d.id].stage].recommendedLevel??d.recommendedLevel,target:H.place(d.id,this.state.heroQuests[d.id]),heard:!!this.state.heroQuests[d.id].heard,accepted:!!this.state.heroQuests[d.id].accepted,complete:this.state.heroQuests[d.id].stage==='complete',taskStatus:this.state.heroQuests[d.id].stage==='complete'?null:this.state.heroQuests[d.id].stage==='freed'?'ready':this.state.heroQuests[d.id].accepted||this.state.heroQuests[d.id].stage!==d.start?'active':'available',objective:this.state.heroQuests[d.id].stage===d.start&&this.state.nodeId!==H.place(d.id,this.state.heroQuests[d.id])?'前往'+D.placeMap[H.place(d.id,this.state.heroQuests[d.id])].name+'查探消息':d.stages[this.state.heroQuests[d.id].stage].objective})),...N.sideQuests.map(t=>{
+      const list=[...D.questDefinitions.map(t=>({...t,complete:t.id==='changshan'?q.stage==='complete':this.coalitionReady(),taskStatus:t.id==='changshan'?(q.stage==='complete'?null:q.stage==='available'?'available':['return','decision'].includes(q.stage)?'ready':'active'):(this.coalitionReady()?null:'active'),objective:t.id==='changshan'?(q.zhaoInvitation?'与赵云商议中山之行':q.healerDecision?'与甄姑娘商议去留':objectives[q.stage]):'为魏、蜀、吴招募英雄'})),...Object.values(H.definitions).filter(d=>this.state.heroQuests[d.id].stage!=='locked'&&this.heroQuestVisible(d)).map(d=>({...d,recommendedLevel:Progression.recommended(d,d.stages[this.state.heroQuests[d.id].stage]),target:H.place(d.id,this.state.heroQuests[d.id]),heard:!!this.state.heroQuests[d.id].heard,accepted:!!this.state.heroQuests[d.id].accepted,complete:this.state.heroQuests[d.id].stage==='complete',taskStatus:this.state.heroQuests[d.id].stage==='complete'?null:this.state.heroQuests[d.id].stage==='freed'?'ready':this.state.heroQuests[d.id].accepted||this.state.heroQuests[d.id].stage!==d.start?'active':'available',objective:this.state.heroQuests[d.id].stage===d.start&&this.state.nodeId!==H.place(d.id,this.state.heroQuests[d.id])?'前往'+D.placeMap[H.place(d.id,this.state.heroQuests[d.id])].name+'查探消息':d.stages[this.state.heroQuests[d.id].stage].objective})),...N.sideQuests.map(t=>{
         const s=this.state.quests.side[t.id],giver=N.npcs.find(n=>n.id===t.giver).name,done=s.wins>=t.rounds,target=s.accepted&&!done?t.place:t.giverPlace;
         const objective=s.paid?'委托已完成':!s.accepted?'向'+D.placeMap[t.giverPlace].name+'的'+giver+'询问委托':done?'返回'+D.placeMap[t.giverPlace].name+'向'+giver+'复命':(at(t.place)?'在':'前往')+D.placeMap[t.place].name+'剿匪 · '+Math.floor(s.wins/t.rounds*100)+'%';
-        return {...t,category:'side',complete:s.paid,taskStatus:s.paid?null:!s.accepted?'available':done?'ready':'active',accepted:s.accepted,target,objective};
+        return {...t,recommendedLevel:Progression.recommended(t),category:'side',complete:s.paid,taskStatus:s.paid?null:!s.accepted?'available':done?'ready':'active',accepted:s.accepted,target,objective};
       }),...(Chapter.quest(this)?[Chapter.quest(this)]:[]),...countries.filter(country=>this.pendingReports(country).length).map(country=>{const d=Courts.definitions[country];return {id:'report-'+country,title:D.factions[country].name+'国复命',category:'side',recommendedLevel:1,accepted:true,complete:false,taskStatus:'ready',target:d.place,objective:'前往'+D.placeMap[d.place].name+'，向'+d.name+'复命'};})].map(q=>({...q,completionOrder:this.state.questCompletions[q.id]||0})).sort((a,b)=>Number(a.complete)-Number(b.complete)||(a.complete?b.completionOrder-a.completionOrder:0));this.questListCache={key:cacheKey,list};return list;
     }
     npcQuestIds(npc){const stage=this.state.quests.changshan.stage,ids=[...(npc.relatedQuests||[])];if(npc.role==='chapter')ids.push('chapter-one');if(npc.role==='court')ids.push('report-'+npc.country);if(npc.questId)ids.push(npc.questId);if(npc.heroQuest)for(const d of Object.values(H.definitions))if(H.place(d.id,this.state.heroQuests[d.id])===this.state.nodeId&&H.npc(d.id,this.state.heroQuests[d.id])?.id===npc.id)ids.push(d.id);for(const data of N.sideQuests)if(data.giver===npc.id)ids.push(data.id);if(npc.id==='zhaoyun'&&!['return','complete'].includes(stage)&&npc.role!=='companion'||npc.id==='changshan-elder'&&stage==='return'||npc.id==='grain-steward'&&stage==='supplies'||npc.id==='refugee-laborer'&&stage==='rescue')ids.push('changshan');return [...new Set(ids)];}
@@ -8731,7 +8773,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     }
     npcUnit(id){
       this.syncCompanionLevels();const member=this.members().find(u=>u.id===id)||this.state.residents[id];if(member)return copy(member);
-      if(['zhangjiao','zhangbao','zhangliang'].includes(id)){const P=node?require('./prologue.js'):root.PengpaiPrologue;return {...P.general(id,10),statusImmunities:['stun']};}
+      if(['zhangjiao','zhangbao','zhangliang'].includes(id)){const P=node?require('./prologue.js'):root.PengpaiPrologue;return P.general(id,10);}
       if(H.definitions[id]){const d=H.definitions[id],phase=Object.keys(d.battles).find(k=>d.battles[k].stage.includes(this.state.heroQuests[id].stage)&&d.battles[k].duel),fight=d.battles[phase];const u=Recruitment.companion(id,this.character.level);return fight?.duel?{...Recruitment.enemies(id,phase,this.character.level)[0],id,characterId:id}:u;}const questNpc=Object.keys(H.definitions).map(id=>H.npc(id,this.state.heroQuests[id])).find(n=>n?.id===id&&n.observe);if(questNpc)return {...H.enemies(1)[0],id:questNpc.id,name:questNpc.name};if(id==='zhaoyun')return this.zhaoYunUnit();if(id==='zhenji')return this.zhenJiUnit();return null;
     }
     startChangshan(){
@@ -8828,7 +8870,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
         return {id:'camp-training',title:training.label,scene:Scenes.arrange(copy(D.townScenes.camp),enemies),allies:[...this.trainingAllies(training),...extraAllies],enemies,passives:heroPassives(),rules:{difficulty:this.character.difficulty,partySlots:this.activeLimit(),bossBattle:!!training.rivals,level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true,seed:this.pending.seed}};
       }
       if(['story','side'].includes(this.pending.kind)){
-        const p=this.pending,data=p.kind==='story'?N.storyBattles[p.phase]:N.sideQuests.find(q=>q.id===p.questId),level=this.enemyLevel(),count=p.kind==='story'?data.count:data.rounds===5?3+this.state.quests.side[data.id].wins%3:2+this.state.quests.side[data.id].wins,enemies=(data.bossId?Optional.roster(data.bossId):N.bandits(level,count,p.kind==='story'&&['grain','escort'].includes(p.phase))).map((u,i)=>({...(data.bossId?u:this.scaleEnemy(u)),...(root.CharacterAssets?root.CharacterAssets.resolve(u.characterId):{}),id:'local-enemy-'+i}));
+        const p=this.pending,data=p.kind==='story'?N.storyBattles[p.phase]:N.sideQuests.find(q=>q.id===p.questId),level=this.enemyLevel(),count=p.kind==='story'?data.count:data.rounds===5?[2,3,2,3,5][this.state.quests.side[data.id].wins]:[2,3,5][Math.min(2,this.state.quests.side[data.id].wins)],enemies=(data.bossId?Optional.roster(data.bossId):N.bandits(level,count,p.kind==='story'&&['grain','escort'].includes(p.phase))).map((u,i)=>({...(data.bossId?u:this.scaleEnemy(u)),...(root.CharacterAssets?root.CharacterAssets.resolve(u.characterId):{}),id:'local-enemy-'+i}));
         return {id:'local-'+p.kind,title:data.title,scene:Scenes.arrange(Scenes.get(data.sceneId||'rural-road'),enemies),allies:[...this.storyAllies(p.phase),...extraAllies],enemies,passives:heroPassives(),rules:{difficulty:this.character.difficulty,partySlots:this.activeLimit(),bossBattle:!!data.bossId,allySp:0,hit:true,critical:true,seed:p.seed}};
       }
       const troops=this.members(),allies=this.state.activeIds.map(id=>troops.find(u=>u.id===id)).filter(Boolean),encounter=D.encounters[this.pending.encounterId];if(!encounter)throw new Error('遭遇配置不存在');
@@ -9300,7 +9342,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
       }
       this.mapEntries=entries;c.save();c.beginPath();c.rect(r.x,r.y,r.w,r.h);c.clip();
       for(const {node,p,icon,label}of entries){for(const [box,center]of [[icon,p],[label,{x:label.x+label.w/2,y:label.y+label.h/2}]]){const x=Math.max(r.x,box.x),y=Math.max(r.y,box.y),w=Math.min(r.x+r.w,box.x+box.w)-x,h=Math.min(r.y+r.h,box.y+box.h)-y;if(w>0&&h>0)this.hits.push({x,y,w,h,center,placeId:node.id,action:()=>this.selectPlace(node.id)});}}
-      this.drawTraveler();c.restore();const shade=c.createLinearGradient(0,0,0,76);shade.addColorStop(0,'#07192390');shade.addColorStop(1,'#07192300');c.fillStyle=shade;c.fillRect(0,0,this.w,76);
+      this.drawTraveler();c.restore();if(this.dialogue)return;const shade=c.createLinearGradient(0,0,0,76);shade.addColorStop(0,'#07192390');shade.addColorStop(1,'#07192300');c.fillStyle=shade;c.fillRect(0,0,this.w,76);
       this.button('+',this.w-52,78,34,34,()=>this.changeZoom(D.mapRules.zoomStep));this.button('−',this.w-52,120,34,34,()=>this.changeZoom(1/D.mapRules.zoomStep));Panels.iconButton(this,'定位',this.w-52,164,34,()=>this.focusLocation());this.drawQuestArrows();if(this.panel?.type!=='mapIntro')this.drawDestination();
     }
     drawMapRegion(r,marks){
@@ -9478,7 +9520,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
       const npc=D.townNpcs.camp.find(n=>n.id==='zhangliang');if(!this.model.recruitZhangLiang()){if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);return;}this.save();this.speak(npc,{lines:['我去跟大哥说一声，再拿上自己的东西。你们在营门口等我一会儿，我很快就来，这回可别忘了带我。']});
     }
     drawTownBackdrop(){
-      const w=this.w,h=this.h,c=this.ctx,node=this.model.location(),scene=(this.dialogue?.npc.sceneId&&root.BattleScenes.get(this.dialogue.npc.sceneId))||D.townScenes[node.id]||D.townScenes.default,key=[scene.background,w,h,this.dpr].join('|');if(this.townBackdrop?.key!==key){const canvas=document.createElement('canvas');canvas.width=w*this.dpr;canvas.height=h*this.dpr;const ctx=canvas.getContext('2d'),img=root.GameAssetLoader?.get(scene.background);ctx.scale(this.dpr,this.dpr);ctx.fillStyle='#152b2d';ctx.fillRect(0,0,w,h);if(img){const scale=Math.max(w/img.naturalWidth,h/img.naturalHeight);ctx.drawImage(img,(w-img.naturalWidth*scale)/2,(h-img.naturalHeight*scale)/2,img.naturalWidth*scale,img.naturalHeight*scale);}ctx.fillStyle='#06192335';ctx.fillRect(0,0,w,h);ctx.fillStyle='#071923ed';ctx.fillRect(0,0,w,68);this.townBackdrop={key,canvas};}c.drawImage(this.townBackdrop.canvas,0,0,w,h);
+      const w=this.w,h=this.h,c=this.ctx,node=this.model.location(),scene=(this.dialogue?.npc.sceneId&&root.BattleScenes.get(this.dialogue.npc.sceneId))||D.townScenes[node.id]||D.townScenes.default,key=[scene.background,w,h,this.dpr].join('|');if(this.townBackdrop?.key!==key){const canvas=document.createElement('canvas');canvas.width=w*this.dpr;canvas.height=h*this.dpr;const ctx=canvas.getContext('2d'),img=root.GameAssetLoader?.get(scene.background);ctx.scale(this.dpr,this.dpr);ctx.fillStyle='#152b2d';ctx.fillRect(0,0,w,h);if(img){const scale=Math.max(w/img.naturalWidth,h/img.naturalHeight);ctx.drawImage(img,(w-img.naturalWidth*scale)/2,(h-img.naturalHeight*scale)/2,img.naturalWidth*scale,img.naturalHeight*scale);}ctx.fillStyle='#06192335';ctx.fillRect(0,0,w,h);this.townBackdrop={key,canvas};}c.drawImage(this.townBackdrop.canvas,0,0,w,h);if(!this.dialogue){c.fillStyle='#071923ed';c.fillRect(0,0,w,68);}
     }
     drawTown(){
       this.drawTownBackdrop();if(this.dialogue)return;const npcs=this.model.sceneNpcs(),c=this.ctx,key=this.model.state.nodeId;

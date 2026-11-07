@@ -139,7 +139,7 @@
       }
       this.mapEntries=entries;c.save();c.beginPath();c.rect(r.x,r.y,r.w,r.h);c.clip();
       for(const {node,p,icon,label}of entries){for(const [box,center]of [[icon,p],[label,{x:label.x+label.w/2,y:label.y+label.h/2}]]){const x=Math.max(r.x,box.x),y=Math.max(r.y,box.y),w=Math.min(r.x+r.w,box.x+box.w)-x,h=Math.min(r.y+r.h,box.y+box.h)-y;if(w>0&&h>0)this.hits.push({x,y,w,h,center,placeId:node.id,action:()=>this.selectPlace(node.id)});}}
-      this.drawTraveler();c.restore();const shade=c.createLinearGradient(0,0,0,76);shade.addColorStop(0,'#07192390');shade.addColorStop(1,'#07192300');c.fillStyle=shade;c.fillRect(0,0,this.w,76);
+      this.drawTraveler();c.restore();if(this.dialogue)return;const shade=c.createLinearGradient(0,0,0,76);shade.addColorStop(0,'#07192390');shade.addColorStop(1,'#07192300');c.fillStyle=shade;c.fillRect(0,0,this.w,76);
       this.button('+',this.w-52,78,34,34,()=>this.changeZoom(D.mapRules.zoomStep));this.button('−',this.w-52,120,34,34,()=>this.changeZoom(1/D.mapRules.zoomStep));Panels.iconButton(this,'定位',this.w-52,164,34,()=>this.focusLocation());this.drawQuestArrows();if(this.panel?.type!=='mapIntro')this.drawDestination();
     }
     drawMapRegion(r,marks){
@@ -317,7 +317,7 @@
       const npc=D.townNpcs.camp.find(n=>n.id==='zhangliang');if(!this.model.recruitZhangLiang()){if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);return;}this.save();this.speak(npc,{lines:['我去跟大哥说一声，再拿上自己的东西。你们在营门口等我一会儿，我很快就来，这回可别忘了带我。']});
     }
     drawTownBackdrop(){
-      const w=this.w,h=this.h,c=this.ctx,node=this.model.location(),scene=(this.dialogue?.npc.sceneId&&root.BattleScenes.get(this.dialogue.npc.sceneId))||D.townScenes[node.id]||D.townScenes.default,key=[scene.background,w,h,this.dpr].join('|');if(this.townBackdrop?.key!==key){const canvas=document.createElement('canvas');canvas.width=w*this.dpr;canvas.height=h*this.dpr;const ctx=canvas.getContext('2d'),img=root.GameAssetLoader?.get(scene.background);ctx.scale(this.dpr,this.dpr);ctx.fillStyle='#152b2d';ctx.fillRect(0,0,w,h);if(img){const scale=Math.max(w/img.naturalWidth,h/img.naturalHeight);ctx.drawImage(img,(w-img.naturalWidth*scale)/2,(h-img.naturalHeight*scale)/2,img.naturalWidth*scale,img.naturalHeight*scale);}ctx.fillStyle='#06192335';ctx.fillRect(0,0,w,h);ctx.fillStyle='#071923ed';ctx.fillRect(0,0,w,68);this.townBackdrop={key,canvas};}c.drawImage(this.townBackdrop.canvas,0,0,w,h);
+      const w=this.w,h=this.h,c=this.ctx,node=this.model.location(),scene=(this.dialogue?.npc.sceneId&&root.BattleScenes.get(this.dialogue.npc.sceneId))||D.townScenes[node.id]||D.townScenes.default,key=[scene.background,w,h,this.dpr].join('|');if(this.townBackdrop?.key!==key){const canvas=document.createElement('canvas');canvas.width=w*this.dpr;canvas.height=h*this.dpr;const ctx=canvas.getContext('2d'),img=root.GameAssetLoader?.get(scene.background);ctx.scale(this.dpr,this.dpr);ctx.fillStyle='#152b2d';ctx.fillRect(0,0,w,h);if(img){const scale=Math.max(w/img.naturalWidth,h/img.naturalHeight);ctx.drawImage(img,(w-img.naturalWidth*scale)/2,(h-img.naturalHeight*scale)/2,img.naturalWidth*scale,img.naturalHeight*scale);}ctx.fillStyle='#06192335';ctx.fillRect(0,0,w,h);this.townBackdrop={key,canvas};}c.drawImage(this.townBackdrop.canvas,0,0,w,h);if(!this.dialogue){c.fillStyle='#071923ed';c.fillRect(0,0,w,68);}
     }
     drawTown(){
       this.drawTownBackdrop();if(this.dialogue)return;const npcs=this.model.sceneNpcs(),c=this.ctx,key=this.model.state.nodeId;

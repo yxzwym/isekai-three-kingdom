@@ -71,10 +71,11 @@
         for (const key of ['war', 'intelligence', 'constitution', 'speed', 'technique']) u[key] = attr(u[key]);
         Object.assign(u,ITEMS.apply(u));
         u.attack = Math.max(0, Math.floor(Number(u.weapon?.power??u.weapon?.attack??u.attack) || 0)); u.armor = Math.max(0,Math.floor(Number(u.armor)||0));u.resistance=Math.max(0,Math.floor(Number(u.resistance)||0));
-        if(u.side==='enemy'&&(this.config.bossBattle||u.boss))u.statusImmunities=[...new Set([...(u.statusImmunities||[]),'stun'])];
+        if(u.side==='enemy'&&(this.config.bossBattle||u.boss||u.passives?.includes('enemy-stun-resistance')))u.statusImmunities=[...new Set([...(u.statusImmunities||[]),'stun'])];
         u.level = attr(u.level ?? (u.side === 'enemy' ? this.config.enemyLevel || this.config.level : this.config.level));
         u.skills = Array.isArray(u.skills) ? u.skills.filter(id=>this.skills[id]&&!this.skills[id].reactionOnly) : [];
-        u.passives = Array.isArray(u.passives) ? [...new Set(u.passives)].filter(id=>this.passives[id]) : [];
+        u.passives = Array.isArray(u.passives) ? [...new Set(u.passives)].filter(id=>this.passives[id]&&(!this.passives[id].enemyOnly||u.side==='enemy')) : [];
+        if(u.side==='enemy'&&u.statusImmunities?.includes('stun'))u.passives=[...new Set([...u.passives,'enemy-stun-resistance'])];
         u.priorities = Array.isArray(u.priorities) ? u.priorities.map(r=>normalizeRule(r,this.skills[r.skill])) : [];
         u.targetRule=u.targetRule||(u.side==='enemy'?'random':'lowestCurrent');u.lastSingleSkill=null;u.lastManualSkill=null;
         u.maxSoldiers = u.healthOverride!=null?attr(u.healthOverride):u.potentials&&u.baseAttributes?maxHealth(u.constitution):u.maxSoldiers == null ? maxHealth(u.constitution) : attr(u.maxSoldiers);
@@ -234,7 +235,6 @@
       if (!targets.length || targets.some(t => !t || t.side !== side || t.dead || (t.soldiers <= 0&&!t.wounded))) return { ok: false, reason: '目标已倒下或阵营不符' };
       if(skill.kind==='buff'&&targets.some(t=>t.wounded))return {ok:false,reason:'需要先治疗重伤目标'};
       if(scope==='single'&&skill.side==='enemy'&&!this.targetPool(u,skill,scope).some(t=>t.id===targetId))return {ok:false,reason:'只能选择嘲讽目标'};
-      if (skill.kind === 'heal' && targets.every(t => t.soldiers >= t.maxSoldiers)) return { ok: false, reason: '目标生命已满' };
       return { ok: true, skill, targets };
     }
     autoCommand(u) {
@@ -254,6 +254,7 @@
         }else enabled=r.when==='always'||(r.when==='allyBelow'&&weakestFriend.soldiers/weakestFriend.maxSoldiers<=threshold)||(r.when==='selfBelow'&&u.soldiers/u.maxSoldiers<=threshold)||(r.when==='enemyCount'&&foes.length>=threshold)||(r.when==='enemyBelow'&&weakestFoe.soldiers/weakestFoe.maxSoldiers<=threshold);
         if(!enabled)continue;
         const scope=skill.scope||(skill.all?r.scope||'single':'single');
+        if(skill.kind==='heal'&&(scope==='all'?friends:[target]).every(t=>t.soldiers>=t.maxSoldiers))continue;
         if(skill.kind==='buff'){const id=skill.buff?.id||skill.id,pool=skill.side==='self'?[u]:skill.side==='ally'?friends:sortedFoes,missing=pool.filter(t=>!t.wounded&&!t.statuses.some(s=>s.id===id&&s.expiresAt>this.time));if(!missing.length)continue;if(scope==='single')target=missing[0];}
         if(skill.side==='enemy'&&scope==='single'&&skill.kind!=='buff'){const pool=this.targetPool(u,skill,scope),sorted=sortedFoes.filter(t=>pool.includes(t));target=sorted[0];}
         if(target&&this.validate(u,skill.id,target.id,scope).ok)candidates.push({skill:skill.id,target:target.id,scope,kind:skill.kind,always,frequency:r.frequency});
