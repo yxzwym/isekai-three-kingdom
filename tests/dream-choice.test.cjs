@@ -1,0 +1,10 @@
+const test=require('node:test'),assert=require('node:assert/strict'),P=require('../js/prologue.js'),R=require('../js/game-rules.js');require('../js/ui-theme.js');require('../js/canvas-story.js');const proto=global.PengpaiStory.CanvasStory.prototype;
+const atChoice=()=>P.checkpoint({storyVersion:2,stage:'dream',index:P.chapters.dream.lines.length-1});
+test('梦境先承诺送回，追加黄金与自愿留下是互斥分支，不能跳过选择',()=>{
+ const progress=atChoice(),v=Object.assign(Object.create(proto),{progress,save(){},draw(){},enter(stage){this.nextStage=stage;}});v.next();assert.equal(v.progress.dreamChoice,null);assert.equal(v.nextStage,undefined);v.skip();assert.equal(v.nextStage,undefined);assert.equal(v.progress.index,P.chapters.dream.lines.length-1);v.chooseDream('stay');assert.equal(v.progress.dreamChoice,'stay');assert.ok(P.linesFor('dream',v.progress).some(l=>l.text.includes('不会干涉')));assert.ok(!P.linesFor('dream',v.progress).some(l=>l.text.includes('十万两黄金')));assert.equal(P.chooseDream(v.progress,'gold'),null);v.skip();assert.equal(v.nextStage,'dawn');
+});
+test('两条梦境分支均保留正确的当前句与最终约定，存读档后继续到天明',()=>{
+ const values=new Map(),store=new R.SaveStore({getItem:key=>values.get(key),setItem:(key,value)=>values.set(key,value)}),c={name:'行客',appearance:'scholar',difficulty:'normal',...R.rollHero('normal',()=>.5)};
+ for(const choice of ['gold','stay']){let progress=P.chooseDream(atChoice(),choice);progress.index+=2;store.save(0,c,progress);const loaded=P.checkpoint(store.slots()[0].progress);assert.equal(loaded.dreamChoice,choice);assert.equal(loaded.index,progress.index);assert.equal(P.linesFor('dream',loaded)[loaded.index].text,P.dreamBranches[choice][2].text);const v=Object.assign(Object.create(proto),{progress:loaded,save(){},draw(){},enter(stage){this.nextStage=stage;}});for(let i=0;i<20&&!v.nextStage;i++)v.next();assert.equal(v.nextStage,'dawn');}
+ assert.ok(P.linesFor('dream',{dreamChoice:'gold'}).some(l=>l.text.includes('十万两黄金')));assert.equal(P.checkpoint({stage:'dream',dreamChoice:'invalid'}).dreamChoice,null);
+});

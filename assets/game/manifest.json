@@ -34,7 +34,7 @@
     "swordswoman": {
       "name": "红衣女侠",
       "status": "ready",
-      "src": "./assets/protagonists/swordswoman/fullbody.webp",
+      "src": "./assets/protagonists/swordswoman/fullbody-v2.webp",
       "width": 1024,
       "height": 1536,
       "portrait": {
@@ -49,7 +49,7 @@
     "healer": {
       "name": "素衣医者",
       "status": "ready",
-      "src": "./assets/protagonists/healer/fullbody.webp",
+      "src": "./assets/protagonists/healer/fullbody-v2.webp",
       "width": 1024,
       "height": 1536,
       "portrait": {
@@ -79,7 +79,7 @@
     "silverguard": {
       "name": "银甲战将",
       "status": "ready",
-      "src": "./assets/protagonists/silverguard/fullbody.webp",
+      "src": "./assets/protagonists/silverguard/fullbody-v2.webp",
       "width": 1024,
       "height": 1536,
       "portrait": {

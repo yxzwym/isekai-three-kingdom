@@ -71,12 +71,14 @@
         for (const key of ['war', 'intelligence', 'constitution', 'speed', 'technique']) u[key] = attr(u[key]);
         Object.assign(u,ITEMS.apply(u));
         u.attack = Math.max(0, Math.floor(Number(u.weapon?.power??u.weapon?.attack??u.attack) || 0)); u.armor = Math.max(0,Math.floor(Number(u.armor)||0));u.resistance=Math.max(0,Math.floor(Number(u.resistance)||0));
+        if(u.side==='enemy'&&(this.config.bossBattle||u.boss))u.statusImmunities=[...new Set([...(u.statusImmunities||[]),'stun'])];
         u.level = attr(u.level ?? (u.side === 'enemy' ? this.config.enemyLevel || this.config.level : this.config.level));
         u.skills = Array.isArray(u.skills) ? u.skills.filter(id=>this.skills[id]&&!this.skills[id].reactionOnly) : [];
         u.passives = Array.isArray(u.passives) ? [...new Set(u.passives)].filter(id=>this.passives[id]) : [];
         u.priorities = Array.isArray(u.priorities) ? u.priorities.map(r=>normalizeRule(r,this.skills[r.skill])) : [];
         u.targetRule=u.targetRule||(u.side==='enemy'?'random':'lowestCurrent');u.lastSingleSkill=null;u.lastManualSkill=null;
         u.maxSoldiers = u.healthOverride!=null?attr(u.healthOverride):u.potentials&&u.baseAttributes?maxHealth(u.constitution):u.maxSoldiers == null ? maxHealth(u.constitution) : attr(u.maxSoldiers);
+        u.maxSoldiers=Math.max(1,Math.floor(u.maxSoldiers*u.passives.reduce((n,id)=>n*(Number(this.passives[id]?.stats?.healthMultiplier)||1),1)));
         u.soldiers = clamp(Math.floor(Number(u.startSoldiers ?? u.maxSoldiers)), 0, u.maxSoldiers);
         u.woundsEnabled=u.side==='ally'&&(u.woundsEnabled??this.config.wounds!==false);u.dead=!!u.dead||u.condition==='dead'||u.soldiers===0&&!u.woundsEnabled;u.wounded=!u.dead&&u.soldiers===0&&u.woundsEnabled;
         u.sp = Math.max(0, Number(u.enemySp) || 0); u.initialSp = u.sp;
@@ -97,14 +99,16 @@
     invalidateAI(){this.revision++;}
     emit(type, detail) { this.revision++;const event = { id: ++this.sequence, tick: this.tick, time: this.time, type, ...detail }; this.events.push(event); return event; }
     start() { if (this.status === 'ready') { this.status = 'running'; this.emit('system', { text: '战鼓已响，两军交锋。' }); this.checkEnd(); } }
-    advance(seconds) {
+    advance(seconds,stopWhen) {
       if (this.status !== 'running') return;
+      if(stopWhen?.()){this.accumulator=0;return;}
       this.accumulator += Math.max(0, Number(seconds) || 0);
       let iterations = 0;
       while (this.accumulator + 1e-9 >= .02 && this.status === 'running' && iterations++ < 50000) {
         this.accumulator -= .02; this.tick++; this.time = this.tick * .02;
         for(const u of this.units)this.tickStatuses(u);if(this.status!=='running')break;
         for (const u of this.units) if (u.soldiers > 0&&!this.stunned(u)) {if(u.progress!==u.progressStamp)u.waitTime=u.progress*u.interval;u.interval=interval(this.effective(u),this.config,u.lastSkillDelay);u.waitTime+=.02;const raw=Math.min(1,u.waitTime/u.interval);u.progress=Math.max(u.progress,raw);u.progressStamp=u.progress;if(!u.ready&&u.waitTime>=u.interval-1e-9)u.readyTick=this.tick;u.ready=u.waitTime>=u.interval-1e-9;}
+        if(stopWhen?.()){this.accumulator=0;break;}
         for (const u of this.units) {
           if (this.status !== 'running') break;
           if (u.soldiers <= 0 || !u.ready || this.stunned(u)) continue;
@@ -112,15 +116,17 @@
             const command = u.queued; u.queued = null;
             const result = this.act(u.id, command.skill, command.target, command.scope);
             if (!result.ok) { this.emit('notice', { actor: u.id, text: `${u.name}指令取消：${result.reason}` }); }
+            if(stopWhen?.()){this.accumulator=0;return;}
           }
           if(u.ready&&u.mode==='auto'&&u.autoCheckedRevision!==this.revision){u.autoCheckedRevision=this.revision;const command=this.autoCommand(u);if(command)this.act(u.id,command.skill,command.target,command.scope);}
+          if(stopWhen?.()){this.accumulator=0;return;}
         }
       }
     }
     effective(u){
       const out={...u};for(const key of ['war','intelligence','constitution','speed','technique','attack','armor','resistance']){
-        const add=u.statuses.reduce((n,s)=>n+(s.attribute===key?(Number(s.amount)||0)*(s.stacks||1):0),0),mult=u.statuses.reduce((n,s)=>n*(Number(s[key+'Multiplier'])||1),1);out[key]=Math.max(key==='constitution'?1:0,(u[key]+add)*mult);
-      }for(const stat of ['healingBonus','physicalBonus','tacticBonus','physicalReduction','tacticReduction'])out[stat]=(Number(u[stat])||0)+u.passives.reduce((n,id)=>n+(Number(this.passives[id]?.stats?.[stat])||0),0);out.damageMultiplier=Number(u.damageMultiplier??1);for(const id of u.passives){const maximum=Number(this.passives[id]?.stats?.missingHealthDamageBonus)||0;if(maximum>0)out.damageMultiplier*=1+maximum*clamp(1-u.soldiers/u.maxSoldiers,0,1);}
+        const passiveAdd=u.passives.reduce((n,id)=>n+(Number(this.passives[id]?.stats?.[key+'Bonus'])||0),0),passiveMult=u.passives.reduce((n,id)=>n*(Number(this.passives[id]?.stats?.[key+'Multiplier'])||1),1);const add=u.statuses.reduce((n,s)=>n+(s.attribute===key?(Number(s.amount)||0)*(s.stacks||1):0),0),mult=u.statuses.reduce((n,s)=>n*(Number(s[key+'Multiplier'])||1),1);out[key]=Math.max(key==='constitution'?1:0,(u[key]+add+passiveAdd)*mult*passiveMult);
+      }for(const stat of ['healingBonus','physicalBonus','tacticBonus','physicalReduction','tacticReduction','hitBonus','criticalBonus','armorPenetration','resistancePenetration'])out[stat]=(Number(u[stat])||0)+u.passives.reduce((n,id)=>n+(Number(this.passives[id]?.stats?.[stat])||0),0);out.damageMultiplier=Number(u.damageMultiplier??1);for(const id of u.passives){if(this.passives[id]?.stats?.guaranteedCritical)out.guaranteedCritical=true;if(this.passives[id]?.stats?.ignoreArmor)out.ignoreArmor=true;const maximum=Number(this.passives[id]?.stats?.missingHealthDamageBonus)||0;if(maximum>0)out.damageMultiplier*=1+maximum*clamp(1-u.soldiers/u.maxSoldiers,0,1);}
       out.weaponPower=PROFICIENCY.power(out.attack,u);return out;
     }
     healingPassives(owner,target){
@@ -142,7 +148,7 @@
     stunned(u){return u.statuses.some(s=>s.stun&&s.expiresAt>this.time);}
     addStatus(source,target,effect,skill={}){
       const base=STATES.definitions[effect.id]||{},definition={...copy(base),...copy(effect)},id=definition.id||skill.id;
-      if(target.dead||(target.soldiers<=0&&!(target.wounded&&definition.period&&!definition.healing))||(target.statusImmunities||[]).includes(id))return null;
+      if(target.dead||(target.soldiers<=0&&!(target.wounded&&definition.period&&!definition.healing))||((target.statusImmunities||[]).includes(id)||definition.stun&&(target.statusImmunities||[]).includes('stun')))return null;
       if(definition.chance!==undefined){const chance=clamp(Number(definition.chance)-(source.side!==target.side?this.effective(target).resistance/1000:0),0,1);if(this.rng()>=chance)return null;}
       const owner=this.effective(source),coefficient=Number(definition.coefficient)||0;
       let amount=Number(definition.amount??((Number(definition.base)||0)+coefficient*(owner[definition.stat||'technique']??0)))||0;if(definition.negative)amount=-Math.abs(amount);
@@ -266,7 +272,7 @@
     }
     dodgeChance(unit,kind){
       const bonus=unit.passives.reduce((n,id)=>n+(Number(this.passives[id]?.stats?.dodgeBonus)||0),0);
-      return clamp((kind==='physical'?(Number(unit.dodge)||0):0)+bonus,0,1);
+      const physicalBonus=kind==='physical'?unit.passives.reduce((n,id)=>n+(Number(this.passives[id]?.stats?.physicalDodgeBonus)||0),0):0;return clamp((kind==='physical'?(Number(unit.dodge)||0):0)+bonus+physicalBonus,0,1);
     }
     survive(unit){
       if(unit.soldiers>0)return null;

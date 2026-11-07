@@ -22,6 +22,6 @@
   const scenario = name==='tutorial'?PengpaiPrologue.createBattle('manual-fight',previewHero):name==='preparation'?PengpaiPrologue.createBattle('prepare',previewHero):name === 'stress' ? BattleScenarios.createStress() : name === 'encounter' ? BattleScenarios.createEncounter()
     : name === 'effects' ? BattleScenarios.createEffectsPreview() : name==='formation'?BattleScenarios.createFormationPreview():BattleScenarios.createChibi();
   const settings=store.settings();
-  window.battleDemo = BattleSystem.mount(document.getElementById('battleCanvas'), scenario,{autoStart:name!=='preparation',profile:new URLSearchParams(location.search).has('profile'),screenShake:settings.screenShake,effects:settings.effects});
+  window.battleDemo = BattleSystem.mount(document.getElementById('battleCanvas'), scenario,{autoStart:name!=='preparation',profile:new URLSearchParams(location.search).has('profile'),...settings,difficulty:previewHero.difficulty});
   }
 })();

@@ -1,0 +1,479 @@
+[
+  {
+    "id": "taishici",
+    "source": "exec-3ffd6734-b6d0-4ae1-902c-4c2352151a2d.png",
+    "prompt": "Use case: style-transfer. Asset: full-body transparent character cutout for the Chinese RPG 异界三国. Images 1 and 2 are the exact approved STYLE references, image 3 is the character to REDRAW. Match references 1 and 2: refined idealized Dynasty Warriors Origins-like Chinese historical game illustration, smooth handsome sculpted faces, elegant elongated 8.5-head anatomy, detailed but clean layered armor and robes, luminous controlled soft lighting, clear face and silhouette at small size, premium polished character key art, subtle flowing cloth. The target must look painted by exactly the same artist and belong beside Zhao Yun, the protagonist and Zhen Ji. Remove the gritty pores, rough photographic skin, squat stocky action-figure proportions and muddy low saturation of image 3. This is NOT a photograph, movie still, hyperreal cosplay, western fantasy, cartoon, chibi, or gritty miniature. Single full standing person, head AND both feet AND entire weapon visible, centered, minimal empty margins, front three-quarter view. Truly transparent alpha background, NO environment, NO gray/brown haze/background/pedestal, no lettering or watermark. Preserve the character's distinct costume colors, weapon and recognizability, but redraw face/proportions/rendering for approved style. Taishi Ci 太史慈: heroic handsome adult man in his early thirties, lean powerful athletic long-legged silhouette, slight tidy stubble, long black hair, dark teal flowing cloak and deep blue steel lamellar armor with silver details, holds his long Chinese spear upright. Do not copy Zhao Yun's white costume or identical face.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/taishici/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "xuchu",
+    "source": "exec-50a7f894-cd67-4add-a4a7-61dfe3f2b400.png",
+    "prompt": "Use case: style-transfer. Asset: full-body transparent character cutout for the Chinese RPG 异界三国. Images 1 and 2 are the exact approved STYLE references, image 3 is the character to REDRAW. Match references 1 and 2: refined idealized Dynasty Warriors Origins-like Chinese historical game illustration, smooth handsome sculpted faces, elegant elongated 8.5-head anatomy, detailed but clean layered armor and robes, luminous controlled soft lighting, clear face and silhouette at small size, premium polished character key art, subtle flowing cloth. The target must look painted by exactly the same artist and belong beside Zhao Yun, the protagonist and Zhen Ji. Remove the gritty pores, rough photographic skin, squat stocky action-figure proportions and muddy low saturation of image 3. This is NOT a photograph, movie still, hyperreal cosplay, western fantasy, cartoon, chibi, or gritty miniature. Single full standing person, head AND both feet AND entire weapon visible, centered, minimal empty margins, front three-quarter view. Truly transparent alpha background, NO environment, NO gray/brown haze/background/pedestal, no lettering or watermark. Preserve the character's distinct costume colors, weapon and recognizability, but redraw face/proportions/rendering for approved style. Xu Chu 许褚: visibly very broad and powerful stout strongman (retain his bulky physique, NOT slim), honest round expressive face, short tidy beard, mustard underrobe, dark bronze armor, dark-red sash, one large iron WAR HAMMER resting down beside him. HAMMER ONLY, no sword or blade. Match painterly smooth heroic rendering, not gritty photo.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/xuchu/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "dianwei",
+    "source": "exec-1e78c67e-c1ca-4f6f-81ee-a5b40c76756d.png",
+    "prompt": "Use case: style-transfer. Asset: full-body transparent character cutout for the Chinese RPG 异界三国. Images 1 and 2 are the exact approved STYLE references, image 3 is the character to REDRAW. Match references 1 and 2: refined idealized Dynasty Warriors Origins-like Chinese historical game illustration, smooth handsome sculpted faces, elegant elongated 8.5-head anatomy, detailed but clean layered armor and robes, luminous controlled soft lighting, clear face and silhouette at small size, premium polished character key art, subtle flowing cloth. The target must look painted by exactly the same artist and belong beside Zhao Yun, the protagonist and Zhen Ji. Remove the gritty pores, rough photographic skin, squat stocky action-figure proportions and muddy low saturation of image 3. This is NOT a photograph, movie still, hyperreal cosplay, western fantasy, cartoon, chibi, or gritty miniature. Single full standing person, head AND both feet AND entire weapon visible, centered, minimal empty margins, front three-quarter view. Truly transparent alpha background, NO environment, NO gray/brown haze/background/pedestal, no lettering or watermark. Preserve the character's distinct costume colors, weapon and recognizability, but redraw face/proportions/rendering for approved style. Dian Wei 典韦: broad powerful muscular adult warrior, square strong face, stern dark eyebrows and short black beard, black-navy lamellar armor and dark cloth. Holds TWO short Chinese iron ji halberds pointing safely down, one in each hand. Do not turn them into daggers or axes. Strong but elegant heroic painted anatomy rather than squat rough photorealism.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/dianwei/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "huangzhong",
+    "source": "exec-34eadf4a-7d6d-42b7-8d33-119b8d36fbae.png",
+    "prompt": "Use case: style-transfer. Asset: transparent full-body Chinese RPG character illustration. Images 1 and 2 are approved STYLE references; image 3 is the redesign target. Exactly match the premium stylized heroic Chinese historical key-art style of the approved characters, Dynasty Warriors Origins-like refined idealized faces, smooth controlled painterly rendering, 8.5-head elegant standing anatomy, flowing layered robes, clean fine embroidered detail, bright soft neutral lighting, high readability in small game cards. Redraw image 3 in that same visual language and same quality as the protagonist and Zhao Yun. NO gritty photoreal skin or pores, no squat proportions, no live-action costume photography, no cartoon, no western fantasy. Keep each person's age, personality, costume colors and props distinct. One character only, full head and both feet visible, 3/4 front standing view, centered, subtle natural cloth motion. Transparent alpha background with absolutely no haze, colored backdrop, platform, ground, smoke, or text. Huang Zhong 黄忠: a magnificent fit elderly Chinese general around sixty, beautiful silver-white hair and neatly shaped long white beard, sharp alert eyes, handsome dignified mature facial structure, tall straight powerful stance. Dark green cloak, clean bronze-gold lamellar armor, elegant long Chinese bow held low with quiver on back. Veteran, not frail or decrepit; do not make young or change bow.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/huangzhong/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "maliang",
+    "source": "exec-6d2dd8d5-0e86-42a0-ae8b-3dcd6b478474.png",
+    "prompt": "Use case: style-transfer. Asset: transparent full-body Chinese RPG character illustration. Images 1 and 2 are approved STYLE references; image 3 is the redesign target. Exactly match the premium stylized heroic Chinese historical key-art style of the approved characters, Dynasty Warriors Origins-like refined idealized faces, smooth controlled painterly rendering, 8.5-head elegant standing anatomy, flowing layered robes, clean fine embroidered detail, bright soft neutral lighting, high readability in small game cards. Redraw image 3 in that same visual language and same quality as the protagonist and Zhao Yun. NO gritty photoreal skin or pores, no squat proportions, no live-action costume photography, no cartoon, no western fantasy. Keep each person's age, personality, costume colors and props distinct. One character only, full head and both feet visible, 3/4 front standing view, centered, subtle natural cloth motion. Transparent alpha background with absolutely no haze, colored backdrop, platform, ground, smoke, or text. Ma Liang 马良: graceful handsome scholar about thirty, unmistakable white eyebrows against black hair, pale gray/ivory and sage-green Han robes, medicinal gourd at waist, holds bamboo medical scroll. Refined gentle lively expression. Long elegant proportions and graceful hand pose. Match approved scholar style exactly; different facial identity from the protagonist.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/maliang/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "lusu",
+    "source": "exec-35d01ea7-047c-4e50-82fc-e47310932496.png",
+    "prompt": "Use case: style-transfer. Asset: transparent full-body Chinese RPG character illustration. Images 1 and 2 are approved STYLE references; image 3 is the redesign target. Exactly match the premium stylized heroic Chinese historical key-art style of the approved characters, Dynasty Warriors Origins-like refined idealized faces, smooth controlled painterly rendering, 8.5-head elegant standing anatomy, flowing layered robes, clean fine embroidered detail, bright soft neutral lighting, high readability in small game cards. Redraw image 3 in that same visual language and same quality as the protagonist and Zhao Yun. NO gritty photoreal skin or pores, no squat proportions, no live-action costume photography, no cartoon, no western fantasy. Keep each person's age, personality, costume colors and props distinct. One character only, full head and both feet visible, 3/4 front standing view, centered, subtle natural cloth motion. Transparent alpha background with absolutely no haze, colored backdrop, platform, ground, smoke, or text. Lu Su 鲁肃: handsome warm composed adult scholar around thirty-eight, tidy short mustache and short goatee, rich warm burgundy-brown silk Han robes with ivory underrobe, understated gold embroidery. Holds bamboo medical/classical scripture. Elegant slightly broad scholarly silhouette, friendly intelligent expression, not heavily aged. Redraw in approved smooth polished heroic game-illustration style.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/lusu/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "huatuo",
+    "source": "exec-657bf38a-f910-4261-825d-12c61c58eac0.png",
+    "prompt": "Use case: stylized-concept. Create ONE full-body NPC cutout for Chinese historical RPG 异界三国. The two reference images define the exact rendering STYLE, not identity or rich costume: smooth idealized Chinese RPG character key art, elegant 8-head anatomy, refined natural facial anatomy, fine but clean painterly textile details, premium Dynasty Warriors Origins-inspired art direction, soft neutral light, beautifully readable silhouette beside the existing protagonist and Zhao Yun. No gritty pores, no photograph, no cartoon, no western fantasy. Distinct NPC identity, practical late Han Chinese clothing; less elaborate than generals. Full head and both feet visible, centered standing three-quarter view, 1024x1536 portrait composition. Truly transparent alpha background, NO backdrop/haze/shadow/environment/text. Hua Tuo 华佗: kindly alert Chinese physician in his sixties with elegant white brows and well-kept white beard, silver hair tied in a simple bun. Graceful straight posture, warm wise eyes. Clean ash gray Han robes and ivory inner robe, brown cloth sash, carries a modest wooden medical case at his side and holds one sprig of medicinal herbs. Render as refined handsome elderly character, not gritty photo or frail beggar.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/huatuo/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "liu-widow",
+    "source": "exec-bce27f14-652b-4a4f-b95d-1ac0c76b636e.png",
+    "prompt": "Use case: stylized-concept. Create ONE full-body NPC cutout for Chinese historical RPG 异界三国. The two reference images define the exact rendering STYLE, not identity or rich costume: smooth idealized Chinese RPG character key art, elegant 8-head anatomy, refined natural facial anatomy, fine but clean painterly textile details, premium Dynasty Warriors Origins-inspired art direction, soft neutral light, beautifully readable silhouette beside the existing protagonist and Zhao Yun. No gritty pores, no photograph, no cartoon, no western fantasy. Distinct NPC identity, practical late Han Chinese clothing; less elaborate than generals. Full head and both feet visible, centered standing three-quarter view, 1024x1536 portrait composition. Truly transparent alpha background, NO backdrop/haze/shadow/environment/text. 刘氏, the widow in Dian Wei's Suiyang story: attractive dignified Chinese woman about thirty-two, DISTINCT oval mature face, slightly tired worried eyes, black hair tied in a modest low married-woman bun secured with a wood pin. Plain muted indigo and gray Han cross-collar robe, faded cream underrobe, long skirt, simple cloth shoes. One hand holds a folded old cloth bundle against her abdomen, other rests near it. No armor, no weapons, no jewelry, not the existing young village maiden, no child present. Gentle but determined expression.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/liu-widow/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "herbalist",
+    "source": "exec-27961e5e-565d-44e8-b032-e551285f20e3.png",
+    "prompt": "Use case: stylized-concept. Create ONE full-body NPC cutout for Chinese historical RPG 异界三国. The two reference images define the exact rendering STYLE, not identity or rich costume: smooth idealized Chinese RPG character key art, elegant 8-head anatomy, refined natural facial anatomy, fine but clean painterly textile details, premium Dynasty Warriors Origins-inspired art direction, soft neutral light, beautifully readable silhouette beside the existing protagonist and Zhao Yun. No gritty pores, no photograph, no cartoon, no western fantasy. Distinct NPC identity, practical late Han Chinese clothing; less elaborate than generals. Full head and both feet visible, centered standing three-quarter view, 1024x1536 portrait composition. Truly transparent alpha background, NO backdrop/haze/shadow/environment/text. A mountain herb gatherer around forty-five, lean wiry Chinese man, narrow weathered-but-smooth painted face, short salt-and-pepper stubble, straw rain hat hanging on back, moss green and tan practical Han tunic, calf wraps and cloth shoes. Wicker basket with herbs strapped to his back, holds a small bamboo herb scoop. Warm alert expression, one foot slightly forward, clearly NOT the existing laborer or scholar.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/herbalist/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "innkeeper",
+    "source": "exec-2b85eed7-8ceb-464b-9c66-77a06957168b.png",
+    "prompt": "Use case: stylized-concept. ONE distinct full-body noncombat NPC for Chinese RPG 异界三国. The reference images are the exact STYLE guide: polished heroic Chinese historical illustration, smooth idealized yet natural faces, clean painterly fabric, soft warm light, elegant 8-head proportions, consistent with existing Zhao Yun and protagonist artwork. Adapt this style to ordinary Han-era civilians, no royal ornament. Not photographic, no gritty skin, no cartoon, no western fantasy. Full standing figure including head and both feet, three-quarter front view, portrait composition with little empty margin. Transparent alpha background, absolutely no scenery, colored haze, platform, cast shadow, text, watermarks or other people. 酒家掌柜, friendly Chinese man in his forties, slightly rounded build, round smiling distinctive face, thin curled mustache, black hair under a simple dark cloth cap. Rolled warm brown cross-collar Han sleeves, dark green apron over beige robe, cloth shoes, holds a ceramic wine jug and white wiping cloth, welcoming conversational gesture. A different person from existing villager.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/innkeeper/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "neighbor-woman",
+    "source": "exec-153dc34d-3c4c-4262-a558-da7ff9d9b402.png",
+    "prompt": "Use case: stylized-concept. ONE distinct full-body noncombat NPC for Chinese RPG 异界三国. The reference images are the exact STYLE guide: polished heroic Chinese historical illustration, smooth idealized yet natural faces, clean painterly fabric, soft warm light, elegant 8-head proportions, consistent with existing Zhao Yun and protagonist artwork. Adapt this style to ordinary Han-era civilians, no royal ornament. Not photographic, no gritty skin, no cartoon, no western fantasy. Full standing figure including head and both feet, three-quarter front view, portrait composition with little empty margin. Transparent alpha background, absolutely no scenery, colored haze, platform, cast shadow, text, watermarks or other people. 邻妇, Chinese woman about forty-five, round cheerful face, sturdy modest build, hair neatly pinned with a pale headcloth, muted terracotta and moss green Han working dress with a cream apron, holds a small wicker vegetable basket on one arm, other hand gesturing as she shares news. Friendly lively expression, mature rather than young maiden, clearly different from Liu widow and village maiden.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/neighbor-woman/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "li-yong",
+    "source": "exec-691c51e7-999c-4e9a-b283-466528e66842.png",
+    "prompt": "Use case: stylized-concept. ONE distinct full-body noncombat NPC for Chinese RPG 异界三国. The reference images are the exact STYLE guide: polished heroic Chinese historical illustration, smooth idealized yet natural faces, clean painterly fabric, soft warm light, elegant 8-head proportions, consistent with existing Zhao Yun and protagonist artwork. Adapt this style to ordinary Han-era civilians, no royal ornament. Not photographic, no gritty skin, no cartoon, no western fantasy. Full standing figure including head and both feet, three-quarter front view, portrait composition with little empty margin. Transparent alpha background, absolutely no scenery, colored haze, platform, cast shadow, text, watermarks or other people. 李永, powerful corrupt local landlord around forty-eight, calculating narrow eyes, pale middle-aged Chinese face with a short thin mustache, slightly heavy elegant build. Expensive dark plum and ochre Han robes with restrained gold edging, black noble cap, holds a folded silk document and a small ring on a hand. Haughty guarded expression. No weapon, no armor, distinct face unlike Lu Su; villainous through expression rather than grotesque caricature.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/li-yong/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "city-north",
+    "source": "exec-ae877fe8-da5d-4b08-83d6-c814a8cfb555.png",
+    "prompt": "Use case: historical-scene. Asset: portrait background for a Canvas Three Kingdoms RPG town/dialogue scene. Match the rendering polish, warm natural textures, elevated three-quarter perspective and semi-realistic painted art of the reference, but make a DISTINCT RICH URBAN CITY environment, not a village. Late Han/Three Kingdoms Chinese architecture: timber halls, gray tiled roofs, plaster or rammed earth, restrained curved eaves, market signs without legible text; NO modern objects, no Japanese buildings, no Ming/Qing ornate palace fantasy. Camera looks downward along a generous stone-paved street or courtyard. Buildings and interesting architecture occupy upper two-thirds and sides; central middle/lower areas have visible walkable ground for character/UI overlays. Clear bright daytime, pleasantly colored, no giant blank sky, no large foreground obstruction, no people, no text, no game UI. Full opaque 1024x1536 vertical illustration. Northern Chinese walled market city like Beihai or Xuchang: handsome gate tower and rammed-earth city wall in distance, stone-paved busy market lane with wooden shop arcades, restrained red-brown beams, beige plaster, merchant banners without lettering, stacked woven baskets, distant trees, clean morning sun. Feels substantial organized CITY rather than village dirt track.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/towns/city-north-v1.webp"
+  },
+  {
+    "id": "city-river",
+    "source": "exec-6be58023-d9bb-4a7f-93ac-f861fea80171.png",
+    "prompt": "Use case: historical-scene. Asset: portrait background for a Canvas Three Kingdoms RPG town/dialogue scene. Match the rendering polish, warm natural textures, elevated three-quarter perspective and semi-realistic painted art of the reference, but make a DISTINCT RICH URBAN CITY environment, not a village. Late Han/Three Kingdoms Chinese architecture: timber halls, gray tiled roofs, plaster or rammed earth, restrained curved eaves, market signs without legible text; NO modern objects, no Japanese buildings, no Ming/Qing ornate palace fantasy. Camera looks downward along a generous stone-paved street or courtyard. Buildings and interesting architecture occupy upper two-thirds and sides; central middle/lower areas have visible walkable ground for character/UI overlays. Clear bright daytime, pleasantly colored, no giant blank sky, no large foreground obstruction, no people, no text, no game UI. Full opaque 1024x1536 vertical illustration. Jiangnan riverside city like Jianye or Changsha: elegant white plaster and dark timber waterside shops, gray tile roofs, willow branches, stone bridge crosses a narrow canal at upper third, moored small cargo boats at right background. Broad stone paved urban embankment fills center and lower half, characters would stand on dry paving, not water. Bright warm late-morning color, muted teal water accents.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/towns/city-river-v1.webp"
+  },
+  {
+    "id": "city-frontier",
+    "source": "exec-bc0181ee-4417-4dbd-b077-ee5c6c585f3a.png",
+    "prompt": "Use case: historical-scene. Asset: portrait background for a Canvas Three Kingdoms RPG town/dialogue scene. Match the rendering polish, warm natural textures, elevated three-quarter perspective and semi-realistic painted art of the reference, but make a DISTINCT RICH URBAN CITY environment, not a village. Late Han/Three Kingdoms Chinese architecture: timber halls, gray tiled roofs, plaster or rammed earth, restrained curved eaves, market signs without legible text; NO modern objects, no Japanese buildings, no Ming/Qing ornate palace fantasy. Camera looks downward along a generous stone-paved street or courtyard. Buildings and interesting architecture occupy upper two-thirds and sides; central middle/lower areas have visible walkable ground for character/UI overlays. Clear bright daytime, pleasantly colored, no giant blank sky, no large foreground obstruction, no people, no text, no game UI. Full opaque 1024x1536 vertical illustration. Northwestern frontier city like Changan/Wuwei: broad sandstone/ochre paved town square and fortified Han gate, tall pale rammed-earth walls, timber merchant arcades with muted rust awnings, sacks and ceramic jars, dry ochre hills glimpsed only through distant gateway. Wealthy ancient trading outpost, disciplined city layout, warm clear sunlight, not desert village.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/towns/city-frontier-v1.webp"
+  },
+  {
+    "id": "city-shu",
+    "source": "exec-37e3ac58-7f1f-438b-b063-a812fd0ed32e.png",
+    "prompt": "Use case: historical-scene. One opaque portrait 1024x1536 RPG scene background for 异界三国, same refined semi-realistic painted architectural style and elevated three-quarter perspective as reference. Late Han/Three Kingdoms China, traditional wooden buildings and restrained gray tile roofs, natural warm daylight, rich but believable colors. Broad visible dry standing ground in center/lower half, architecture and details around upper half and sides, no broad sky. No people, no figures, no text or UI, no modern elements, no Japanese or late-imperial architecture. Prosperous Sichuan city like Chengdu: a graceful wide stone-paved lane leading to a Han timber public hall, bamboo and lush green courtyard trees, gray tiled deep eaves, warm red/brown wooden shops, silk awnings in muted gold and green, pale plaster walls, carved stone drainage channels. The feeling is a sheltered cultured green walled CITY with clear stone paving, not a rural farm.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/towns/city-shu-v1.webp"
+  },
+  {
+    "id": "clinic-courtyard",
+    "source": "exec-c247ff67-6e3c-4109-a72c-a7b5ce86893f.png",
+    "prompt": "Use case: historical-scene. One opaque portrait 1024x1536 RPG scene background for 异界三国, same refined semi-realistic painted architectural style and elevated three-quarter perspective as reference. Late Han/Three Kingdoms China, traditional wooden buildings and restrained gray tile roofs, natural warm daylight, rich but believable colors. Broad visible dry standing ground in center/lower half, architecture and details around upper half and sides, no broad sky. No people, no figures, no text or UI, no modern elements, no Japanese or late-imperial architecture. A physician's courtyard within a Chinese town: elegant but modest wooden medical hall at upper center, covered verandas to sides, herb drying trays, woven baskets, wooden medicine drawers partly visible behind an open door, ceramic water jars, a small tree and herb planters. Clean stone paving across center and lower half, warm filtered daytime light and quiet lived-in atmosphere. A small real medical courtyard, not mystical temple, no beds in foreground.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/towns/clinic-courtyard-v1.webp"
+  },
+  {
+    "id": "town-doctor",
+    "source": "exec-7c4a1043-e993-4178-baa6-a453642385f8.png",
+    "prompt": "Use case: stylized-concept. A single full-body ordinary town NPC cutout for Three Kingdoms Chinese RPG 异界三国. Match the exact polished Chinese historical character key-art STYLE of the references: refined smooth painted face, elegant 8-head anatomy, natural soft light, clean layered cloth details, premium Dynasty Warriors Origins-like illustration. Not photographic, no gritty pores, no cartoon, no western fantasy. Ordinary late-Han civilian clothes rather than ornate general or noble costume. Full head and both feet visible, centered relaxed standing three-quarter front view, 1024x1536 portrait composition. Transparent alpha background, absolutely no environmental haze, backdrop, floor, text, or other people. A town physician in his late forties, distinctive long slim face, short neatly trimmed black-and-gray beard, thoughtful kind slightly hooded eyes, black hair under a small plain pale sage cloth cap. Clean muted sage-green Han robe with cream collar, narrow brown sash, cloth shoes. Holds an open bamboo medical record and a small sealed ceramic medicine jar. Clearly different facial identity from silver-haired Hua Tuo, the brown-clothed old villager, the young scholar, and the herb gatherer. Practical approachable local doctor, no hat decorations.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/town-doctor/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "peddler",
+    "source": "exec-44a3b031-ace1-48cb-b3f7-a86bb5402c76.png",
+    "prompt": "Use case: stylized-concept. A single full-body ordinary town NPC cutout for Three Kingdoms Chinese RPG 异界三国. Match the exact polished Chinese historical character key-art STYLE of the references: refined smooth painted face, elegant 8-head anatomy, natural soft light, clean layered cloth details, premium Dynasty Warriors Origins-like illustration. Not photographic, no gritty pores, no cartoon, no western fantasy. Ordinary late-Han civilian clothes rather than ornate general or noble costume. Full head and both feet visible, centered relaxed standing three-quarter front view, 1024x1536 portrait composition. Transparent alpha background, absolutely no environmental haze, backdrop, floor, text, or other people. A traveling equipment merchant in his thirties, distinctive angular cheerful face with one dimple and short dark mustache, slightly wavy black hair tied under a tan headcloth. Indigo short-sleeved Han tunic over cream cross-collar undershirt, dark warm-brown leather-and-cloth vest, narrow belt with a modest small coin pouch, practical cloth boots. Carries a closed rectangular merchandise case at one side, free hand raised in a welcoming bargaining gesture. Lean energetic build, clearly different from the broad smiling innkeeper or existing muscular laborer. No wine jug, no weapon in hand, no elaborate ornaments.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/peddler/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "simayi",
+    "prompt": "Use case: stylized-concept. Asset type: full-body transparent character illustration for Chinese Three Kingdoms RPG, later cropped to bust portrait. Image 1 is style reference ONLY (Zhao Yun): match its polished Chinese historical game character CG illustration, smooth restrained rendering, realistic cloth and finely drawn Chinese face, same head to body proportion and comparable head scale within canvas. Draw Sima Yi, Chinese male about 45, narrow thoughtful eyes, composed reserved expression, neat mustache and small pointed beard, black traditional scholar guan. Formal dark ink-blue and charcoal Chinese Han-era robes, muted silver-gray brocade edges and a dignified wide belt, holding a closed bamboo scroll in one hand, the other relaxed by sleeve. No feather fan. Calm standing three-quarter pose looking slightly left. Full figure including feet and hat entirely visible, centered, tall portrait canvas. Clear readable silhouette, gentle neutral lighting, no environment, no pedestal, no text, no logo, genuinely transparent alpha background.",
+    "tool": "built-in image_gen",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-f1f5d332-e6f2-4f3e-8bb2-a04cbfa2d94c.png",
+    "savedPath": "assets/characters/simayi/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "zhugeliang",
+    "prompt": "Use case: stylized-concept. Asset type: full-body transparent character illustration for Chinese Three Kingdoms RPG, later cropped to bust portrait. Image 1 is style reference ONLY (Zhao Yun): match its polished Chinese historical game character CG illustration, smooth restrained rendering, realistic cloth, attractive natural face, same head to body proportion and comparable head scale within canvas. Draw Zhuge Liang, Chinese male about 35, gentle intelligent face, neat short mustache and narrow beard, traditional guan cap, flowing ivory scholar robe with pale jade and muted blue trim, broad long sleeves, holding his recognizable white feather fan at his waist. Relaxed standing three-quarter pose looking slightly right. Full figure including feet and hat entirely visible, centered, tall portrait canvas. Elegant human proportions like reference, do not make head tiny. Clear silhouette, gentle neutral lighting, no environment, no pedestal, no text, no logo, genuinely transparent alpha background.",
+    "tool": "built-in image_gen",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-572b13fb-0007-4b6f-a17e-3dc855bef5b2.png",
+    "savedPath": "assets/characters/zhugeliang/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "taishici-blade",
+    "prompt": "Use case: precise-object-edit. Image 1 is Tai Shi Ci, the edit target for a Three Kingdoms RPG. Replace ONLY the long spear with a Chinese dao saber in his right hand, angled downward beside his right leg: practical gently curved single-edged steel blade, restrained bronze guard. Remove the spearhead, long pole and tassel completely. Preserve the exact face, hair, crown, head size and position, body proportions, teal cape, blue armor, pose, polished Chinese CG illustration style, lighting, and full-body framing. Keep hat and both feet in frame. Transparent alpha background, no scene, no text or watermark.",
+    "tool": "built-in image_gen",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-c221621d-138d-49ec-ac63-5cf02e27326e.png",
+    "savedPath": "assets/characters/taishici/classic/fullbody-v3.webp"
+  },
+  {
+    "id": "liubei",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-d1bda5e9-bf1f-486a-8f34-9405a2e065bd.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Chinese male 45, warm thoughtful eyes, neatly trimmed beard, dark teal and ivory formal Han robes, a simple straight sword held low. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/liubei/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "guanyu",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-5e0158c1-dc8c-4704-8cd5-770e7e1bf12e.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Very tall powerful Chinese male 40, dignified long flowing black beard, warm ruddy face, green silk battle robe and traditional armor, green headcloth, holding the famous Green Dragon crescent glaive. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/guanyu/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "zhangfei",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-69be0a45-f4cf-4b24-82db-1752943b3c7e.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Massive muscular Chinese male 38, dark weathered complexion, fierce round eyes, thick curly beard, black and bronze armor, holding his distinctive long serpent spear with a sinuous spear tip. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/zhangfei/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "machao",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-4c4bbb18-0657-422f-8490-2fe9d8d413d8.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Handsome Chinese male 28, sharp brave eyes, western Liang silver lion-crested helmet and white armor, blue silk details, long ornate winged spear. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/machao/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "caocao",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-3263a5be-dd47-48a5-8839-8a780c25c35f.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Chinese male 48, shrewd narrow eyes, tidy black beard, black and muted crimson brocade military robes, bronze belt, holding a restrained straight sword. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/caocao/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "xiahoudun",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-44e914a5-4a67-4ad6-9afb-813da4a333f2.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Rugged strong Chinese male 40, left eye covered by a dark leather eye patch, short beard, dark blue lamellar armor, holding a Chinese dao saber. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/xiahoudun/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "zhangliao",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-7af341cc-5452-4148-a8de-1f97bf1c1ae2.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Chinese male 35, disciplined stern face, short beard, purple and charcoal Han armor and helmet, holding a compact ancient Chinese crossbow low, no spear. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/zhangliao/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "xunyu",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-870cb1c5-6bfe-44cd-90be-bc2733a01221.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Elegant Chinese male 35, gentle clever face, clean refined bearing, dark green scholar robes and black formal guan, holding a bound bamboo book, no blade. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/xunyu/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "jiaxu",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-a9f30965-8432-4801-b49d-4ce634032657.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Chinese male 50, lean face, carefully groomed small beard, calm calculating eyes, muted plum and ink-blue scholar robes, holding a short Chinese ritual banner with bronze fittings, no western fantasy elements. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/jiaxu/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "sunquan",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-dde9e8d2-f618-42f4-8da1-88471eebb77a.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Chinese male 32, distinctive faint reddish brown beard and clear gray-green eyes, dignified dark red and black Jiangdong robes with traditional armor accents, simple sword in relaxed hand. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/sunquan/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "huanggai",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-8a26c284-8769-4fb7-ad3f-e17c4ed4a670.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Sturdy veteran Chinese male 60, gray beard, weathered strong face, brown and bronze armor, holding a large practical round Chinese shield by his side. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/huanggai/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "lvmeng",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-97d1480e-4c36-49b3-b24a-ac17adcf14dd.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Chinese male 30, practical alert face, short beard, green-blue light armor with scholar cloth layers, holding a straight Chinese sword. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/lvmeng/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "luxun",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-6e22bdad-5089-44e7-afc1-26c551355a62.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Young elegant Chinese male 25, intelligent clean-shaven face, traditional cap, red-orange and pale cream scholar robes, holding a folded fan, composed stance. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/luxun/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "sunshangxiang",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-8def2b9f-9636-4ee1-a07b-3874569282aa.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Beautiful adult Chinese woman 25, confident lively eyes, dark hair in a high historical ponytail, refined crimson and ivory Han-style archer clothing with elegant light armor, holding a graceful Chinese bow. Attractive heroic Chinese game design, no modern or western fantasy clothing. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/sunshangxiang/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "lvbu",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-642cbd8b-3a27-4306-8aeb-57b90c74f226.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Imposing handsome Chinese male 32, long black hair, legendary twin pheasant feathers on gold battle crown, black and gold armor, dark red silk cloak, holding the distinctive Fangtian halberd with side crescent blades. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/lvbu/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "diaochan",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-333d707d-1fb7-4503-b12d-628b0ce1b7c7.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Exceptionally beautiful adult Chinese woman 24, graceful composed expression, long dark hair with delicate traditional gold ornaments, luxurious flowing pale lilac and soft pink Han-style silk dress, elegant bare shoulders, holding a slim short blade angled downward. Tasteful classic Chinese historical beauty, no modern or western fantasy clothing. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/diaochan/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "menghuo",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-dfc8ed41-d845-4c1c-83b7-b2fba3a071b1.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Broad muscular adult southern Chinese tribal leader 40, rugged face and dark hair, bronze ornaments, woven cloth and dark red leather armor, heavy Chinese battle axe resting by side. Human and historical-inspired rather than fantasy monster. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/menghuo/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "dongzhuo",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-41fbcc54-313b-4ace-bba1-8bf737d50fe9.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Heavy-set powerful Chinese male 55, broad mature face, thick dark beard, commanding uneasy expression, black and deep burgundy luxurious Han military robes with bronze armor, large belt, holding a broad Chinese saber. Clearly stout and older, not a slim handsome youth. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/dongzhuo/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "huaxiong",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-00c55885-9a34-4e89-8be6-6770a7507c49.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Large battle-hardened Chinese male 40, stern thick-bearded face, dark bronze western Liang armor, holding a heavy Chinese dao saber. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/huaxiong/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "gaoshun",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-25d03e24-ff5d-444c-9e73-338d1d8b9c44.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Disciplined Chinese commander 38, clean stern face, black and gray iron lamellar armor, holding a rectangular Chinese shield with a sheathed sword. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/gaoshun/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "liru",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-76334a47-89cf-4308-9118-fad8659617de.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Lean Chinese scholar 50, narrow cold eyes, thin mustache, dark purple and black ceremonial robes and guan, holding bamboo strategy slips. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/liru/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "lijue",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-82bea20f-24f1-4035-ba17-03a08abcf88d.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Rough Chinese military commander 42, harsh scarred face and beard, worn dark red iron armor, holding a long Chinese spear. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/lijue/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "guosi",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-e246c7cf-f180-4609-822a-a46818298b26.png",
+    "prompt": "Use case: stylized-concept. Asset: full-body character illustration for the Chinese Three Kingdoms RPG. Reference image 1 (Zhao Yun) establishes the exact visual family: polished Chinese historical character CG illustration, smooth restrained rendering, realistic fabric and metal, finely drawn natural Chinese faces, same readable head-to-body proportions and head size within the canvas. Subject: Rough stout Chinese commander 40, scruffy beard, brown and black iron armor, holding a short broad dao saber. Composition: one character standing in relaxed three-quarter pose, centered portrait canvas, hat and feet fully visible. Match reference scale, keep head large enough for a bust crop, no tiny head, no exaggerated long legs. Gentle neutral lighting, crisp readable silhouette. Genuine transparent alpha background, no environment, no ground pedestal, no text, no name label, no logo, no watermark.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/guosi/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "yuanshu",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-0b919c74-8b46-4125-8984-3604209bfaac.png",
+    "prompt": "Create a single isolated full body character illustration for a Three Kingdoms Chinese RPG: 袁术, a proud aristocratic middle aged warlord with a narrow trimmed beard, ornate gold and dark yellow silk robes over lamellar armor and a ceremonial Chinese straight sword. Match the attached reference's polished Chinese historical game CG painting style, proportion and lighting. One adult man only, readable face, visible head to boots, 3/4 natural standing pose, distinct authentic Eastern Han clothes, not western fantasy. Same reasonably large head and sturdy readable body as reference. No scene, no text, no UI, transparent background. Keep the figure large within the canvas, all body and weapon in frame.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/yuanshu/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "yanbaihu",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-7f8d53e8-0ed4-4dd4-88d1-f367c2dc53ef.png",
+    "prompt": "Create a single isolated full body character illustration for a Three Kingdoms Chinese RPG: 严白虎, a rough strong middle aged Jiangdong bandit leader, weathered broad face and coarse beard, dark brown and white fur trimmed Chinese leather lamellar armor, holding a heavy Chinese dao. Match the attached reference's polished Chinese historical game CG painting style, proportion and lighting. One adult man only, readable face, visible head to boots, 3/4 natural standing pose, distinct authentic Eastern Han clothes, not western fantasy. Same reasonably large head and sturdy readable body as reference. No scene, no text, no UI, transparent background. Keep the figure large within the canvas, all body and weapon in frame.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/yanbaihu/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "liubei",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-f61d4791-2b0b-4adf-94e8-eaf16d08e86d.png",
+    "prompt": "Edit this exact full-body Chinese RPG character illustration (刘备). ONLY correct the weapon placement, hand anatomy and arm pose; preserve his exact facial identity, hair, clothing design, armor detail, colors, age, body build, full-body scale, composition, and the same polished Chinese historical game CG painting style. Put his straight sword fully INSIDE a handsome green and bronze scabbard suspended naturally from his waist belt on the left hip. Both hands relaxed naturally, one hand at the belt, the other at his side, neither hand holding a naked weapon. A dignified peaceful ruler stance. Sword hilt and guard clearly protrude from scabbard but no blade visible. Anatomically clear human hands with five normal fingers, a believable full-palm closed power grip when wielding a weapon; the blade, crossguard, handle and pommel must be mechanically distinct. Keep hat, feet and entire weapon in frame. Transparent alpha background, no scene, no text, no watermark. Do not redesign the character, do not introduce western fantasy weapons.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/liubei/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "caocao",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-637064c6-e912-4fdb-b025-39ae2c522582.png",
+    "prompt": "Edit this exact full-body Chinese RPG character illustration (曹操). ONLY correct the weapon placement, hand anatomy and arm pose; preserve his exact facial identity, hair, clothing design, armor detail, colors, age, body build, full-body scale, composition, and the same polished Chinese historical game CG painting style. His straight sword is fully SHEATHED in a black and bronze scabbard secured at the waist. His right hand may rest naturally on the pommel at his waist, with elbow bent, not dangling it towards the ground. The other arm folds calmly behind his back. A commanding ruler stance, NO bare blade. Anatomically clear human hands with five normal fingers, a believable full-palm closed power grip when wielding a weapon; the blade, crossguard, handle and pommel must be mechanically distinct. Keep hat, feet and entire weapon in frame. Transparent alpha background, no scene, no text, no watermark. Do not redesign the character, do not introduce western fantasy weapons.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/caocao/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "sunquan",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-855d1805-6632-4a30-a66c-f3320300024c.png",
+    "prompt": "Edit this exact full-body Chinese RPG character illustration (孙权). ONLY correct the weapon placement, hand anatomy and arm pose; preserve his exact facial identity, hair, clothing design, armor detail, colors, age, body build, full-body scale, composition, and the same polished Chinese historical game CG painting style. His straight sword is completely SHEATHED at the waist on a proper belt hanger. One hand rests on his waist belt, the other relaxed at his side. Authoritative lord stance. Show the hilt and scabbard clearly at his hip; no exposed metal blade. Anatomically clear human hands with five normal fingers, a believable full-palm closed power grip when wielding a weapon; the blade, crossguard, handle and pommel must be mechanically distinct. Keep hat, feet and entire weapon in frame. Transparent alpha background, no scene, no text, no watermark. Do not redesign the character, do not introduce western fantasy weapons.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/sunquan/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "lvmeng",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-ff4ff1dc-45e5-4648-ba31-bb7e3e0ca83d.png",
+    "prompt": "Edit this exact full-body Chinese RPG character illustration (吕蒙). ONLY correct the weapon placement, hand anatomy and arm pose; preserve his exact facial identity, hair, clothing design, armor detail, colors, age, body build, full-body scale, composition, and the same polished Chinese historical game CG painting style. Change his right arm to a clearly bent elbow at waist level, his right hand firmly CLOSED around the entire cord-wrapped sword grip, fingers curled around the hilt with thumb opposing, a broad visible crossguard separating fist from blade. He holds the straight sword in a natural forward ready guard, blade pointing diagonally UP and OUT away from his body on image-left. Blade never crosses his face. Practical warrior grip, NOT reverse grip, NOT pinching the pommel with two fingers. Anatomically clear human hands with five normal fingers, a believable full-palm closed power grip when wielding a weapon; the blade, crossguard, handle and pommel must be mechanically distinct. Keep hat, feet and entire weapon in frame. Transparent alpha background, no scene, no text, no watermark. Do not redesign the character, do not introduce western fantasy weapons.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/lvmeng/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "xiahoudun",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-e1b9cb96-6400-4b45-b88d-aa39a90e6538.png",
+    "prompt": "Edit this exact full-body Chinese RPG character illustration (夏侯惇). ONLY correct the weapon placement, hand anatomy and arm pose; preserve his exact facial identity, hair, clothing design, armor detail, colors, age, body build, full-body scale, composition, and the same polished Chinese historical game CG painting style. He firmly grips a Chinese dao SABER with the whole right hand wrapped around the handle, thumb opposing the fingers. Right elbow bent at chest height; the dao rests naturally across his RIGHT SHOULDER with the broad blade extending backwards diagonally up. Clearly show handle below guard, all fingers on handle. His shoulder armor supports the blade's flat spine. Strong casual warrior stance, no downward dangling blade, face remains unobscured. Anatomically clear human hands with five normal fingers, a believable full-palm closed power grip when wielding a weapon; the blade, crossguard, handle and pommel must be mechanically distinct. Keep hat, feet and entire weapon in frame. Transparent alpha background, no scene, no text, no watermark. Do not redesign the character, do not introduce western fantasy weapons.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/xiahoudun/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "dongzhuo",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-7bfa2fa2-b2ef-4082-8cd8-52f7bcea94aa.png",
+    "prompt": "Edit this exact full-body Chinese RPG character illustration (董卓). ONLY correct the weapon placement, hand anatomy and arm pose; preserve his exact facial identity, hair, clothing design, armor detail, colors, age, body build, full-body scale, composition, and the same polished Chinese historical game CG painting style. His right elbow is bent and his large right fist firmly wraps ALL FOUR FINGERS and thumb around the saber handle BELOW a very visible guard. His heavy Chinese dao blade points diagonally UP and outward on image-left, held in a grounded powerful ready stance at waist/chest level, not touching his body. The other hand stays on his hip. Keep his stout physique and face. Do not pinch the pommel or hold the blade. Anatomically clear human hands with five normal fingers, a believable full-palm closed power grip when wielding a weapon; the blade, crossguard, handle and pommel must be mechanically distinct. Keep hat, feet and entire weapon in frame. Transparent alpha background, no scene, no text, no watermark. Do not redesign the character, do not introduce western fantasy weapons.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/dongzhuo/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "huaxiong",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-e43d60b4-f4af-4c79-bd38-4559cb8b4616.png",
+    "prompt": "Edit this exact full-body Chinese RPG character illustration (华雄). ONLY correct the weapon placement, hand anatomy and arm pose; preserve his exact facial identity, hair, clothing design, armor detail, colors, age, body build, full-body scale, composition, and the same polished Chinese historical game CG painting style. Change his arms to a confident TWO HANDED forward Chinese dao guard: both fists completely encircle the long wrapped handle BELOW the guard, right hand by the crossguard and left hand near the pommel. Blade points diagonally UPWARD on image-left, away from his face, the grip held at waist height with bent elbows. A plausible stable fighting stance. No dangling blade, no fingers touching metal blade. Anatomically clear human hands with five normal fingers, a believable full-palm closed power grip when wielding a weapon; the blade, crossguard, handle and pommel must be mechanically distinct. Keep hat, feet and entire weapon in frame. Transparent alpha background, no scene, no text, no watermark. Do not redesign the character, do not introduce western fantasy weapons.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/huaxiong/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "guosi",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-2715d3a5-8c37-468c-a95f-c76a10a6051e.png",
+    "prompt": "Edit this exact full-body Chinese RPG character illustration (郭汜). ONLY correct the weapon placement, hand anatomy and arm pose; preserve his exact facial identity, hair, clothing design, armor detail, colors, age, body build, full-body scale, composition, and the same polished Chinese historical game CG painting style. His right elbow bends naturally, raising a Chinese dao saber into an outward guard with the blade pointing diagonally UP and OUT on image-left. Right fist fully encircles the wrapped handle below a distinct guard, all fingers curled and thumb opposing. Other hand is clenched by his hip. Rough experienced fighter stance. No loose pinching, no reverse grip, no hand on blade. Anatomically clear human hands with five normal fingers, a believable full-palm closed power grip when wielding a weapon; the blade, crossguard, handle and pommel must be mechanically distinct. Keep hat, feet and entire weapon in frame. Transparent alpha background, no scene, no text, no watermark. Do not redesign the character, do not introduce western fantasy weapons.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/guosi/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "yanbaihu",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-5718d471-0ba2-40e6-af44-0ff953ec8cb0.png",
+    "prompt": "Edit this exact full-body Chinese RPG character illustration (严白虎). ONLY correct the weapon placement, hand anatomy and arm pose; preserve his exact facial identity, hair, clothing design, armor detail, colors, age, body build, full-body scale, composition, and the same polished Chinese historical game CG painting style. He carries his heavy Chinese dao saber resting over his RIGHT SHOULDER in a casual bandit-leader stance. The right fist firmly wraps the corded grip below the guard, elbow bent, blade's back supported against shoulder armor and pointing backwards diagonally upward, well clear of his head and neck. His free hand stays at his hip. No blade pointing down, no pinching by two fingers. Anatomically clear human hands with five normal fingers, a believable full-palm closed power grip when wielding a weapon; the blade, crossguard, handle and pommel must be mechanically distinct. Keep hat, feet and entire weapon in frame. Transparent alpha background, no scene, no text, no watermark. Do not redesign the character, do not introduce western fantasy weapons.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/characters/yanbaihu/classic/fullbody-v2.webp"
+  },
+  {
+    "id": "capital-wei",
+    "name": "许昌",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-5f0f95e5-2bdf-423b-a90b-9354adb9342e.png",
+    "prompt": "Create a portrait-format background illustration for the Chinese Three Kingdoms RPG 异界三国. A majestic Eastern Han military administrative headquarters in Xuchang, northern China: strong symmetrical timber gate hall in deep red and charcoal, dark gray tiled roofs, thick square wooden columns, bronze fittings, flanking stone steps and disciplined outer walls. Crisp dry northern air, restrained ochre and dark crimson palette, warm morning sun. A civic and military seat, NOT a Qing Forbidden City or a giant fantasy palace. High-end realistic Chinese historical RPG environment painting, carefully rendered natural stone, wood and roof tile, matching polished Chinese game character CG, cinematic but BRIGHT and readable, no excessive blue filter or darkness. Ground-level frontal three-quarter view, believable human scale, full environment from foreground to hall. Composition: solid continuous walkable stone courtyard across the entire middle and bottom two-thirds, enough ground for character figures to stand on; buildings occupy the upper third, NO open sky occupying the top half, sky at most a very narrow strip (under 5%). Details concentrate at the edges and upper architecture, calm open center for game UI overlay. Absolutely NO people, no characters, no weapons, no portraits, no readable writing, no UI, no text, no watermark. Full opaque scenic background. Make this clearly distinct from the other capitals while retaining the same painterly game style.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/towns/capital-wei-v1.webp"
+  },
+  {
+    "id": "capital-shu",
+    "name": "成都",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-a81a5ca9-2edb-493f-93fe-b97b8b9f568d.png",
+    "prompt": "Create a portrait-format background illustration for the Chinese Three Kingdoms RPG 异界三国. An elegant Eastern Han government residence courtyard in Chengdu, Sichuan: layered dark green-gray tile timber halls, warm reddish wood, shaded covered corridors, bamboo groves, lush small trees and flowering shrubs along the edges, subtle distant green hills partly visible behind rooftops. Soft warm humid daylight, jade green and warm timber palette. Dignified and lived in, not rural farmland, not an imperial Qing palace. High-end realistic Chinese historical RPG environment painting, carefully rendered natural stone, wood and roof tile, matching polished Chinese game character CG, cinematic but BRIGHT and readable, no excessive blue filter or darkness. Ground-level frontal three-quarter view, believable human scale, full environment from foreground to hall. Composition: solid continuous walkable stone courtyard across the entire middle and bottom two-thirds, enough ground for character figures to stand on; buildings occupy the upper third, NO open sky occupying the top half, sky at most a very narrow strip (under 5%). Details concentrate at the edges and upper architecture, calm open center for game UI overlay. Absolutely NO people, no characters, no weapons, no portraits, no readable writing, no UI, no text, no watermark. Full opaque scenic background. Make this clearly distinct from the other capitals while retaining the same painterly game style.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/towns/capital-shu-v1.webp"
+  },
+  {
+    "id": "capital-wu",
+    "name": "建业",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-b22a32e0-f442-47db-ba3e-563cdbe643b3.png",
+    "prompt": "Create a portrait-format background illustration for the Chinese Three Kingdoms RPG 异界三国. A refined Eastern Han Jiangdong waterfront government residence in Jianye: white plaster and natural gray-tile timber buildings, dark red wood columns, connected waterfront pavilions, willow trees, a glimpse of the broad blue-green river and tiny distant sailboats behind the buildings on the upper right edge. Bright clear daylight with muted teal, ivory and vermilion. Foreground is an entirely dry solid flagstone courtyard and waterfront steps, not water. Not a Qing palace, not rural farmland. High-end realistic Chinese historical RPG environment painting, carefully rendered natural stone, wood and roof tile, matching polished Chinese game character CG, cinematic but BRIGHT and readable, no excessive blue filter or darkness. Ground-level frontal three-quarter view, believable human scale, full environment from foreground to hall. Composition: solid continuous walkable stone courtyard across the entire middle and bottom two-thirds, enough ground for character figures to stand on; buildings occupy the upper third, NO open sky occupying the top half, sky at most a very narrow strip (under 5%). Details concentrate at the edges and upper architecture, calm open center for game UI overlay. Absolutely NO people, no characters, no weapons, no portraits, no readable writing, no UI, no text, no watermark. Full opaque scenic background. Make this clearly distinct from the other capitals while retaining the same painterly game style.",
+    "tool": "built-in image_gen",
+    "savedPath": "./assets/towns/capital-wu-v1.webp"
+  },
+  {
+    "id": "diaochan",
+    "prompt": "Use case: precise-object-edit. Asset type: transparent full-body Chinese Three Kingdoms RPG character sprite. Input is the edit target. Remove the dagger completely. Give her an elegant natural empty-handed pose, one hand relaxed and the other gently gathering a sleeve. Preserve the exact adult face, hairstyle, beautiful ornate lavender and pink Han-inspired gown, proportions and painterly realistic game illustration style. Keep the same full-body framing from headdress to feet, foot placement and head size. Do not crop. No weapon, scabbard or replacement weapon. Anatomically natural hands. Transparent background, no environment, no text, no watermark. Change only the requested held equipment and hand pose.",
+    "source": "/Users/administrator/Dev/isekai-three-kingdom/assets/characters/diaochan/classic/fullbody-v1.webp",
+    "generated": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-907ddfab-074b-4bcf-bf3a-a775c8caf51e.png",
+    "final": "./assets/characters/diaochan/classic/fullbody-v2.webp",
+    "tool": "built-in image_gen",
+    "intent": "precise-object-edit"
+  },
+  {
+    "id": "sunshangxiang",
+    "prompt": "Use case: precise-object-edit. Asset type: transparent full-body Chinese Three Kingdoms RPG character sprite. Input is the edit target. Remove the longbow, arrows and quiver completely. Confident empty-handed pose with one hand resting naturally at the waist. Preserve the exact adult face, hairstyle, red and ivory armor, costume details, proportions and realistic painterly game illustration style. Keep the same full-body framing from headdress to feet, foot placement and head size. Do not crop. No weapon, scabbard or replacement weapon. Anatomically natural hands. Transparent background, no environment, no text, no watermark. Change only the requested held equipment and hand pose.",
+    "source": "/Users/administrator/Dev/isekai-three-kingdom/assets/characters/sunshangxiang/classic/fullbody-v1.webp",
+    "generated": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-22ff9a7b-c29d-414a-8a78-84901485c2f3.png",
+    "final": "./assets/characters/sunshangxiang/classic/fullbody-v2.webp",
+    "tool": "built-in image_gen",
+    "intent": "precise-object-edit"
+  },
+  {
+    "id": "jiaxu",
+    "prompt": "Use case: precise-object-edit. Asset type: transparent full-body Chinese Three Kingdoms RPG character sprite. Input is the edit target. Remove the tall flag staff and banner completely. This is a civilian strategist, with hands folded naturally in front of his waist. Preserve the exact face, age, hairstyle, plum-colored robes, proportions and realistic painterly game illustration style. Keep the same full-body framing from headdress to feet, foot placement and head size. Do not crop. No weapon, scabbard or replacement weapon. Anatomically natural hands. Transparent background, no environment, no text, no watermark. Change only the requested held equipment and hand pose.",
+    "source": "/Users/administrator/Dev/isekai-three-kingdom/assets/characters/jiaxu/classic/fullbody-v1.webp",
+    "generated": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-8310644e-ba36-4600-8904-f73762533516.png",
+    "final": "./assets/characters/jiaxu/classic/fullbody-v2.webp",
+    "tool": "built-in image_gen",
+    "intent": "precise-object-edit"
+  },
+  {
+    "id": "hero-swordswoman",
+    "prompt": "Use case: precise-object-edit. Transparent full-body Chinese RPG character sprite; reference is edit target. Remove her sword and any scabbard completely. Empty relaxed hands, one resting naturally at her belt. Preserve exact adult face, red costume, body proportions and painterly realistic Three Kingdoms game style. Keep the same full-body framing from headdress to feet, foot position and head size. Complete visible feet. No crop, no environment, no text, no watermark. Change only held equipment and necessary hand pose. Transparent alpha background.",
+    "source": "/Users/administrator/Dev/isekai-three-kingdom/assets/protagonists/swordswoman/fullbody.webp",
+    "generated": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-3f76fe84-6ae9-4d16-95fc-678a7af6cf6d.png",
+    "final": "./assets/protagonists/swordswoman/fullbody-v2.webp",
+    "tool": "built-in image_gen",
+    "intent": "precise-object-edit"
+  },
+  {
+    "id": "hero-healer",
+    "prompt": "Use case: precise-object-edit. Transparent full-body Chinese RPG character sprite; reference is edit target. Remove the long needles from her hand completely, leaving a gentle natural empty-hand pose at waist height. Preserve exact adult face, hairstyle, elegant ivory healer costume and painterly realistic Three Kingdoms game style. Do not add weapons. Keep the same full-body framing from headdress to feet, foot position and head size. Complete visible feet. No crop, no environment, no text, no watermark. Change only held equipment and necessary hand pose. Transparent alpha background.",
+    "source": "/Users/administrator/Dev/isekai-three-kingdom/assets/protagonists/healer/fullbody.webp",
+    "generated": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-6e613e1b-009d-49e1-b5eb-4e2065525bd1.png",
+    "final": "./assets/protagonists/healer/fullbody-v2.webp",
+    "tool": "built-in image_gen",
+    "intent": "precise-object-edit"
+  },
+  {
+    "id": "hero-silverguard",
+    "prompt": "Use case: precise-object-edit. Transparent full-body Chinese RPG character sprite; reference is edit target. Remove the polearm and all weapons completely. Natural confident empty-handed pose, one hand at the waist. Preserve exact adult face, silver armor and every costume detail, body proportions and painterly realistic Three Kingdoms game style. Keep the same full-body framing from headdress to feet, foot position and head size. Complete visible feet. No crop, no environment, no text, no watermark. Change only held equipment and necessary hand pose. Transparent alpha background.",
+    "source": "/Users/administrator/Dev/isekai-three-kingdom/assets/protagonists/silverguard/fullbody.webp",
+    "generated": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-2c7e8ba0-ebda-4c88-8efa-d3458d62afef.png",
+    "final": "./assets/protagonists/silverguard/fullbody-v2.webp",
+    "tool": "built-in image_gen",
+    "intent": "precise-object-edit"
+  },
+  {
+    "prompt": "Use case: stylized-concept. Asset type: one square realistic Chinese Three Kingdoms RPG inventory icon of Lü Bu's Fangtian painted halberd 方天画戟. A single distinctive long red lacquer shaft with central spear point and two curved crescent blades on either side, forged steel with restrained gold fittings, diagonal from lower-left to upper-right. The complete weapon fits within the square with generous padding, easily readable silhouette at 48 pixels. Realistic game item painting matching Chinese historical RPG, warm soft metallic lighting, transparent background, no tile border, no lettering, no character, no hands, no extra weapon.",
+    "generated": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-1492e485-10bb-4dbe-9064-c559cfc475af.png",
+    "final": "./assets/ui/fangtian-halberd-v1.webp",
+    "tool": "built-in image_gen",
+    "intent": "stylized-concept"
+  }
+]

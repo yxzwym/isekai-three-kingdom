@@ -346,7 +346,7 @@
     if(next.weaponProficiencies&&Object.hasOwn(next.weaponProficiencies,'jade')){next.weaponProficiencies.qin??=next.weaponProficiencies.jade;delete next.weaponProficiencies.jade;}
     if(Array.isArray(next.passives))next.passives=next.passives.filter(id=>id!=='revive');return next;
   }
-  const SETTINGS={screenShake:true,effects:true,menuScale:1};
+  const SETTINGS={screenShake:true,effects:true,manualPause:true,menuScale:1};
   class SaveStore{
     constructor(storage){this.storage=storage;this.key='pengpai-sanguo:saves:v1';this.settingsKey='pengpai-sanguo:settings:v1';}
     slots(){
@@ -360,8 +360,8 @@
       const slots=this.slots();slots[index]={version:4,character:current,savedAt:new Date().toISOString(),chapter:progress?.stage==='world'?'world-map':progress?.stage==='complete'?'prologue-complete':'prologue-start',...(progress?{progress:clone(progress)}:{})};
       this.storage.setItem(this.key,JSON.stringify(slots));return clone(slots[index]);
     }
-    settings(){let data;try{data=JSON.parse(this.storage.getItem(this.settingsKey)||'{}');}catch{data={};}return {screenShake:typeof data?.screenShake==='boolean'?data.screenShake:true,effects:typeof data?.effects==='boolean'?data.effects:true,menuScale:[.9,1,1.1].includes(data?.menuScale)?data.menuScale:1};}
-    setSettings(settings){const next={...SETTINGS,...settings};if(typeof next.screenShake!=='boolean'||typeof next.effects!=='boolean'||![.9,1,1.1].includes(next.menuScale))throw new TypeError('设置无效');this.storage.setItem(this.settingsKey,JSON.stringify(next));return next;}
+    settings(){let data;try{data=JSON.parse(this.storage.getItem(this.settingsKey)||'{}');}catch{data={};}return {...Object.fromEntries(['screenShake','effects','manualPause'].map(key=>[key,typeof data?.[key]==='boolean'?data[key]:SETTINGS[key]])),menuScale:[.9,1,1.1].includes(data?.menuScale)?data.menuScale:1};}
+    setSettings(settings){const next={...SETTINGS,...settings};if(['screenShake','effects','manualPause'].some(key=>typeof next[key]!=='boolean')||![.9,1,1.1].includes(next.menuScale))throw new TypeError('设置无效');this.storage.setItem(this.settingsKey,JSON.stringify(next));return next;}
   }
   const sortPassives=(ids,map=PASSIVE_MAP)=>ids.map((id,index)=>({id,index})).sort((a,b)=>(Object.keys(QUALITIES).indexOf(map[b.id]?.quality)-Object.keys(QUALITIES).indexOf(map[a.id]?.quality))||a.index-b.index).map(v=>v.id);
   const api={sortPassives,PARTY_LIMIT:4,ATTRIBUTES,PROFICIENCY_BASE,DIFFICULTIES,getDifficulty,WEAPON_GROUPS,WEAPON_TYPES,WEAPON_SKILL_PLANS,getWeaponProficiency,IDENTITIES,IDENTITY_PASSIVE_WEIGHTS,QUALITIES,PASSIVES,PASSIVE_MAP,APPEARANCES,randomInt,rollPassives,rollHero,sanitizeName,heroName,nameLength:value=>segments(value).length,validCharacter,SaveStore};

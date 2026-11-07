@@ -36,8 +36,8 @@ test('技能配置关闭即保存，教学战点头像不能打开配置；状�
   const b=battle();b.start();const view={battle:b,panel:null};CanvasBattle.prototype.openTactics.call(view,b.unit('a'));view.panel.rules[0].disabled=true;CanvasBattle.prototype.commitTactics.call(view);assert.equal(view.panel,null);assert.equal(b.unit('a').priorities[0].disabled,true);
   b.scenario.control.lockTactics=true;let notice='';view.notify=s=>notice=s;CanvasBattle.prototype.openTactics.call(view,b.unit('a'));assert.equal(view.panel,null);assert.equal(notice,'本场无法配置技能');for(const id of ['taunt','armorDown','bleed','poison','burn','stun','paralysis']){assert.ok(S.definitions[id].icon);assert.ok(S.definitions[id].color);}
 });
-test('阵型由场景配置决定，前排队长在四个后排前方，缺省仍横排',()=>{
-  const rects=layout(390,844,3,5,{back:[1,2,3,4],front:[0]}).filter(r=>r.side==='enemy'),front=rects.find(r=>r.index===0);assert.ok(rects.filter(r=>r.index!==0).every(r=>r.y<front.y));assert.ok(Math.abs(front.x+front.w/2-195)<.01);assert.equal(new Set(layout(390,844,3,5).filter(r=>r.side==='enemy').map(r=>r.y)).size,1);
+test('阵型由场景配置决定，前排队长在四个后排前方，缺省多人自动分排',()=>{
+  const rects=layout(390,844,3,5,{back:[1,2,3,4],front:[0]}).filter(r=>r.side==='enemy'),front=rects.find(r=>r.index===0);assert.ok(rects.filter(r=>r.index!==0).every(r=>r.y<front.y));assert.ok(Math.abs(front.x+front.w/2-195)<.01);assert.equal(new Set(layout(390,844,3,5).filter(r=>r.side==='enemy').map(r=>r.y)).size,2);
 });
 test('状态提示实时显示剩余时间，时间推进和刷新状态后都会更新',()=>{
   const b=battle(),source=b.unit('a'),target=b.unit('x'),texts=[],view={battle:b,w:390,h:844,box(){},text:value=>texts.push(value)};b.start();

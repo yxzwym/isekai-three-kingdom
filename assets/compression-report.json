@@ -496,6 +496,96 @@
       ],
       "quality": 90,
       "transparent": true
+    },
+    "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-907ddfab-074b-4bcf-bf3a-a775c8caf51e.png": {
+      "src": "./assets/characters/diaochan/classic/fullbody-v2.webp",
+      "originalBytes": 2184744,
+      "bytes": 145618,
+      "originalSize": [
+        768,
+        1152
+      ],
+      "size": [
+        768,
+        1152
+      ],
+      "quality": 85,
+      "transparent": true
+    },
+    "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-22ff9a7b-c29d-414a-8a78-84901485c2f3.png": {
+      "src": "./assets/characters/sunshangxiang/classic/fullbody-v2.webp",
+      "originalBytes": 2237007,
+      "bytes": 146104,
+      "originalSize": [
+        768,
+        1152
+      ],
+      "size": [
+        768,
+        1152
+      ],
+      "quality": 85,
+      "transparent": true
+    },
+    "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-8310644e-ba36-4600-8904-f73762533516.png": {
+      "src": "./assets/characters/jiaxu/classic/fullbody-v2.webp",
+      "originalBytes": 2178555,
+      "bytes": 112758,
+      "originalSize": [
+        768,
+        1152
+      ],
+      "size": [
+        768,
+        1152
+      ],
+      "quality": 85,
+      "transparent": true
+    },
+    "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-3f76fe84-6ae9-4d16-95fc-678a7af6cf6d.png": {
+      "src": "./assets/protagonists/swordswoman/fullbody-v2.webp",
+      "originalBytes": 1954933,
+      "bytes": 164668,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 85,
+      "transparent": true
+    },
+    "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-6e613e1b-009d-49e1-b5eb-4e2065525bd1.png": {
+      "src": "./assets/protagonists/healer/fullbody-v2.webp",
+      "originalBytes": 2094476,
+      "bytes": 160232,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 85,
+      "transparent": true
+    },
+    "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-2c7e8ba0-ebda-4c88-8efa-d3458d62afef.png": {
+      "src": "./assets/protagonists/silverguard/fullbody-v2.webp",
+      "originalBytes": 2060379,
+      "bytes": 190802,
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "quality": 85,
+      "transparent": true
     }
   }
 }

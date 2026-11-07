@@ -39,5 +39,6 @@
     add(total,logic,paint,gap,now){this.samples.push({total,logic,paint,gap});if(this.samples.length>600)this.samples.shift();this.count++;if(now-this.last<1000)return null;this.last=now;const pick=key=>this.samples.map(s=>s[key]).sort((a,b)=>a-b),p=(a,q)=>Number(a[Math.min(a.length-1,Math.floor(a.length*q))].toFixed(2));const cpu=pick('total'),draw=pick('paint'),gaps=pick('gap');return{frames:this.count,samples:cpu.length,cpuP50:p(cpu,.5),cpuP95:p(cpu,.95),paintP95:p(draw,.95),gapP95:p(gaps,.95),slowFrames:this.samples.filter(s=>s.total>16.7).length};}
   }
   const sliderValue=(x,left,width,max)=>Math.max(0,Math.min(max,Math.round((x-left)/Math.max(1,width)*max)));
-  const api={formatNumber,DAMAGE_COLORS,resultColor,HealthTrack,ExperienceTrack,idlePose,enemyDefeatPose,FrameStats,sliderValue};root.BattlePresentation=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  function addFloat(floats,entry){const used=new Set(floats.filter(f=>f.id===entry.id&&entry.born-f.born<1100).map(f=>f.lane));let lane=0;while(used.has(lane))lane++;const next={...entry,lane};floats.push(next);return next;}
+  const api={addFloat,formatNumber,DAMAGE_COLORS,resultColor,HealthTrack,ExperienceTrack,idlePose,enemyDefeatPose,FrameStats,sliderValue};root.BattlePresentation=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

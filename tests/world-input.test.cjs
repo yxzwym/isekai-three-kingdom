@@ -27,19 +27,19 @@ test('行路模型按出战首位选择，脚底锚定实际路线，不再绘�
 test('营地到常山为1秒，不同路线统一按实际道路长度计算耗时',()=>{
  assert.equal(D.travelDurationMs('camp','changshan'),1000);assert.equal(D.travelDurationMs('changshan','camp'),1000);
  const list=D.roads.map(([a,b])=>({a,b,length:D.roadLength(a,b)})).sort((a,b)=>a.length-b.length),short=list[0],long=list.at(-1),previous=global.performance;global.performance={now:()=>80};
- try{for(const road of [short,long]){const {v}=base();v.journey={from:road.a,to:road.b,progress:0,last:0};v.model.journey={checked:true};v.boundCamera=()=>{};v.tickJourney();assert.ok(Math.abs(v.journey.progress*road.length-D.travelRules.speed*.08/D.travelTimeFactor(v.model.partyGroups().active[0]?.potentials?.speed??50))<1e-9);}assert.ok(Math.abs(D.travelDurationMs(long.a,long.b)/D.travelDurationMs(short.a,short.b)-long.length/short.length)<1e-9);
+ try{for(const road of [short,long]){const {v}=base();v.journey={from:road.a,to:road.b,progress:0,last:0};v.model.journey={checked:true};v.boundCamera=()=>{};v.tickJourney();assert.ok(Math.abs(v.journey.progress*road.length-D.travelRules.speed*require('../js/travel-motion.js').advance(1,80).distanceMs/1000/D.travelTimeFactor(v.model.partyGroups().active[0]?.potentials?.speed??50))<1e-9);}assert.ok(Math.abs(D.travelDurationMs(long.a,long.b)/D.travelDurationMs(short.a,short.b)-long.length/short.length)<1e-9);
  const [a,b]=D.roads.find(([a,b])=>D.roadPath(a,b).length>2),path=D.roadPath(a,b),length=path.slice(1).reduce((n,p,i)=>n+Math.hypot(p.x-path[i].x,p.y-path[i].y),0);assert.ok(Math.abs(D.travelDurationMs(a,b)*D.travelRules.speed/1000-length)<1e-9);
  }finally{global.performance=previous;}
 });
 test('安静路段通过中点不损失本帧已行进的距离',()=>{
- const {v}=base(),previous=global.performance;let now=0;global.performance={now:()=>now};try{v.model.beginTravel('julu',{eventRoll:.8});v.journey={from:'camp',to:'julu',progress:0,last:0};v.boundCamera=()=>{};const duration=D.travelDurationMs('camp','julu',v.model.partyGroups().active[0]?.potentials?.speed??50),steps=Math.ceil(duration*.6/80);for(let i=0;i<steps;i++){now+=80;v.tickJourney();}assert.ok(v.model.journey.checked);assert.ok(Math.abs(v.journey.progress-now/duration)<1e-9);}finally{global.performance=previous;}
+ const {v}=base(),previous=global.performance;let now=0;global.performance={now:()=>now};try{v.model.beginTravel('julu',{eventRoll:.8});v.journey={from:'camp',to:'julu',progress:0,last:0};v.boundCamera=()=>{};const duration=D.travelDurationMs('camp','julu',v.model.partyGroups().active[0]?.potentials?.speed??50),steps=Math.ceil(duration*.6/80);for(let i=0;i<steps;i++){now+=80;v.tickJourney();}assert.ok(v.model.journey.checked);assert.ok(Math.abs(v.journey.progress-require('../js/travel-motion.js').advance(1,now).distanceMs/duration)<1e-9);}finally{global.performance=previous;}
 });
 
 test('地图动画抵达中途地标后自动衔接下一段，途中仍逐段结算事件',()=>{
  const {v}=base(),previous=global.performance;let now=0,saves=0;global.performance={now:()=>now};
- try{v.save=()=>{saves++;};v.animate=()=>{};v.boundCamera=()=>{};v.model.state.steps=2;v.model.state.lastEventStep=2;const route=v.model.findRoute('chengdu');v.travel('chengdu');assert.equal(v.journey.from,'camp');let reached=0;
+ try{v.save=()=>{saves++;};v.character=v.model.character;v.showCourtDream=()=>{};v.animate=()=>{};v.boundCamera=()=>{};v.model.state.steps=2;v.model.state.lastEventStep=2;const route=v.model.findRoute('chengdu');v.travel('chengdu');assert.equal(v.journey.from,'camp');let reached=0;
   for(let i=0;i<2000&&v.journey;i++){now+=80;v.tickJourney();if(v.panel?.type==='event'){assert.equal(v.journey.paused,true);if(v.panel.event.kind==='battle')v.model.resolveBattle({result:'victory',units:[{id:'hero',side:'ally',soldiers:50}]});v.panel=null;v.resumeJourney();}reached=v.model.state.steps-2;}
-  assert.equal(v.model.state.nodeId,'chengdu');assert.equal(v.model.state.routeTarget,null);assert.equal(v.journey,null);assert.equal(reached,route.nodes.length-1);assert.ok(saves>=2*reached);assert.equal(v.selected,'chengdu');
+  assert.equal(v.model.state.nodeId,'chengdu');assert.equal(v.model.state.routeTarget,null);assert.equal(v.journey,null);assert.equal(reached,route.nodes.length-1);assert.ok(saves>=2*reached);assert.equal(v.selected,null);assert.equal(v.model.state.inside,true);
  }finally{global.performance=previous;}
 });
 
@@ -53,8 +53,8 @@ function animationHarness(){
  Object.assign(v,{disposed:false,raf:0,idleFrameAt:100,dialogue:null,journey:null,invalidate:CanvasWorld.prototype.invalidate,tickJourney(){},draw(){draws++;this.hits=[{x:30,y:200,w:100,h:40,label:this.panel?'离开':this.dialogue?'继续':'赵云',action:()=>{if(this.panel)this.panel=null;else if(this.dialogue)this.dialogue=null;else this.interact({id:'zhaoyun',name:'赵云'});}}];this.drawnRevision=this.revision;}});v.draw();
  return {v,frames,draws:()=>draws,step(time){now=time;const next=frames.entries().next().value;assert.ok(next,'应有待处理的动画帧');frames.delete(next[0]);next[1](time);},restore(){for(const [key,value]of Object.entries(previous)){if(value===undefined)delete global[key];else global[key]=value;}}};
 }
-test('队伍待机的限帧不能吞掉打开赵云菜单或离开的重绘，后续点击仍然有效',()=>{
- const h=animationHarness(),{v}=h;try{v.animate();v.down(e(50,220));v.up(e(50,220));assert.equal(v.panel.type,'npcMenu');h.step(116);assert.equal(v.drawnRevision,v.revision);assert.equal(v.hits[0].label,'离开');v.down(e(50,220));v.up(e(50,220));h.step(120);assert.equal(v.panel,null);assert.equal(v.drawnRevision,v.revision);assert.equal(v.hits[0].label,'赵云');assert.ok(h.frames.size>0);v.down(e(50,220));v.up(e(50,220));h.step(128);assert.equal(v.hits[0].label,'离开');}finally{h.restore();}
+test('队伍待机的限帧不能吞掉直接打开赵云对话或离开的重绘，后续点击仍然有效',()=>{
+ const h=animationHarness(),{v}=h;try{v.animate();v.down(e(50,220));v.up(e(50,220));assert.ok(v.dialogue);assert.equal(v.panel,null);h.step(116);assert.equal(v.drawnRevision,v.revision);assert.equal(v.hits[0].label,'继续');v.down(e(50,220));v.up(e(50,220));h.step(120);assert.equal(v.dialogue,null);assert.equal(v.drawnRevision,v.revision);assert.equal(v.hits[0].label,'赵云');assert.ok(h.frames.size>0);v.down(e(50,220));v.up(e(50,220));h.step(128);assert.equal(v.hits[0].label,'继续');}finally{h.restore();}
 });
 test('从待机切入对话后，即使不足33毫秒也必须绘制，不能留下永远过期的点击区域',()=>{
  const h=animationHarness(),{v}=h;try{v.animate();v.dialogue={npc:{name:'赵云'}};v.invalidate();h.step(108);assert.equal(v.drawnRevision,v.revision);assert.equal(v.hits[0].label,'继续');assert.equal(h.frames.size,0);v.down(e(50,220));v.up(e(50,220));h.step(112);assert.equal(v.dialogue,null);assert.equal(v.drawnRevision,v.revision);}finally{h.restore();}

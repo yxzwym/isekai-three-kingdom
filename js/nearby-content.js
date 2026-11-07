@@ -3,47 +3,54 @@
  const node=typeof module!=='undefined'&&module.exports,G=node?require('./character-growth.js'):root.CharacterGrowth,I=node?require('./items.js'):root.ItemCatalog,W=node?require('./weapon-skills.js'):root.WeaponSkills;
  const np=(id,name,art,role,place,lines)=>({id,name,art,role,place,side:role==='healer'?'right':'left',roleLabel:{civilian:'交谈',quest:'委托',merchant:'商贩',healer:'疗伤'}[role]||'交谈',lines});
  const npcs=[
-  np('changshan-elder','里正','villager','quest','changshan',['你是来找人的，还是想找个地方歇脚？西边那间屋子还空着，我叫人给你腾个铺位。','这些逃难来的乡亲暂时都住在村里，多亏子龙照应。住处还能挤一挤，就是吃的快不够了。']),
-  np('changshan-woodcutter','樵夫','laborer','quest','changshan',['你要进山？可别走山口那条近路，前两天我在那里碰上了贼，柴和斧头都没保住。','以前天不亮就能进山，现在得等上几家一起走。人多了壮胆，真碰到贼，大伙儿也能互相喊一声。']),
-  np('changshan-doctor','乡医','villager','healer','changshan',['我看看，是新添的伤？坐这里吧，把伤口露出来，别隔着衣服自己乱摸。','我这里还能替你们看伤，就是干净布条快用完了。要包扎的话，到这边坐吧。']),
-  np('changshan-maiden','阿禾','village-maiden','civilian','changshan',['我把西边的空屋打扫过了，晚些再铺点干草。来投宿的人要是多，大概还得借几床被子。','东边那家的小孩总算肯出来玩了。刚来那几天，一听见马蹄声就往桌子底下钻，怎么哄都没用。']),
-  np('grain-steward','仓守','villager','quest','zhongshan',['这仓里的粮，是附近几家凑给常山那些流民的。哪知道车还没备好，贼先来了，把人赶出去就占了仓。','你看粮袋上的线，颜色都不一样，各家自己缝的。我一袋袋点过数，只盼着别被他们糟蹋了。']),
-  np('road-merchant','行商','laborer','merchant','zhongshan',['想买点什么？我这儿有些旧兵器，也有能穿的甲。东西看着旧了点，用起来没问题，你慢慢挑。','最近走一趟路太不容易，几文钱的小买卖，也得看能不能平安送到。等路上安稳些，我再多进点货。']),
-  np('grain-maiden','阿芹','village-maiden','civilian','zhongshan',['你问甄姑娘？她原先在这里给伤者看病。贼来了以后，听说她家里有粮，就把她和几个伤者一块儿带走了。','甄姑娘替我弟弟看过伤，他怕疼，一直不肯让人碰，还是她哄着才包上的。也不知道她现在怎么样了。']),
-  np('refugee-laborer','车夫','laborer','quest','zhongshan-county',['我看见他们把人带进旧祠堂了，就在后院。门口有两个守着，隔一会儿就进去看看，我不敢靠得太近。','车轮修好了，我就把车停在旁边等着。甄姑娘要照顾那几个伤者，他们自己肯定走不远。']),
-  np('wujii-servant','甄家侍女','maid','civilian','zhongshan-county',['你们见到我家姑娘了吗？她出去给人看病，到现在也没回来。我打听到这里，守门的人就是不让我进去。','姑娘出门带了一整箱药，原先说用完就回来。我昨天还在家里等她，早知道该跟着她一起出来。']),
-  np('julu-carrier','运粮老卒','villager','quest','julu',['那支粮队往广宗去了，说好前日回来，到现在还没信儿。我想去找，可这条腿连上车都费劲。','你是从外头来的，路上见过几辆运粮车没有？赶车的老冯跟我差不多年纪，脸上有一道疤。']),
-  np('guangzong-worker','补车匠','laborer','civilian','julu-county',['你那车轮要是松了就推过来，我帮你紧一紧。可别想着凑合赶路，真掉在半道上，还得回头找我。','这几天来修车的人多，木料都有些不够了。急着赶路的我先修，不急的就在旁边坐会儿。']),
-  {...np('xinye-doctor','药铺郎中','villager','healer','xinye',['伤口先别沾水，来这边坐。我替你清理一下，旧布条也得换掉。','外头闹得厉害，你们要是还有事要办，至少先把伤养好，别硬撑着出去。']),unlockQuest:'ganning'}
+  np('changshan-elder','里正','villager','quest','changshan',['你是想打听人，还是找个住的地方？西边有间空屋，我让人腾张铺位出来。走了一路，先在这里歇歇吧。','逃难来的乡亲暂时都住在村里，赵云一直帮着照顾。住的地方还能再挤一挤，可粮食剩得不多了，大家都在发愁。']),
+  np('changshan-woodcutter','樵夫','laborer','quest','changshan',['你准备进山吗？山口那条近路先别走，我前两天在那里遇见了贼，柴和斧头都没保住，跑回来时还摔了一跤。','以前我天不亮就进山，如今得等邻居们一起出门。也不是人多就打得过，只是遇到事情，总能有人跑回来报信。']),
+  np('changshan-doctor','乡医','villager','healer','changshan',['身上有伤吗？到这边坐，把袖子挽起来，我看看伤口。别隔着衣服自己揉，脏东西揉进去，会更难处理。','想包扎的话就在这里坐会儿，轮到了我叫你。干净布条剩得不多，我还得找人再洗一些，伤重的先看，别着急。']),
+  np('changshan-maiden','阿禾','village-maiden','civilian','changshan',['西边那间屋子我已经扫干净了，晚上再铺些干草。今天投宿的人多，要是被子不够，我再去问邻居借几床。','东边那家的小孩今天总算肯出来玩了。刚来的时候，一听见马蹄声就躲到桌下，抱着他娘怎么也不肯松手，实在叫人心疼。']),
+  np('grain-steward','仓守','villager','quest','zhongshan',['这些粮是附近几家凑给常山乡亲的。我们还没把车备好，贼就来了，把守仓的人赶走，连仓门都给换了锁。','你看这些粮袋，线的颜色都不一样，是各家自己缝好送来的。我都点过数，只怕那伙人搬来搬去，把好好的粮食也糟蹋了。']),
+  np('road-merchant','行商','laborer','merchant','zhongshan',['要买兵器还是护具？我这里有些旧货，看着不新，刃口和甲扣都修过了，用起来没问题，你可以慢慢挑。','最近送货太难，一趟路常要绕好几个村子，走到天黑也未必能到。等道路安稳些，我再多进点东西，现在先卖手里这些。']),
+  np('grain-maiden','阿芹','village-maiden','civilian','zhongshan',['你在找甄姑娘？她本来在这里替人看伤，贼听说甄家有粮，就把她和几个伤者一起带走了，说要叫她家里拿东西来换人。','甄姑娘给我弟弟包过伤，他一直怕疼不肯让人碰，还是她哄了半天才肯伸手。不知道她现在有没有受伤，我这几天一直惦记着。']),
+  np('refugee-laborer','车夫','laborer','quest','zhongshan-county',['我跟着那伙人看见了，他们把甄姑娘带进旧祠堂的后院。门口一直有人守着，我想靠近听听，还差点被他们发现。','车轮已经修好，我就停在路边等。里面那几个伤者走不动，甄姑娘肯定不愿意丢下他们，所以还得有人把车赶过去接。']),
+  np('wujii-servant','甄家侍女','maid','civilian','zhongshan-county',['你们有没有见过我家姑娘？她出门给人看病，到现在都没回家。我一路问到这里，可守门的人连她的消息都不肯说。','她出门时带了整箱药，跟我说用完就回来。我昨天还在等她回家，早知道外头这么乱，真该一起出来，至少有人能送个信。']),
+  np('julu-carrier','运粮老卒','villager','quest','julu',['粮车往广宗去了，本来说前天就回，可一直没消息。我想去找找，偏偏这条腿又犯了老伤，连上车都得有人扶。','你们从外面过来，有没有看见几辆运粮车？赶车的老冯脸上有道疤，年纪跟我差不多，要是见过，劳烦跟我说一声。']),
+  np('guangzong-worker','补车匠','laborer','civilian','julu-county',['车轮松了就推到这边来，我帮你看看。别觉得还能转就凑合上路，真在半道掉下来，伤着人不说，货也全得耽误。','这两天等着修的车太多，木料都快用光了。有急事的我先修，能等的就在旁边歇一会儿，轮到谁我会叫。']),
+  {...np('xinye-doctor','药铺郎中','villager','healer','xinye',['到这里坐吧，我先把伤口清理一下，再换上干净布条。包好以后别沾水，觉得又疼又热，就回来让我再看看。','衙门那边闹得很厉害，你们要是还准备过去办事，至少先把身上的伤处理好。带着伤硬撑，真碰到麻烦就更难脱身了。']),unlockQuest:'ganning'}
  ];
  const conversations={
-  'changshan-elder':{afterReturn:['粮已经分下去了，剩下的我让人锁进了仓里。你要是不急着赶路，今晚在村里吃顿饭吧。','今早有人问能不能回去收拾田地了，我让他们再等等，先打听清楚路上有没有乱兵。']},
-  'changshan-maiden':{afterReturn:['昨天煮饭的时候，几个孩子都挤在灶台边上不肯走。分到自己那碗，捧着就喝，连烫都顾不上了。','被子还给你们留着呢。什么时候回来，跟我说一声就行，我再去抱点晒过的干草。']},
-  'grain-steward':{afterReturn:['粮车送到了就好。我这两天把仓门补一补，往后收粮，可不敢再只留我一个老头守着了。','那几只破粮袋我没舍得扔，洗干净还能补。你们要是路上缺口袋，来这里拿就是。']},
-  'grain-maiden':{afterRescue:['听说你们把甄姑娘救出来了？太好了！我弟弟还一直问，她什么时候再来呢。','我煮了点吃的，想给那几个伤者送去。你们要是见到甄姑娘，替我问问有什么是他们不能吃的。']},
-  'refugee-laborer':{afterRescue:['人都接出来了，车也没坏，我这心里总算踏实了。以后要运什么，提前跟我说一声，我来赶车。','那几个伤者路上还一直道谢，我让他们少说两句，留点力气。下回见面，盼着他们能自己走过来。']},
-  'wujii-servant':{afterRescue:['多谢你们把姑娘救了出来！她刚回来就问药箱找着没有，我都不知道该先高兴还是先生气。','我给姑娘收拾了换洗的衣服。她若是还跟你们在外头走动，烦你提醒她按时吃饭，别又顾不上自己。']}
+  'changshan-elder':{afterReturn:['粮食已经分给各家了，剩下的也收进了仓里。今晚大家准备一起做顿饭，你们不急着赶路的话，就留下吃完再走吧。','早上有人想回去看看自家的田，我劝他们先等等。路上还有没有乱兵，得问清楚，不能刚吃上几顿饱饭，又出了事。']},
+  'changshan-maiden':{afterReturn:['昨天饭刚煮好，几个孩子就围在灶边等。好不容易分到碗里，烫得直吹气也不肯放下，看来之前真是饿坏了。','你们住过的铺位还留着，回来提前跟我说一声就行。我把被子晒一晒，再换些干草，晚上住着也舒服点。']},
+  'grain-steward':{afterReturn:['粮车平安送到，我这边也放心了。这两天我找人把仓门补好，再安排几个年轻人轮流守着，不能总让我一个老头留在这里。','那些破粮袋我都收着呢，洗干净再补一补还能用。你们路上要是缺袋子，来跟我拿，别又为了装点东西多跑一趟。']},
+  'grain-maiden':{afterRescue:['听说甄姑娘已经救出来了，太好了！我弟弟还问她什么时候再来，想把自己做的小竹篮送给她，说以后能用来装药。','我煮了些吃的，想送给祠堂里救出来的伤者。你们见到甄姑娘，帮我问问他们有没有什么不能吃的，我好重新准备。']},
+  'refugee-laborer':{afterRescue:['人接出来，车也没坏，我终于敢回家安心睡一觉了。你们以后还要运人运东西，提前来叫我，我把车收拾好再出发。','那几个伤者一路上都在跟我道谢，我让他们少说话，先留着力气养伤。盼着下次见面，他们都能自己站起来走路。']},
+  'wujii-servant':{afterRescue:['多亏你们把姑娘救回来！她刚进门就问药箱找到了没有，自己身上的灰都没拍。我又高兴又着急，只好先拉着她坐下来。','换洗的衣服我已经收好了。姑娘要是还跟你们出门，麻烦帮我提醒她按时吃饭，她一忙起来，常常只记得病人，忘了自己也饿着。']}
  };
  const sideQuests=[
-  {id:'clear-mountain',sceneId:'bandit-camp',title:'山道清剿',giver:'changshan-woodcutter',giverPlace:'changshan',place:'zhongshan',enemyName:'山道盗匪',enemyArt:'mountain-bandit',recommendedLevel:4,rounds:5,money:180,item:'leather-armor',quality:'green',description:'前往中山山道清理盗匪，再回常山向樵夫复命。',accept:'你真愿意帮忙？那我带你去山口。他们在几处旧棚里落脚，不一定都在一块儿，咱们一处一处找，别漏了藏在后头的。'},
-  {id:'grain-escort',sceneId:'farmland',title:'营粮归路',giver:'julu-carrier',giverPlace:'julu',place:'julu-county',enemyName:'拦粮山贼',enemyArt:'mountain-bandit',recommendedLevel:3,rounds:2,money:100,item:'cloth-armor',quality:'green',description:'前往广宗击退拦粮山贼、护送粮车，再回巨鹿向老卒复命。',accept:'劳烦你往广宗走一趟，他们走的是旧驿道。先找着人，看看出了什么事；要是被困在那儿了，帮着把他们和粮车送出来。'},
-  {id:'trade-road',sceneId:'market-street',title:'商路肃清',giver:'road-merchant',giverPlace:'zhongshan',place:'zhongshan-county',enemyName:'商道匪首',enemyArt:'brigand',recommendedLevel:5,rounds:5,money:240,item:'copper-ring',quality:'green',description:'前往毋极清理商道盗匪，再回中山向行商复命。',accept:'西边商道上的贼分了好几伙，专等落单的货队。我们几个做买卖的凑了钱，你若能把这条路清出来，酬劳一文也不会少。'}
+  {id:'clear-mountain',sceneId:'bandit-camp',title:'山道清剿',giver:'changshan-woodcutter',giverPlace:'changshan',place:'zhongshan',enemyName:'山道盗匪',enemyArt:'mountain-bandit',recommendedLevel:4,rounds:5,money:180,item:'leather-armor',quality:'green',description:'前往中山山道清理盗匪，再回常山向樵夫复命。',accept:'你们愿意帮忙，那真是太好了。那些贼就在通往中山的山道上，分散住着几间旧棚。到了找一找，把还没离开的也清出去，不能只赶跑眼前的一伙。'},
+  {id:'grain-escort',sceneId:'farmland',title:'营粮归路',giver:'julu-carrier',giverPlace:'julu',place:'julu-county',enemyName:'拦粮山贼',enemyArt:'mountain-bandit',recommendedLevel:3,rounds:2,money:100,item:'cloth-armor',quality:'green',description:'前往广宗击退拦粮山贼、护送粮车，再回巨鹿向老卒复命。',accept:'麻烦你们往广宗走一趟，粮车走的是那条旧驿道。找到人以后，先看看有没有受伤，要真被贼拦住了，也请把他们和粮车一起接出来。'},
+  {id:'trade-road',sceneId:'market-street',title:'商路肃清',giver:'road-merchant',giverPlace:'zhongshan',place:'zhongshan-county',enemyName:'商道匪首',enemyArt:'brigand',recommendedLevel:5,rounds:5,money:240,item:'copper-ring',quality:'green',description:'前往毋极清理商道盗匪，再回中山向行商复命。',accept:'毋极那边的商道有好几伙贼，专盯着落单的货车。你们要是肯帮忙清路，我们几个商人愿意一起出酬劳，等事情办好，一定按约给你们。'}
  ];
  function enemy(profile,level,name,art,type,skills,index=0){const weapon=I.create('weapon-'+type,'white','enemy-'+index);weapon.id='outlaw-'+type;weapon.skills=skills.map(id=>id==='blade-cut'?{base:id,name:'劈砍'}:id);skills=W.forWeapon(weapon);return {...G.create(profile,level),name,characterId:art,weapon,weaponProficiencies:{[type]:40},armor:3,resistance:3,equipment:{armor:I.create('cloth-armor','white','enemy-armor-'+index)},skills,targetRule:'random',priorities:skills.map(skill=>({skill,when:W.skills[skill].scope==='all'?'enemyCount':'always',threshold:2,frequency:'sometimes'}))};}
- const bandits=(level,count,captain=false)=>Array.from({length:count},(_,i)=>enemy(i===0&&captain?'brigand':i%2?'riverBandit':'thief',level,i===0&&captain?'盗匪头目':i%2?'山贼':'盗贼',i===0&&captain?'brigand':i%2?'mountain-bandit':'thief',i%2?'spear':'blade',i%2?['spear-cut','spear-sweep']:['blade-cut'],i));
+ const bandits=(level,count,captain=false)=>Array.from({length:count},(_,i)=>({...enemy(i===0&&captain?'brigand':i%2?'riverBandit':'thief',level,i===0&&captain?'盗匪头目':i%2?'山贼':'盗贼',i===0&&captain?'brigand':i%2?'mountain-bandit':'thief',i%2?'spear':'blade',i===0&&captain?['blade-sweep','blade-cut']:i%2?['spear-cut']:['blade-cut'],i),...(i===0&&captain?{formationRow:'front'}:{})}));
  const storyConversations={changshanEntry:[
-  {speaker:'villager',text:'你也是来投宿的？先别往里去了。村口来了几个山贼，正堵着人要粮，已经打伤两个人了。'},
-  {speaker:'hero',text:'这地方看着也不像有多少余粮。没有人管吗？'},
-  {speaker:'villager',text:'官府早就不管了。这几天多亏一个年轻枪客照应着，他刚往村东去了，偏偏这时候……坏了，他们过来了。'},
-  {speaker:'thief',text:'老头，别磨蹭，那两袋粮搬出来。旁边那个也不许走，把身上的东西都拿出来！'},
-  {speaker:'hero',text:'他们自己都快没饭吃了，这点口粮你们也要抢？'},
-  {speaker:'thief',text:'你想替他们出头？行，连你一块儿绑了，看你身上能搜出什么！'},
-  {speaker:'zhaoyun',text:'把人放开。这几袋粮要留给村里的老人孩子，不能让你们拿走。'},
-  {speaker:'thief',text:'又是你坏事！一起上，今天非得让他长长记性！'},
-  {speaker:'zhaoyun',text:'这位朋友，先帮我拦住左边那个人，别让他往村里跑。乡亲们，都退到屋里去！'},
-  {speaker:'hero',text:'好，你当心后面那个，我来守这边。'}
+  {speaker:'villager',text:'你想进村歇脚吗？先在这里等等吧，里面来了几个山贼，堵着人要粮，还把劝架的人打伤了，正吵得厉害。'},
+  {speaker:'hero',text:'村里看着也没剩多少粮，他们还来抢？附近没有能帮忙的人吗，大家就这么被堵在这里？'},
+  {speaker:'villager',text:'官府很久没管过了。最近有个使枪的年轻人在照应，可他刚去了村东……你看，那几个贼往这边来了，你先站远一点。'},
+  {speaker:'thief',text:'老头，那两袋粮还没搬出来？赶紧去拿！旁边那个也不许走，既然来了，把身上值钱的都留下。'},
+  {speaker:'hero',text:'村里的人已经快吃不上饭了，你们连最后这点粮也要拿走？他刚才还在告诉我，有人被你们打伤了。'},
+  {speaker:'thief',text:'怎么，你也想管？那就跟他们一起留下！把他绑起来，先搜搜他身上有没有钱，别让他跑了！'},
+  {speaker:'zhaoyun',text:'把人放开，别再动手。这些粮要留给村里的老人和孩子，你们拿走了，叫他们明天吃什么？'},
+  {speaker:'thief',text:'又是你！昨天放你一马，今天还敢来拦？弟兄们一起上，把他手里的枪夺下来，看他还怎么逞强！'},
+  {speaker:'zhaoyun',text:'这位朋友，帮我拦一下左边那个人，别让他进村去抓人。乡亲们先回屋，把门关好，这里我们来挡！'},
+  {speaker:'hero',text:'左边我来守，你小心后面还有一个。大叔，你也赶紧进屋，别留在路中间。'}
  ]};
- const storyBattles={entry:{sceneId:'farmland',title:'常山村口',place:'changshan',scaling:'early',count:2},grain:{sceneId:'market-street',title:'夺回乡粮',place:'zhongshan',scaling:'early',count:3},rescue:{sceneId:'market-street',title:'祠堂救人',place:'zhongshan-county',scaling:'early',count:2},escort:{sceneId:'rural-road',title:'粮车归途',place:'changshan',scaling:'early',count:4}};
+ storyConversations.escortArrival=[
+  {speaker:'villager',text:'赵云，你们把粮运回来了！快往村里推吧，大家都等着呢……后面那几个带刀的，也是跟你们一起回来的吗？'},
+  {speaker:'zhaoyun',text:'不是，他们应该一路跟着车。乡亲们先把粮推进去，进屋以后把门拴好，别在外头围着看。'},
+  {speaker:'thief',text:'前面的给我站住！从粮仓里搬了东西，拍拍手就想走？那几车粮今天得留下，你们谁也不许推！'},
+  {speaker:'hero',text:'他们果然没肯罢休，还追到村口来了。里面有孩子和伤者，不能让他们冲进去，我们得在这里把人拦住。'},
+  {speaker:'zhaoyun',text:'我守住村口这条路，你帮着照看粮车旁边。乡亲们快进去，等把门关好再出来帮忙，别让他们抓到人。'}
+ ];
+ const storyBattles={entry:{sceneId:'farmland',title:'常山村口',place:'changshan',scaling:'early',count:2},grain:{followup:{phase:'grain',speaker:'zhaoyun',lines:['前院的人已经退开，粮袋还在。后院还有几个正在搬东西，我们现在过去，别让他们把仓门堵上，再从后墙逃走。']},sceneId:'market-street',title:'夺回乡粮',place:'zhongshan',scaling:'early',count:3},rescue:{sceneId:'market-street',title:'祠堂救人',place:'zhongshan-county',scaling:'early',count:2},escort:{sceneId:'rural-road',title:'粮车归途',place:'changshan',scaling:'early',count:4}};
  const services={healing:{price:8,currency:'文'}};
  const combatProgression={initialCap:10,caps:[10,15,20]};
  const api={services,combatProgression,npcs,conversations,storyConversations,sideQuests,enemy,bandits,storyBattles};root.NearbyContent=api;if(node)module.exports=api;

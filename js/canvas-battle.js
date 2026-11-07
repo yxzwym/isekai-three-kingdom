@@ -1,7 +1,8 @@
 (function (root) {
   'use strict';
   const UI=typeof module!=='undefined'&&module.exports?require('./ui-theme.js'):root.PengpaiUI;
-  const font=UI.font,PARTY_LIMIT=(typeof module!=='undefined'&&module.exports?require('./game-rules.js'):root.PengpaiRules).PARTY_LIMIT;
+  const Rules=typeof module!=='undefined'&&module.exports?require('./game-rules.js'):root.PengpaiRules;
+  const font=UI.font,PARTY_LIMIT=Rules.PARTY_LIMIT;
   const clamp = (n,a,b) => Math.max(a,Math.min(b,n));
   const clock = time => `${String(Math.floor(time/60)).padStart(2,'0')}:${String(Math.floor(time%60)).padStart(2,'0')}`;
   const Presentation=typeof module!=='undefined'&&module.exports?require('./presentation.js'):root.BattlePresentation;
@@ -16,18 +17,23 @@
   }
   function layout(width,height,allies,enemies,formation,allyColumns=PARTY_LIMIT) {
     const rects=[],gap=3,groupWidth=Math.min(width-12,640);
+    const indices=formation?[...(formation.back||[]),...(formation.front||[])]:[];
+    const validFormation=indices.length===enemies&&new Set(indices).size===enemies&&indices.every(i=>Number.isInteger(i)&&i>=0&&i<enemies);
+    if(!validFormation&&enemies>=4&&enemies<=6){const split=Math.floor(enemies/2);formation={back:Array.from({length:split},(_,i)=>i),front:Array.from({length:enemies-split},(_,i)=>i+split)};}
     for(const [side,count]of[['ally',allies],['enemy',enemies]]){
-      if(!count)continue;const columns=side==='ally'?allyColumns:Math.min(5,count),cardWidth=((side==='ally'?Math.min(width-32,640):groupWidth)-gap*(columns-1))/columns,rows=Math.ceil(count/columns),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),startEnemy=enemies===1?Math.min(110,height*.13):enemies<=3?Math.min(76,height*.13):Math.min(170,height*.22),partyRatio=height<650&&height>width&&rows===1?.23:.33,ch=side==='ally'?Math.min((height*partyRatio-gap*(rows-1))/rows,cardWidth*440/256+54):Math.max(30,Math.min((allyTop-112-startEnemy-gap*(rows-1))/rows,cardWidth*440/256+90)),start=side==='ally'?height-14-rows*ch-gap*(rows-1):startEnemy;
+      if(!count)continue;const columns=side==='ally'?allyColumns:Math.min(3,count),cardWidth=((side==='ally'?Math.min(width-32,640):groupWidth)-gap*(columns-1))/columns,rows=Math.ceil(count/columns),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),startEnemy=enemies===1?Math.min(110,height*.13):enemies<=3?Math.min(76,height*.13):Math.min(170,height*.22),partyRatio=height<650&&height>width&&rows===1?.23:.33,ch=side==='ally'?Math.min((height*partyRatio-gap*(rows-1))/rows,cardWidth*440/256+54):Math.max(30,Math.min((allyTop-112-startEnemy-gap*(rows-1))/rows,cardWidth*440/256+90)),start=side==='ally'?height-14-rows*ch-gap*(rows-1):startEnemy;
       for(let i=0;i<count;i++){const row=Math.floor(i/columns),col=i%columns,n=Math.min(columns,count-row*columns),rowWidth=n*cardWidth+(n-1)*gap;rects.push({side,index:i,row,column:col,x:(width-rowWidth)/2+col*(cardWidth+gap),y:start+row*(ch+gap),w:cardWidth,h:ch});}
     }
     if(enemies===1){const r=rects.find(r=>r.side==='enemy'),allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y));r.x=16;r.y=Math.min(110,height*.13);r.w=width-32;r.h=Math.max(54,allyTop-116-r.y);r.boss=true;}
     if(formation&&enemies>1){const back=formation.back||[],front=formation.front||[],all=[...back,...front];
       if(all.length===enemies&&new Set(all).size===enemies&&all.every(i=>Number.isInteger(i)&&i>=0&&i<enemies)){
-        const allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),top=Math.min(110,height*.13),end=allyTop-116,frontY=top+Math.min(198,height*.23,(end-top)*.5);
-        for(const [ids,row,y,ch]of[[back,0,top,frontY-top-14],[front,1,frontY,Math.max(44,end-frontY)]]){const widthUnit=ids.length===1?Math.min(groupWidth*.42,180):(groupWidth-gap*(ids.length-1))/Math.max(1,ids.length),total=ids.length*widthUnit+(ids.length-1)*gap;ids.forEach((index,col)=>{const r=rects.find(r=>r.side==='enemy'&&r.index===index);Object.assign(r,{x:(width-total)/2+col*(widthUnit+gap),y,w:widthUnit,h:Math.max(44,ch),row,column:col,boss:false});});}
+        const allyTop=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y)),top=Math.min(110,height*.13),end=allyTop-116,frontY=top+Math.min(70,height*.1,(end-top)*.3),rowH=Math.max(44,end-frontY);
+        for(const [ids,row,y,ch]of[[back,0,top,rowH],[front,1,frontY,rowH]]){const widthUnit=ids.length===1?Math.min(groupWidth*.42,180):(groupWidth-gap*(Math.max(back.length,front.length)-1))/Math.max(back.length,front.length),total=ids.length*widthUnit+(ids.length-1)*gap;ids.forEach((index,col)=>{const r=rects.find(r=>r.side==='enemy'&&r.index===index);Object.assign(r,{x:(width-total)/2+col*(widthUnit+gap),y,w:widthUnit,h:Math.max(44,ch),row,column:col,boss:false});});}
         rects.sort((a,b)=>a.side===b.side?(a.side==='enemy'?a.row-b.row:a.index-b.index):a.side==='enemy'?-1:1);
       }
     }
+    const enemyRows=[...new Set(rects.filter(r=>r.side==='enemy').map(r=>r.row))].sort((a,b)=>a-b);
+    if(enemyRows.length>1){const top=Math.min(126,Math.max(104,height*.16)),bottom=Math.min(...rects.filter(r=>r.side==='ally').map(r=>r.y))-116,depth=Math.min(70,height*.1,Math.max(0,(bottom-top)/(enemyRows.length+2))),ch=Math.max(44,bottom-top-depth*(enemyRows.length-1));for(const r of rects.filter(r=>r.side==='enemy')){r.y=top+enemyRows.indexOf(r.row)*depth;r.h=ch;r.hudAbove=r.row!==enemyRows.at(-1);}rects.sort((a,b)=>a.side===b.side?(a.side==='enemy'?a.row-b.row:a.index-b.index):a.side==='enemy'?-1:1);}
     return rects;
   }
   class CanvasBattle {
@@ -35,13 +41,14 @@
       if (!canvas?.getContext) throw new TypeError('需要传入 canvas 元素');
       this.canvas=canvas;this.ctx=canvas.getContext('2d');this.options=options;this.visuals=new Map();this.textTextures=new Map();this.spriteBuilds=0;this.dpr=1;this.background=null;this.ariaLabel='';this.metrics=options.profile?new Presentation.FrameStats():null;this.images=new Map();this.imageIds=new WeakMap();this.imageSerial=0;this.sprites=new Map();this.hits=[];this.floats=[];this.vfx=new root.BattleVFX.BattleEffects();this.aim=null;this.panel=null;this.focus=-1;this.disposed=false;
       this.click=this.click.bind(this);this.key=this.key.bind(this);this.resize=this.resize.bind(this);this.frame=this.frame.bind(this);
-      this.down=this.down.bind(this);this.up=this.up.bind(this);this.move=this.move.bind(this);this.cancel=this.cancel.bind(this);this.context=e=>e.preventDefault();this.wheel=e=>{if(['tactics','inspect','skillInfo'].includes(this.panel?.type)){e.preventDefault();this.panel.scroll=clamp(this.panel.scroll+e.deltaY,0,this.panel.maxScroll||0);}};
+      this.down=this.down.bind(this);this.up=this.up.bind(this);this.move=this.move.bind(this);this.cancel=this.cancel.bind(this);this.context=e=>e.preventDefault();this.wheel=e=>{if(['tactics','inspect','skillInfo','passiveInfo'].includes(this.panel?.type)){e.preventDefault();this.panel.scroll=clamp(this.panel.scroll+e.deltaY,0,this.panel.maxScroll||0);}};
       canvas.addEventListener('pointerdown',this.down);canvas.addEventListener('pointerup',this.up);canvas.addEventListener('pointermove',this.move);canvas.addEventListener('pointercancel',this.cancel);canvas.addEventListener('contextmenu',this.context);canvas.addEventListener('wheel',this.wheel,{passive:false});canvas.addEventListener('keydown',this.key);
       this.observer=new ResizeObserver(this.resize);this.observer.observe(canvas);
       this.load(scenario);this.resize();this.lastTime=performance.now();this.raf=requestAnimationFrame(this.frame);
     }
     load(scenario) {
       this.battle=new root.BattleEngine.Battle(scenario);this.scenario=scenario;this.seen=0;this.ended=false;this.enemyDefeats=new Map();this.resultAt=0;this.panel=null;this.floats=[];this.aim=null;this.activeManual=null;this.selectionKey=null;this.preparationHintDismissed=false;this.health=new Map(this.battle.units.map(u=>[u.id,new Presentation.HealthTrack(u.soldiers,u.maxSoldiers)]));this.vfx=new root.BattleVFX.BattleEffects();
+      for(const u of this.battle.units){const id=u.characterId||u.id,record=root.CharacterAssets?.manifest.characters[id];if(record){const art=root.CharacterAssets.resolve(id,record.variants[u.variant]?u.variant:undefined);u.portrait??=art.portrait;u.fullbody??=art.fullbody;}}
       const urls=[scenario.scene?.background,...this.battle.units.map(u=>(u.side==='enemy'?u.fullbody||u.portrait:u.portrait)?.src)].filter(Boolean);
       urls.forEach(src=>this.image(src));this.visuals.clear();this.vfx.prepare([...this.battle.units.flatMap(u=>u.skills.map(id=>root.BattleVFX.kindOf(this.battle.skills[id]))),'thunder']);this.updateLayout();this.buildBackground();this.preparePortraits();if(this.options.autoStart!==false)this.battle.start();return this;
     }
@@ -64,7 +71,7 @@
       for(const r of this.rects){r.unit=(r.side==='ally'?this.allies:this.enemies)[r.index];r.id=r.unit.id;
         const enemy=r.side==='enemy',barWidth=r.boss?Math.min(280,this.w*.52):enemy?Math.min(r.w,180):r.w;
         r.figure={x:r.x,y:r.y+(r.boss?84:0),w:r.w,h:Math.max(0,r.h-(r.boss?84:50))};
-        r.hud={x:r.x+(r.w-barWidth)/2,y:enemy&&!r.boss?r.figure.y+r.figure.h+20:r.y,w:barWidth,belowFigure:enemy&&!r.boss};
+        r.hud={x:r.x+(r.w-barWidth)/2,y:enemy&&!r.boss?(r.hudAbove?r.figure.y-34:r.figure.y+r.figure.h+20):r.y,w:barWidth,belowFigure:enemy&&!r.boss&&!r.hudAbove};
         r.effectY=r.figure.y+r.figure.h*.55;r.floatY=r.figure.y+22;
       }
       this.rectMap=new Map(this.rects.map(r=>[r.id,r]));this.allyTop=Math.min(...this.rects.filter(r=>r.side==='ally').map(r=>r.y));
@@ -72,7 +79,7 @@
     preparePortraits(){
       if(!this.rects)return;
       for(const r of this.rects){const u=r.unit,art=r.side==='enemy'?u.fullbody||u.portrait:u.portrait,img=this.image(art?.src);if(!img)continue;const source=art.crop||{x:0,y:0,width:img.naturalWidth,height:img.naturalHeight},dst=fitImage(source.width,source.height,r.figure),width=Math.max(1,Math.ceil(dst.w*Math.max(2,this.dpr)));
-        const fade=art.status==='legacy';this.visuals.set(u.id,{sprite:this.sprite(img,source,width,false,fade),red:this.sprite(img,source,width,true,fade),dst});
+        const fade=art.status==='legacy';this.visuals.set(u.id,{sprite:this.sprite(img,source,width,false,fade),red:this.sprite(img,source,width,true,fade),dst});if(r.hudAbove)r.hud.y=dst.y-36;
       }
     }
     buildBackground(){
@@ -89,24 +96,24 @@
     frame(now) {
       if(this.disposed) return;
       const delta=Math.max(0,(now-this.lastTime)/1000);this.lastTime=now;
-      const started=this.metrics?performance.now():0;this.battle.advance(delta);
+      const started=this.metrics?performance.now():0;this.battle.advance(delta,this.manualPauseEnabled()?()=>this.manualReadyActors().length>0:undefined);
       this.processEvents(now);if(this.disposed)return;this.vfx.prewarm(2);const updated=this.metrics?performance.now():0;this.draw(now);if(this.metrics){const ended=performance.now(),report=this.metrics.add(ended-started,updated-started,ended-updated,delta*1000,now);if(report)this.canvas.dataset.frameStats=JSON.stringify({...report,actions:this.battle.actionCount,vfx:this.vfx.items.length,spritesBuilt:this.spriteBuilds,fxTextures:this.vfx.cacheInfo().textures});}if(!this.disposed)this.raf=requestAnimationFrame(this.frame);
     }
     processEvents(now){
       this.enemyDefeats||=new Map();
       const b=this.battle,events=b.events,totals=new Map(),health=new Map();
-      for(let i=this.seen;i<events.length;i++){const e=events[i];if(e.type==='modeblocked')this.floats.push({id:e.actor,text:e.text,color:'#f1dfae',born:now,type:'skill'});if(e.type==='passive'){this.floats.push({id:e.actor,text:e.skillName,color:'#ef9389',born:now,type:'skill'});this.vfx.addEffect(e.target||e.actor,e.effect==='cleanse'?'heal':'buff',now,650,false);}if(e.type!=='action')continue;const skill=b.skills[e.skill];this.vfx.action(e,skill,now);
-        if(!e.periodic)this.floats.push({id:e.actor,text:e.skillName,color:root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]||'#ead8a5',born:now,type:'skill'});
+      for(let i=this.seen;i<events.length;i++){const e=events[i];if(e.type==='modeblocked')Presentation.addFloat(this.floats,{id:e.actor,text:e.text,color:'#f1dfae',born:now,type:'skill'});if(e.type==='passive'){Presentation.addFloat(this.floats,{id:e.actor,text:e.skillName,color:UI.passiveColor(b.passives[e.passive]||{}),born:now,type:'skill'});this.vfx.addEffect(e.target||e.actor,e.effect==='cleanse'?'heal':'buff',now,650,false);}if(e.type!=='action')continue;const skill=b.skills[e.skill];this.vfx.action(e,skill,now);
+        if(!e.periodic)Presentation.addFloat(this.floats,{id:e.actor,text:e.skillName,color:root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]||'#ead8a5',born:now,type:'skill'});
         for(const r of e.results){if(r.buff)continue;if(!r.miss)health.set(r.target,r.after);const damageType=r.damageType||skill?.damageType||skill?.kind||'physical',displayAmount=r.healing?r.actual:r.amount??r.actual,key=r.target+':'+(r.miss||(r.healing?'heal':damageType)),old=totals.get(key);if(old){old.actual+=r.actual;old.displayAmount+=displayAmount;old.critical=old.critical||r.critical;}else totals.set(key,{...r,damageType,displayAmount});}
         this.options.onAction?.(e,this);if(this.battle!==b)return;
       }this.seen=events.length;
       for(const [id,value]of health){this.health.get(id)?.set(value,now);const u=b.unit(id);if(u?.side==='enemy'){if(u.soldiers<=0&&!this.enemyDefeats.has(id))this.enemyDefeats.set(id,now);else if(u.soldiers>0)this.enemyDefeats.delete(id);}}
       for(const r of totals.values()){
-        const occupied=this.floats.filter(f=>f.id===r.target&&f.type!=='skill'&&now-f.born<650).map(f=>f.lane||0);let lane=0;while(occupied.includes(lane)&&lane<4)lane++;
-        this.floats.push({id:r.target,text:r.miss||`${r.healing?'+':'−'}${number(r.displayAmount)}${r.critical?'!':''}`,color:Presentation.resultColor(r),born:now,critical:r.critical,lane});
+
+        Presentation.addFloat(this.floats,{id:r.target,text:(r.miss?(b.unit(r.target)?.side==='ally'?'闪避':'未命中'):null)||`${r.healing?'+':'−'}${number(r.displayAmount)}${r.critical?'!':''}`,color:Presentation.resultColor(r),born:now,critical:r.critical});
       }
       if(!this.ended&&!['ready','running'].includes(b.status)){this.ended=true;this.resultAt=now+(b.status==='victory'&&[...this.enemyDefeats.values()].some(t=>now-t<500)?500:0);if(!this.options.hideResult&&now>=this.resultAt)this.panel={type:'result'};const result=b.export();this.canvas.dispatchEvent(new CustomEvent('battlecomplete',{detail:result}));this.options.onComplete?.(result,this);}
-      this.floats=this.floats.filter(f=>now-f.born<1100);const limit=Math.max(48,b.units.length*6);if(this.floats.length>limit)this.floats.splice(0,this.floats.length-limit);
+      this.floats=this.floats.filter(f=>now-f.born<1100);const limit=Math.max(96,b.units.length*10);if(this.floats.length>limit)this.floats.splice(0,this.floats.length-limit);
     }
     text(text,x,y,size=14,color='#dce6e5',align='center'){
       size=UI.textSize(size);text=String(text);const key=size+'|'+color+'|'+text;let image=this.textTextures.get(key);
@@ -129,7 +136,8 @@
       if(this.battle.canRetreat())this.button('撤退',w-63,12,53,30,()=>this.battle.retreat());
       for(const r of this.rects)this.drawUnit(r.unit,r,now);
       this.drawTargeting(now);if(this.options.effects!==false)this.vfx.draw(c,this.rectMap,now);this.drawReadySkills(now);if(this.battle.status==='ready')this.drawPreparation();
-      for(const f of this.floats){const r=this.rectMap.get(f.id);if(!r)continue;const progress=(now-f.born)/1100,pop=f.type==='skill'?1:1+.25*Math.sin(Math.PI*Math.min(1,progress*5));c.save();c.globalAlpha=1-progress;const face=this.visuals.get(f.id)?.dst||r.figure,x=face.x+face.w/2,y=(f.type==='skill'?face.y-8:face.y+20+(f.lane||0)*22)-progress*32;c.translate(x,y);c.scale(pop,pop);this.text(f.text,0,0,Math.min(f.type==='skill'?14:f.critical?25:22,r.w*(f.type==='skill'?.2:.33)),f.color);c.restore();}
+      const floatRows=new Map();for(const f of this.floats)floatRows.set(f.id,Math.max(floatRows.get(f.id)||0,f.lane||0));
+      for(const f of this.floats){const r=this.rectMap.get(f.id);if(!r||now<f.born)continue;const progress=(now-f.born)/1100,pop=f.type==='skill'?1:1+.25*Math.sin(Math.PI*Math.min(1,progress*5));c.save();c.globalAlpha=1-progress;const face=this.visuals.get(f.id)?.dst||r.figure,x=face.x+face.w/2,y=Math.max(24,Math.min(this.h-24-(floatRows.get(f.id)||0)*28,face.y-10))+(f.lane||0)*28-progress*28;c.translate(x,y);c.scale(pop,pop);this.text(f.text,0,0,Math.min(f.type==='skill'?14:f.critical?25:22,r.w*(f.type==='skill'?.2:.33)),f.color);c.restore();}
       if(this.battle.status==='running'&&this.scenario.hint&&!this.allies.some(u=>u.stats.actions>0||u.ready)){this.box(24,h/2-22,w-48,44,'#091e29d9','#8d9a8e');this.text(this.scenario.hint,w/2,h/2,14,'#f2dfb8');}
       if(this.panel)this.drawPanel();
       this.drawNotice(now);
@@ -210,12 +218,14 @@
       if(skill.kind==='buff')return skill.buff?.taunt?'嘲讽':skill.buff?.reflect||skill.buff?.reflectFormula?'反伤':skill.side==='enemy'?(all?'群体削弱':'单体削弱'):skill.side==='self'?'自身增益':all?'群体增益':'单体增益';
       return (all?'群体':'单体')+(skill.kind==='physical'?'物理伤害':'魔法伤害');
     }
+    manualPauseEnabled(){return this.options?.manualPause!==false;}
+    manualReadyActors(){return this.battle.units.filter(u=>u.side==='ally'&&u.soldiers>0&&u.mode==='manual'&&u.ready&&!u.queued&&!this.battle.stunned(u)&&u.skills.some(id=>{const skill=this.battle.skills[id];return skill&&this.battle.availableSp(u)>=skill.cost&&this.battle.targetPool(u,skill).length;})).sort((a,b)=>(a.readyTick??Infinity)-(b.readyTick??Infinity)||a.order-b.order);}
     drawSkillIcon(skill,x,y,size,color) {
       root.SkillIcons.draw(this.ctx,skill,x+2,y+2,size-4,{image:src=>this.image(src)});
     }
     drawReadySkills(now) {
       if(this.battle.status!=='running')return;
-      const ready=this.battle.units.filter(u=>u.side==='ally'&&u.soldiers>0&&u.mode==='manual'&&u.ready).sort((a,b)=>(a.readyTick??Infinity)-(b.readyTick??Infinity)||a.order-b.order);
+      const ready=this.manualReadyActors();
       if(!ready.some(u=>u.id===this.activeManual))this.activeManual=ready[0]?.id||null;
       const u=this.battle.unit(this.activeManual);if(!u)return;
       const key=u.id+':'+u.readyTick;if(this.selectionKey!==key){this.selectionKey=key;const last=this.battle.skills[u.lastManualSkill];if(last&&last.scope!=='all'&&last.side!=='self')this.aim={actor:u.id,skill:last.id,side:last.side==='enemy'?'enemy':'ally'};}
@@ -249,11 +259,13 @@
       if(!u?.skills.includes(id)||!this.battle.skills[id])return;
       this.panel={type:'skillInfo',id:u.id,skill:id,previous:this.panel,scroll:0};
     }
+    openPassiveInfo(u,id){if(u?.passives.includes(id)&&this.battle.passives[id])this.panel={type:'passiveInfo',id:u.id,passive:id,previous:this.panel,scroll:0};}
     drawInspect(){
       const p=this.panel,u=this.battle.unit(p.id);if(!u){this.panel=null;return;}
       const potential=root.CharacterGrowth.isGeneral(u)&&u.potentials,{x,y,w,h}=this.panelFrame(u.name+' · 属性',u.side==='enemy'&&!potential?440:620),left=x+22,right=x+w-22,start=y+54,bottom=y+h-14,c=this.ctx,headerHits=this.hits.length;let row=start+12-(p.scroll||0);
       c.save();c.beginPath();c.rect(x,start,w,bottom-start);c.clip();
       const pairs=[['生命',number(u.soldiers)+' / '+number(u.maxSoldiers)],['等级',number(u.level)],...(!potential?root.PengpaiRules.ATTRIBUTES.map(([key,label])=>[label,number(u[key])]):[]),['护甲',number(this.battle.effective(u).armor)],['抗性',number(this.battle.effective(u).resistance)]];
+      if(u.statusImmunities?.includes('stun'))pairs.push(['状态','抵抗眩晕']);
       for(let i=0;i<pairs.length;i++){const xx=left+(i%2)*(w-44)/2,yy=row+Math.floor(i/2)*26;this.text(pairs[i][0],xx,yy,14,'#acbec2','left');this.text(pairs[i][1],xx+(w-44)/2-10,yy,14,'#eddfbd','right');}
       row+=Math.ceil(pairs.length/2)*26+13;
       if(potential){this.text('属性',left,row,14,'#acbec2','left');this.text('当前',left+(w-44)*.55,row,14,'#acbec2','right');this.text('潜力',right,row,14,'#d8bc8b','right');row+=27;for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.text(label,left,row,14,'#c5d3d5','left');this.text(u[key],left+(w-44)*.55,row,14,'#e4e2d4','right');this.text(u.potentials[key],right,row,14,'#ddc393','right');row+=27;}row+=14;}
@@ -263,8 +275,16 @@
       const weaponType=root.PengpaiRules.WEAPON_TYPES.find(t=>t.id===u.weapon?.type),profession=root.PengpaiRules.WEAPON_GROUPS.find(g=>g.id===weaponType?.group);if(profession){this.text('职业　'+profession.name+(u.side==='ally'?' · '+weaponType.name:''),left,row,14,'#c5d3d5','left');row+=26;}
       this.text('技能',left,row,14,'#ebd4a6','left');row+=20;const col=(w-44)/Math.max(1,u.skills.length),icon=44;
       u.skills.forEach((id,i)=>{const skill=this.battle.skills[id],cx=left+col*(i+.5),ix=cx-icon/2;this.box(ix,row,icon,icon,'#0b222d','#7b9ba6');this.drawSkillIcon(skill,ix,row,icon,root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]);this.text(skill.name,cx,row+57,14,'#e6e8dd');this.text(this.skillRole(skill),cx,row+76,12,'#b7cbd0');this.hits.push({x:left+col*i,y:row,w:col,h:88,label:skill.name,action:()=>this.openSkillInfo(u,id)});});row+=110;
-      for(const id of root.PengpaiRules.sortPassives(u.passives,this.battle.passives)){const passive=this.battle.passives[id];this.text(passive.name,left,row,14,'#ef9389','left');row+=24;for(const line of this.wrapInfo(passive.description,w-44)){this.text(line,left,row,14,'#c5d3d5','left');row+=22;}}
+      const passives=root.PengpaiRules.sortPassives(u.passives,this.battle.passives).map(id=>this.battle.passives[id]).filter(Boolean);
+      if(passives.length){this.text('被动技能',left,row,14,'#ebd4a6','left');row+=18;row+=UI.passiveButtons(this,passives,left,row,w-44,passive=>this.openPassiveInfo(u,passive.id))+12;}
       c.restore();p.maxScroll=Math.max(0,row+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);this.hits=this.hits.filter((hit,i)=>i<headerHits||(hit.y>=start&&hit.y+hit.h<=bottom));
+    }
+    drawPassiveInfo(){
+      const p=this.panel,passive=this.battle.passives[p.passive];if(!passive){this.closePanel();return;}
+      const lines=this.wrapInfo(passive.description,Math.min(this.w-24,460)-44),{x,y,w,h}=this.panelFrame(passive.name,112+lines.length*24),start=y+54,bottom=y+h-16,c=this.ctx;
+      c.save();c.beginPath();c.rect(x,start,w,bottom-start);c.clip();let row=start+15-(p.scroll||0);
+      this.text(passive.exclusive?'专属特质':root.PengpaiRules.QUALITIES[passive.quality]?.name+'品质',x+22,row,14,UI.passiveColor(passive),'left');row+=32;
+      for(const line of lines){this.text(line,x+22,row,14,'#d2e0df','left');row+=24;}c.restore();p.maxScroll=Math.max(0,row+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);
     }
     wrapInfo(value,width){const c=this.ctx;c.font=`14px ${font}`;const rows=[];let line='';for(const ch of String(value).match(/(?:武器威力|武力|智力|体质|速度|技巧)(?:×\d+(?:\.\d+)?)?|\d+(?:\.\d+)?%?|./gu)||[]){if(line&&c.measureText(line+ch).width>width&&!/[，。！？、；：）】》]/.test(ch)){rows.push(line);line='';}line+=ch;}if(line)rows.push(line);return rows;}
     drawSkillInfo(){
@@ -277,6 +297,7 @@
       if(this.panel.type==='tactics')return this.drawTactics();
       if(this.panel.type==='inspect')return this.drawInspect();
       if(this.panel.type==='skillInfo')return this.drawSkillInfo();
+      if(this.panel.type==='passiveInfo')return this.drawPassiveInfo();
       if(this.battle.status==='running'){this.panel=null;return;}
       if(this.panel.type==='log')return this.drawLog();
       if(this.panel.type==='rules')return this.drawRules();
@@ -314,7 +335,7 @@
       if(!this.press||(e.pointerId!==undefined&&e.pointerId!==this.press.pointer))return;const p=this.point(e),dx=p.x-this.press.x,dy=p.y-this.press.y;
       if(!this.press.axis&&Math.max(Math.abs(dx),Math.abs(dy))>7)this.press.axis=this.press.hit?.kind==='slider'&&Math.abs(dx)>Math.abs(dy)?'slider':'scroll';
       if(this.press.axis==='slider'){clearTimeout(this.pressTimer);this.press.moved=true;this.press.hit.change(p.x);}
-      else if(this.press.axis==='scroll'){clearTimeout(this.pressTimer);this.press.moved=true;if(['tactics','inspect','skillInfo'].includes(this.panel?.type))this.panel.scroll=clamp(this.press.scroll-dy,0,this.panel.maxScroll||0);}
+      else if(this.press.axis==='scroll'){clearTimeout(this.pressTimer);this.press.moved=true;if(['tactics','inspect','skillInfo','passiveInfo'].includes(this.panel?.type))this.panel.scroll=clamp(this.press.scroll-dy,0,this.panel.maxScroll||0);}
     }
     up(e){
       if(!this.press||e.pointerId!==this.press.pointer)return;const press=this.press,p=this.point(e);this.cancel();
@@ -374,7 +395,7 @@
       for(const r of p.rules)if(this.battle.skills[r.skill].kind==='buff'){if(this.battle.skills[r.skill].buff?.taunt){const t=r.displayThreshold??1.01;r.when=t>=1.01?'always':'selfBelow';r.threshold=t;}else{r.when='always';r.threshold=0;}delete r.displayThreshold;}
       this.battle.setTactics(u.id,{rules:p.rules,targetRule:p.targetRule});this.panel=null;this.options?.onTacticsSave?.(u,this);
     }
-    closePanel(){if(this.panel?.type==='tactics')this.commitTactics();else if(this.panel?.type==='skillInfo')this.panel=this.panel.previous;else this.panel=null;}
+    closePanel(){if(this.panel?.type==='tactics')this.commitTactics();else if(['skillInfo','passiveInfo'].includes(this.panel?.type))this.panel=this.panel.previous;else this.panel=null;}
     notify(text){this.notice={text,until:performance.now()+2000};}
     notifyStatus(u,status){this.notice={unitId:u.id,statusId:status.id,statusName:status.name,until:performance.now()+2000};}
     drawNotice(now){

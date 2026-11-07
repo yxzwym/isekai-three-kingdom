@@ -38,38 +38,38 @@ test('头像以原比例等比缩放，宽屏、窄屏均不拉伸',()=>{
 test('己方一到四人都占相同四分之一槽宽，阵容水平居中',()=>{
   for(const [w,h]of[[320,568],[390,844],[640,900]]){const full=layout(w,h,4,1).filter(r=>r.side==='ally');for(let n=1;n<=4;n++){const cards=layout(w,h,n,1).filter(r=>r.side==='ally');assert.ok(cards.every(r=>r.w===full[0].w));assert.ok(Math.abs((cards[0].x+cards.at(-1).x+cards.at(-1).w)/2-w/2)<.01);}}
 });
-test('五名敌人在窄屏和宽屏均保持同一横排，剧情超员不会被截掉',()=>{
+test('四至六名敌人默认前后分排，五人为后二前三，超员继续换行且不截掉',()=>{
   for(const [w,h]of[[320,568],[375,667],[640,900],[844,390]]){
     const enemies=layout(w,h,5,5).filter(r=>r.side==='enemy');assert.equal(enemies.length,5);
-    assert.equal(new Set(enemies.map(r=>r.y)).size,1);assert.deepEqual(enemies.map(r=>r.index),[0,1,2,3,4]);
+    assert.equal(new Set(enemies.map(r=>r.y)).size,2);assert.equal(enemies.filter(r=>r.row===0).length,2);assert.equal(enemies.filter(r=>r.row===1).length,3);assert.deepEqual(enemies.map(r=>r.index),[0,1,2,3,4]);
     for(const count of[1,3,5,9,12]){
       const cards=layout(w,h,5,count).filter(r=>r.side==='enemy');assert.equal(cards.length,count);
       for(const [i,r]of cards.entries()){
         assert.ok(r.x>=0&&r.y>=0&&r.w>0&&r.h>0);assert.ok(r.x+r.w<=w+.001);assert.ok(r.y+r.h<=h+.001);
-        for(const previous of cards.slice(0,i))assert.ok(r.x>=previous.x+previous.w-.001||previous.x>=r.x+r.w-.001||r.y>=previous.y+previous.h-.001||previous.y>=r.y+r.h-.001);
+        for(const previous of cards.slice(0,i).filter(previous=>previous.row===r.row))assert.ok(r.x>=previous.x+previous.w-.001||previous.x>=r.x+r.w-.001||r.y>=previous.y+previous.h-.001||previous.y>=r.y+r.h-.001);
       }
     }
   }
 });
-test('两到四名敌人按实际人数分配站位，两名敌人左右展开且模型可用空间更大',()=>{
+test('两三名敌人按实际人数左右展开，多人分排后模型仍有足够空间',()=>{
   for(const [w,h]of [[320,568],[375,667],[390,844],[640,800]]){
     const five=layout(w,h,4,5).filter(r=>r.side==='enemy');
-    for(const count of [2,3,4]){
+    for(const count of [2,3]){
       const cards=layout(w,h,4,count).filter(r=>r.side==='enemy');
       assert.equal(cards.length,count);assert.equal(new Set(cards.map(r=>r.y)).size,1);
-      assert.ok(cards.every(r=>r.w>five[0].w));
+      assert.ok(cards.every(r=>r.w>=(w-18)/3));
       assert.ok(Math.abs((cards[0].x+cards.at(-1).x+cards.at(-1).w)/2-w/2)<.01);
       for(let i=1;i<cards.length;i++)assert.ok(cards[i].x>cards[i-1].x+cards[i-1].w);
       if(count===2){
         assert.ok(cards[0].x+cards[0].w<w/2&&cards[1].x>w/2);
         const large=fitImage(1024,1536,{x:cards[0].x,y:cards[0].y,w:cards[0].w,h:cards[0].h-50});
         const small=fitImage(1024,1536,{x:five[0].x,y:five[0].y,w:five[0].w,h:five[0].h-50});
-        assert.ok(large.h>small.h*1.5);
+        assert.ok(large.h>=small.h);
       }
     }
   }
 });
-test('敌人按阵容顺序横排，旧分排配置或拖动不会改变位置和战斗结算',()=>{
+test('默认分排保留阵容顺序，旧字段或战斗拖动不改变位置和战斗结算',()=>{
   for(const input of[D.createChibi(),D.createEffectsPreview()]){
     input.scene.enemyRows=[['caocao'],['yujin','zhangliao'],['xuhuang','caoren']];
     const source=JSON.stringify(input),b=new Battle(input);b.start();b.advance(2);
@@ -78,11 +78,11 @@ test('敌人按阵容顺序横排，旧分排配置或拖动不会改变位置�
     assert.deepEqual(view.rects.filter(r=>r.side==='enemy').map(r=>r.id),expected);
     const fixed=view.rects.map(r=>({id:r.id,x:r.x,y:r.y})),r=view.rectMap.get('caocao');view.press={x:r.x+10,y:r.y+10,hit:{...r,kind:'unit',unitId:'caocao'}};
     CanvasBattle.prototype.move.call(view,{x:r.x+55,y:r.y+30});assert.deepEqual(view.rects.map(r=>({id:r.id,x:r.x,y:r.y})),fixed);
-    view.w=320;view.h=568;view.updateLayout();const enemies=view.rects.filter(r=>r.side==='enemy');assert.equal(new Set(enemies.map(r=>r.y)).size,1);assert.deepEqual(enemies.map(r=>r.id),expected);
+    view.w=320;view.h=568;view.updateLayout();const enemies=view.rects.filter(r=>r.side==='enemy');assert.equal(new Set(enemies.map(r=>r.y)).size,2);assert.deepEqual(enemies.map(r=>r.id),expected);
     assert.deepEqual(b.export(),before);assert.equal(JSON.stringify(input),source);
   }
 });
-test('多名敌人的姓名和双条贴在脚下，只有单敌血条位于上方',()=>{
+test('单敌和后排双条在模型上方，前排姓名双条贴在脚下',()=>{
   for(const count of [1,5]){
   const input=D.createEffectsPreview(),b=new Battle(input),boxes=[],texts=[];
   b.units=b.units.filter(u=>u.side==='ally'||u.id==='caocao'||count===5);
@@ -92,7 +92,7 @@ test('多名敌人的姓名和双条贴在脚下，只有单敌血条位于上�
   CanvasBattle.prototype.updateLayout.call(view);const r=view.rectMap.get('caocao');CanvasBattle.prototype.drawUnit.call(view,r.unit,r,0);
   const hp=boxes.find(box=>box.fill==='#10171d'),progress=boxes.find(box=>box.fill==='#07141c');
   assert.ok(texts.find(t=>t.text==='曹操').y<hp.y);assert.ok(hp.y+hp.h<=progress.y);
-  if(count===1)assert.ok(progress.y+progress.h<=r.figure.y+.001);
+  if(count===1||r.hudAbove)assert.ok(progress.y+progress.h<=r.figure.y+.001);
   else {assert.ok(texts.find(t=>t.text==='曹操').y>=r.figure.y+r.figure.h);assert.equal(hp.y-r.figure.y-r.figure.h,20);}
   assert.equal(view.hits.length,2);assert.ok(view.hits.every(hit=>hit.unitId==='caocao'&&hit.kind==='unit'));
   }

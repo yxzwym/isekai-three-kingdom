@@ -39,6 +39,7 @@
     c.restore();
   }
   function texture(kind,critical,frame){
+    frame=Math.max(0,Math.min(FRAME_COUNT-1,Math.floor(Number(frame)||0)));
     kind=style(kind);critical=kind==='impact'&&!!critical;const key=kind+':'+Number(critical)+':'+frame;
     if(textureCache.has(key))return textureCache.get(key);
     const canvas=document.createElement('canvas');canvas.width=128;canvas.height=160;paintEffect(canvas.getContext('2d'),kind,(frame+.5)/FRAME_COUNT,critical);textureCache.set(key,canvas);return canvas;
@@ -51,7 +52,7 @@
     addMotion(motion){const prior=this.motions.find(m=>m.id===motion.id&&m.role===motion.role);if(prior)Object.assign(prior,motion,{critical:prior.critical||motion.critical});else this.motions.push(motion);}
     action(event,skill,now){
       const kind=kindOf(skill);if(!event.periodic)this.addMotion({id:event.actor,born:now,role:'cast',physical:skill.kind==='physical'});
-      for(const r of event.results){
+      for(const r of event.results){if(event.periodic&&!r.healing)continue;
         if(!r.miss)this.addEffect(r.target,kind,now,kind==='physical'?330:kind==='thunder'?650:850,r.critical);
         if(!r.healing&&!r.buff&&!r.miss&&r.actual>0){const hit=this.hits.find(f=>f.id===r.target);if(hit){hit.born=now;hit.critical=hit.critical||r.critical;}else this.hits.push({id:r.target,born:now,critical:r.critical});this.addMotion({id:r.target,born:now,role:'hit',critical:r.critical});if(kind!=='thunder')this.addEffect(r.target,'impact',now,190,r.critical);if(now>=this.shakeUntil){this.shakePower=1.7;this.shakeDuration=110;this.shakeStart=now;this.shakeUntil=now+110;}}
         if(r.critical&&!r.miss){this.shakeStart=now;this.shakePower=8;this.shakeDuration=310;this.shakeUntil=now+310;}
@@ -59,13 +60,13 @@
     }
     beginFrame(now){
       if(this.preparedAt===now)return;this.preparedAt=now;this.items=this.items.filter(e=>now-e.born<e.duration);this.hits=this.hits.filter(e=>now-e.born<300);this.motions=this.motions.filter(e=>now-e.born<320);this.poses.clear();this.red.clear();
-      for(const hit of this.hits)this.red.set(hit.id,Math.max(0,1-(now-hit.born)/300)*(.48+.5*Math.abs(Math.sin((now-hit.born)*.04))));
-      for(const motion of this.motions){let pose=this.poses.get(motion.id);if(!pose){pose={cast:0,hit:0,hitX:0,angle:0,scale:1};this.poses.set(motion.id,pose);}const t=Math.min(1,(now-motion.born)/300),pulse=Math.sin(Math.PI*t)*(1-t);if(motion.role==='cast'){pose.cast=pulse*(motion.physical?22:8);pose.scale+=pulse*.09;}else{pose.hit=pulse*7;pose.hitX=Math.sin(t*24)*pulse*(motion.critical?11:6);pose.angle=Math.sin(t*18)*pulse*.08;pose.scale+=pulse*.06;}}
+      for(const hit of this.hits){const elapsed=Math.max(0,now-hit.born);this.red.set(hit.id,Math.max(0,1-elapsed/300)*(.48+.5*Math.abs(Math.sin(elapsed*.04))));}
+      for(const motion of this.motions){let pose=this.poses.get(motion.id);if(!pose){pose={cast:0,hit:0,hitX:0,angle:0,scale:1};this.poses.set(motion.id,pose);}const t=Math.max(0,Math.min(1,(now-motion.born)/300)),pulse=Math.sin(Math.PI*t)*(1-t);if(motion.role==='cast'){pose.cast=pulse*(motion.physical?22:8);pose.scale+=pulse*.09;}else{pose.hit=pulse*7;pose.hitX=Math.sin(t*24)*pulse*(motion.critical?11:6);pose.angle=Math.sin(t*18)*pulse*.08;pose.scale+=pulse*.06;}}
     }
-    offset(now){if(now>=this.shakeUntil)return{x:0,y:0};const a=this.shakePower*(this.shakeUntil-now)/this.shakeDuration;return{x:Math.sin((now-this.shakeStart)*.14)*a,y:Math.cos((now-this.shakeStart)*.19)*a*.65};}
+    offset(now){if(now<this.shakeStart||now>=this.shakeUntil)return{x:0,y:0};const a=this.shakePower*(this.shakeUntil-now)/this.shakeDuration;return{x:Math.sin((now-this.shakeStart)*.14)*a,y:Math.cos((now-this.shakeStart)*.19)*a*.65};}
     pose(id,side,now){this.beginFrame(now);const p=this.poses.get(id);if(!p)return{x:0,y:0,angle:0,scale:1};const dir=side==='ally'?-1:1;return{x:p.hitX,y:dir*(p.cast-p.hit),angle:p.angle,scale:p.scale};}
     redAlpha(id,now){this.beginFrame(now);return this.red.get(id)||0;}
-    draw(c,rects,now){this.beginFrame(now);const lookup=rects instanceof Map?rects:new Map(rects.map(r=>[r.id,r]));for(const e of this.items){const r=lookup.get(e.id);if(!r)continue;const p=(now-e.born)/e.duration,frame=Math.min(FRAME_COUNT-1,Math.floor(p*FRAME_COUNT)),scale=Math.max(20,Math.min(64,r.w*.65))/32;c.drawImage(texture(e.kind,e.critical,frame),r.x+r.w/2-64*scale,(r.effectY??r.y+(r.h-50)*.58)-80*scale,128*scale,160*scale);}}
+    draw(c,rects,now){this.beginFrame(now);const lookup=rects instanceof Map?rects:new Map(rects.map(r=>[r.id,r]));for(const e of this.items){const r=lookup.get(e.id);if(!r)continue;const p=Math.max(0,Math.min(1,(now-e.born)/e.duration)),frame=Math.min(FRAME_COUNT-1,Math.floor(p*FRAME_COUNT)),scale=Math.max(20,Math.min(64,r.w*.65))/32;c.drawImage(texture(e.kind,e.critical,frame),r.x+r.w/2-64*scale,(r.effectY??r.y+(r.h-50)*.58)-80*scale,128*scale,160*scale);}}
     cacheInfo(){return{textures:textureCache.size,maximumTextures:(styles.size+1)*FRAME_COUNT,warmRemaining:this.warmJobs.length-this.warmCursor};}
   }
   const api={BattleEffects,kindOf,COLORS};root.BattleVFX=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;

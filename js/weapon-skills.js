@@ -45,8 +45,7 @@
       if(out.weapon&&C.types.some(t=>t.id===nextType)&&(!out.skills?.length||out.skills.some(id=>!['punch','spear-cut','spear-sweep','sword-cut','sword-sweep'].includes(id)))){const next=forWeapon(out.weapon);if(JSON.stringify(out.skills)!==JSON.stringify(next)){out.skills=next;out.priorities=prioritiesFor(out.skills);out.weaponPlanMigrated=true;}}
     }
     if(special(out.weapon)){out.skills=forWeapon(out.weapon);out.priorities=out.priorities?.every(r=>out.skills.includes(r.skill))?out.priorities:prioritiesFor(out.skills);}
-    if(out.id==='zhenji'||out.characterId==='zhenji')out.passives=[...new Set([...(out.passives||[]),'benevolent-healer','zhenji-clear-water'])];
-    if(out.id==='zhaoyun'||out.characterId==='zhaoyun')out.passives=[...new Set([...(out.passives||[]),'zhaoyun-courage','zhaoyun-seven-crossings','zhaoyun-ever-victorious','zhaoyun-loyal-guard'])];if(out.id==='zhangliang'||out.characterId==='zhangliang')out.passives=[...new Set([...(out.passives||[]),'zhangliang-might','zhangliang-hardy'])];out.weaponPlanVersion=3;return out;
+    const passiveCatalog=typeof module!=='undefined'&&module.exports?require('./passives.js'):root.BattlePassives;if(passiveCatalog?.heroDefaults[out.characterId||out.id])out.passives=passiveCatalog.forUnit(out);out.weaponPlanVersion=3;return out;
   }
   const effects=Object.fromEntries(Object.values(skills).flatMap(s=>s.effects||[]).map(e=>[e.id,e]));
   const api={skills,specials,special,resolveWeapon,definitionsForWeapon,registerWeapon,forWeapon,forEquipment,prioritiesFor,migrateWeaponPlan,effects};root.WeaponSkills=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;

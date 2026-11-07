@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),E=require('../js/engine.js'),P=require('../js/passives.js'),Prologue=require('../js/prologue.js'),R=require('../js/game-rules.js'),W=require('../js/weapon-skills.js'),{World}=require('../js/world.js');
-test('赵云两红两金、张梁一绿一白，旧存档迁移保留其他被动且不重复添加',()=>{
+test('赵云两红两金、张梁蓝绿白三被动，旧存档迁移保留其他被动且不重复添加',()=>{
  const hero={name:'行客',...R.rollHero('normal',()=>.4)},w=new World(hero,{nodeId:'changshan'});w.startChangshan();const z=w.members().find(u=>u.id==='zhaoyun');assert.deepEqual(R.sortPassives(z.passives,P.definitions).map(id=>P.definitions[id].quality),['red','red','gold','gold']);
- const liang=Prologue.general('zhangliang',15);assert.deepEqual(liang.passives.map(id=>P.definitions[id].quality),['green','white']);
+ const liang=Prologue.general('zhangliang',15);assert.deepEqual(liang.passives.map(id=>P.definitions[id].quality),['green','white','blue']);
  const old={...z,passives:['thunder-lord']},once=W.migrateWeaponPlan(old),twice=W.migrateWeaponPlan(once);assert.deepEqual(once.passives,twice.passives);assert.ok(once.passives.includes('thunder-lord'));assert.equal(once.passives.length,5);
  assert.deepEqual(W.migrateWeaponPlan({...liang,passives:[]}).passives,liang.passives);
 });

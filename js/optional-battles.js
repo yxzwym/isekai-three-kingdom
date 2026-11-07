@@ -1,0 +1,23 @@
+(function(root){
+ 'use strict';
+ const node=typeof module!=='undefined'&&module.exports,N=node?require('./nearby-content.js'):root.NearbyContent,G=node?require('./character-growth.js'):root.CharacterGrowth,I=node?require('./items.js'):root.ItemCatalog,W=node?require('./weapon-skills.js'):root.WeaponSkills;
+ const profiles={ironWarden:[[20,4,100,10,15],[80,20,100,45,30]],marshDoctor:[[5,30,80,12,20],[20,80,80,55,75]],ruinGuard:[[18,4,80,9,15],[75,20,100,45,50]],ruinCaster:[[5,20,22,10,15],[20,80,80,50,60]]};for(const [id,[base,potential]]of Object.entries(profiles)){const keys=G.KEYS;G.PROFILES[id]={baseAttributes:Object.fromEntries(keys.map((k,i)=>[k,base[i]])),potentials:Object.fromEntries(keys.map((k,i)=>[k,potential[i]]))};}
+ const skills={
+  'warden-renew':{id:'warden-renew',name:'固守',kind:'buff',side:'self',scope:'single',cooldown:.6,scaling:{},buff:{id:'regeneration',duration:30,amount:22,period:1}},
+  'warden-strike':{id:'warden-strike',name:'裂石击',kind:'physical',side:'enemy',scope:'single',cooldown:1.2,scaling:{war:2.4},weaponCoefficient:1,hitChance:.6,criticalChance:.05},
+  'marsh-mist':{id:'marsh-mist',name:'毒瘴',kind:'tactic',side:'enemy',scope:'all',element:'wood',cooldown:3.5,scaling:{intelligence:.6},weaponCoefficient:1,hitChance:.9,criticalChance:0,effects:[{id:'poison',chance:1,duration:16,period:1,base:9,coefficient:.3,stat:'technique'}]},
+  'ruin-thunder':{id:'ruin-thunder',name:'落雷',kind:'tactic',side:'enemy',scope:'all',element:'thunder',cooldown:3,scaling:{intelligence:1.5},weaponCoefficient:1,hitChance:.8,criticalChance:.05}
+ };Object.assign(W.skills,skills);
+ I.templates['sage-robe']={id:'sage-robe',name:'绢布法衣',slot:'armor',attributes:{armor:1,resistance:18},price:90};
+ I.templates['herbal-pendant']={id:'herbal-pendant',name:'药草香囊',slot:'accessory',attributes:{resistance:4},statusImmunities:['poison'],price:120};
+ const definitions={
+  iron:{id:'iron',title:'石场铁卫',giverPlace:'ye',place:'old-quarry',sceneId:'bandit-camp',hint:'那个人穿着一身厚甲，我们砍了半天也没伤到多少，他一退到石堆后面，还能把伤重新包好。你们去之前最好想想办法，光靠拿刀上去砍，怕是跟我们一样吃亏。',item:'iron-armor'},
+  poison:{id:'poison',title:'芦泽毒踪',giverPlace:'pingyuan',place:'poison-marsh',sceneId:'river-dock',hint:'芦苇里有个会用毒的人，伤口明明不深，回来却浑身没劲，连站都站不稳。最好带上能解毒的同伴，商贩卖的药草香囊也能防一防，别像我们这样没准备就下去。',item:'herbal-pendant'},
+  reflection:{id:'reflection',title:'废垒雷声',giverPlace:'jibei',place:'fort-ruins',sceneId:'bandit-camp',hint:'前面拿盾的只顾着拦人，后面那两个才一直在放雷。我们盯着盾打，自己反倒被震伤，等反应过来，人已经倒了一片。你们得先想办法对付后面的人，别光跟那面盾耗着。',item:'wood-beads'}
+ };
+ for(const d of Object.values(definitions)){const giver='challenge-'+d.id;N.npcs.push({id:giver,name:'伤兵',art:'imperial-soldier',place:d.giverPlace,role:'quest',side:'left',roleLabel:'委托',lines:[d.hint,'你们真要过去，先把伤治好，把要带的东西检查一遍。我在这里吃过亏，实在不想再看见有人让同伴抬着回来。']});N.sideQuests.push({id:'challenge-'+d.id,bossId:d.id,title:d.title,giver,giverPlace:d.giverPlace,place:d.place,sceneId:d.sceneId,recommendedLevel:10,rounds:1,money:300,item:d.item,quality:'green',enemyName:d.title,enemyArt:d.id==='poison'?'mountain-bandit':'imperial-soldier',accept:d.hint});}
+ function unit(profile,id,name,art,type,skills,extra={}){const weapon=I.create('weapon-'+type,'green',id+'-weapon');weapon.skills=skills;const actual=W.forWeapon(weapon);return {...G.create(profile,10),id,name,characterId:art,weapon,skills:actual,equipment:{armor:I.create('leather-armor')},armor:6,resistance:4,weaponProficiencies:{[type]:50},targetRule:'random',priorities:actual.map(skill=>({skill,when:W.skills[skill].scope==='all'?'enemyCount':'always',threshold:2,frequency:'always'})),...extra};}
+ function buildRoster(id){if(id==='iron')return [unit('ironWarden','iron-warden','石场铁卫','imperial-soldier','hammer',['warden-renew','warden-strike'],{armor:180,resistance:0,experienceWeight:4})];if(id==='poison')return [unit('marshDoctor','marsh-doctor','使毒方士','mountain-bandit','gourd',['marsh-mist'],{formationRow:'back',experienceWeight:2}),...N.bandits(10,2).map((u,i)=>({...u,id:'marsh-outlaw-'+i,formationRow:'front'}))];return [unit('ruinGuard','ruin-guard','持盾守卫','imperial-soldier','spear',['shield-taunt','shield-reflect','spear-cut'],{formationRow:'front',armor:32}),...Array.from({length:2},(_,i)=>unit('ruinCaster','ruin-caster-'+i,'雷术方士','mountain-bandit','staff',['ruin-thunder'],{formationRow:'back',experienceWeight:1.5}))];}
+ const roster=id=>buildRoster(id).map(u=>({...u,boss:true,statusImmunities:[...new Set([...(u.statusImmunities||[]),'stun'])]}));
+ const api={definitions,roster};root.OptionalBattles=api;if(node)module.exports=api;
+})(globalThis);

@@ -15,7 +15,7 @@ test('官兵装备长枪且从零读条，不同武力速度自然错开首次�
 test('群疗按智力与武器威力计算，每人按熟练度后的武器威力恢复生命，不会一次回满',()=>{
   const b=battle(),u=b.unit('zhangbao'),skill=b.skills['scripture-2'];b.start();
   for(const ally of b.living('ally'))ally.soldiers=100;
-  const value=E.skillValue(b.effective(u),skill),amount=Math.floor(value),info=I.describe(b,u,skill);assert.ok(info.lines.some(l=>l.startsWith('为我方全体回复'+amount+'（智力×0.85＋武器威力×')));
+  const value=E.skillValue(b.effective(u),skill),amount=E.calculate({attacker:b.effective(u),skill}).amount,info=I.describe(b,u,skill);assert.ok(info.lines.some(l=>l.startsWith('为我方全体回复'+amount+'（智力×0.85＋武器威力×')));
   b.setMode(u.id,'manual');ready(u);assert.ok(b.manual(u.id,skill.id).ok);
   const event=b.events.find(e=>e.type==='action'&&e.skill===skill.id);
   assert.deepEqual(event.results.map(r=>r.actual),[amount,amount,amount]);assert.ok(b.living('ally').every(a=>a.soldiers===100+amount));
@@ -27,7 +27,7 @@ test('双方技能详情读取当前属性及通用技能定义，伤害、恢�
   assert.ok(info.lines.some(l=>l.startsWith(`对敌方单体造成${expected}（武力×2＋武器威力`)));assert.ok(info.lines.some(l=>l.includes('武器威力×1.1')));
   assert.ok(info.lines.includes(`冷却时间增加${skill.cooldown}秒。`));
   const taunt=I.describe(b,c,b.skills['shield-taunt']);assert.equal(taunt.lines.filter(s=>s.startsWith('护甲提升')).length,1);assert.ok(taunt.lines.some(s=>s.includes('9.9')&&s.includes('30秒')));
-  const armorBreak=I.describe(b,b.unit('zhangliang'),b.skills['spear-break']);assert.ok(armorBreak.lines.includes('破甲：减少目标6.75（3＋技巧×0.25）点护甲，持续8秒。'));assert.ok(armorBreak.lines.some(s=>s.includes('65%几率附加破甲')));
+  const armorBreak=I.describe(b,b.unit('zhangliang'),b.skills['spear-break']);assert.ok(armorBreak.lines.includes('破甲：减少目标10.25（3＋技巧×0.25）点护甲，持续8秒。'));assert.ok(armorBreak.lines.some(s=>s.includes('65%几率附加破甲')));
 });
 test('技能介绍不假定任何受击角色，敌方护甲变化不改变减伤前基础伤害',()=>{
   const b=battle(),u=b.unit('captain'),skill=b.skills['blade-cut'],before=I.describe(b,u,skill);

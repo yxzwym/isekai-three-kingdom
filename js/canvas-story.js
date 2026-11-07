@@ -66,20 +66,20 @@
       }const img=this.image(scene==='camp'?'./assets/story/yellow-camp.webp':'./assets/story/village-road-v3.webp');c.fillStyle='#172a2c';c.fillRect(0,0,this.w,this.h);if(img){const s=Math.max(this.w/img.naturalWidth,this.h/img.naturalHeight);c.drawImage(img,(this.w-img.naturalWidth*s)/2,(this.h-img.naturalHeight*s)/2,img.naturalWidth*s,img.naturalHeight*s);}const g=c.createLinearGradient(0,0,0,this.h);g.addColorStop(0,'#06131b66');g.addColorStop(.45,'#06131b00');g.addColorStop(1,'#06131baa');c.fillStyle=g;c.fillRect(0,0,this.w,this.h);}
     makeFog(){const canvas=document.createElement('canvas');canvas.width=512;canvas.height=192;const c=canvas.getContext('2d');for(let i=0;i<9;i++){const x=70+i*45,y=96+Math.sin(i*2)*12,g=c.createRadialGradient(x,y,0,x,y,64);g.addColorStop(0,'#d9e9e7b0');g.addColorStop(1,'#c2dbdf00');c.fillStyle=g;c.fillRect(x-64,y-64,128,128);}return canvas;}
     drawScene(){
-      if(this.disposed||this.view||!this.w)return;const c=this.ctx,w=this.w,h=this.h,chapter=P.chapters[this.progress.stage],line=chapter?.lines[this.progress.index];this.hits=[];this.backdrop(chapter?.scene||'camp');
+      if(this.disposed||this.view||!this.w)return;const c=this.ctx,w=this.w,h=this.h,chapter=P.chapters[this.progress.stage],line=P.linesFor(this.progress.stage,this.progress)?.[this.progress.index];this.hits=[];this.backdrop(chapter?.scene||'camp');
       if(this.progress.stage==='departure'){this.drawDeparture();if(this.panel){root.BattleSystem.CanvasBattle.prototype.drawSkillInfo.call(this);this.canvas.setAttribute('aria-label','技能详情：'+this.battle.skills[this.panel.skill].name+'。'+root.BattleSkillInfo.describe(this.battle,this.battle.unit('hero'),this.battle.skills[this.panel.skill]).lines.join('')+'关闭后返回选择兵器。');}return;}
       if(this.failure){this.box(24,h/2-92,w-48,184);this.text('未能守住村口',w/2,h/2-46,20,'#f0dfbc','center');this.button('再试一次',48,h/2+12,w-96,42,()=>this.enter(this.progress.stage));return;}
       if(!line){this.canvas.setAttribute('aria-label','序章结束，未完待续。返回主菜单。');this.text('序章 · 黄天之下',w/2,h*.36,25,'#f4dfb3','center');this.text('未完待续',w/2,h*.36+46,16,'#dfd7c8','center');this.button('返回主菜单',w/2-100,h*.66,200,42,()=>this.leave());return;}
-      this.text(chapter.title,w/2,33,20,'#f2e4cb','center');this.button('跳过',w-64,56,48,32,()=>this.skip());
-      const content=line.text.replaceAll('{name}',this.character.name);c.font=`16px ${FONT}`;const rows=UI.wrapLines(c,content,w-52),panelH=Math.max(208,112+rows.length*25),top=h-panelH,partner=line.partner;
+      this.text(chapter.title,w/2,33,20,'#f2e4cb','center');if(!line.choices)this.button('跳过',w-64,56,48,32,()=>this.skip());
+      const content=line.text.replaceAll('{name}',this.character.name);c.font=`16px ${FONT}`;const rows=UI.wrapLines(c,content,w-52),panelH=Math.max(208,112+rows.length*25+(line.choices?100:0)),top=h-panelH,partner=line.partner;
       if(line.speaker==='hero')this.bust('hero','right',top,true);else if(line.speaker!=='narrator')this.bust(partner,line.side||'left',top,true);
       const fade=c.createLinearGradient(0,top-24,0,top+panelH);fade.addColorStop(0,'#081b2600');fade.addColorStop(.25,'#081b26ed');fade.addColorStop(1,'#081b26ff');c.fillStyle=fade;c.fillRect(0,top-24,w,panelH+24);c.strokeStyle='#bcab8644';c.beginPath();c.moveTo(24,top+45);c.lineTo(w-24,top+45);c.stroke();
       const names={zhangjiao:'张角',zhangbao:'张宝',zhangliang:'张梁',nanhua:'南华',zuoci:'左慈',yuji:'于吉','imperial-soldier':'官兵',villager:'老人',narrator:'',hero:this.character.name};
       const right=(line.side|| (line.speaker==='hero'?'right':'left'))==='right';this.text(names[line.speaker]||'',right?w-26:26,top+24,16,'#ead1a2',right?'right':'left');
       rows.forEach((row,i)=>this.text(row,26,top+73+i*25,16));
-      this.text('›',w-32,h-30,24,'#c7b386','center');UI.singleChoiceHit(this.hits,w,h,[{action:()=>this.next()}]);
+      if(line.choices){line.choices.forEach((choice,i)=>this.button(choice.label,26,h-108+i*49,w-52,41,()=>this.chooseDream(choice.id)));}else{this.text('›',w-32,h-30,24,'#c7b386','center');UI.singleChoiceHit(this.hits,w,h,[{action:()=>this.next()}]);}
       if(this.saveError)this.text('存档写入失败',w/2,65,12,'#edaa92','center');
-      this.canvas.setAttribute('aria-label',`${chapter.title}。${names[line.speaker]||'旁白'}：${line.text.replaceAll('{name}',this.character.name)} 点击继续。`);
+      this.canvas.setAttribute('aria-label',`${chapter.title}。${names[line.speaker]||'旁白'}：${line.text.replaceAll('{name}',this.character.name)} ${line.choices?line.choices.map(choice=>choice.label).join('。'):'点击继续。'}`);
     }
     chooseWeapon(id,persist=true){
       const type=root.PengpaiRules.WEAPON_TYPES.find(t=>t.id===id);if(!type)return false;
@@ -90,7 +90,7 @@
       this.weaponGroup??=R.WEAPON_TYPES.find(t=>t.id===this.weaponChoice)?.group||R.WEAPON_GROUPS[0].id;if(!this.weaponChoice)this.chooseWeapon(R.WEAPON_TYPES.find(t=>t.group===this.weaponGroup).id,false);
       c.fillStyle='#071923d9';c.fillRect(0,0,w,h);this.text('选择兵器',w/2,35,20,'#edddbc','center');this.button('‹',16,18,30,34,()=>this.leave());
       const left=16,inner=w-32,statTop=62,statH=compact?38:42,cellW=inner/R.ATTRIBUTES.length,actor=this.departureWorld.members()[0];this.box(left,statTop,inner,statH,'#10262edc','#49666c');
-      R.ATTRIBUTES.forEach(([key,label],i)=>{const x=left+i*cellW;if(i){c.strokeStyle='#3e5b62';c.beginPath();c.moveTo(x,statTop);c.lineTo(x,statTop+statH);c.stroke();}this.text(label,x+cellW/2,statTop+10,14,'#aebfc2','center');this.text(String(actor[key]),x+cellW/2,statTop+statH-10,14,'#efddba','center');});
+      R.ATTRIBUTES.forEach(([key,label],i)=>{const x=left+i*cellW;if(i){c.strokeStyle='#3e5b62';c.beginPath();c.moveTo(x,statTop);c.lineTo(x,statTop+statH);c.stroke();}this.text(label,x+cellW/2,statTop+10,14,'#aebfc2','center');this.text('潜力'+String(actor.potentials?.[key]??'—'),x+cellW/2,statTop+statH-10,14,'#efddba','center');});
       const groupTop=compact?110:116,groupH=compact?38:44,groupGap=compact?4:6,groupW=(inner-groupGap*5)/6;
       R.WEAPON_GROUPS.forEach((group,i)=>{const x=left+i*(groupW+groupGap),active=group.id===this.weaponGroup;this.box(x,groupTop,groupW,groupH,active?'#4b402b':'#112a34',active?'#dfc18b':'#4b6872');this.text(group.name,x+groupW/2,groupTop+groupH/2,14,active?'#ffe4b0':'#c5d5d6','center');this.hits.push({x,y:groupTop,w:groupW,h:groupH,label:group.name,action:()=>{if(this.weaponGroup!==group.id)this.chooseWeapon(R.WEAPON_TYPES.find(t=>t.group===group.id).id);this.draw();}});});
       const group=R.WEAPON_GROUPS.find(g=>g.id===this.weaponGroup);c.font=`14px ${FONT}`;UI.wrapLines(c,group.description,inner).forEach((line,i)=>this.text(line,left,(compact?167:180)+i*20,14,'#b8cbd0'));
@@ -101,7 +101,7 @@
       ids.forEach((id,i)=>{const skill=W.skills[id],x=left+i*(cardW+cardGap),role=proto.skillRole.call(this,skill),prefix=/^(单体|群体|自身)/.exec(role),scope=prefix?prefix[0]:skill.side==='self'?'自身':skill.scope==='all'?'群体':'单体',effect=prefix?role.slice(prefix[0].length):role,color=skill.kind==='heal'?'#91ddb1':skill.kind==='buff'?'#d9c084':skill.kind==='tactic'?'#c7a6e7':'#dbb39c',icon=compact?38:44;
         this.box(x,skillTop,cardW,cardH,'#102832ee','#54757c');this.box(x+(cardW-icon)/2,skillTop+10,icon,icon,'#0b222d','#719199');proto.drawSkillIcon.call(this,skill,x+(cardW-icon)/2,skillTop+10,icon);this.text(skill.name,x+cardW/2,skillTop+icon+28,14,'#e5e9e5','center');this.text(scope,x+cardW/2,skillTop+icon+51,14,'#b4c9cc','center');this.text(effect,x+cardW/2,skillTop+icon+71,14,color,'center');this.hits.push({x,y:skillTop,w:cardW,h:cardH,label:'查看'+skill.name+'详情',action:()=>this.openWeaponSkill(id)});
       });
-      const fy=h-64;this.text('后续可随意切换武器',w/2,fy-22,14,'#b6cbd0','center');this.button('启程',16,fy,inner,44,()=>this.depart());this.canvas.setAttribute('aria-label','选择初始兵器。'+R.ATTRIBUTES.map(([key,label])=>label+actor[key]).join('，')+'。'+group.name+'：'+group.description+'。已选'+selected.name+'，'+selected.style+'。'+ids.map(id=>W.skills[id].name).join('、')+'。技能可点击查看详情。后续可随意切换武器。启程。');
+      const fy=h-64;this.text('后续可随意切换武器',w/2,fy-22,14,'#b6cbd0','center');this.button('启程',16,fy,inner,44,()=>this.depart());this.canvas.setAttribute('aria-label','选择初始兵器。'+R.ATTRIBUTES.map(([key,label])=>label+'潜力'+actor.potentials?.[key]).join('，')+'。'+group.name+'：'+group.description+'。已选'+selected.name+'，'+selected.style+'。'+ids.map(id=>W.skills[id].name).join('、')+'。技能可点击查看详情。后续可随意切换武器。启程。');
     }
     openWeaponSkill(id){
       const unit=this.departureWorld?.members()[0];if(!unit?.skills.includes(id))return false;
@@ -113,8 +113,9 @@
     closePanel(){this.panel=null;this.detailPress=null;this.draw();}
     scrollSkill(delta){if(!this.panel)return;this.panel.scroll=Math.max(0,Math.min(this.panel.maxScroll||0,(this.panel.scroll||0)+delta));this.draw();}
     depart(){if(!this.weaponChoice)return;this.departureWorld.chooseWeapon(this.weaponChoice);this.progress.world=this.departureWorld.snapshot();this.enter('world');}
-    skip(){if(this.transition)return;const chapter=P.chapters[this.progress.stage];if(chapter)this.enter(chapter.next);}
-    next(){if(this.transition)return;if(this.failure){this.enter(this.progress.stage);return;}const chapter=P.chapters[this.progress.stage];if(!chapter)return;if(this.progress.index+1<chapter.lines.length){this.progress.index++;this.save();this.draw();}else this.enter(chapter.next);}
+    skip(){if(this.transition)return;const chapter=P.chapters[this.progress.stage];if(this.progress.stage==='dream'&&!this.progress.dreamChoice){this.progress.index=chapter.lines.length-1;this.save();this.draw();return;}if(chapter)this.enter(chapter.next);}
+    chooseDream(id){const next=P.chooseDream(this.progress,id);if(!next)return;this.progress=next;this.save();this.draw();}
+    next(){if(this.transition)return;if(this.failure){this.enter(this.progress.stage);return;}const chapter=P.chapters[this.progress.stage],lines=P.linesFor(this.progress.stage,this.progress);if(!chapter||lines[this.progress.index]?.choices)return;if(this.progress.index+1<lines.length){this.progress.index++;this.save();this.draw();}else this.enter(chapter.next);}
     leave(){this.save();this.options.onExit?.();}
     destroy(){this.disposed=true;clearTimeout(this.timer);cancelAnimationFrame(this.transitionRaf);this.transitionRaf=0;this.transition=null;cancelAnimationFrame(this.fogRaf);this.fogRaf=0;this.view?.destroy();this.observer.disconnect();for(const [type,fn]of [['pointerdown',this.down],['pointermove',this.move],['pointercancel',this.cancel],['wheel',this.wheel]])this.canvas.removeEventListener(type,fn);this.canvas.removeEventListener('pointerup',this.up);this.canvas.removeEventListener('keydown',this.key);}
   }

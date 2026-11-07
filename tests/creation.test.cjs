@@ -100,8 +100,8 @@ test('已删除的复生被动不再抽取，旧存档只移除该被动并保�
 });
 test('设置持久化且容错，不影响主角属性、身份或被动',()=>{
   const storage=memory(),store=new R.SaveStore(storage),c=hero();store.save(0,c);const before=store.slots();
-  store.setSettings({screenShake:false,effects:false,menuScale:1.1});assert.deepEqual(new R.SaveStore(storage).settings(),{screenShake:false,effects:false,menuScale:1.1});assert.deepEqual(store.slots(),before);
-  storage.setItem(store.settingsKey,'null');assert.deepEqual(store.settings(),{screenShake:true,effects:true,menuScale:1});assert.throws(()=>store.setSettings({menuScale:99}),/无效/);
+  store.setSettings({screenShake:false,effects:false,menuScale:1.1});assert.deepEqual(new R.SaveStore(storage).settings(),{screenShake:false,effects:false,manualPause:true,menuScale:1.1});assert.deepEqual(store.slots(),before);
+  storage.setItem(store.settingsKey,'null');assert.deepEqual(store.settings(),{screenShake:true,effects:true,manualPause:true,menuScale:1});assert.throws(()=>store.setSettings({menuScale:99}),/无效/);
 });
 test('八种形象均可保存并兼容旧形象，独立立绘与头像区域都有对应素材',()=>{
   const manifest=require('../assets/game/manifest.json'),store=new R.SaveStore(memory());

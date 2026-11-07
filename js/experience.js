@@ -21,6 +21,7 @@
     {id:'moon',label:'月阶',costs:[...range(25,5000,200),...range(64,10000),...range(10,15000,1000)],approximate:false},
     {id:'sun',label:'日阶',costs:[...range(9,25000,500),...range(30,50000,200),...range(110,56000,500)],approximate:false}
   ];
+  let curveLevel=1;for(const stage of stages)stage.costs=stage.costs.map(cost=>Math.max(cost,20*curveLevel++));
   const costs=stages.flatMap(stage=>stage.costs),maxLevel=costs.length+1,cumulative=[0];for(const cost of costs)cumulative.push(cumulative.at(-1)+cost);
   let startLevel=1;for(const stage of stages){stage.startLevel=startLevel;stage.endLevel=startLevel+stage.costs.length;stage.total=stage.costs.reduce((a,b)=>a+b,0);startLevel=stage.endLevel;}
   const required=level=>costs[Math.max(1,integer(level))-1]??Infinity;
@@ -31,8 +32,8 @@
   function rewardForEnemy(enemy,member){
     const level=Math.max(1,integer(member.level)),difference=Math.max(-5,Math.min(5,Math.max(1,integer(enemy.level))-level));
     if(difference<=-5||level>=maxLevel)return 0;
-    const multiplier=[0,.1,.25,.45,.7,1,1.2,1.4,1.6,1.8,2][difference+5];
-    return points(required(level)*multiplier/20);
+    const multiplier=[0,.1,.25,.45,.7,1,1.04,1.08,1.12,1.16,1.2][difference+5];
+    return points(required(level)*multiplier/10*Math.max(0,Math.min(5,Number(enemy.experienceWeight??1)||0)));
   }
   const reward=(enemies,member)=>points((enemies||[]).reduce((sum,enemy)=>sum+rewardForEnemy(enemy,member),0));
   function grant(record,amount){
