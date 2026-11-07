@@ -1,5 +1,6 @@
 (function(root){
   'use strict';
+  const Viewport=typeof module!=='undefined'&&module.exports?require('./canvas-viewport.js'):root.CanvasViewport;
   async function loadImageURL(url,signal){
     const image=new Image();
     await new Promise((resolve,reject)=>{
@@ -74,10 +75,10 @@
       if(error){ctx.strokeStyle='#79999c';ctx.strokeRect(retry.x,retry.y,retry.w,retry.h);ctx.fillStyle='#e4e8e4';ctx.fillText('重试',width/2,retry.y+20);}
       canvas.setAttribute('aria-label',error?'资源加载失败，点击重试':`资源加载 ${state.percent}%，${state.completed||0}/${files.length} 项`);
     }
-    function resize(){const rect=canvas.getBoundingClientRect();width=rect.width;height=rect.height;dpr=Math.min(2,root.devicePixelRatio||1);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);draw();}
+    function resize(){const view=Viewport.resize(canvas,ctx);width=view.w;height=view.h;dpr=view.dpr;draw();}
     function destroy(){disposed=true;observer.disconnect();canvas.removeEventListener('pointerup',click);canvas.removeEventListener('keydown',key);}
     async function run(){error=false;draw();try{await loader.preload(files,{onProgress:value=>{state=value;draw();}});}catch(cause){if(disposed)return;error=true;draw();console.error(cause);return;}if(disposed)return;destroy();onReady();}
-    function click(event){if(!error)return;const rect=canvas.getBoundingClientRect(),x=event.clientX-rect.left,y=event.clientY-rect.top;if(x>=retry.x&&x<=retry.x+retry.w&&y>=retry.y&&y<=retry.y+retry.h)run();}
+    function click(event){if(!error)return;const {x,y}=Viewport.point(canvas.getBoundingClientRect(),event);if(x>=retry.x&&x<=retry.x+retry.w&&y>=retry.y&&y<=retry.y+retry.h)run();}
     function key(event){if(error&&event.key==='Enter'){event.preventDefault();run();}}
     const observer=new ResizeObserver(resize);observer.observe(canvas);canvas.addEventListener('pointerup',click);canvas.addEventListener('keydown',key);resize();run();return {destroy};
   }

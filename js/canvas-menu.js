@@ -1,6 +1,7 @@
 (function(root){
   'use strict';
   const R=root.PengpaiRules;
+  const Viewport=typeof module!=='undefined'&&module.exports?require('./canvas-viewport.js'):root.CanvasViewport;
   const UI=root.PengpaiUI,FONT=UI.font;
   const SERIF=FONT;
   const GOLD='#dfc18b',INK='#0b1920',MUTED='#a7b2ad',WHITE='#f1ece1';
@@ -18,7 +19,7 @@
       this.observer=new ResizeObserver(this.resize);this.observer.observe(canvas);this.image(this.assets.background);this.resize();
     }
     image(src){if(!src)return null;const loaded=root.GameAssetLoader?.get(src);if(loaded)return loaded;if(!this.images.has(src)){const img=new Image();img.onload=()=>{this.background=null;this.invalidate();};img.onerror=()=>this.invalidate();img.src=root.BattleEmbeddedAssets?.[src]||src;this.images.set(src,img);}const img=this.images.get(src);return img.complete&&img.naturalWidth?img:null;}
-    resize(){const rect=this.canvas.getBoundingClientRect();this.w=Math.max(1,rect.width);this.h=Math.max(1,rect.height);this.dpr=Math.min(2,window.devicePixelRatio||1);const pixelsW=Math.round(this.w*this.dpr),pixelsH=Math.round(this.h*this.dpr);if(this.canvas.width!==pixelsW||this.canvas.height!==pixelsH){this.canvas.width=pixelsW;this.canvas.height=pixelsH;}this.ctx.setTransform(this.dpr,0,0,this.dpr,0,0);this.background=null;this.invalidate();}
+    resize(){Object.assign(this,Viewport.resize(this.canvas,this.ctx));this.background=null;this.invalidate();}
     invalidate(){if(this.disposed||this.raf)return;this.raf=requestAnimationFrame(now=>{this.raf=0;this.draw(now);if(this.toast?.until>now)this.invalidate();});}
     text(value,x,y,size=14,color=WHITE,align='center',serif=false){size=UI.textSize(size);const c=this.ctx;c.font=`${size*this.settings.menuScale}px ${serif?SERIF:FONT}`;c.textBaseline='middle';c.textAlign=align;c.fillStyle=color;c.fillText(String(value),x,y);}
     wrap(value,x,y,width,size=13,color=MUTED,line=23){size=UI.textSize(size);const c=this.ctx;c.font=`${size*this.settings.menuScale}px ${FONT}`;let text='';for(const ch of Array.from(value)){if(c.measureText(text+ch).width>width&&text){if(/[，。！？、；：）》」』】]/u.test(ch)){const chars=Array.from(text),last=chars.pop();this.text(chars.join(''),x,y,size,color,'left');text=last+ch;}else{this.text(text,x,y,size,color,'left');text=ch;}y+=line;}else text+=ch;}if(text)this.text(text,x,y,size,color,'left');return y+line;}
@@ -92,7 +93,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     }
     saveSettings(){try{this.store.setSettings(this.settings);}catch{this.notify('设置未能保存');}this.invalidate();}
     saveCharacter(index){const character={name:this.draft.name,difficulty:this.draft.difficulty,appearance:this.draft.appearance,...this.draft.roll};try{this.store.save(index,character);this.character=character;this.go('record');this.notify('人物已创建，存档已保存');this.options.onCharacterCreated?.(character,index);}catch{this.notify('存档未能写入，请检查浏览器存储权限');}}
-    syncInput(){if(!this.input)return;const show=this.screen==='appearance'&&!this.modal;this.input.hidden=!show;if(!show){if(document.activeElement===this.input)this.input.blur();return;}const r=this.canvas.getBoundingClientRect(),n=this.nameRect;Object.assign(this.input.style,{left:`${r.left+n.x}px`,top:`${r.top+n.y}px`,width:`${n.w}px`,height:`${n.h}px`});if(!this.composing&&this.input.value!==this.draft.name)this.input.value=this.draft.name;}
+    syncInput(){if(!this.input)return;const show=this.screen==='appearance'&&!this.modal;this.input.hidden=!show;if(!show){if(document.activeElement===this.input)this.input.blur();return;}const n=this.nameRect,r=Viewport.clientRect(this.canvas.getBoundingClientRect(),n);Object.assign(this.input.style,{left:`${r.left}px`,top:`${r.top}px`,width:`${n.w}px`,height:`${n.h}px`,transformOrigin:'top left',transform:`scale(${r.scaleX},${r.scaleY})`});if(!this.composing&&this.input.value!==this.draft.name)this.input.value=this.draft.name;}
     draw(now=performance.now()){
       if(this.disposed)return;const c=this.ctx;c.clearRect(0,0,this.w,this.h);this.hits=[];this.backdrop();
       if(this.screen==='main')this.drawMain();else if(this.screen==='create')this.drawCreate();else if(this.screen==='appearance')this.drawAppearance();else if(this.screen==='record')this.drawRecord();else if(this.screen==='load')this.drawLoad();
@@ -113,7 +114,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
       c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,this.w,this.h);c.font=`${16*this.settings.menuScale}px ${FONT}`;
       const maxWidth=Math.min(380,this.w-40),lines=[];let line='';for(const ch of this.toast.text){if(line&&c.measureText(line+ch).width>maxWidth-40){lines.push(line);line=ch;}else line+=ch;}if(line)lines.push(line);
       const width=Math.min(maxWidth,Math.max(164,...lines.map(value=>c.measureText(value).width+48))),height=lines.length*24+28,viewport=window.visualViewport;
-      const top=Math.max(0,(viewport?.offsetTop||0)-r.top),bottom=Math.min(this.h,(viewport?.offsetTop||0)+(viewport?.height||window.innerHeight)-r.top),x=(this.w-width)/2,y=(top+Math.max(top,bottom)-height)/2;
+      const scaleY=r.height/this.h,top=Math.max(0,((viewport?.offsetTop||0)-r.top)/scaleY),bottom=Math.min(this.h,((viewport?.offsetTop||0)+(viewport?.height||window.innerHeight)-r.top)/scaleY),x=(this.w-width)/2,y=(top+Math.max(top,bottom)-height)/2;
       c.save();c.globalAlpha=clamp((this.toast.until-now)/180,0,1);c.shadowColor='#000b';c.shadowBlur=20;c.shadowOffsetY=5;c.beginPath();c.roundRect(x,y,width,height,6);c.fillStyle='#10242cfa';c.fill();c.shadowBlur=0;c.shadowOffsetY=0;c.strokeStyle='#cbb381';c.lineWidth=1;c.stroke();c.fillStyle=WHITE;c.textAlign='center';c.textBaseline='middle';lines.forEach((value,i)=>c.fillText(value,this.w/2,y+26+i*24));c.restore();
       if(canvas.getAttribute('aria-label')!==this.toast.text)canvas.setAttribute('aria-label',this.toast.text);
     }

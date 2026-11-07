@@ -7,6 +7,7 @@
   const clock = time => `${String(Math.floor(time/60)).padStart(2,'0')}:${String(Math.floor(time%60)).padStart(2,'0')}`;
   const Presentation=typeof module!=='undefined'&&module.exports?require('./presentation.js'):root.BattlePresentation;
   const Scenes=typeof module!=='undefined'&&module.exports?require('./battle-scenes.js'):root.BattleScenes;
+  const Viewport=typeof module!=='undefined'&&module.exports?require('./canvas-viewport.js'):root.CanvasViewport;
   const number=Presentation.formatNumber;
   function fitImage(sourceWidth,sourceHeight,box) {
     const scale=Math.min(box.w/sourceWidth,box.h/sourceHeight);
@@ -91,8 +92,7 @@
       const shade=c.createLinearGradient(0,0,0,h);shade.addColorStop(0,'#00101b24');shade.addColorStop(.5,'#00101b00');shade.addColorStop(1,'#00101b44');c.fillStyle=shade;c.fillRect(0,0,w,h);this.background=canvas;
     }
     resize(){
-      const r=this.canvas.getBoundingClientRect();this.w=Math.max(1,r.width);this.h=Math.max(1,r.height);this.dpr=Math.min(this.options.maxDpr||2,window.devicePixelRatio||1);
-      this.canvas.width=Math.round(this.w*this.dpr);this.canvas.height=Math.round(this.h*this.dpr);this.ctx.setTransform(this.dpr,0,0,this.dpr,0,0);this.sprites.clear();this.visuals.clear();this.textTextures.clear();this.updateLayout();this.buildBackground();this.preparePortraits();this.draw();
+      Object.assign(this,Viewport.resize(this.canvas,this.ctx,{maxDpr:this.options.maxDpr}));this.sprites.clear();this.visuals.clear();this.textTextures.clear();this.updateLayout();this.buildBackground();this.preparePortraits();this.draw();
     }
     frame(now) {
       if(this.disposed) return;
