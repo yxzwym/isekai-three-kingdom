@@ -8,7 +8,7 @@ test('七种历史模板各有五维潜力范围，主角每次同时获得三�
   const rng=random(2026);assert.equal(R.IDENTITIES.length,7);
   for(const identity of R.IDENTITIES)for(let n=0;n<80;n++){
     const roll=R.rollHero(identity.id,rng);assert.equal(roll.passives.length,3);
-    for(const[key]of R.ATTRIBUTES){const value=roll.potentials[key],[min,max]=identity.ranges[key];assert.ok(Number.isInteger(value)&&value>=min&&value<=max);assert.ok(value>=1&&value<=100);if(identity.id==='worthless')assert.equal(value,1);if(identity.id==='overlord')assert.equal(value,100);}
+    for(const[key]of R.ATTRIBUTES){const value=roll.potentials[key],[min,max]=identity.ranges[key];assert.ok(Number.isInteger(value)&&value>=min&&value<=max);assert.ok(value>=1&&value<=100);if(identity.id==='worthless')assert.ok(value>=16&&value<=76);if(identity.id==='overlord')assert.equal(value,100);}
   }
   assert.throws(()=>R.rollHero(null),/先选择难度/);assert.throws(()=>R.rollHero('unknown'),/先选择难度/);
 });
@@ -16,7 +16,7 @@ test('同档智将与猛将互换武智范围，平均潜力随难度降低而�
   const ids=Object.fromEntries(R.IDENTITIES.map(i=>[i.id,i]));
   for(const[a,b]of[['teacher','bully'],['strategist','warrior']]){assert.deepEqual(ids[a].ranges.war,ids[b].ranges.intelligence);assert.deepEqual(ids[a].ranges.intelligence,ids[b].ranges.war);}
   const average=id=>{const rng=random(84);let sum=0;for(let n=0;n<1000;n++)sum+=Object.values(R.rollHero(id,rng).potentials).reduce((a,b)=>a+b,0);return sum/1000;};
-  const totals=Object.fromEntries(['worthless','civilian','teacher','strategist','overlord'].map(id=>[id,average(id)]));for(const[a,b]of[['worthless','civilian'],['civilian','teacher'],['teacher','strategist'],['strategist','overlord']])assert.ok(totals[a]<totals[b]);
+  const totals=Object.fromEntries(['worthless','civilian','teacher','strategist','overlord'].map(id=>[id,average(id)]));assert.equal(totals.worthless,totals.civilian);for(const[a,b]of[['civilian','teacher'],['teacher','strategist'],['strategist','overlord']])assert.ok(totals[a]<totals[b]);
 });
 test('老百姓多数潜力为中低值，但单项能突破满值的60%',()=>{
   const rng=random(88);let common=0,exceptional=0,high=0;for(let n=0;n<1000;n++){const values=Object.values(R.rollHero('civilian',rng).potentials);for(const value of values){assert.ok(value>=16&&value<=76);if(value<=43)common++;else high++;if(value>60)exceptional++;}}
@@ -24,7 +24,7 @@ test('老百姓多数潜力为中低值，但单项能突破满值的60%',()=>{
 });
 test('新建只提供五档难度，原身份模板不再作为职业选项',()=>{
   assert.deepEqual(R.DIFFICULTIES.map(d=>d.stars),[5,4,3,2,1]);assert.equal(new Set(R.DIFFICULTIES.map(d=>d.id)).size,5);
-  for(const difficulty of R.DIFFICULTIES){const rng=random(43);for(let n=0;n<100;n++){const c={name:'无名氏',difficulty:difficulty.id,appearance:'wanderer',...R.rollHero(difficulty.id,rng)};assert.equal(R.validCharacter(c),true);for(const value of Object.values(c.potentials)){assert.ok(value>=1&&value<=100);if(difficulty.id==='hell')assert.equal(value,1);if(difficulty.id==='protagonist')assert.equal(value,100);}const allowed=R.IDENTITY_PASSIVE_WEIGHTS[difficulty.profiles[0]];for(const id of c.passives)assert.ok(allowed[R.PASSIVE_MAP[id].quality]>0);}}
+  for(const difficulty of R.DIFFICULTIES){const rng=random(43);for(let n=0;n<100;n++){const c={name:'无名氏',difficulty:difficulty.id,appearance:'wanderer',...R.rollHero(difficulty.id,rng)};assert.equal(R.validCharacter(c),true);for(const value of Object.values(c.potentials)){assert.ok(value>=1&&value<=100);if(difficulty.id==='hell')assert.ok(value>=16&&value<=76);if(difficulty.id==='protagonist')assert.equal(value,100);}const allowed=R.IDENTITY_PASSIVE_WEIGHTS[difficulty.profiles[0]];for(const id of c.passives)assert.ok(allowed[R.PASSIVE_MAP[id].quality]>0);}}
 });
 test('旧身份存档映射五档难度，新存档兼容独立装备和武器熟练度字段',()=>{
   const storage=memory(),store=new R.SaveStore(storage);
@@ -59,7 +59,7 @@ test('重掷不重复被动，彩虹融合品质不会从任何身份开局出�
   assert.ok(R.rollPassives(()=>.999999,3).every(id=>R.PASSIVE_MAP[id].quality==='red'));
 });
 test('身份限制开局被动品质，两个极端始终只出白色或金红色，同档使用相同概率',()=>{
-  const allowed={worthless:['white'],civilian:['white','green','blue'],teacher:['white','green','blue','gold'],bully:['white','green','blue','gold'],strategist:['blue','gold','red'],warrior:['blue','gold','red'],overlord:['gold','red']};
+  const allowed={worthless:['white','green','blue'],civilian:['white','green','blue'],teacher:['white','green','blue','gold'],bully:['white','green','blue','gold'],strategist:['blue','gold','red'],warrior:['blue','gold','red'],overlord:['gold','red']};
   for(const identity of R.IDENTITIES){const rng=random(20261103),seen=new Set();for(let n=0;n<600;n++){const result=R.rollHero(identity.id,n<2?()=>n?1:0:rng);assert.equal(result.passives.length,3);assert.equal(new Set(result.passives).size,3);for(const id of result.passives){const quality=R.PASSIVE_MAP[id].quality;assert.ok(allowed[identity.id].includes(quality),`${identity.id}抽到了${quality}`);seen.add(quality);}}assert.deepEqual([...seen].sort(),allowed[identity.id].sort());}
   assert.deepEqual(R.IDENTITY_PASSIVE_WEIGHTS.teacher,R.IDENTITY_PASSIVE_WEIGHTS.bully);assert.deepEqual(R.IDENTITY_PASSIVE_WEIGHTS.strategist,R.IDENTITY_PASSIVE_WEIGHTS.warrior);
   assert.throws(()=>R.rollPassives(random(1),99,{white:1}),/数量/);
@@ -100,8 +100,8 @@ test('已删除的复生被动不再抽取，旧存档只移除该被动并保�
 });
 test('设置持久化且容错，不影响主角属性、身份或被动',()=>{
   const storage=memory(),store=new R.SaveStore(storage),c=hero();store.save(0,c);const before=store.slots();
-  store.setSettings({screenShake:false,effects:false,menuScale:1.1});assert.deepEqual(new R.SaveStore(storage).settings(),{screenShake:false,effects:false,manualPause:true,menuScale:1.1});assert.deepEqual(store.slots(),before);
-  storage.setItem(store.settingsKey,'null');assert.deepEqual(store.settings(),{screenShake:true,effects:true,manualPause:true,menuScale:1});assert.throws(()=>store.setSettings({menuScale:99}),/无效/);
+  store.setSettings({screenShake:false,effects:false,menuScale:1.1});assert.deepEqual(new R.SaveStore(storage).settings(),{screenShake:false,effects:false,manualPause:true,music:true,soundEffects:true,menuScale:1.1});assert.deepEqual(store.slots(),before);
+  storage.setItem(store.settingsKey,'null');assert.deepEqual(store.settings(),{screenShake:true,effects:true,manualPause:true,music:true,soundEffects:true,menuScale:1});assert.throws(()=>store.setSettings({menuScale:99}),/无效/);
 });
 test('八种形象均可保存并兼容旧形象，独立立绘与头像区域都有对应素材',()=>{
   const manifest=require('../assets/game/manifest.json'),store=new R.SaveStore(memory());

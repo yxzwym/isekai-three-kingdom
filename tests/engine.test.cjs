@@ -17,7 +17,7 @@ test('每点体质提供十点生命，突破初始范围仍保持相同公式',
 test('技能伤害按属性系数加武器威力，不再乘兵力、等级或阵营系数',()=>{
  const args={attacker:sample,target:sample},full=E.physical(args).raw;close(full,(200+100)*50/170);for(const soldiers of [2000,1000,1])close(E.physical({...args,attacker:{...sample,soldiers,maxSoldiers:4000,side:'enemy'},level:99}).raw,full);close(E.physical({...args,attacker:{...sample,war:100}}).raw,200*50/170);close(E.physical({...args,attacker:{...sample,attack:200}}).raw,400*50/170);assert.equal(E.physical({...args,attacker:{...sample,soldiers:0}}).amount,0);
 });
-test('护甲和抗性使用原作50系数减伤曲线',()=>{
+test('护甲和抗性使用现有50系数减伤曲线',()=>{
  for(const protection of [0,50,100,200,999]){const p=E.physical({attacker:sample,target:{armor:protection}}),m=E.tactic({skill:D.SKILLS.dare,intelligence:200,target:{resistance:protection}});close(p.raw/p.beforeMitigation,m.raw/m.beforeMitigation);close(p.mitigation,50/(50+protection));}
 });
 test('护甲不影响计策，抗性不影响物理，无视护甲能真正穿透到0',()=>{

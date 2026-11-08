@@ -27,6 +27,9 @@
   for(const [id,name,description,stats]of [
     ['enemy-negative-immunity','百邪不侵','本场战斗免疫一切负面状态，包括眩晕、麻痹、持续伤害和属性衰减。增益与治疗不受影响。',{immuneNegative:true}],
     ['enemy-healing-suppression','压制回复','存活期间，敌方的治疗、回春和吸血回复效果降低75%。本场战斗结束后失效。',{opponentHealingMultiplier:.25}],
+    ['enemy-trial-armor','校场护具','本场切磋穿戴护具，最大生命提高100%。',{healthMultiplier:2}],
+    ['enemy-hell-strength','乱世凶兵','地狱难度：最大生命与造成的伤害提高20%。',{healthMultiplier:1.2,damageMultiplier:1.2}],
+    ['enemy-hunt-wounded','追击伤者','优先攻击当前生命值最低的目标。',{ }],
     ['enemy-ignore-taunt','无视嘲讽','本场战斗的攻击不受嘲讽影响，可以越过嘲讽者选择其他目标。',{ignoreTaunt:true}]
   ])definitions[id]={id,name,description,stats,quality:'white',enemyOnly:true,temporary:true,triggers:[]};
   for(const seconds of [60,120,180,300,600]){const id='enemy-wipe-'+seconds;definitions[id]={id,name:'限时决战',quality:'white',enemyOnly:true,temporary:true,description:'开战'+seconds/60+'分钟后释放绝境一击，击败敌方全体，重伤者也无法幸免。在期限内击败此人可阻止释放。',stats:{},triggers:[{on:'battleTime',after:seconds,effect:'wipeOpponents'}]};}

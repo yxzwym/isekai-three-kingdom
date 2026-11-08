@@ -43,6 +43,6 @@ test('群攻的自动条件最低两人，偶尔单体进入随机技能池',()=
   const s=P.createBattle('manual-fight',character()),b=new E.Battle(s),u=b.unit('zhangjiao');b.setPriorities(u.id,[{skill:'staff-storm',when:'enemyCount',threshold:1},{skill:'staff-shock',when:'always'}]);assert.equal(u.priorities[0].threshold,2);assert.equal(b.autoCommand(u).skill,'staff-shock');
   const p={...s,allies:[{...s.allies[0],weapon:null,skills:['staff-shock','spear-cut'],priorities:[{skill:'staff-shock',when:'always',frequency:'sometimes'},{skill:'spear-cut',when:'always'}]}]},random=new E.Battle(p),j=random.unit('zhangjiao');random.rng=()=>0;assert.equal(random.autoCommand(j).skill,'spear-cut');j.priorities[1].frequency='sometimes';assert.equal(random.autoCommand(j).skill,'staff-shock');random.rng=()=>.99;assert.equal(random.autoCommand(j).skill,'spear-cut');assert.equal(j.priorities[0].frequency,'sometimes');
 });
-test('教程按体质生命和原作技能倍率运行，通过等级成长控制来回交锋与治疗',()=>{
+test('教程按体质生命和现有技能倍率运行，通过等级成长控制来回交锋与治疗',()=>{
  const b=new E.Battle(P.createBattle('squad-fight',character()));for(const u of b.units)assert.equal(u.maxSoldiers,u.constitution*10);assert.equal(b.unit('zhangjiao').intelligence,42);assert.equal(b.skills['staff-shock'].scaling.intelligence,2.55);b.start();b.advance(150);assert.equal(b.status,'victory');assert.equal(b.living('ally').length,3);assert.ok(b.events.some(e=>e.skill==='scripture-2'));assert.ok(b.events.some(e=>e.side==='enemy'&&e.type==='action'&&e.results.some(r=>r.actual>5)));
 });

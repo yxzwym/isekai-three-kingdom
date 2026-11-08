@@ -12,7 +12,7 @@ test('村县保持实际东西南北关系，辽隧不再生成于襄平以东',
   assert.ok(p['guiyang-county'].lat>p.guiyang.lat);assert.ok(p['yongan-county'].lon<p.yongan.lon);
 });
 test('参考经纬度保持不变，地图显示只做有界偏移，所有地点均有核对依据',()=>{
-  for(const p of D.places){const recorded=L.locations[p.id];assert.ok(recorded?.source,p.id);assert.deepEqual({lon:p.lon,lat:p.lat},{lon:recorded.lon,lat:recorded.lat});assert.deepEqual({x:p.anchorX,y:p.anchorY},D.geography.project(p.lon,p.lat));assert.ok(Math.hypot(p.x-p.anchorX,p.y-p.anchorY)<=(p.kind==='city'?48:72)+1e-6);const back=D.geography.unproject({x:p.anchorX,y:p.anchorY});assert.ok(Math.abs(back.lon-p.lon)<1e-10&&Math.abs(back.lat-p.lat)<1e-10);}
+  for(const p of D.places){const recorded=L.locations[p.id];assert.ok(recorded&&Number.isFinite(recorded.lon)&&Number.isFinite(recorded.lat),p.id);assert.deepEqual({lon:p.lon,lat:p.lat},{lon:recorded.lon,lat:recorded.lat});assert.deepEqual({x:p.anchorX,y:p.anchorY},D.geography.project(p.lon,p.lat));assert.ok(Math.hypot(p.x-p.anchorX,p.y-p.anchorY)<=(p.kind==='city'?48:72)+1e-6);const back=D.geography.unproject({x:p.anchorX,y:p.anchorY});assert.ok(Math.abs(back.lon-p.lon)<1e-10&&Math.abs(back.lat-p.lat)<1e-10);}
   assert.ok(D.placeMap.yamatai.note.includes('有争议'));assert.ok(D.placeMap.camp.note.includes('虚构'));assert.ok(D.geography.bounds.width>D.placeMap.edo.x);assert.ok(D.placeMap.yumen.x>0);
 });
 test('同址附郭县合并后旧存档仍可载入，不丢生命、战术和连续行路终点',()=>{

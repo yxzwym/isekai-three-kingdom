@@ -10,5 +10,5 @@
     if(id==='korea')id='mainland';
     return landmasses.some(m=>(!id||m.id===id)&&p.x>=m.bounds.minX&&p.x<=m.bounds.maxX&&p.y>=m.bounds.minY&&p.y<=m.bounds.maxY&&contains(p,m.points)&&(!margin||m.points.every((a,i)=>edgeDistance(p,a,m.points[(i+1)%m.points.length])>=margin)));
   }
-  const api={project,unproject,landmasses,isLand,rivers:data.rivers,rasterScale:.6,bounds:{width:6200,height:4000},source:data.source};root.WorldGeography=api;if(node)module.exports=api;
+  const api={project,unproject,landmasses,isLand,rivers:data.rivers,rasterScale:.6,bounds:{width:6200,height:4000}};root.WorldGeography=api;if(node)module.exports=api;
 })(globalThis);

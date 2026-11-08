@@ -5,7 +5,6 @@
   const minZoom=p=>majorCities.includes(p.id)?0:p.kind==='city'?.34:p.kind==='village'?1.12:.86;
   const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 
-  // 调整只生成一次，不随缩放跳动；保留经纬度和来源，显示位置允许小幅偏移。
   function arrange(places,geography){
     const placed=[],segments=geography.rivers.flatMap(r=>r.points.slice(1).map((p,i)=>[geography.project(...r.points[i]),geography.project(...p)]));
     const lineClear=(a,b,id)=>{const steps=Math.max(1,Math.ceil(distance(a,b)/6));for(let i=0;i<=steps;i++)if(!geography.isLand({x:a.x+(b.x-a.x)*i/steps,y:a.y+(b.y-a.y)*i/steps},id))return false;return true;};

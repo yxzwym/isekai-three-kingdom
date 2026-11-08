@@ -3,7 +3,6 @@
   const G=typeof module!=='undefined'&&module.exports?require('./character-growth.js'):root.CharacterGrowth;
   const integer=n=>Number.isFinite(Number(n))?Math.min(Number.MAX_SAFE_INTEGER,Math.max(0,Math.floor(Number(n)))):0;
   const points=n=>Number.isFinite(Number(n))?Math.round(Math.min(Number.MAX_SAFE_INTEGER/100,Math.max(0,Number(n)))*100)/100:0;
-  // 缺少逐级表的阶段经确认平滑分配，阶段总消耗严格匹配Wiki。
   function smoothCosts(count,total,first,last){
     let lo=.01,hi=20;
     const values=power=>Array.from({length:count},(_,i)=>first+(last-first)*(i/(count-1))**power);
@@ -44,5 +43,5 @@
     if(next.baseAttributes&&next.potentials){next.attributes=G.attributesAt(next.baseAttributes,next.potentials,next.level);if(next.id!=='hero')Object.assign(next,next.attributes);}
     return {record:next,amount:points(amount),before:current,after:next.level};
   }
-  const api={required,reward,rewardForEnemy,grant,normalizeRecord,stages,costs,cumulative,maxLevel,display:n=>String(points(n)),source:'https://wiki.biligame.com/dxcb2/英雄升级所需要的魂'};root.CharacterExperience=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const api={required,reward,rewardForEnemy,grant,normalizeRecord,stages,costs,cumulative,maxLevel,display:n=>String(points(n))};root.CharacterExperience=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

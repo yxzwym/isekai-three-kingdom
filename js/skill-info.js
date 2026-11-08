@@ -19,7 +19,7 @@
     else if(s.attribute)detail=(s.negative||s.amount<0?'减少':'提升')+'目标'+calculated(amount,effectFormula(s))+'点'+(attributes[s.attribute]||s.attribute);
     else if(multipliers.length)detail=multipliers.map(key=>{const value=s[key+'Multiplier'];return(value<1?'降低':'提升')+'目标'+n(Math.abs(value-1)*100)+'%'+attributes[key];}).join('，');
     else if(s.reflect||s.reflectFormula){const f=s.reflectFormula;detail='反弹'+calculated((f?(f.base||0)+(f.coefficient||0)*(actor[f.stat||'technique']??0):s.reflect)*100,f?expression({[f.stat||'technique']:(f.coefficient||0)*100},(f.base||0)*100):'')+'%所受伤害';}
-    return name+'：'+(detail||'附加此状态')+duration+'。';
+    return name+'：'+(detail||'附加此状态')+duration+'。'+(s.unresistable?'无法免疫。':'')+(s.uncleansable?'无法净除。':'');
   }
   function describe(b,u,skill){
     const actor=b.effective(u),all=skill.scope==='all',heal=skill.kind==='heal',buff=skill.kind==='buff',role=buff?(skill.buff?.taunt?'嘲讽':skill.buff?.reflect||skill.buff?.reflectFormula?'反伤':skill.side==='enemy'?'削弱状态':'增益状态'):(all?'群体':'单体')+(heal?'治疗':skill.kind==='physical'?'物理伤害':'计策伤害'),lines=[role];

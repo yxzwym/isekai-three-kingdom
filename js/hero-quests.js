@@ -39,7 +39,7 @@
    ['hero','我们也准备去各地走走，找愿意一起对付董卓的人。你想去江东的话，可以先跟着我们，到了建业再一起去拜见孙将军。'],
    ['npc','好，我先托人告诉弟兄们，让他们去江边等消息。你们现在方便的话，我就一起走；人手已经够了，我先去建业，往后你们也能在那里找到我。']),choices:[{label:'留下同行',recruit:true},{label:'先去建业',recruit:false}]}},
   complete:{objective:'甘宁已脱困，愿为吴国效力'}
- },battles:{breach:{stage:['plan','breach'],next:'cell',title:'新野衙门',sceneId:'market-street',count:4},cell:{stage:['cell'],next:'freed',title:'牢房突围',sceneId:'county-prison',count:5}},source:'https://article.ali213.net/html/1241_9.html'};
+ },battles:{breach:{stage:['plan','breach'],next:'cell',title:'新野衙门',sceneId:'market-street',count:4},cell:{stage:['cell'],next:'freed',title:'牢房突围',sceneId:'county-prison',count:5}}};
  const definitions={ganning:definition};
  function place(id,state){const d=definitions[id];return d?.stages[state?.stage]?.place||d?.place;}
  function normalize(value={},unlocked=false){return Object.fromEntries(Object.values(definitions).map(d=>{const old=value?.[d.id]||{},stage=Object.hasOwn(d.stages,old.stage)?old.stage:unlocked||d.requiresChangshan===false?d.start:'locked';return [d.id,{stage,heard:!!old.heard,accepted:old.accepted??(!!old.stage&&old.stage!=='locked'&&old.stage!==d.start),...(old.puzzle?{puzzle:old.puzzle}:{})}];}));}

@@ -74,6 +74,7 @@
         if(u.side==='enemy'&&(this.config.bossBattle||u.boss||u.passives?.includes('enemy-stun-resistance')))u.statusImmunities=[...new Set([...(u.statusImmunities||[]),'stun'])];
         u.level = attr(u.level ?? (u.side === 'enemy' ? this.config.enemyLevel || this.config.level : this.config.level));
         u.skills = Array.isArray(u.skills) ? u.skills.filter(id=>this.skills[id]&&!this.skills[id].reactionOnly) : [];
+        if(u.side==='enemy'&&this.config.difficulty==='hell')u.passives=[...(u.passives||[]),'enemy-hell-strength'];
         u.passives = Array.isArray(u.passives) ? [...new Set(u.passives)].filter(id=>this.passives[id]&&(!this.passives[id].enemyOnly||u.side==='enemy')) : [];
         if(u.side==='enemy'&&!u.passives.includes('enemy-negative-immunity'))for(const immunity of u.statusImmunities||[]){const id=immunity==='stun'?'enemy-stun-resistance':'enemy-status-immunity:'+immunity;if(!this.passives[id]){const name=STATES.definitions[immunity]?.name||immunity;this.passives[id]={id,name:name+'免疫',quality:'white',temporary:true,enemyOnly:true,description:'本场战斗免疫'+name+'。',stats:{},triggers:[]};}u.passives=[...new Set([...u.passives,id])];}
         u.priorities = Array.isArray(u.priorities) ? u.priorities.map(r=>normalizeRule(r,this.skills[r.skill])) : [];
@@ -152,7 +153,7 @@
     healingPassives(owner,target){
       for(const id of owner.passives)for(const trigger of this.passives[id]?.triggers||[]){
         if(trigger.on!=='heal'||trigger.effect!=='cleanse')continue;const removed=[];
-        for(let n=0;n<(trigger.count||1);n++){const index=target.statuses.findIndex(s=>s.negative||s.harmful||s.stun||(s.period&&!s.healing)||(s.attribute&&s.amount<0)||Object.entries(s).some(([key,value])=>key.endsWith('Multiplier')&&Number(value)<1));if(index<0)break;removed.push(target.statuses.splice(index,1)[0]);}
+        for(let n=0;n<(trigger.count||1);n++){const index=target.statuses.findIndex(s=>!s.uncleansable&&(s.negative||s.harmful||s.stun||(s.period&&!s.healing)||(s.attribute&&s.amount<0)||Object.entries(s).some(([key,value])=>key.endsWith('Multiplier')&&Number(value)<1)));if(index<0)break;removed.push(target.statuses.splice(index,1)[0]);}
         if(removed.length)this.emit('passive',{actor:owner.id,actorName:owner.name,target:target.id,passive:id,skillName:this.passives[id].name,effect:'cleanse',removed:removed.map(s=>s.id)});
       }
     }
@@ -170,9 +171,9 @@
       const base=STATES.definitions[effect.id]||{},definition={...copy(base),...copy(effect)},id=definition.id||skill.id;
       const protection=PASSIVES.statsFor(target,this.passives);if((definition.stun||id==='stun')&&protection.immuneStun)return null;
       const harmful=definition.negative||definition.harmful||definition.stun||definition.period&&!definition.healing||definition.attribute&&Number(definition.amount)<0||Object.entries(definition).some(([key,value])=>key.endsWith('Multiplier')&&Number(value)<1);
-      if(harmful&&protection.immuneNegative)return null;
-      if(target.dead||(target.soldiers<=0&&!(target.wounded&&definition.period&&!definition.healing))||((target.statusImmunities||[]).includes(id)||definition.stun&&(target.statusImmunities||[]).includes('stun')))return null;
-      if(definition.chance!==undefined){const chance=clamp(Number(definition.chance)-(source.side!==target.side?this.effective(target).resistance/1000:0),0,1);if(this.rng()>=chance)return null;}
+      if(harmful&&(target.wounded||protection.immuneNegative&&!definition.unresistable))return null;
+      if(target.dead||target.soldiers<=0||(!definition.unresistable&&((target.statusImmunities||[]).includes(id)||definition.stun&&(target.statusImmunities||[]).includes('stun'))))return null;
+      if(definition.chance!==undefined){const chance=clamp(Number(definition.chance)-(source.side!==target.side&&!definition.unresistable?this.effective(target).resistance/1000:0),0,1);if(this.rng()>=chance)return null;}
       const owner=this.effective(source),coefficient=Number(definition.coefficient)||0;
       let amount=Number(definition.amount??((Number(definition.base)||0)+coefficient*(owner[definition.stat||'technique']??0)))||0;if(definition.healing&&definition.period)amount*=1+(owner.healingBonus||0);if(definition.negative)amount=-Math.abs(amount);if(amount<0&&protection.immuneNegative)return null;
       const previous=target.statuses.find(s=>s.id===id),origin=skill.id||id,maxStacks=Math.max(1,Number(definition.maxStacks)||1),same=previous?.origin===origin;
@@ -292,7 +293,7 @@
         if(groups.length)chosen=groups[0];
         else chosen=damage[Math.floor(this.rng()*damage.length)];
       }
-      if(this.skills[chosen.skill].side==='enemy'&&chosen.scope==='single'&&chosen.kind!=='buff'){const skill=this.skills[chosen.skill],pool=this.targetPool(u,skill),taunted=pool.some(t=>t.statuses.some(s=>s.taunt&&s.expiresAt>this.time));if(u.targetRule==='random'||(u.side==='enemy'&&taunted))chosen={...chosen,target:pool[Math.floor(this.rng()*pool.length)].id};}
+      if(this.skills[chosen.skill].side==='enemy'&&chosen.scope==='single'&&chosen.kind!=='buff'){const skill=this.skills[chosen.skill],pool=this.targetPool(u,skill),taunted=!skill.ignoreTaunt&&!PASSIVES.statsFor(u,this.passives).ignoreTaunt&&pool.some(t=>t.statuses.some(s=>s.taunt&&s.expiresAt>this.time));if(u.targetRule==='random'||(u.side==='enemy'&&taunted))chosen={...chosen,target:pool[Math.floor(this.rng()*pool.length)].id};}
       return {skill:chosen.skill,target:chosen.target,scope:chosen.scope};
     }
     dodgeChance(unit,kind){

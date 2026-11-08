@@ -3,12 +3,12 @@
   const ATTRIBUTES=[['war','武力'],['intelligence','智力'],['constitution','体质'],['speed','速度'],['technique','技巧']],KEYS=ATTRIBUTES.map(([id])=>id);
   const vector=(war,intelligence,constitution,speed,technique)=>({war,intelligence,constitution,speed,technique});
   const profile=(base,potentials)=>({baseAttributes:vector(...base),potentials:vector(...potentials)});
-  const POTENTIAL_REFERENCE={edition:'三国志11',fields:['war','intelligence','constitution','speed','technique'],pages:{xuchu:356,dianwei:677,huangzhong:396,maliang:724,taishici:598,zhangjiao:611,zhangbao:642,zhangliang:646,zhenji:510,zhaoyun:201,zhouyu:456,huanggai:375,ganning:323,lusu:869,zhugeliang:123,caocao:338,zhangliao:204,xuhuang:500,yujin:211,caoren:551,sunquan:576,lvbu:202},statistics:{
+  const GENERAL_POTENTIALS={
     xuchu:[65,96,36],dianwei:[56,95,35],huangzhong:[86,93,60],maliang:[46,23,85],taishici:[82,93,66],zhangjiao:[86,25,86],zhangbao:[83,71,81],zhangliang:[78,80,68],zhenji:[15,4,71],zhaoyun:[91,96,76],zhouyu:[97,71,96],huanggai:[79,83,65],ganning:[86,94,76],lusu:[80,56,92],zhugeliang:[92,38,100],caocao:[96,72,91],zhangliao:[93,92,78],xuhuang:[88,90,74],yujin:[84,78,70],caoren:[89,86,56],sunquan:[76,67,80],lvbu:[87,100,26]
-  }};
-  // 原始数据顺序：统率、武力、智力。速度与技巧是本作规则推导值，不冒充原版属性。
+  };
+  // 潜力顺序：统率、武力、智力；速度和技巧按固定规则计算。
   const derivedPotential=reference=>Math.round((Math.max(1,reference-20)+Math.min(100,reference+10))/2);
-  function generalProfile(id,base){const [command,war,intelligence]=POTENTIAL_REFERENCE.statistics[id];return profile(base,[war,intelligence,command,derivedPotential(war),derivedPotential(intelligence)]);}
+  function generalProfile(id,base){const [command,war,intelligence]=GENERAL_POTENTIALS[id];return profile(base,[war,intelligence,command,derivedPotential(war),derivedPotential(intelligence)]);}
   // 1级裸属性与成长潜力独立；换武器不会改写人物的成长曲线。
   const PROFILES={
     hero:profile([10,10,10,10,10],[50,50,50,50,50]),
@@ -44,7 +44,7 @@
     lvbu:generalProfile('lvbu',[14,4,12,11,10])
   };
   function normalizeKnownPotentials(unit){
-    const id=unit.characterId||unit.id;if(unit.potentialRevision>=2||!POTENTIAL_REFERENCE.pages[id]||!unit.potentials)return unit;
+    const id=unit.characterId||unit.id;if(unit.potentialRevision>=2||!GENERAL_POTENTIALS[id]||!unit.potentials)return unit;
     const next=clone(unit);if(!(unit.potentialRevision>=1))for(const key of ['war','intelligence'])next.potentials[key]=PROFILES[id].potentials[key];for(const key of ['constitution','speed','technique'])next.potentials[key]=PROFILES[id].potentials[key];next.potentialRevision=2;return next;
   }
   const clone=x=>JSON.parse(JSON.stringify(x)),positive=value=>Math.max(1,Math.floor(Number(value)||1)),level=value=>positive(value);
@@ -72,5 +72,5 @@
   }
   const GENERAL_IDS=['xuchu','dianwei','huangzhong','maliang','taishici','hero','zhangjiao','zhangbao','zhangliang','zhaoyun','zhenji','zhouyu','huanggai','ganning','lusu','zhugeliang','caocao','zhangliao','xuhuang','yujin','caoren','sunquan','lvbu'];
   const isGeneral=unit=>unit.unitType==='general'||GENERAL_IDS.includes(unit.characterId||unit.id);
-  const api={GENERAL_IDS,isGeneral,ATTRIBUTES,KEYS,PROFILES,POTENTIAL_REFERENCE,derivedPotential,normalizeKnownPotentials,growthPerLevel,attributesAt,create,characterAt,normalizeCharacter,validGrowth};root.CharacterGrowth=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const api={GENERAL_IDS,isGeneral,ATTRIBUTES,KEYS,PROFILES,GENERAL_POTENTIALS,derivedPotential,normalizeKnownPotentials,growthPerLevel,attributesAt,create,characterAt,normalizeCharacter,validGrowth};root.CharacterGrowth=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

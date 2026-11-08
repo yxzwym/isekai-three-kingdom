@@ -60,10 +60,10 @@
   healer:{profile:'fieldPriest',name:'符水医师',armyName:'随军医师',art:'herbalist',type:'scripture',skills:['scripture-3','scripture-2']},
   witch:{profile:'outlawWitch',name:'使毒巫医',armyName:'使毒方士',art:'herbalist',type:'gourd',skills:['gourd-poison','gourd-regeneration']}
  };
- function roleEnemy(role,level,index,{army=false}={}){const d=enemyRoles[role];if(!d)throw new Error('未知敌军职责：'+role);const weapon=I.create('weapon-'+d.type,'white','enemy-'+role+'-'+index);weapon.skills=d.skills;const skills=W.forWeapon(weapon);return {...G.create(d.profile,level),id:'enemy-'+role+'-'+index,name:army?d.armyName:d.name,characterId:d.art,unitType:'soldier',enemyRole:role,weapon,skills,priorities:W.prioritiesFor(skills),equipment:{armor:I.create('cloth-armor')},armor:1,resistance:2,weaponProficiencies:{[d.type]:30},targetRule:'random'};}
+ function roleEnemy(role,level,index,options={}){if(!enemyRoles[role])throw new Error('未知敌军职责：'+role);return (node?require('./enemy-catalog.js'):root.EnemyCatalog).unit(role,level,index,options);}
  function mixRoster(roster,roles,options={}){if(!roles)return roster;return roster.map((u,i)=>enemyRoles[roles[i]]?{...roleEnemy(roles[i],u.level,i,options),id:u.id,...(u.formationRow?{formationRow:u.formationRow}:{}),...(u.experienceWeight?{experienceWeight:u.experienceWeight}:{})}:u);}
  function mixedRoles(count,variant=0){const roles=Array(count).fill(null);if(count<2)return roles;const options=['caster','medic','healer','witch'],pick=((Number(variant)||0)%8+8)%8;if(pick>=options.length)return roles;roles[count-1]=options[pick];if(count>=5)roles[count-2]=options[(pick+2)%options.length];return roles;}
  const services={healing:{price:8,currency:'文'}};
- const combatProgression={initialCap:10,caps:[10,15,20]};
+ const combatProgression={initialCap:20,caps:[20]};
  const api={services,combatProgression,npcs,conversations,storyConversations,sideQuests,enemy,bandits,storyBattles,enemyRoles,roleEnemy,mixRoster,mixedRoles};root.NearbyContent=api;if(node)module.exports=api;
 })(globalThis);

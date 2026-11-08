@@ -52,7 +52,7 @@
       this.load(scenario);this.resize();this.lastTime=performance.now();this.raf=requestAnimationFrame(this.frame);
     }
     load(scenario) {
-      this.battle=new root.BattleEngine.Battle(scenario);this.scenario=scenario;this.seen=0;this.ended=false;this.enemyDefeats=new Map();this.resultAt=0;this.panel=null;this.floats=[];this.aim=null;this.activeManual=null;this.selectionKey=null;this.preparationHintDismissed=false;this.health=new Map(this.battle.units.map(u=>[u.id,new Presentation.HealthTrack(u.soldiers,u.maxSoldiers)]));this.vfx=new root.BattleVFX.BattleEffects();
+      this.battle=new root.BattleEngine.Battle(scenario);root.GameAudio?.setScene(this.battle.config.bossBattle?'boss':'battle');this.scenario=scenario;this.seen=0;this.ended=false;this.enemyDefeats=new Map();this.resultAt=0;this.panel=null;this.floats=[];this.aim=null;this.activeManual=null;this.selectionKey=null;this.preparationHintDismissed=false;this.health=new Map(this.battle.units.map(u=>[u.id,new Presentation.HealthTrack(u.soldiers,u.maxSoldiers)]));this.vfx=new root.BattleVFX.BattleEffects();
       for(const u of this.battle.units){const id=u.characterId||u.id,record=root.CharacterAssets?.manifest.characters[id];if(record){const art=root.CharacterAssets.resolve(id,record.variants[u.variant]?u.variant:undefined);u.portrait??=art.portrait;u.fullbody??=art.fullbody;}}
       const urls=[...(root.GameAssetManifest||[]).filter(f=>f.src.includes('/ui/')).map(f=>f.src),scenario.scene?.background,...this.battle.units.map(u=>(u.side==='enemy'?u.fullbody||u.portrait:u.portrait)?.src)].filter(Boolean);
       urls.forEach(src=>this.image(src));this.visuals.clear();this.vfx.prepare([...this.battle.units.flatMap(u=>u.skills.map(id=>root.BattleVFX.kindOf(this.battle.skills[id]))),'thunder']);this.updateLayout();this.buildBackground();this.preparePortraits();if(this.options.autoStart!==false)this.battle.start();return this;
@@ -106,7 +106,7 @@
     processEvents(now){
       this.enemyDefeats||=new Map();
       const b=this.battle,events=b.events,totals=new Map(),health=new Map();
-      for(let i=this.seen;i<events.length;i++){const e=events[i];if(e.type==='modeblocked')Presentation.addFloat(this.floats,{id:e.actor,text:e.text,color:'#f1dfae',born:now,type:'skill'});if(e.type==='passive'){Presentation.addFloat(this.floats,{id:e.actor,text:e.skillName,color:UI.passiveColor(b.passives[e.passive]||{}),born:now,type:'skill'});this.vfx.addEffect(e.target||e.actor,e.effect==='cleanse'?'heal':'buff',now,650,false);}if(e.type!=='action')continue;const skill=b.skills[e.skill];this.vfx.action(e,skill,now);
+      for(let i=this.seen;i<events.length;i++){const e=events[i];if(e.type==='modeblocked')Presentation.addFloat(this.floats,{id:e.actor,text:e.text,color:'#f1dfae',born:now,type:'skill'});if(e.type==='passive'){Presentation.addFloat(this.floats,{id:e.actor,text:e.skillName,color:UI.passiveColor(b.passives[e.passive]||{}),born:now,type:'skill'});this.vfx.addEffect(e.target||e.actor,e.effect==='cleanse'?'heal':'buff',now,650,false);}if(e.type!=='action')continue;const skill=b.skills[e.skill];if(b.time-(e.time||0)<.4)root.GameAudio?.skill(skill,e);this.vfx.action(e,skill,now);
         if(!e.periodic)Presentation.addFloat(this.floats,{id:e.actor,text:e.skillName,color:root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]||'#ead8a5',born:now,type:'skill'});
         for(const r of e.results){if(r.buff)continue;if(!r.miss)health.set(r.target,r.after);const damageType=r.damageType||skill?.damageType||skill?.kind||'physical',displayAmount=r.amount??r.actual,key=r.target+':'+(r.miss||(r.healing?'heal':damageType)),old=totals.get(key);if(old){old.actual+=r.actual;old.displayAmount+=displayAmount;old.critical=old.critical||r.critical;}else totals.set(key,{...r,damageType,displayAmount});}
         this.options.onAction?.(e,this);if(this.battle!==b)return;
@@ -116,7 +116,7 @@
 
         Presentation.addFloat(this.floats,{id:r.target,text:(r.miss?(b.unit(r.target)?.side==='ally'?'闪避':'未命中'):null)||`${r.healing?'+':'−'}${number(r.displayAmount)}${r.critical?'!':''}`,color:Presentation.resultColor(r),born:now,critical:r.critical});
       }
-      if(!this.ended&&!['ready','running'].includes(b.status)){this.ended=true;this.resultAt=now+(b.status==='victory'&&[...this.enemyDefeats.values()].some(t=>now-t<500)?500:0);if(!this.options.hideResult&&now>=this.resultAt)this.panel={type:'result'};const result=b.export();this.canvas.dispatchEvent(new CustomEvent('battlecomplete',{detail:result}));this.options.onComplete?.(result,this);}
+      if(!this.ended&&!['ready','running'].includes(b.status)){this.ended=true;if(b.status==='victory'||b.status==='defeat')root.GameAudio?.play(b.status);this.resultAt=now+(b.status==='victory'&&[...this.enemyDefeats.values()].some(t=>now-t<500)?500:0);if(!this.options.hideResult&&now>=this.resultAt)this.panel={type:'result'};const result=b.export();this.canvas.dispatchEvent(new CustomEvent('battlecomplete',{detail:result}));this.options.onComplete?.(result,this);}
       this.floats=this.floats.filter(f=>now-f.born<1100);const limit=Math.max(96,b.units.length*10);if(this.floats.length>limit)this.floats.splice(0,this.floats.length-limit);
     }
     text(text,x,y,size=14,color='#dce6e5',align='center'){
@@ -129,7 +129,7 @@
     }
     button(label,x,y,w,h,action,active=false,disabled=false) {
       this.box(x,y,w,h,active?'#34565d':'#102b35',active?'#b1d7d8':'#486c77');this.text(label,x+w/2,y+h/2,Math.min(14,w/4),disabled?'#58747a':active?'#f1e2b3':'#c6e2e4');
-      if(!disabled)this.hits.push({x,y,w,h,action,label});
+      if(!disabled)this.hits.push({x,y,w,h,action:()=>{root.GameAudio?.play('ui');action();},label});
     }
     draw(now=performance.now()) {
       if(!this.battle||!this.w)return;
@@ -280,14 +280,14 @@
       this.text('技能',left,row,14,'#ebd4a6','left');row+=20;const col=(w-44)/Math.max(1,u.skills.length),icon=44;
       u.skills.forEach((id,i)=>{const skill=this.battle.skills[id],cx=left+col*(i+.5),ix=cx-icon/2;this.box(ix,row,icon,icon,'#0b222d','#7b9ba6');this.drawSkillIcon(skill,ix,row,icon,root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]);this.text(skill.name,cx,row+57,14,'#e6e8dd');this.text(this.skillRole(skill),cx,row+76,12,'#b7cbd0');this.hits.push({x:left+col*i,y:row,w:col,h:88,label:skill.name,action:()=>this.openSkillInfo(u,id)});});row+=110;
       const passives=root.PengpaiRules.sortPassives(u.passives,this.battle.passives).map(id=>this.battle.passives[id]).filter(Boolean);
-      if(passives.length){this.text('被动技能',left,row,14,'#ebd4a6','left');row+=18;row+=UI.passiveButtons(this,passives,left,row,w-44,passive=>this.openPassiveInfo(u,passive.id))+12;}
+      if(passives.length){this.text('特质',left,row,14,'#ebd4a6','left');row+=18;row+=UI.passiveButtons(this,passives,left,row,w-44,passive=>this.openPassiveInfo(u,passive.id))+12;}
       c.restore();p.maxScroll=Math.max(0,row+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);this.hits=this.hits.filter((hit,i)=>i<headerHits||(hit.y>=start&&hit.y+hit.h<=bottom));
     }
     drawPassiveInfo(){
       const p=this.panel,passive=this.battle.passives[p.passive];if(!passive){this.closePanel();return;}
       const lines=this.wrapInfo(passive.description,Math.min(this.w-24,460)-44),{x,y,w,h}=this.panelFrame(passive.name,112+lines.length*24),start=y+54,bottom=y+h-16,c=this.ctx;
       c.save();c.beginPath();c.rect(x,start,w,bottom-start);c.clip();let row=start+15-(p.scroll||0);
-      this.text(passive.temporary?'临时特质 · 仅本场战斗':passive.exclusive?'专属特质':root.PengpaiRules.QUALITIES[passive.quality]?.name+'品质',x+22,row,14,UI.passiveColor(passive),'left');row+=32;
+      this.text(UI.passiveLabel(passive),x+22,row,14,UI.passiveColor(passive),'left');row+=32;
       for(const line of lines){this.text(line,x+22,row,14,'#d2e0df','left');row+=24;}c.restore();p.maxScroll=Math.max(0,row+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);
     }
     wrapInfo(value,width){const c=this.ctx;c.font=`14px ${font}`;const rows=[];let line='';for(const ch of String(value).match(/(?:武器威力|武力|智力|体质|速度|技巧)(?:×\d+(?:\.\d+)?)?|\d+(?:\.\d+)?%?|./gu)||[]){if(line&&c.measureText(line+ch).width>width&&!/[，。！？、；：）】》]/.test(ch)){rows.push(line);line='';}line+=ch;}if(line)rows.push(line);return rows;}

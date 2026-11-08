@@ -2,7 +2,6 @@
   'use strict';
   const Scenes=typeof module!=='undefined'&&module.exports?require('./battle-scenes.js'):root.BattleScenes;
   const factions={yellow:{name:'黄巾',color:'#c5a64a'},wei:{name:'魏',color:'#5b91ba'},shu:{name:'蜀',color:'#749766'},wu:{name:'吴',color:'#b86958'},dong:{name:'董卓朝廷',color:'#825a78'},yuan:{name:'袁绍',color:'#a08664'},shuYuan:{name:'袁术',color:'#ad8551'},liu:{name:'刘表',color:'#6d9286'},ma:{name:'马腾',color:'#947559'},zhang:{name:'张鲁',color:'#827aa5'},gongsun:{name:'公孙瓒',color:'#9c9b8c'},neutral:{name:'乡野',color:'#9c927b'}};
-  // 城池名单以《三国志13》60城为基底；经纬度与来源独立保存在 world-locations.js。
   const geography=typeof module!=='undefined'&&module.exports?require('./world-geography.js'):root.WorldGeography,project=geography.project,locationData=typeof module!=='undefined'&&module.exports?require('./world-locations.js'):root.WorldLocations;
   const locate=id=>{const p=locationData.locations[id];if(!p)throw new Error('缺少地理坐标：'+id);return {...p,...project(p.lon,p.lat)};};
   const cityRows=[
@@ -145,6 +144,6 @@
   const placeAliases={jiujiang:'chaisang',...locationData.aliases};
   const travelTimeFactor=potential=>{const p=Math.max(0,Math.min(100,Number.isFinite(Number(potential))?Number(potential):50));return p<=50?2-p/50:1-(p-50)/100;};
   const travelDurationMs=(a,b,potential=50)=>Math.max(1,roadLength(a,b)/travelRules.speed*1000*travelTimeFactor(potential));
-  const api={mapRules,travelRules,travelTimeFactor,travelDurationMs,placeAliases,factions,places,roads,clues,weaponNames,roadEvents,encounters,townScenes,townNpcs,gateGuard,trainingOptions,questDefinitions,questNpcs,placeMap,roadPath,roadLength,roadPosition,geography,mapLayout,bounds:geography.bounds,cityIds:cityRows.map(row=>row[0]),mapSource:{title:'三国志13 · 60城（固定经纬度）',url:'https://www.gamecity.ne.jp/sangokushi13/concept.html'}};
+  const api={mapRules,travelRules,travelTimeFactor,travelDurationMs,placeAliases,factions,places,roads,clues,weaponNames,roadEvents,encounters,townScenes,townNpcs,gateGuard,trainingOptions,questDefinitions,questNpcs,placeMap,roadPath,roadLength,roadPosition,geography,mapLayout,bounds:geography.bounds,cityIds:cityRows.map(row=>row[0])};
   root.WorldData=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

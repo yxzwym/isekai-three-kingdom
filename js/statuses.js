@@ -5,6 +5,7 @@
     taunt:{name:'嘲讽',icon:'盾',color:'#e5b45e',duration:30,taunt:true},
     armorDown:{name:'破甲',icon:'裂',color:'#d7a27c',duration:8},
     resistanceDown:{name:'破抗',icon:'蚀',color:'#bc97dd',duration:8},
+    lifeLoss:{name:'生命流失',icon:'血',color:'#d8c2c4',duration:5,period:1,unresistable:true,uncleansable:true},
     bleed:{name:'流血',icon:'血',color:'#ed6b72',duration:8,period:1},
     plague:{name:'瘟疫',icon:'疫',color:'#b5b65f',duration:8,period:1},
     warDown:{name:'武力衰减',icon:'弱',color:'#d19b86',duration:8},

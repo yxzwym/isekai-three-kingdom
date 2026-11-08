@@ -5,6 +5,7 @@
   const name = new URLSearchParams(location.search).get('scenario');
   let storage;try{storage=window.localStorage;}catch{storage={getItem(){return null;},setItem(){throw new Error('浏览器存储不可用');}};}
   const store=new PengpaiRules.SaveStore(storage);
+  globalThis.GameAudio?.bind(store);
   GameAssetLoader.startBackground?.();
   if(!name){
     const canvas=document.getElementById('battleCanvas'),input=document.getElementById('heroName');let screen;
