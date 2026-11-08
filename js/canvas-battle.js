@@ -18,6 +18,8 @@
     return {x:(width-w)/2,y:(height-h)/2,w,h};
   }
   function layout(width,height,allies,enemies,formation,allyColumns=PARTY_LIMIT) {
+    // 单挑限制参战人数，不改变己方卡片宽度；扩编时仍可增加列数。
+    const configuredColumns=Number(allyColumns);allyColumns=Math.max(PARTY_LIMIT,Number.isFinite(configuredColumns)?Math.floor(configuredColumns):PARTY_LIMIT);
     const rects=[],gap=3,groupWidth=Math.min(width-12,640);
     const indices=formation?[...(formation.back||[]),...(formation.front||[])]:[];
     const validFormation=indices.length===enemies&&new Set(indices).size===enemies&&indices.every(i=>Number.isInteger(i)&&i>=0&&i<enemies);
@@ -284,7 +286,7 @@
       const p=this.panel,passive=this.battle.passives[p.passive];if(!passive){this.closePanel();return;}
       const lines=this.wrapInfo(passive.description,Math.min(this.w-24,460)-44),{x,y,w,h}=this.panelFrame(passive.name,112+lines.length*24),start=y+54,bottom=y+h-16,c=this.ctx;
       c.save();c.beginPath();c.rect(x,start,w,bottom-start);c.clip();let row=start+15-(p.scroll||0);
-      this.text(passive.exclusive?'专属特质':root.PengpaiRules.QUALITIES[passive.quality]?.name+'品质',x+22,row,14,UI.passiveColor(passive),'left');row+=32;
+      this.text(passive.temporary?'临时特质 · 仅本场战斗':passive.exclusive?'专属特质':root.PengpaiRules.QUALITIES[passive.quality]?.name+'品质',x+22,row,14,UI.passiveColor(passive),'left');row+=32;
       for(const line of lines){this.text(line,x+22,row,14,'#d2e0df','left');row+=24;}c.restore();p.maxScroll=Math.max(0,row+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);
     }
     wrapInfo(value,width){const c=this.ctx;c.font=`14px ${font}`;const rows=[];let line='';for(const ch of String(value).match(/(?:武器威力|武力|智力|体质|速度|技巧)(?:×\d+(?:\.\d+)?)?|\d+(?:\.\d+)?%?|./gu)||[]){if(line&&c.measureText(line+ch).width>width&&!/[，。！？、；：）】》]/.test(ch)){rows.push(line);line='';}line+=ch;}if(line)rows.push(line);return rows;}

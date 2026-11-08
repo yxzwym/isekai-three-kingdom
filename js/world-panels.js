@@ -13,8 +13,8 @@
   if(!u){this.closeWorldPanel();return;}
   const previewKey=JSON.stringify(u);if(p.previewKey!==previewKey){p.previewKey=previewKey;p.previewCache=this.memberPreview(u);}const preview=p.previewCache,actor=preview.unit(u.id),current=preview.effective(actor),ids=actor.skills,passives=root.PengpaiRules.sortPassives(actor.passives,preview.passives),c=this.ctx;
   const showPotential=!!u.potentials&&(!p.readonly||root.CharacterGrowth.isGeneral(u)),statsH=108,showExperience=members.some(member=>member.id===u.id);
-  const compact=this.h<640,width=Math.min(560,this.w-16),inner=width-28,headerH=compact?44:48,skillSize=compact?48:52,skillRowH=compact?60:64,footerH=compact?42:46,barH=showExperience?(compact?32:36):17,skillCols=Math.min(3,Math.max(1,ids.length)),skillRows=Math.ceil(ids.length/skillCols),passiveCols=4,passiveRows=Math.ceil(passives.length/passiveCols);
-  const fixed=headerH+skillRows*skillRowH+passiveRows*24+statsH+4+barH+footerH,modelH=clamp(Math.min(440,inner*1.18,this.h-16-fixed),180,440),contentH=modelH+skillRows*skillRowH+passiveRows*24+statsH+4+barH;
+  const compact=this.h<640,width=Math.min(560,this.w-16),inner=width-28,headerH=compact?44:48,skillSize=compact?48:52,skillRowH=compact?60:64,footerH=compact?42:46,barH=showExperience?(compact?32:36):17,skillCols=Math.min(3,Math.max(1,ids.length)),skillRows=Math.ceil(ids.length/skillCols),passiveH=root.PengpaiUI.passiveHeight(passives.map(id=>preview.passives[id]),width-28);
+  const fixed=headerH+skillRows*skillRowH+passiveH+statsH+4+barH+footerH,modelH=clamp(Math.min(440,inner*1.18,this.h-16-fixed),180,440),contentH=modelH+skillRows*skillRowH+passiveH+statsH+4+barH;
   const f=this.frame(u.name+'  '+u.level+'级',fixed+modelH,{titleAlign:'center',maxWidth:560,inset:8,verticalInset:8}),left=f.x+14,top=f.y+headerH,bottom=f.y+f.h-footerH,slotSize=Math.min(46,Math.floor(modelH/4)-5),slotGap=Math.min(12,(modelH-slotSize*4)/3),equipmentOffset=(modelH-slotSize*4-slotGap*3)/2,proto=root.BattleSystem.CanvasBattle.prototype;
   const teammates=p.readonly?[]:[...this.model.partyGroups().active,...this.model.partyGroups().reserve];
   if(teammates.length>1&&teammates.some(member=>member.id===u.id))for(const [delta,glyph,label]of [[-1,'‹','上一位队友'],[1,'›','下一位队友']]){const index=teammates.findIndex(member=>member.id===u.id);this.button(glyph,f.x+f.w/2+(delta<0?-102:72),f.y+9,30,30,()=>this.openCharacter(teammates[(index+delta+teammates.length)%teammates.length].id,p.previous));this.hits.at(-1).label=label;}
@@ -38,7 +38,7 @@
   });
   y+=skillRows*skillRowH;
   root.PengpaiUI.passiveButtons(this,passives.map(id=>preview.passives[id]),left,y,inner,passive=>this.openPassiveInfo(passive,p));
-  y+=passiveRows*24;
+  y+=passiveH;
   const gap=12,cw=(inner-gap)/2,pairs=[['war','武力','constitution','体质'],['intelligence','智力','armor','护甲'],['technique','技巧','resistance','抗性'],['speed','速度',...(u.statusImmunities?.includes('stun')?['stunProtection','抗晕']:[])]];
   this.box(left,y,inner,statsH,'#091d26','#37545e',3);
   pairs.forEach((row,i)=>{const yy=y+i*27+13.5;for(let col=0;col<row.length/2;col++){const x=left+col*(cw+gap),key=row[col*2],label=row[col*2+1],potential=showPotential?u.potentials?.[key]:null;if(potential!=null){this.text(label+' '+Number(current[key].toFixed(2)),x+6,yy,14,'#eddfc0');this.text(potential+'(+'+Number(root.CharacterGrowth.growthPerLevel(potential).toFixed(2))+')',x+cw-6,yy,14,'#d6bb8b','right');}else{this.text(label,x+6,yy,14,'#a9bec3');this.text(key==='stunProtection'?'抵抗':Number(current[key].toFixed(2)),x+cw-6,yy,16,'#eddfc0','right');}}});

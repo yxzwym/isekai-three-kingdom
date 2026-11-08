@@ -320,7 +320,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     'thunder-renewal':{id:'thunder-renewal',name:'雷公助我',scope:'single',kind:'heal',cost:0,side:'self',reactionOnly:true}
   };
   const definitions={
-    'enemy-stun-resistance':{id:'enemy-stun-resistance',name:'眩晕抵抗',quality:'white',enemyOnly:true,temporary:true,description:'免疫眩晕。',stats:{},triggers:[]},
+    'enemy-stun-resistance':{id:'enemy-stun-resistance',name:'免疫眩晕',quality:'white',enemyOnly:true,temporary:true,description:'本场战斗免疫眩晕。离开战斗后失效。',stats:{immuneStun:true},triggers:[]},
     'xuchu-tiger':{id:'xuchu-tiger',name:'虎痴悍勇',quality:'gold',description:'物理伤害提高12%。',stats:{physicalBonus:.12},triggers:[]},
     'dianwei-guard':{id:'dianwei-guard',name:'恶来护主',quality:'gold',description:'受到的物理伤害减少12%。',stats:{physicalReduction:.12},triggers:[]},
     'huangzhong-veteran':{id:'huangzhong-veteran',name:'老当益壮',quality:'gold',description:'物理伤害提高12%。',stats:{physicalBonus:.12},triggers:[]},
@@ -338,6 +338,12 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     'zhaoyun-courage':{id:'zhaoyun-courage',name:'一身是胆',quality:'red',exclusive:true,description:'生命每损失1%，造成的伤害提高0.5%，最多提高50%。',stats:{missingHealthDamageBonus:.5},triggers:[]},
     'zhaoyun-seven-crossings':{id:'zhaoyun-seven-crossings',name:'七进七出',quality:'red',exclusive:true,description:'受伤或治疗使生命越过25%、50%、75%时，立即充满当前行动进度。',stats:{},triggers:[{on:'healthCrossing',thresholds:[.25,.5,.75],direction:'both',effect:'fillProgress'}]}
   };
+  for(const [id,name,description,stats]of [
+    ['enemy-negative-immunity','百邪不侵','本场战斗免疫一切负面状态，包括眩晕、麻痹、持续伤害和属性衰减。增益与治疗不受影响。',{immuneNegative:true}],
+    ['enemy-healing-suppression','压制回复','存活期间，敌方的治疗、回春和吸血回复效果降低75%。本场战斗结束后失效。',{opponentHealingMultiplier:.25}],
+    ['enemy-ignore-taunt','无视嘲讽','本场战斗的攻击不受嘲讽影响，可以越过嘲讽者选择其他目标。',{ignoreTaunt:true}]
+  ])definitions[id]={id,name,description,stats,quality:'white',enemyOnly:true,temporary:true,triggers:[]};
+  for(const seconds of [60,120,180,300,600]){const id='enemy-wipe-'+seconds;definitions[id]={id,name:'限时决战',quality:'white',enemyOnly:true,temporary:true,description:'开战'+seconds/60+'分钟后释放绝境一击，击败敌方全体，重伤者也无法幸免。在期限内击败此人可阻止释放。',stats:{},triggers:[{on:'battleTime',after:seconds,effect:'wipeOpponents'}]};}
   definitions['thunder-lord-tutorial']={...JSON.parse(JSON.stringify(definitions['thunder-lord'])),id:'thunder-lord-tutorial',tutorialOnly:true,basePassive:'thunder-lord',description:'闪避率增加25个百分点；闪避后电击攻击者；濒死时恢复全部生命。',triggers:[...definitions['thunder-lord'].triggers,{on:'lethal',effect:'restoreFull',skill:'thunder-renewal'}]};
   // 英雄天赋与兵器分开管理；普通杂兵不会自动获得这些特性。
   const heroDefaults={
@@ -412,6 +418,11 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     zhenji:[['serenity','静水凝心','blue','受到的计策伤害减少8%。',{tacticReduction:.08}]]
   };
   for(const [hero,rows]of Object.entries(additions))for(const [suffix,name,quality,description,stats]of rows){const id=hero+'-'+suffix;definitions[id]={id,name,quality,description,stats,triggers:[]};}
+  // 人物名号、事迹与门派绑定的特质显示专属紫；普通资质仍按品质着色。
+  for(const id of ['xuchu-tiger','dianwei-guard','huangzhong-veteran','taishici-bold','maliang-white-brow','lusu-generous','ganning-brocade',
+    'liubei-fortitude','caocao-ambition','xiahoudun-defiance','guanyu-overawe','guanyu-martial','zhangfei-ferocity','machao-swift',
+    'zhouyu-elegance','zhouyu-steady','lvmeng-discipline','lvmeng-ambush','lvbu-flying','zhuge-divine','menghuo-endure',
+    'zhangjiao-taiping','zhangjiao-clarity','zhangbao-salve','dianwei-fury','ganning-night-raid','xuchu-steadfast'])definitions[id].exclusive=true;
   function forUnit(unit){
     const existing=Array.isArray(unit.passives)?unit.passives.filter(id=>!definitions[id]?.enemyOnly||unit.side==='enemy'):[];
     // 教学专用的不败版本不叠加正式英雄天赋，避免改变新手战的节奏。
@@ -709,14 +720,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
         "scope": "single",
         "cost": 0,
         "cooldown": 1.2,
-        "effects": [
-          {
-            "id": "stun",
-            "duration": 5,
-            "chance": 0.7,
-            "stun": true
-          }
-        ],
+        "effects": [],
         "scaling": {
           "war": 2
         },
@@ -779,14 +783,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
         "scope": "single",
         "cost": 0,
         "cooldown": 1.2,
-        "effects": [
-          {
-            "id": "stun",
-            "duration": 5,
-            "chance": 0.7,
-            "stun": true
-          }
-        ],
+        "effects": [],
         "scaling": {
           "war": 2.4
         },
@@ -5487,6 +5484,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   const skills=Object.fromEntries(Object.entries(definitions).filter(([,s])=>s.period).map(([id,s])=>['status-'+id,{id:'status-'+id,name:s.name,kind:s.healing?'heal':'tactic',side:s.healing?'ally':'enemy',scope:'single',cost:0,reactionOnly:true,vfx:s.healing?'heal':id==='burn'?'fire':['poison','plague'].includes(id)?'wood':'physical'}]));
   skills['status-reflect']={id:'status-reflect',name:'反伤',kind:'physical',damageType:'true',side:'enemy',scope:'single',cost:0,reactionOnly:true};
   skills['passive-counter']={id:'passive-counter',name:'以逸待劳',kind:'physical',side:'enemy',scope:'single',cost:0,reactionOnly:true};
+  skills['enemy-wipe']={id:'enemy-wipe',name:'绝境一击',kind:'tactic',damageType:'true',side:'enemy',scope:'all',cost:0,reactionOnly:true};
   const api={definitions,skills};root.BattleStatuses=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
 
@@ -5587,7 +5585,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
  const node=typeof module!=='undefined'&&module.exports,G=node?require('./character-growth.js'):root.CharacterGrowth,I=node?require('./items.js'):root.ItemCatalog,W=node?require('./weapon-skills.js'):root.WeaponSkills;
  const np=(id,name,art,role,place,lines)=>({id,name,art,role,place,side:role==='healer'?'right':'left',roleLabel:{civilian:'交谈',quest:'委托',merchant:'商贩',healer:'疗伤'}[role]||'交谈',lines});
  const npcs=[
-  np('changshan-elder','里正','villager','quest','changshan',['你是想打听人，还是找个住的地方？西边有间空屋，我让人腾张铺位出来。走了一路，先在这里歇歇吧。','逃难来的乡亲暂时都住在村里，赵云一直帮着照顾。住的地方还能再挤一挤，可粮食剩得不多了，大家都在发愁。']),
+  np('changshan-elder','里正','villager','quest','changshan',['你是想打听人，还是找个住的地方？西边有间空屋，我让人腾张铺位出来。走了一路，先在这里歇歇吧。','逃难来的乡亲暂时都住在村里，赵将军一直帮着照顾。住的地方还能再挤一挤，可粮食剩得不多了，大家都在发愁。']),
   np('changshan-woodcutter','樵夫','laborer','quest','changshan',['你准备进山吗？山口那条近路先别走，我前两天在那里遇见了贼，柴和斧头都没保住，跑回来时还摔了一跤。','以前我天不亮就进山，如今得等邻居们一起出门。也不是人多就打得过，只是遇到事情，总能有人跑回来报信。']),
   np('changshan-doctor','乡医','villager','healer','changshan',['身上有伤吗？到这边坐，把袖子挽起来，我看看伤口。别隔着衣服自己揉，脏东西揉进去，会更难处理。','想包扎的话就在这里坐会儿，轮到了我叫你。干净布条剩得不多，我还得找人再洗一些，伤重的先看，别着急。']),
   np('changshan-maiden','阿禾','village-maiden','civilian','changshan',['西边那间屋子我已经扫干净了，晚上再铺些干草。今天投宿的人多，要是被子不够，我再去问邻居借几床。','东边那家的小孩今天总算肯出来玩了。刚来的时候，一听见马蹄声就躲到桌下，抱着他娘怎么也不肯松手，实在叫人心疼。']),
@@ -5614,7 +5612,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   {id:'trade-road',sceneId:'market-street',title:'商路肃清',giver:'road-merchant',giverPlace:'zhongshan',place:'zhongshan-county',enemyName:'商道匪首',enemyArt:'brigand',recommendedLevel:5,rounds:5,money:240,item:'copper-ring',quality:'green',description:'前往毋极清理商道盗匪，再回中山向行商复命。',accept:'毋极那边的商道有好几伙贼，专盯着落单的货车。你们要是肯帮忙清路，我们几个商人愿意一起出酬劳，等事情办好，一定按约给你们。'}
  ];
  function enemy(profile,level,name,art,type,skills,index=0){const weapon=I.create('weapon-'+type,'white','enemy-'+index);weapon.id='outlaw-'+type;weapon.skills=skills.map(id=>id==='blade-cut'?{base:id,name:'劈砍'}:id);skills=W.forWeapon(weapon);return {...G.create(profile,level),name,characterId:art,weapon,weaponProficiencies:{[type]:40},armor:3,resistance:3,equipment:{armor:I.create('cloth-armor','white','enemy-armor-'+index)},skills,targetRule:'random',priorities:skills.map(skill=>({skill,when:W.skills[skill].scope==='all'?'enemyCount':'always',threshold:2,frequency:'sometimes'}))};}
- const bandits=(level,count,captain=false)=>Array.from({length:count},(_,i)=>({...enemy(i===0&&captain?'brigand':i%2?'riverBandit':'thief',level,i===0&&captain?'盗匪头目':i%2?'山贼':'盗贼',i===0&&captain?'brigand':i%2?'mountain-bandit':'thief',i%2?'spear':'blade',i===0&&captain?['blade-sweep','blade-cut']:i%2?['spear-cut']:['blade-cut'],i),...(i===0&&captain?{formationRow:'front'}:{})}));
+ const bandits=(level,count,captain=false)=>Array.from({length:count},(_,i)=>({...enemy(i===0&&captain?'brigand':i%2?'riverBandit':'thief',level,i===0&&captain?'盗匪头目':i%2?'山贼':'盗贼',i===0&&captain?'brigand':i%2?'mountain-bandit':'thief',i%2?'spear':'blade',i===0&&captain?['blade-sweep','blade-cut']:i%2?['spear-cut']:['blade-cut'],i),...(i===0&&captain?{formationRow:'front',statusImmunities:['stun'],passives:['enemy-stun-resistance']}:{})}));
  const storyConversations={changshanEntry:[
   {speaker:'villager',text:'你想进村歇脚吗？先在这里等等吧，里面来了几个山贼，堵着人要粮，还把劝架的人打伤了，正吵得厉害。'},
   {speaker:'hero',text:'村里看着也没剩多少粮，他们还来抢？附近没有能帮忙的人吗，大家就这么被堵在这里？'},
@@ -5628,16 +5626,28 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   {speaker:'hero',text:'左边我来守，你小心后面还有一个。大叔，你也赶紧进屋，别留在路中间。'}
  ]};
  storyConversations.escortArrival=[
-  {speaker:'villager',text:'赵云，你们把粮运回来了！快往村里推吧，大家都等着呢……后面那几个带刀的，也是跟你们一起回来的吗？'},
+  {speaker:'villager',text:'子龙，你们把粮运回来了！快往村里推吧，大家都等着呢……后面那几个带刀的，也是跟你们一起回来的吗？'},
   {speaker:'zhaoyun',text:'不是，他们应该一路跟着车。乡亲们先把粮推进去，进屋以后把门拴好，别在外头围着看。'},
   {speaker:'thief',text:'前面的给我站住！从粮仓里搬了东西，拍拍手就想走？那几车粮今天得留下，你们谁也不许推！'},
   {speaker:'hero',text:'他们果然没肯罢休，还追到村口来了。里面有孩子和伤者，不能让他们冲进去，我们得在这里把人拦住。'},
   {speaker:'zhaoyun',text:'我守住村口这条路，你帮着照看粮车旁边。乡亲们快进去，等把门关好再出来帮忙，别让他们抓到人。'}
  ];
  const storyBattles={entry:{sceneId:'farmland',title:'常山村口',place:'changshan',scaling:'early',count:2},grain:{followup:{phase:'grain',speaker:'zhaoyun',lines:['前院的人已经退开，粮袋还在。后院还有几个正在搬东西，我们现在过去，别让他们把仓门堵上，再从后墙逃走。']},sceneId:'market-street',title:'夺回乡粮',place:'zhongshan',scaling:'early',count:3},rescue:{sceneId:'market-street',title:'祠堂救人',place:'zhongshan-county',scaling:'early',count:2},escort:{sceneId:'rural-road',title:'粮车归途',place:'changshan',scaling:'early',count:4}};
+ // 普通施法者使用独立的杂兵成长档案，数值随等级成长，不借用名将潜力。
+ const casterProfiles={outlawCaster:[[3,9,7,10,8],[15,45,35,50,40]],fieldMedic:[[3,9,8,8,8],[15,45,40,40,45]],fieldPriest:[[3,9,8,7,8],[15,45,40,35,45]],outlawWitch:[[3,8,8,8,8],[15,45,40,40,45]]};
+ for(const [id,[base,potential]]of Object.entries(casterProfiles))G.PROFILES[id]={baseAttributes:Object.fromEntries(G.KEYS.map((key,i)=>[key,base[i]])),potentials:Object.fromEntries(G.KEYS.map((key,i)=>[key,potential[i]]))};
+ const enemyRoles={
+  caster:{profile:'outlawCaster',name:'游方法士',armyName:'军中方士',art:'herbalist',type:'staff',skills:['staff-fire']},
+  medic:{profile:'fieldMedic',name:'盗匪医师',armyName:'军医',art:'town-doctor',type:'needle',skills:[{base:'needle-stun',name:'飞针袭',effects:[]},'needle-heal']},
+  healer:{profile:'fieldPriest',name:'符水医师',armyName:'随军医师',art:'herbalist',type:'scripture',skills:['scripture-3','scripture-2']},
+  witch:{profile:'outlawWitch',name:'使毒巫医',armyName:'使毒方士',art:'herbalist',type:'gourd',skills:['gourd-poison','gourd-regeneration']}
+ };
+ function roleEnemy(role,level,index,{army=false}={}){const d=enemyRoles[role];if(!d)throw new Error('未知敌军职责：'+role);const weapon=I.create('weapon-'+d.type,'white','enemy-'+role+'-'+index);weapon.skills=d.skills;const skills=W.forWeapon(weapon);return {...G.create(d.profile,level),id:'enemy-'+role+'-'+index,name:army?d.armyName:d.name,characterId:d.art,unitType:'soldier',enemyRole:role,weapon,skills,priorities:W.prioritiesFor(skills),equipment:{armor:I.create('cloth-armor')},armor:1,resistance:2,weaponProficiencies:{[d.type]:30},targetRule:'random'};}
+ function mixRoster(roster,roles,options={}){if(!roles)return roster;return roster.map((u,i)=>enemyRoles[roles[i]]?{...roleEnemy(roles[i],u.level,i,options),id:u.id,...(u.formationRow?{formationRow:u.formationRow}:{}),...(u.experienceWeight?{experienceWeight:u.experienceWeight}:{})}:u);}
+ function mixedRoles(count,variant=0){const roles=Array(count).fill(null);if(count<2)return roles;const options=['caster','medic','healer','witch'],pick=((Number(variant)||0)%8+8)%8;if(pick>=options.length)return roles;roles[count-1]=options[pick];if(count>=5)roles[count-2]=options[(pick+2)%options.length];return roles;}
  const services={healing:{price:8,currency:'文'}};
  const combatProgression={initialCap:10,caps:[10,15,20]};
- const api={services,combatProgression,npcs,conversations,storyConversations,sideQuests,enemy,bandits,storyBattles};root.NearbyContent=api;if(node)module.exports=api;
+ const api={services,combatProgression,npcs,conversations,storyConversations,sideQuests,enemy,bandits,storyBattles,enemyRoles,roleEnemy,mixRoster,mixedRoles};root.NearbyContent=api;if(node)module.exports=api;
 })(globalThis);
 
 </script>
@@ -5679,8 +5689,8 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   freed:{objective:'与甘宁商议去留',npc:{id:'ganning',name:'甘宁',art:'ganning',observe:true,...talk(
    ['npc','你居然真的把我救出来了。你走了那么久，我还以为外头出了事，或者你听说了我的底细，不肯再回来帮忙了。'],
    ['hero','我答应出去想办法，当然得回来告诉你结果。现在人平安出来了，你有没有地方能去，弟兄们还找得到吗？'],
-   ['npc','我得先给他们送个消息，免得他们也闯进来送死。之后想去建业找孙权，问问他肯不肯收我们。这次我会先把话问清楚，不会再傻乎乎地直接去喝酒了。'],
-   ['hero','我们也准备去各地走走，找愿意一起对付董卓的人。你想去江东的话，可以先跟着我们，到了建业再一起去见孙权。'],
+   ['npc','我得先给他们送个消息，免得他们也闯进来送死。之后想去建业拜见孙将军，问问他肯不肯收我们。这次我会先把话问清楚，不会再傻乎乎地直接去喝酒了。'],
+   ['hero','我们也准备去各地走走，找愿意一起对付董卓的人。你想去江东的话，可以先跟着我们，到了建业再一起去拜见孙将军。'],
    ['npc','好，我先托人告诉弟兄们，让他们去江边等消息。你们现在方便的话，我就一起走；人手已经够了，我先去建业，往后你们也能在那里找到我。']),choices:[{label:'留下同行',recruit:true},{label:'先去建业',recruit:false}]}},
   complete:{objective:'甘宁已脱困，愿为吴国效力'}
  },battles:{breach:{stage:['plan','breach'],next:'cell',title:'新野衙门',sceneId:'market-street',count:4},cell:{stage:['cell'],next:'freed',title:'牢房突围',sceneId:'county-prison',count:5}},source:'https://article.ali213.net/html/1241_9.html'};
@@ -5808,7 +5818,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
         u.level = attr(u.level ?? (u.side === 'enemy' ? this.config.enemyLevel || this.config.level : this.config.level));
         u.skills = Array.isArray(u.skills) ? u.skills.filter(id=>this.skills[id]&&!this.skills[id].reactionOnly) : [];
         u.passives = Array.isArray(u.passives) ? [...new Set(u.passives)].filter(id=>this.passives[id]&&(!this.passives[id].enemyOnly||u.side==='enemy')) : [];
-        if(u.side==='enemy'&&u.statusImmunities?.includes('stun'))u.passives=[...new Set([...u.passives,'enemy-stun-resistance'])];
+        if(u.side==='enemy'&&!u.passives.includes('enemy-negative-immunity'))for(const immunity of u.statusImmunities||[]){const id=immunity==='stun'?'enemy-stun-resistance':'enemy-status-immunity:'+immunity;if(!this.passives[id]){const name=STATES.definitions[immunity]?.name||immunity;this.passives[id]={id,name:name+'免疫',quality:'white',temporary:true,enemyOnly:true,description:'本场战斗免疫'+name+'。',stats:{},triggers:[]};}u.passives=[...new Set([...u.passives,id])];}
         u.priorities = Array.isArray(u.priorities) ? u.priorities.map(r=>normalizeRule(r,this.skills[r.skill])) : [];
         u.targetRule=u.targetRule||(u.side==='enemy'?'random':'lowestCurrent');u.lastSingleSkill=null;u.lastManualSkill=null;
         u.maxSoldiers=u.healthOverride!=null?attr(u.healthOverride):Math.max(1,Math.floor(u.baseMaxHealth*(PASSIVES.statsFor(u,this.passives).healthMultiplier||1)));
@@ -5822,6 +5832,8 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
         return u;
       });
       this.unitIndex=new Map(this.units.map(u=>[u.id,u]));
+      this.healingAuras=this.units.filter(u=>PASSIVES.statsFor(u,this.passives).opponentHealingMultiplier!==undefined);
+      this.battleTimers=this.units.flatMap(u=>u.passives.flatMap(id=>(this.passives[id]?.triggers||[]).filter(t=>t.on==='battleTime').map(trigger=>({unit:u,id,trigger,fired:false}))));
       this.initialTroops = { ally: this.total('ally'), enemy: this.total('enemy') };
       this.emit('system', { text: `${this.scenario.title}，双方就位。` });
     }
@@ -5840,6 +5852,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
       let iterations = 0;
       while (this.accumulator + 1e-9 >= .02 && this.status === 'running' && iterations++ < 50000) {
         this.accumulator -= .02; this.tick++; this.time = this.tick * .02;
+        this.tickBattleTimers();if(this.status!=='running')break;
         for(const u of this.units)this.tickStatuses(u);if(this.status!=='running')break;
         for (const u of this.units) if (u.soldiers > 0&&!this.stunned(u)) {if(u.progress!==u.progressStamp)u.waitTime=u.progress*u.interval;u.interval=interval(this.effective(u),this.config,u.lastSkillDelay);u.waitTime+=.02;const raw=Math.min(1,u.waitTime/u.interval);u.progress=Math.max(u.progress,raw);u.progressStamp=u.progress;if(!u.ready&&u.waitTime>=u.interval-1e-9)u.readyTick=this.tick;u.ready=u.waitTime>=u.interval-1e-9;}
         if(stopWhen?.()){this.accumulator=0;break;}
@@ -5872,6 +5885,13 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     gainShield(source,target,amount){
       if(amount<=0||target.dead)return;let status=target.statuses.find(s=>s.id==='passiveShield');if(status)status.amount+=amount;else{status={id:'passiveShield',name:'护盾',shield:true,amount,source:source.id,permanent:true,expiresAt:Infinity};target.statuses.push(status);}this.emit('status',{actor:source.id,target:target.id,status:copy(status)});
     }
+    healingFactor(target){return (this.healingAuras||[]).reduce((n,u)=>Math.min(n,u.side!==target.side&&u.soldiers>0?(PASSIVES.statsFor(u,this.passives).opponentHealingMultiplier??1):1),1);}
+    tickBattleTimers(){
+      for(const timer of this.battleTimers){const {unit:u,id,trigger}=timer;if(timer.fired||u.soldiers<=0||this.time+1e-9<trigger.after)continue;timer.fired=true;if(trigger.effect!=='wipeOpponents')continue;
+        const results=[];for(const target of this.targetable(u.side==='enemy'?'ally':'enemy')){const amount=target.maxSoldiers*10,result=this.damageUnit(u,target,amount,{ignoreWounds:true,fatal:true});results.push({target:target.id,targetName:target.name,...result,damageType:'true',healing:false,amount,raw:amount});}
+        this.emit('action',{actor:u.id,actorName:u.name,side:u.side,passive:id,skill:'enemy-wipe',skillName:'绝境一击',reaction:true,scope:'all',cost:0,results});this.checkEnd();if(this.status!=='running')return;
+      }
+    }
     healingPassives(owner,target){
       for(const id of owner.passives)for(const trigger of this.passives[id]?.triggers||[]){
         if(trigger.on!=='heal'||trigger.effect!=='cleanse')continue;const removed=[];
@@ -5891,27 +5911,30 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     stunned(u){return u.statuses.some(s=>s.stun&&s.expiresAt>this.time);}
     addStatus(source,target,effect,skill={}){
       const base=STATES.definitions[effect.id]||{},definition={...copy(base),...copy(effect)},id=definition.id||skill.id;
+      const protection=PASSIVES.statsFor(target,this.passives);if((definition.stun||id==='stun')&&protection.immuneStun)return null;
+      const harmful=definition.negative||definition.harmful||definition.stun||definition.period&&!definition.healing||definition.attribute&&Number(definition.amount)<0||Object.entries(definition).some(([key,value])=>key.endsWith('Multiplier')&&Number(value)<1);
+      if(harmful&&protection.immuneNegative)return null;
       if(target.dead||(target.soldiers<=0&&!(target.wounded&&definition.period&&!definition.healing))||((target.statusImmunities||[]).includes(id)||definition.stun&&(target.statusImmunities||[]).includes('stun')))return null;
       if(definition.chance!==undefined){const chance=clamp(Number(definition.chance)-(source.side!==target.side?this.effective(target).resistance/1000:0),0,1);if(this.rng()>=chance)return null;}
       const owner=this.effective(source),coefficient=Number(definition.coefficient)||0;
-      let amount=Number(definition.amount??((Number(definition.base)||0)+coefficient*(owner[definition.stat||'technique']??0)))||0;if(definition.healing&&definition.period)amount*=1+(owner.healingBonus||0);if(definition.negative)amount=-Math.abs(amount);
+      let amount=Number(definition.amount??((Number(definition.base)||0)+coefficient*(owner[definition.stat||'technique']??0)))||0;if(definition.healing&&definition.period)amount*=1+(owner.healingBonus||0);if(definition.negative)amount=-Math.abs(amount);if(amount<0&&protection.immuneNegative)return null;
       const previous=target.statuses.find(s=>s.id===id),origin=skill.id||id,maxStacks=Math.max(1,Number(definition.maxStacks)||1),same=previous?.origin===origin;
       const status={...definition,id,name:definition.name||skill.name||id,source:source.id,origin,amount,...(definition.reflectFormula?{reflect:(Number(definition.reflectFormula.base)||0)+(Number(definition.reflectFormula.coefficient)||0)*(owner[definition.reflectFormula.stat||'technique']??0)}:{}),stacks:same?Math.min(maxStacks,(previous.stacks||1)+1):1,expiresAt:this.time+Math.max(.02,Number(definition.duration)||5),nextTick:this.time+(Number(definition.period)||1)};
       target.statuses=target.statuses.filter(s=>s.id!==id);target.statuses.push(status);this.emit('status',{actor:source.id,target:target.id,status:copy(status)});return status;
     }
     resetProgress(u){u.progress=0;u.progressStamp=0;u.waitTime=0;u.ready=false;u.readyTick=null;u.queued=null;}
     healUnit(source,target,amount){
-      const before=target.soldiers;if(target.dead)return {before,after:before,actual:0};
-      const actual=Math.min(Math.max(0,Math.floor(amount)),target.maxSoldiers-before),recovered=!!target.wounded&&actual>0;target.soldiers+=actual;source.stats.healing+=actual;
+      const before=target.soldiers;amount=Math.max(0,Math.floor(amount*this.healingFactor(target)));if(target.dead)return {before,after:before,actual:0,amount:0};
+      const actual=Math.min(amount,target.maxSoldiers-before),recovered=!!target.wounded&&actual>0;target.soldiers+=actual;source.stats.healing+=actual;
       const shieldRate=PASSIVES.statsFor(source,this.passives).overhealShield||0;if(shieldRate>0)this.gainShield(source,target,Math.floor(Math.max(0,amount-actual)*shieldRate));
       if(recovered){target.wounded=false;target.condition='healthy';this.resetProgress(target);target.lastSkillDelay=0;target.interval=interval(this.effective(target),this.config,0);}
-      return {before,after:target.soldiers,actual,recovered};
+      return {before,after:target.soldiers,actual,recovered,amount};
     }
-    damageUnit(source,target,amount,{periodic=false,ignoreWounds=false}={}){
+    damageUnit(source,target,amount,{periodic=false,ignoreWounds=false,fatal=false}={}){
       const before=target.soldiers;if(target.dead)return {before,after:before,actual:0,dead:true};
       if(target.wounded&&!ignoreWounds&&this.rng()<.5){target.stats.dodges++;return {before,after:before,actual:0,miss:'闪避',woundDodge:true};}
-      let remaining=Math.max(0,Math.floor(amount)),absorbed=0;for(const shield of target.statuses.filter(s=>s.shield)){const used=Math.min(shield.amount,remaining);shield.amount-=used;remaining-=used;absorbed+=used;}target.statuses=target.statuses.filter(s=>!s.shield||s.amount>0);
-      const actual=Math.min(before,remaining);target.soldiers-=actual;source.stats.damage+=actual;target.stats.received+=actual;const after=target.soldiers,restored=this.survive(target);
+      let remaining=fatal?Math.max(0,target.soldiers):Math.max(0,Math.floor(amount)),absorbed=0;for(const shield of target.statuses.filter(s=>s.shield&&!fatal)){const used=Math.min(shield.amount,remaining);shield.amount-=used;remaining-=used;absorbed+=used;}target.statuses=target.statuses.filter(s=>!s.shield||s.amount>0);
+      const actual=Math.min(before,remaining);target.soldiers-=actual;source.stats.damage+=actual;target.stats.received+=actual;const after=target.soldiers,restored=fatal?null:this.survive(target);
       if(target.soldiers===0){
         target.dead=!!(target.wounded||!target.woundsEnabled||ignoreWounds||(periodic&&this.rng()>=.5));target.wounded=!target.dead;target.condition=target.dead?'dead':'wounded';this.resetProgress(target);
         if(target.dead){source.stats.kills++;target.statuses=[];}
@@ -5923,7 +5946,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
       for(const status of [...u.statuses])if(status.period){while(status.nextTick<=this.time+1e-9&&status.nextTick<=status.expiresAt+1e-9&&!u.dead){
         status.nextTick+=status.period;if(status.healing&&u.wounded)continue;
         const source=this.unit(status.source)||u,amount=Math.max(1,Math.floor(Math.abs(status.amount)*(status.stacks||1)*(status.healing?1:this.effective(source).damageMultiplier))),result=status.healing?this.healUnit(source,u,amount):this.damageUnit(source,u,amount,{periodic:true}),{restored,...detail}=result;
-        this.emit('action',{actor:source.id,actorName:source.name,side:source.side,skill:'status-'+status.id,skillName:status.name,scope:'single',cost:0,periodic:true,results:[{target:u.id,targetName:u.name,...detail,damageType:this.skills['status-'+status.id]?.kind,healing:!!status.healing,raw:amount,amount,factors:[],formula:'持续状态每秒结算'}]});this.healthChanged(u,result.before,result.after);this.restoredHealth(restored);this.checkEnd();if(this.status!=='running')return;
+        this.emit('action',{actor:source.id,actorName:source.name,side:source.side,skill:'status-'+status.id,skillName:status.name,scope:'single',cost:0,periodic:true,results:[{target:u.id,targetName:u.name,...detail,damageType:this.skills['status-'+status.id]?.kind,healing:!!status.healing,raw:status.healing?result.amount:amount,amount:status.healing?result.amount:amount,factors:[],formula:'持续状态每秒结算'}]});this.healthChanged(u,result.before,result.after);this.restoredHealth(restored);this.checkEnd();if(this.status!=='running')return;
       }}
       const old=u.statuses.length;u.statuses=u.statuses.filter(s=>s.expiresAt>this.time+1e-9);if(u.statuses.length!==old)this.invalidateAI();
     }
@@ -5965,7 +5988,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     }
     targetPool(u,skill,scope=skill.scope||'single'){
       const side=skill.side==='enemy'?(u.side==='ally'?'enemy':'ally'):u.side,pool=skill.side==='self'?[u]:skill.kind==='buff'?this.living(side):this.targetable(side);
-      if(scope!=='single'||skill.side!=='enemy'||!['physical','tactic'].includes(skill.kind)||skill.ignoreTaunt)return pool;
+      if(scope!=='single'||skill.side!=='enemy'||!['physical','tactic'].includes(skill.kind)||skill.ignoreTaunt||PASSIVES.statsFor(u,this.passives).ignoreTaunt)return pool;
       const taunted=pool.filter(t=>t.statuses.some(s=>s.taunt&&s.expiresAt>this.time));return taunted.length?taunted:pool;
     }
     validate(u, skillId, targetId, scope = 'single') {
@@ -6069,12 +6092,12 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
         const {restored,...detail}=result;if(restored)restores.push(restored);if(result.miss)miss=result.miss;healthChanges.push({unit:target,before,after:target.soldiers});
         if(!healing&&!miss){drain+=Math.floor(calc.amount*((Number(skill.lifesteal)||0)+(skill.kind==='physical'?(actor.physicalLifesteal||0):0)));const reflect=target.soldiers>0?target.statuses.reduce((n,s)=>n+(Number(s.reflect)||0),0):0;if(skill.kind==='physical'&&target.soldiers>0){const p=PASSIVES.statsFor(target,this.passives);if(p.counterChance&&this.rng()<p.counterChance)counters.push({source:target,multiplier:p.counterMultiplier||.5});}if(reflect>0)reflections.push({source:target,amount:Math.floor(result.actual*reflect*this.effective(target).damageMultiplier)});}
         if(!miss&&!target.dead)for(const effect of skill.effects||[])if(effect.recipient!=='self')this.addStatus(u,target,effect,skill);
-        event.results.push({target:target.id,targetName:target.name,...detail,healing,miss,critical:!miss&&critical,multiplier,random,...calc});
+        event.results.push({target:target.id,targetName:target.name,...detail,healing,miss,critical:!miss&&critical,multiplier,random,...calc,...(healing?{amount:result.amount,raw:result.amount}:{})});
       }
       for(const effect of skill.effects||[])if(effect.recipient==='self')this.addStatus(u,u,effect,skill);
       if (skill.element === 'fire') this.fireCount++;
-      if(drain>0&&u.soldiers>0){const before=u.soldiers,actual=Math.min(drain,u.maxSoldiers-before);u.soldiers+=actual;u.stats.healing+=actual;healthChanges.push({unit:u,before,after:u.soldiers});event.results.push({target:u.id,targetName:u.name,before,after:u.soldiers,actual,healing:true,raw:drain,amount:drain,factors:[],formula:'吸血回复'});}
-      const regen=Math.floor(u.maxSoldiers*(PASSIVES.statsFor(u,this.passives).actionRegen||0));if(regen>0&&u.soldiers>0){const result=this.healUnit(u,u,regen);event.results.push({target:u.id,targetName:u.name,...result,healing:true,raw:regen,amount:regen,formula:'行动回复'});healthChanges.push({unit:u,before:result.before,after:result.after});}
+      if(drain>0&&u.soldiers>0){const result=this.healUnit(u,u,drain);healthChanges.push({unit:u,before:result.before,after:result.after});event.results.push({target:u.id,targetName:u.name,...result,healing:true,raw:result.amount,factors:[],formula:'吸血回复'});}
+      const regen=Math.floor(u.maxSoldiers*(PASSIVES.statsFor(u,this.passives).actionRegen||0));if(regen>0&&u.soldiers>0){const result=this.healUnit(u,u,regen);event.results.push({target:u.id,targetName:u.name,...result,healing:true,raw:result.amount,amount:result.amount,formula:'行动回复'});healthChanges.push({unit:u,before:result.before,after:result.after});}
       const delay=this.config.skillDelays?.[skillId]??skill.cooldown??0;
       u.progress = 0;u.progressStamp=0;u.waitTime=0;u.lastSkillDelay=Number(delay)||0; u.ready = false; u.readyTick=null; u.interval = interval(this.effective(u), this.config, delay);
       event.skillDelay = Number(delay) || 0;
@@ -6110,16 +6133,20 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   function wrapLines(ctx,value,width){const lines=[];let row='';for(const ch of String(value)){if(row&&ctx.measureText(row+ch).width>width){if(/[，。！？、；：）》」』】,.!?;:]/u.test(ch)){const chars=Array.from(row),last=chars.pop();if(chars.length)lines.push(chars.join(''));row=last+ch;}else if(/[（《「『【(]$/u.test(row)){const chars=Array.from(row),last=chars.pop();if(chars.length)lines.push(chars.join(''));row=last+ch;}else{lines.push(row);row=ch;}}else row+=ch;}if(row)lines.push(row);return lines;}
   function singleChoiceHit(hits,width,height,choices){if(choices.length===1)hits.unshift({x:0,y:0,w:width,h:height,action:choices[0].action});}
   const EXCLUSIVE_COLOR='#b69cff';
-  function passiveColor(passive,qualities=root.PengpaiRules?.QUALITIES){return passive.exclusive?EXCLUSIVE_COLOR:qualities?.[passive.quality]?.color||'#c4d5d3';}
-  function passiveButtons(view,passives,x,y,width,onSelect){
-    const cellW=width/4;
-    passives.forEach((passive,i)=>{const row=Math.floor(i/4),count=Math.min(4,passives.length-row*4),cw=cellW-6,xx=x+(width-count*cellW)/2+i%4*cellW+3,yy=y+row*24+2,tint=passiveColor(passive);
-      view.box(xx,yy,cw,20,'#112932',tint,3);view.text(passive.name,xx+cw/2,yy+10,14,tint,'center');
-      view.hits.push({x:xx,y:yy,w:cw,h:20,label:passive.name,action:()=>onSelect(passive)});
-    });
-    return Math.ceil(passives.length/4)*24;
+  function passiveColor(passive,qualities=root.PengpaiRules?.QUALITIES){return passive.temporary?(qualities?.white?.color||'#d5dedf'):passive.exclusive?EXCLUSIVE_COLOR:qualities?.[passive.quality]?.color||'#c4d5d3';}
+  function passiveRows(passives,width){
+    const rows=[],chars=Math.max(1,Math.floor((width/4-10)/14));let y=0;
+    for(let i=0;i<passives.length;i+=4){const items=passives.slice(i,i+4).map(passive=>{const letters=Array.from(passive.name),lines=[];for(let n=0;n<letters.length;n+=chars)lines.push(letters.slice(n,n+chars).join(''));return{passive,lines,h:20+(lines.length-1)*18+(passive.temporary?20:0)};}),h=Math.max(...items.map(item=>item.h))+4;rows.push({items,y,h});y+=h;}return rows;
   }
-  const api={font,textSize,wrapLines,singleChoiceHit,EXCLUSIVE_COLOR,passiveColor,passiveButtons};root.PengpaiUI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const passiveHeight=(passives,width)=>passiveRows(passives,width).reduce((n,row)=>n+row.h,0);
+  function passiveButtons(view,passives,x,y,width,onSelect){
+    const cellW=width/4,rows=passiveRows(passives,width);
+    for(const row of rows)row.items.forEach(({passive,lines,h},i)=>{const cw=cellW-6,xx=x+(width-row.items.length*cellW)/2+i*cellW+3,yy=y+row.y+(row.h-4-h)/2+2,tint=passiveColor(passive);
+      view.box(xx,yy,cw,h,'#112932',tint,3);lines.forEach((line,n)=>view.text(line,xx+cw/2,yy+10+n*18,14,tint,'center'));if(passive.temporary)view.text('临时',xx+cw/2,yy+h-10,14,tint,'center');
+      view.hits.push({x:xx,y:yy,w:cw,h,label:passive.name,action:()=>onSelect(passive)});
+    });return rows.reduce((n,row)=>n+row.h,0);
+  }
+  const api={font,textSize,wrapLines,singleChoiceHit,EXCLUSIVE_COLOR,passiveColor,passiveButtons,passiveHeight};root.PengpaiUI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
 
 </script>
@@ -6414,7 +6441,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
   const calculated=(value,formula)=>n(value)+(formula?'（'+formula+'）':'');
   function statusText(effect,actor){
     const s={...S.definitions[effect.id],...effect},name=s.name||effect.id;
-    const healingFactor=s.healing&&s.period?1+(actor.healingBonus||0):1,amount=Math.abs(Number(s.amount??((s.base||0)+(s.coefficient||0)*(actor[s.stat||'technique']??0))))*healingFactor,duration=s.duration?'，持续'+n(s.duration)+'秒':'',multipliers=Object.keys(attributes).filter(key=>s[key+'Multiplier']!==undefined);
+    const healingFactor=s.healing&&s.period?(1+(actor.healingBonus||0))*(actor.healingReceivedMultiplier??1):1,amount=Math.abs(Number(s.amount??((s.base||0)+(s.coefficient||0)*(actor[s.stat||'technique']??0))))*healingFactor,duration=s.duration?'，持续'+n(s.duration)+'秒':'',multipliers=Object.keys(attributes).filter(key=>s[key+'Multiplier']!==undefined);
     let detail='';
     if(s.period)detail='每'+n(s.period)+'秒'+(s.healing?'回复':'损失')+calculated(Math.max(1,Math.floor(amount)),healingFactor===1?effectFormula(s):'（'+(effectFormula(s)||n(amount/healingFactor))+'）×'+n(healingFactor))+'点生命';
     else if(s.stun)detail='使目标无法行动';
@@ -6431,13 +6458,13 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     let action;
     if(buff)action='对'+target+'施放'+(skill.buff?.name||skill.name);
     else {
-      const value=E.calculate({attacker:actor,target:{armor:0,resistance:0,species:'none'},skill}).amount;
-      const factor=heal?1+(actor.healingBonus||0):(1+(actor[skill.kind==='physical'?'physicalBonus':'tacticBonus']||0))*(actor.damageMultiplier??1),formula=skillFormula(skill).replace('武器威力',actor.weaponPower!==undefined&&actor.weaponPower!==actor.attack?'武器威力×'+n(actor.weaponPower/Math.max(1,actor.attack)):'武器威力'),displayed=calculated(value,factor===1?formula:'（'+formula+'）×'+n(factor));action=heal?'为'+target+'回复'+displayed+'点生命':'对'+target+'造成'+displayed+'点'+(skill.kind==='physical'?'物理':'计策')+'伤害';
+      const received=heal&&b.healingFactor?b.healingFactor(u):1,value=Math.floor(E.calculate({attacker:actor,target:{armor:0,resistance:0,species:'none'},skill}).amount*received);
+      const factor=heal?(1+(actor.healingBonus||0))*received:(1+(actor[skill.kind==='physical'?'physicalBonus':'tacticBonus']||0))*(actor.damageMultiplier??1),formula=skillFormula(skill).replace('武器威力',actor.weaponPower!==undefined&&actor.weaponPower!==actor.attack?'武器威力×'+n(actor.weaponPower/Math.max(1,actor.attack)):'武器威力'),displayed=calculated(value,factor===1?formula:'（'+formula+'）×'+n(factor));action=heal?'为'+target+'回复'+displayed+'点生命':'对'+target+'造成'+displayed+'点'+(skill.kind==='physical'?'物理':'计策')+'伤害';
     }
     const attached=effects.filter(e=>e.id!==skill.buff?.id).map(e=>(e.chance===undefined?'附加':n(e.chance*100)+'%几率附加')+(S.definitions[e.id]?.name||e.name||e.id));
     lines.push(action+(attached.length?'，'+attached.join('，'):'')+'。');
     if(skill.buff?.taunt)lines.push('嘲讽：成为敌方单体技能的攻击目标，持续'+n(skill.buff.duration)+'秒。');
-    for(const effect of effects)lines.push(statusText(effect,actor));
+    for(const effect of effects)lines.push(statusText(effect,{...actor,healingReceivedMultiplier:b.healingFactor?b.healingFactor(u):1}));
     if(['physical','tactic'].includes(skill.kind)){lines.push('基础命中率：'+n((skill.hitChance??.4)*100)+'%');lines.push('基础暴击率：'+n((skill.criticalChance||0)*100)+'%');}
     if(skill.lifesteal)lines.push('将伤害的'+n(skill.lifesteal*100)+'%转化为自身生命。');
     const races={humanoid:'人型生物',beast:'野兽',dragon:'龙',spirit:'灵体',dark:'黑暗生物'};for(const [tag,value]of Object.entries(skill.raceBonuses||{}))lines.push('对'+(races[tag]||tag)+'额外造成'+n(value*100)+'%伤害。');
@@ -6471,6 +6498,8 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     return {x:(width-w)/2,y:(height-h)/2,w,h};
   }
   function layout(width,height,allies,enemies,formation,allyColumns=PARTY_LIMIT) {
+    // 单挑限制参战人数，不改变己方卡片宽度；扩编时仍可增加列数。
+    const configuredColumns=Number(allyColumns);allyColumns=Math.max(PARTY_LIMIT,Number.isFinite(configuredColumns)?Math.floor(configuredColumns):PARTY_LIMIT);
     const rects=[],gap=3,groupWidth=Math.min(width-12,640);
     const indices=formation?[...(formation.back||[]),...(formation.front||[])]:[];
     const validFormation=indices.length===enemies&&new Set(indices).size===enemies&&indices.every(i=>Number.isInteger(i)&&i>=0&&i<enemies);
@@ -6737,7 +6766,7 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
       const p=this.panel,passive=this.battle.passives[p.passive];if(!passive){this.closePanel();return;}
       const lines=this.wrapInfo(passive.description,Math.min(this.w-24,460)-44),{x,y,w,h}=this.panelFrame(passive.name,112+lines.length*24),start=y+54,bottom=y+h-16,c=this.ctx;
       c.save();c.beginPath();c.rect(x,start,w,bottom-start);c.clip();let row=start+15-(p.scroll||0);
-      this.text(passive.exclusive?'专属特质':root.PengpaiRules.QUALITIES[passive.quality]?.name+'品质',x+22,row,14,UI.passiveColor(passive),'left');row+=32;
+      this.text(passive.temporary?'临时特质 · 仅本场战斗':passive.exclusive?'专属特质':root.PengpaiRules.QUALITIES[passive.quality]?.name+'品质',x+22,row,14,UI.passiveColor(passive),'left');row+=32;
       for(const line of lines){this.text(line,x+22,row,14,'#d2e0df','left');row+=24;}c.restore();p.maxScroll=Math.max(0,row+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);
     }
     wrapInfo(value,width){const c=this.ctx;c.font=`14px ${font}`;const rows=[];let line='';for(const ch of String(value).match(/(?:武器威力|武力|智力|体质|速度|技巧)(?:×\d+(?:\.\d+)?)?|\d+(?:\.\d+)?%?|./gu)||[]){if(line&&c.measureText(line+ch).width>width&&!/[，。！？、；：）】》]/.test(ch)){rows.push(line);line='';}line+=ch;}if(line)rows.push(line);return rows;}
@@ -7549,7 +7578,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
    ['hero','左边那两个人我来拦。你看着马，别让他们趁着我们说话，从后面的林子绕过去。']], [{label:'夺回失马',battle:'horses'}]),
   school:S('changsha','回长沙向黄忠请教','huangzhong','黄忠','huangzhong',[
    ['npc','马夫已经把马都领回去了，路上也没再受伤。今天多亏你肯帮忙，不然我顾着马，确实很难把四散的人都拦住。'],
-   ['hero','我以前就听说过你的箭术，刚才亲眼看见，更觉得厉害了。等你有空，能不能教我怎么站、怎么瞄准？'],
+   ['hero','早就听说汉升将军的箭术，刚才亲眼看见，更觉得厉害了。等你有空，能不能教我怎么站、怎么瞄准？'],
    ['npc','可以，等你休息好了，我们去教场试试。刚开始不用急着跟别人比，先把弓拿稳，找个你使起来顺手的姿势。']], [{label:'请教箭术',battle:'duel'}]),
   freed:finish('huangzhong','黄忠','changsha','chengdu')
  },{street:{stage:['stable','street'],next:'track',title:'长沙马市',sceneId:'city-river',count:3,enemyKind:'bandit',guest:'huangzhong'},horses:{stage:['horses'],next:'school',title:'浏阳寻马',sceneId:'rural-road',count:4,enemyKind:'bandit',guest:'huangzhong'},duel:{stage:['school','duel'],next:'freed',title:'长沙试箭',sceneId:'farmland',duel:'huangzhong',acceptDefeat:true}},['huangzhong-veteran']);
@@ -7562,7 +7591,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
    ['npc','我弟弟跟刘家的公子争吵，推搡时把人弄伤了，现在还关着。我想先把伤治好，可城里已经请过几位大夫，都没有见好。']], [next('问问能否帮忙','doctor')]),
   doctor:S('xiangyang','与马良商量请医的办法','maliang','马良','maliang',[
    ['npc','听药铺的人说，华先生这几天在宜城。我想去请他，又怕府里找不到人，以为我们要逃走，实在没法离开。'],
-   ['hero','宜城不算远，我替你跑一趟。你把怎么受伤、现在有什么症状写下来，我带过去，也免得说漏了。'],
+   ['hero','季常，宜城不算远，我替你跑一趟。你把怎么受伤、现在有什么症状写下来，我带过去，也免得说漏了。'],
    ['npc','我已经写好一张，麻烦你带上。刘家也派了人一起去，他一直照顾伤者，有什么细节不明白，可以让他告诉大夫。']], [next('前往宜城请医','clinic')]),
   clinic:S('xiangyang-county','在宜城找到华佗','huatuo','华佗','huatuo',[
    ['npc','伤口在哪儿、烧了多久，我从信里看见了。不过要换药，还得亲眼看看伤口，我跟你们去一趟，不能只照着几句话开方子。'],
@@ -7591,8 +7620,8 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
    ['npc','前面还有老人和孩子，别让他们跑进人群里。你帮我拦左边，我去拉住那辆车，先把这几个人分开。'],
    ['hero','左边我会看着。你也留意一下巷子口，那里还藏着一个，别只顾着眼前的人。']], [{label:'护住医馆',battle:'street'}]),
   doctor:S('beihai','与太史慈、华佗商议追回药材','taishici','太史慈','taishici',[
-   ['npc','谢谢你帮忙，我叫太史慈。本来是替母亲来抓药，到了才知道药车被抢，连看病的先生也伤了，只好先来帮着守门。'],
-   ['hero','我听常山的人提过，你母亲这阵子身体不好，才想着过来看看。她现在怎么样，药有没有断？'],
+   ['npc','谢谢你帮忙，我叫太史慈，字子义。本来是替母亲来抓药，到了才知道药车被抢，连看病的先生也伤了，只好先来帮着守门。'],
+   ['hero','子义，我听常山的人提过，令堂这阵子身体不好，才想着过来看看。她现在怎么样，药有没有断？'],
    ['huatuo','我刚给她看过，暂时还稳得住。需要的药原本都有，可都装在那辆被抢走的车上，得尽快把药找回来。'],
    ['npc','他们把车拉到都昌去了，我认得那条路。我和这位朋友去找，母亲这边，还得请先生帮忙照顾。'],
    ['huatuo','你们路上当心，到了先找药车，别一见人就追。箱子里还有针具，搬的时候扶稳，别伤着自己的手。'],
@@ -7606,7 +7635,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
    ['hero','你伤到腿没有，还能不能走？先把车推到路口停着，那里来往的人多，你也能找人帮忙。'],
    ['taishici','你先照看一下他，我去棚子旁边看看。门口那几个还在，我们等把车安置好，再一起过去。']], [{label:'包扎后取回药箱',battle:'depot',restoreParty:true}]),
   mix:S('beihai','将药材送回北海医馆','huatuo','华佗','huatuo',[
-   ['npc','药箱放在这张桌上吧，这几包没受潮，都能用。太史慈，你先回去把水烧好，我配完药就过去，别让你母亲等急了。'],
+   ['npc','药箱放在这张桌上吧，这几包没受潮，都能用。子义，你先回去把水烧好，我配完药就过去，别让你母亲等急了。'],
    ['taishici','我这就回去。她刚才有没有再发热，人醒着吗？我出去这么久，一直有些放心不下。'],
    ['npc','刚刚睡着，邻居大嫂在屋里陪她。你回去轻一点，不用把她叫醒，先把水备好就行。'],
    ['hero','剩下的药我帮你送进铺里。门口还有人在等着，先把急着用的几样整理出来吧。']], [next('去太史慈家看看','return')],{sceneId:'clinic-courtyard'}),
@@ -7621,10 +7650,10 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   rumor:S('changsha','询问粮行前排队的乡民','lusu','鲁肃','lusu',[
    ['npc','每家先照人数领，孩子多的再添一些。大家别挤，仓里还备着粮，一个个来，今天都能领到。'],
    ['hero','这些粮是你在分？我们从北边过来，很多地方连想买粮都买不到，你们这里还能接济这么多人，真不容易。'],
-   ['npc','是附近几家一起凑出来的，我只是帮忙照看。我叫鲁肃，你们要是一路没带够，也可以来领一份，赶路不能一直饿着。'],
-   ['hero','谢谢，我们带的还够用。不过我倒很想跟你聊聊。我们正在各地找愿意帮忙的人，你分粮的时候这么周到，应该很了解大家缺什么。']], [next('和鲁肃聊聊粮队','convoy')]),
+   ['npc','是附近几家一起凑出来的，我只是帮忙照看。我叫鲁肃，字子敬。你们要是一路没带够，也可以来领一份，赶路不能一直饿着。'],
+   ['hero','谢谢，我们带的还够用。不过我倒很想跟子敬聊聊。我们正在各地找愿意帮忙的人，你分粮的时候这么周到，应该很了解大家缺什么。']], [next('和鲁肃聊聊粮队','convoy')]),
   convoy:S('changsha','与鲁肃商量护送粮车','lusu','鲁肃','lusu',[
-   ['npc','原来是来找人商量事情的。你来得正好，我明天准备往江东送一批粮，周瑜来信说，建业收留了不少流民，已经快供应不上了。'],
+   ['npc','原来是来找人商量事情的。你来得正好，我明天准备往江东送一批粮，公瑾来信说，建业收留了不少流民，已经快供应不上了。'],
    ['hero','那这一趟要送到建业去吗？路上那么多粮车，你们打算怎么护送，已经找好人手没有？'],
    ['npc','先用车送到浏阳，再换船去建业。人手倒有，只是前一队到了渡口又退回来，说有人堵着码头，给了船钱还不让走。'],
    ['hero','我们可以陪你到渡口看看。粮食一直放在这里也不是办法，先问清楚是什么人在拦路，再商量怎么过去。']], [next('护送粮车前往浏阳','dock',{guest:'lusu'})]),
@@ -7632,30 +7661,30 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
    ['npc','这么多车粮，想从我们的码头上船？你们带的那点钱可不够，先把车停在这里，等我们查完再说。'],
    ['lusu','这些粮是送给逃难的百姓的，船钱我们会照付。你们如果也缺吃的，可以商量着分一些，别把所有车都扣住，江东那边还等着。'],
    ['npc','你说给多少就给多少？这码头现在由我们说了算。车和粮都留下，你们到旁边等着，没有吩咐不许动。'],
-   ['hero','鲁先生，让车夫先往后退，别停在水边。他们根本没想让我们过去，我们把乡亲安置好，再回来处理。']], [{label:'护住粮队',battle:'dock'}]),
+   ['hero','子敬，让车夫先往后退，别停在水边。他们根本没想让我们过去，我们把乡亲安置好，再回来处理。']], [{label:'护住粮队',battle:'dock'}]),
   letter:S('jianye','陪鲁肃将粮送到建业','zhouyu','周瑜','zhouyu',[
-   ['npc','鲁肃，你总算到了。我前天还叫人去长沙送信，生怕你没收到消息，看来是跟你在路上错过了。'],
+   ['npc','子敬，你总算到了。我前天还叫人去长沙送信，生怕你没收到消息，看来是跟你在路上错过了。'],
    ['lusu','信我收到了，只是渡口出了些麻烦。多亏这几位帮忙，粮车才没被扣下。现在都卸好了，让管事按单子点一点，看有没有少。'],
-   ['npc','这一路辛苦你们了。我想请鲁肃留下帮忙，他说还想先听听你们的打算。你们接下来准备去哪里，需要他做些什么？'],
-   ['hero','我们会继续去各地查探，遇到缺粮、缺药，或者被人欺负的地方，就尽量帮忙。鲁先生愿意同行很好，有别的安排也不用勉强。'],
-   ['npc','我明白了。我给鲁肃写封介绍信，往后去江东各地办事，也方便跟当地的人说明来历。至于留在哪里，你们慢慢商量就好。']], [next('与鲁肃商议去留','freed')]),
+   ['npc','这一路辛苦你们了。我想请子敬留下帮忙，他说还想先听听你们的打算。你们接下来准备去哪里，需要他做些什么？'],
+   ['hero','我们会继续去各地查探，遇到缺粮、缺药，或者被人欺负的地方，就尽量帮忙。子敬愿意同行很好，有别的安排也不用勉强。'],
+   ['npc','我明白了。我给子敬写封介绍信，往后去江东各地办事，也方便跟当地的人说明来历。至于留在哪里，你们慢慢商量就好。']], [next('与鲁肃商议去留','freed')]),
   freed:finish('lusu','鲁肃','jianye','jianye')
  },{dock:{stage:['dock'],next:'letter',title:'浏阳渡边',sceneId:'river-dock',count:4,enemyKind:'bandit',guest:'lusu'}},['lusu-generous']);
  actors['xu-bandit']={id:'xu-bandit',name:'盗贼队长',art:'brigand',side:'left'};actors['li-servant']={id:'li-servant',name:'李府家丁',art:'brigand',side:'left'};actors['horse-thief']={id:'horse-thief',name:'马贼头目',art:'brigand',side:'left'};actors['medicine-bandit']={id:'medicine-bandit',name:'盗贼',art:'thief',side:'left'};actors['imperial-soldier']={id:'imperial-soldier',name:'官兵',art:'imperial-soldier',side:'left'};
  const rumors={xuchu:'许家村最近常遭贼，村里的许褚几次把人赶走。你们如果经过那里，可以去他家坐坐，他很乐意招待过路的朋友。',dianwei:'睢阳李家的家丁又在欺负刘家那对母子。听说有个叫典韦的壮士看不过去，已经过去了。',huangzhong:'长沙有位黄老将军，年纪虽大，弓却拉得比年轻人还稳。听说他常去酒肆和马厩，你去那儿问问。',maliang:'襄阳马先生正在四处找大夫，好像是他弟弟闯了祸。我也只听了个大概，你到了城里，不妨亲自问问。',taishici:'太史慈就在北海。听说他母亲病着，城里的药铺偏偏又被人抢了。你们想找他的话，到医馆附近问问，邻家大嫂认得他。',lusu:'鲁肃在长沙收粮，打算送去江东。我见过他一回，做事很实在，跟他说话也不必拐弯抹角。',ganning:'新野前几日抓了个江上来的人，官府不许人探望。街坊们议论得多，你到了那里再问，比听我传话强。'};for(const [id,text]of Object.entries(rumors))H.definitions[id].rumor=text;
  const conclusions={
-  xuchu:[['npc','家里已经安排好轮流守夜的人，我爹也答应让我出门了。我准备去许昌看看，听说曹操正在找能做事的人，也许能帮我们把附近几处村子一起照应起来。'],['hero','那我们就一起走。你家里要是有消息送来，随时告诉我们，需要回来的时候，大家再一起商量。']],
-  dianwei:[['npc','借据已经交给县里，里正也愿意作证，李永这回没法再随便说别人欠债了。只是刘大嫂和孩子已经不在，说什么都补不回来。'],['hero','我们先把他们的后事办好，也去看看受伤的家人。你身上的伤还没处理，别再一个人硬撑着跑。'],['npc','我知道，等这边都安排好，我想去许昌找曹操。你们要是还在外面走，我也能先跟着，路上再碰到这样的事，多个人总能多帮一点。']],
-  huangzhong:[['npc','先歇一会儿吧，刚才练得够久了。你已经知道看我抬手就往旁边躲，比刚来的时候好多了，不用急着再打一场。'],['hero','再练下去，我明天怕是连胳膊都抬不起来了。对了，你以后有什么打算，还一直留在长沙吗？'],['npc','我想去成都见见刘备，听说他正在安置很多流民，应该用得上人手。你们要去别的地方，我也可以先同行，路上同样有需要帮忙的人。']],
-  maliang:[['npc','病人已经退烧，刚才还吃了些东西。我弟弟也放出来了，我让他先去道歉，再在医馆帮几天忙，不能弄伤了人，治好就当没发生。'],['hero','他肯去道歉，也愿意留下照顾人，你应该能少担心些了。等这边安排好了，你自己准备去哪里？'],['npc','我先把弟弟送回家，然后想去成都拜访刘备。如果你们还要在各地走访，我愿意一起去，记账、找药、跟人商量事情，我都可以帮忙。']],
-  taishici:[['npc','我跟母亲说过你们要去各地找人的事了。她让我要是想去就去，不用整天守在屋里。华先生会来看病，邻家大嫂也答应常来照应。'],['hero','我们不急着催你。要是你还想等她再好一些，就再多留几天，等你们都放心了再决定。'],['npc','我知道你们没催。我自己也想去江东见见孙权，听说他愿意接纳外来的人。能先跟你们一起走，我也能多熟悉些地方，到建业再去拜访。']],
+  xuchu:[['npc','家里已经安排好轮流守夜的人，我爹也答应让我出门了。我准备去许昌看看，听说曹公正在找能做事的人，也许能帮我们把附近几处村子一起照应起来。'],['hero','那我们就一起走。你家里要是有消息送来，随时告诉我们，需要回来的时候，大家再一起商量。']],
+  dianwei:[['npc','借据已经交给县里，里正也愿意作证，李永这回没法再随便说别人欠债了。只是刘大嫂和孩子已经不在，说什么都补不回来。'],['hero','我们先把他们的后事办好，也去看看受伤的家人。你身上的伤还没处理，别再一个人硬撑着跑。'],['npc','我知道，等这边都安排好，我想去许昌拜见曹公。你们要是还在外面走，我也能先跟着，路上再碰到这样的事，多个人总能多帮一点。']],
+  huangzhong:[['npc','先歇一会儿吧，刚才练得够久了。你已经知道看我抬手就往旁边躲，比刚来的时候好多了，不用急着再打一场。'],['hero','再练下去，我明天怕是连胳膊都抬不起来了。对了，你以后有什么打算，还一直留在长沙吗？'],['npc','我想去成都拜见玄德公，听说他正在安置很多流民，应该用得上人手。你们要去别的地方，我也可以先同行，路上同样有需要帮忙的人。']],
+  maliang:[['npc','病人已经退烧，刚才还吃了些东西。我弟弟也放出来了，我让他先去道歉，再在医馆帮几天忙，不能弄伤了人，治好就当没发生。'],['hero','他肯去道歉，也愿意留下照顾人，你应该能少担心些了。等这边安排好了，你自己准备去哪里？'],['npc','我先把弟弟送回家，然后想去成都拜访玄德公。如果你们还要在各地走访，我愿意一起去，记账、找药、跟人商量事情，我都可以帮忙。']],
+  taishici:[['npc','我跟母亲说过你们要去各地找人的事了。她让我要是想去就去，不用整天守在屋里。华先生会来看病，邻家大嫂也答应常来照应。'],['hero','我们不急着催你。要是你还想等她再好一些，就再多留几天，等你们都放心了再决定。'],['npc','我知道你们没催。我自己也想去江东拜见孙将军，听说他愿意接纳外来的人。能先跟你们一起走，我也能多熟悉些地方，到建业再去拜访。']],
   lusu:[['npc','介绍信我收好了，粮也交给了管事。我留下两个伙计帮忙，暂时不用急着回长沙。你们接下来准备先去哪里？'],['hero','还没决定，先在附近打听一下。要是有地方正缺人帮忙，我们就过去看看，再决定往哪边走。'],['npc','那我也一起去打听。粮铺、药铺我都认识一些人，要是碰到缺东西的村子，说不定还能帮着找找门路。']]
  };
  for(const [id,rows]of Object.entries(conclusions))H.definitions[id].stages.freed.npc.turns=rows.map(([speaker,text])=>({speaker,text}));
  const factories=new Map();
  function companion(id,currentLevel){if(factories.has(id))return root.BattlePassives.complete(factories.get(id)(currentLevel));const d=H.definitions[id];if(id==='ganning')return root.BattlePassives.complete(H.companion(currentLevel??1));const weapon=I.create('weapon-'+d.type,'green',id+'-weapon'),skills=W.forWeapon(weapon);return {...G.create(id,currentLevel??d.level??10),id,name:d.name,characterId:id,unitType:'general',homeNode:d.home,experience:0,experienceVersion:2,weaponPlanVersion:3,defaultLoadoutVersion:2,weapon,skills,priorities:W.prioritiesFor(skills),equipment:{armor:I.create('leather-armor','white',id+'-armor'),accessory1:null,accessory2:null},armor:3,resistance:3,weaponProficiencies:{[d.type]:60},passives:root.BattlePassives.forUnit({id,passives:d.passives||[]})};}
  function buildEnemies(id,phase,currentLevel){const d=H.definitions[id],f=d.battles[phase];if(f.roster)return f.roster();if(f.duel){let u=companion(f.duel,f.scaleToHero?Math.min(10,currentLevel||10):f.level);if(f.trainingWeapon){const weapon={...I.create('weapon-'+u.weapon.type,'white','duel-training'),id:'training-'+f.duel,name:f.trainingWeapon,skills:f.trainingSkills||[{base:'sword-cut',name:'试招'}]},skills=W.forWeapon(weapon);u={...u,weapon,skills,priorities:W.prioritiesFor(skills),weaponProficiencies:{[u.weapon.type]:40}};}return [{...u,id:'duel-'+f.duel,experienceWeight:1}];}if(!f.enemyKind)return H.enemies(f.count);return N.bandits(f.scaleEnemies||!f.boss&&!f.fixedLevel?Math.max(1,Math.min(10,currentLevel||1)):f.level||10,f.count,true).map((u,i)=>({...u,id:id+'-foe-'+i,name:i===0&&f.leaderName?f.leaderName:f.enemyKind==='retainer'?(i?'家丁':'家丁头目'):u.name,...(i===0&&f.leaderArt?{characterId:f.leaderArt}:{})}));}
- function enemies(id,phase,currentLevel){const f=H.definitions[id].battles[phase],boss=f.boss||f.duel||f.named||f.roster;return buildEnemies(id,phase,currentLevel).map(u=>boss?{...u,boss:true,statusImmunities:[...new Set([...(u.statusImmunities||[]),'stun'])]}:u);}
+ function enemies(id,phase,currentLevel){const f=H.definitions[id].battles[phase],boss=f.boss||f.duel||f.named||f.roster;return N.mixRoster(buildEnemies(id,phase,currentLevel),f.enemyRoles,{army:!f.enemyKind}).map(u=>({...u,...(boss?{boss:true,statusImmunities:[...new Set([...(u.statusImmunities||[]),'stun'])]}:{}),passives:[...new Set([...(u.passives||[]),...(f.temporaryPassives||[])])]}));}
  // 城镇日常人物长期保留；线索只指出当前需要前往的地点。
  const Scenes=node?require('./battle-scenes.js'):root.BattleScenes;
  const excluded=new Set(['camp']);
@@ -7686,12 +7715,12 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
 (function(root){
  'use strict';
  const node=typeof module!=='undefined'&&module.exports,N=node?require('./nearby-content.js'):root.NearbyContent,G=node?require('./character-growth.js'):root.CharacterGrowth,I=node?require('./items.js'):root.ItemCatalog,W=node?require('./weapon-skills.js'):root.WeaponSkills;
- const profiles={ironWarden:[[20,4,100,10,15],[80,20,100,45,30]],marshDoctor:[[5,30,80,12,20],[20,80,80,55,75]],ruinGuard:[[18,4,80,9,15],[75,20,100,45,50]],ruinCaster:[[5,20,22,10,15],[20,80,80,50,60]]};for(const [id,[base,potential]]of Object.entries(profiles)){const keys=G.KEYS;G.PROFILES[id]={baseAttributes:Object.fromEntries(keys.map((k,i)=>[k,base[i]])),potentials:Object.fromEntries(keys.map((k,i)=>[k,potential[i]]))};}
+ const profiles={ironWarden:[[20,4,100,10,15],[80,20,100,45,30]],marshDoctor:[[5,30,80,12,20],[20,80,80,55,75]],ruinGuard:[[18,4,80,9,15],[75,20,100,45,50]],ruinCaster:[[5,30,22,10,15],[20,80,80,50,60]]};for(const [id,[base,potential]]of Object.entries(profiles)){const keys=G.KEYS;G.PROFILES[id]={baseAttributes:Object.fromEntries(keys.map((k,i)=>[k,base[i]])),potentials:Object.fromEntries(keys.map((k,i)=>[k,potential[i]]))};}
  const skills={
   'warden-renew':{id:'warden-renew',name:'固守',kind:'buff',side:'self',scope:'single',cooldown:.6,scaling:{},buff:{id:'regeneration',duration:30,amount:22,period:1}},
   'warden-strike':{id:'warden-strike',name:'裂石击',kind:'physical',side:'enemy',scope:'single',cooldown:1.2,scaling:{war:2.4},weaponCoefficient:1,hitChance:.6,criticalChance:.05},
   'marsh-mist':{id:'marsh-mist',name:'毒瘴',kind:'tactic',side:'enemy',scope:'all',element:'wood',cooldown:3.5,scaling:{intelligence:.6},weaponCoefficient:1,hitChance:.9,criticalChance:0,effects:[{id:'poison',chance:1,duration:16,period:1,base:9,coefficient:.3,stat:'technique'}]},
-  'ruin-thunder':{id:'ruin-thunder',name:'落雷',kind:'tactic',side:'enemy',scope:'all',element:'thunder',cooldown:3,scaling:{intelligence:1.5},weaponCoefficient:1,hitChance:.8,criticalChance:.05}
+  'ruin-thunder':{id:'ruin-thunder',name:'落雷',kind:'tactic',side:'enemy',scope:'single',element:'thunder',cooldown:3,scaling:{intelligence:2.1},weaponCoefficient:1,hitChance:.8,criticalChance:.05}
  };Object.assign(W.skills,skills);
  I.templates['sage-robe']={id:'sage-robe',name:'绢布法衣',slot:'armor',attributes:{armor:1,resistance:18},price:90};
  I.templates['herbal-pendant']={id:'herbal-pendant',name:'药草香囊',slot:'accessory',attributes:{resistance:4},statusImmunities:['poison'],price:120};
@@ -7703,7 +7732,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  for(const d of Object.values(definitions)){const giver='challenge-'+d.id;N.npcs.push({id:giver,name:'伤兵',art:'imperial-soldier',place:d.giverPlace,role:'quest',side:'left',roleLabel:'委托',lines:[d.hint,'你们真要过去，先把伤治好，把要带的东西检查一遍。我在这里吃过亏，实在不想再看见有人让同伴抬着回来。']});N.sideQuests.push({id:'challenge-'+d.id,bossId:d.id,title:d.title,giver,giverPlace:d.giverPlace,place:d.place,sceneId:d.sceneId,recommendedLevel:10,rounds:1,money:300,item:d.item,quality:'green',enemyName:d.title,enemyArt:d.id==='poison'?'mountain-bandit':'imperial-soldier',accept:d.hint});}
  function unit(profile,id,name,art,type,skills,extra={}){const weapon=I.create('weapon-'+type,'green',id+'-weapon');weapon.skills=skills;const actual=W.forWeapon(weapon);return {...G.create(profile,10),id,name,characterId:art,weapon,skills:actual,equipment:{armor:I.create('leather-armor')},armor:6,resistance:4,weaponProficiencies:{[type]:50},targetRule:'random',priorities:actual.map(skill=>({skill,when:W.skills[skill].scope==='all'?'enemyCount':'always',threshold:2,frequency:'always'})),...extra};}
  function buildRoster(id){if(id==='iron')return [unit('ironWarden','iron-warden','石场铁卫','imperial-soldier','hammer',['warden-renew','warden-strike'],{armor:180,resistance:0,experienceWeight:4})];if(id==='poison')return [unit('marshDoctor','marsh-doctor','使毒方士','mountain-bandit','gourd',['marsh-mist'],{formationRow:'back',experienceWeight:2}),...N.bandits(10,2).map((u,i)=>({...u,id:'marsh-outlaw-'+i,formationRow:'front'}))];return [unit('ruinGuard','ruin-guard','持盾守卫','imperial-soldier','spear',['shield-taunt','shield-reflect','spear-cut'],{formationRow:'front',armor:32}),...Array.from({length:2},(_,i)=>unit('ruinCaster','ruin-caster-'+i,'雷术方士','mountain-bandit','staff',['ruin-thunder'],{formationRow:'back',experienceWeight:1.5}))];}
- const roster=id=>buildRoster(id).map(u=>({...u,boss:true,statusImmunities:[...new Set([...(u.statusImmunities||[]),'stun'])]}));
+ const roster=id=>buildRoster(id).map((u,i)=>({...u,...(u.id==='marsh-doctor'||u.id.startsWith('ruin-caster')?{characterId:'herbalist'}:{}),boss:true,statusImmunities:[...new Set([...(u.statusImmunities||[]),'stun'])],passives:[...(u.passives||[]),...(i===0?[id==='iron'?'enemy-negative-immunity':'enemy-stun-resistance','enemy-wipe-'+(id==='iron'?300:id==='poison'?180:120)]:[]),...(u.id.startsWith('ruin-caster')?['enemy-ignore-taunt']:[])]}));
  const api={definitions,roster};root.OptionalBattles=api;if(node)module.exports=api;
 })(globalThis);
 
@@ -7714,22 +7743,22 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   // 参考《三国群侠传》三国军师接洽及每名将臣一次赏钱的流程，沿用本作铜钱单位。
   const rewardPerHero=500;
   const rulers={
-    wei:{id:'caocao',name:'曹操',minimum:5,before:['曹操前些天南下，想把沿江几处渡口的人联络起来。最初还能收到回信，后来送信的人一直没到，我也在派人找。','现在还不能让你们贸然追过去。先把愿意来魏国做事的人找齐五位，城里的接应和粮路有人负责，我们才能腾出人手一起查。'],restored:'曹操已经平安回来了，伤兵也都安顿好。你们这趟辛苦，往后要找他，可以到府里问，准备出门时他也会留个口信。'},
-    shu:{id:'liubei',name:'刘备',minimum:5,before:['刘备去了江夏，想跟当地人商量安置流民。前面几封信说谈得不顺，如今该回信的时候却没有消息，我怕他还在为乡亲的住处跟人争执。','我想去接应，也得先有人照看成都。你们帮蜀国找到五位愿意做事的人，再来找我，我们就能把城里安排开，仔细查他的去处。'],restored:'刘备和江夏的乡亲都平安到了成都。你想找他，我会替你传话；他若又准备出门，也得先把接应和行程交代清楚，不能再让大家干等。'},
-    wu:{id:'sunquan',name:'孙权',minimum:5,before:['孙权去接应沿江的百姓了。柴桑送来的信越来越少，渡口又有人拦船，具体是哪一路人，我还在等探子回来确认。','先为江东找到五位愿意帮忙的将士。渡口和城里都得留够人手，到时若真要接应孙权，我们才不会一出门，后面就没人照管。'],restored:'孙权已经回到建业，接回来的百姓也有了住处。你要找他，我替你问问；若他正跟你们同行，城里的事情由我和主簿接着管。'}
+    wei:{id:'caocao',name:'曹操',minimum:5,before:['主公前些天南下，想把沿江几处渡口的人联络起来。最初还能收到回信，后来送信的人一直没到，我也在派人找。','现在还不能让你们贸然追过去。先把愿意来魏国做事的人找齐五位，城里的接应和粮路有人负责，我们才能腾出人手一起查。'],restored:'主公已经平安回来了，伤兵也都安顿好。你们这趟辛苦，往后要找他，可以到府里问，准备出门时他也会留个口信。'},
+    shu:{id:'liubei',name:'刘备',minimum:5,before:['主公去了江夏，想跟当地人商量安置流民。前面几封信说谈得不顺，如今该回信的时候却没有消息，我怕他还在为乡亲的住处跟人争执。','我想去接应，也得先有人照看成都。你们帮蜀国找到五位愿意做事的人，再来找我，我们就能把城里安排开，仔细查他的去处。'],restored:'主公和江夏的乡亲都平安到了成都。你想找他，我会替你传话；他若又准备出门，也得先把接应和行程交代清楚，不能再让大家干等。'},
+    wu:{id:'sunquan',name:'孙权',minimum:5,before:['主公去接应沿江的百姓了。柴桑送来的信越来越少，渡口又有人拦船，具体是哪一路人，我还在等探子回来确认。','先为江东找到五位愿意帮忙的将士。渡口和城里都得留够人手，到时若真要接应主公，我们才不会一出门，后面就没人照管。'],restored:'主公已经回到建业，接回来的百姓也有了住处。你要找他，我替你问问；若他正跟你们同行，城里的事情由我和主簿接着管。'}
   };
   function rulerStatus(world,country){const data=rulers[country];if(!data)return null;const q=world.state.heroQuests[data.id];return {...data,count:world.state.recruits[country].length,ready:world.state.recruits[country].length>=data.minimum,complete:q.stage==='complete',stage:q.stage,accepted:q.accepted};}
   const definitions={
     wei:{country:'wei',place:'xuchang',id:'simayi',name:'司马懿',art:'simayi',side:'left',
-      welcome:['曹操还没有回来，许昌的事情暂时由我照看。听说你们在外面帮过不少乡亲，这一路应该也累了，进来坐下喝点水，我们慢慢聊。','这里还需要能带兵、也肯管束手下的人。你们走的地方多，要是遇到愿意来魏国做事的将士，麻烦帮我们介绍一下，事后回来告诉我就好。'],
+      welcome:['曹公还没有回来，许昌的事情暂时由我照看。听说你们在外面帮过不少乡亲，这一路应该也累了，进来坐下喝点水，我们慢慢聊。','这里还需要能带兵、也肯管束手下的人。你们走的地方多，要是遇到愿意来魏国做事的将士，麻烦帮我们介绍一下，事后回来告诉我就好。'],
       thanks:'他们已经来信，说了你们一路帮忙的事情。我让人备好了赏钱，你们收着吧，往后还要赶路，吃住和买药都用得上。',
       idle:'你上次介绍来的人，我已经记好了。以后再碰到合适的，也可以叫他来这里找我，到了报你的名字，我们会安排接待。'},
     shu:{country:'shu',place:'chengdu',id:'zhugeliang',name:'诸葛亮',art:'zhugeliang',side:'right',
-      welcome:['刘备现在不在成都，府里的事情先由我处理。门口的人说你们从北边来，走了这么远，先坐下歇歇，想问什么都可以慢慢说。','成都最近收留了不少逃难的人，住处、粮车、沿路护送都缺人照看。你们如果遇到愿意来帮忙的将士，麻烦替我们问问，介绍成了，路上的花费也该由我们出一些。'],
+      welcome:['主公现在不在成都，府里的事情先由我处理。门口的人说你们从北边来，走了这么远，先坐下歇歇，想问什么都可以慢慢说。','成都最近收留了不少逃难的人，住处、粮车、沿路护送都缺人照看。你们如果遇到愿意来帮忙的将士，麻烦替我们问问，介绍成了，路上的花费也该由我们出一些。'],
       thanks:'你们介绍来的几位，已经说过一路发生的事情了。这份赏钱请收下，不能总让你们自己出钱赶路，大家愿意来，少不了你们费心。',
       idle:'你带回的消息我都记下了。想休息就多住几天，府里有地方安排；准备继续走的话，也先把伤治好，不用刚到就急着出门。'},
     wu:{country:'wu',place:'jianye',id:'zhouyu',name:'周瑜',art:'zhouyu',side:'left',
-      welcome:['孙权还没有回建业，有事可以先跟我说。你们刚从外头回来吧？这一路怎么样，沿江有没有遇到拦船的人？','来建业的乡亲越来越多，渡口要有人接应，城里也要安排吃住。你们在外头遇到愿意来江东做事的人，替我们带句话，办成以后回来，我会给大家备好路上的花费。'],
+      welcome:['主公还没有回建业，有事可以先跟我说。你们刚从外头回来吧？这一路怎么样，沿江有没有遇到拦船的人？','来建业的乡亲越来越多，渡口要有人接应，城里也要安排吃住。你们在外头遇到愿意来江东做事的人，替我们带句话，办成以后回来，我会给大家备好路上的花费。'],
       thanks:'这几位的事情我已经记好了，真是帮了江东的大忙。赏钱带上吧，接下来不管是找人还是救急，总有要花钱的地方。',
       idle:'上次那份赏钱已经结清了，账上也都有记录。你们可以放心去办自己的事，再找到愿意来江东的人，回来告诉我，我会接着安排。'}
   };
@@ -7794,8 +7823,9 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  ['sunquan-command','坐镇江东','gold','受到的物理和计策伤害减少8%。',{physicalReduction:.08,tacticReduction:.08}],['zhouyu-flames','赤焰周郎','gold','计策伤害提高18%。',{tacticBonus:.18}],['huanggai-veteran','铁骨老将','gold','受到的物理伤害减少15%。',{physicalReduction:.15}],['lvmeng-study','刮目相看','gold','物理和计策伤害提高10%。',{physicalBonus:.1,tacticBonus:.1}],['luxun-fire','连营烈火','gold','计策伤害提高18%。',{tacticBonus:.18}],['sunshangxiang-bow','弓腰姬','gold','物理伤害提高15%。',{physicalBonus:.15}],
  ['lvbu-peerless','天下无双','red','物理技能必定暴击，无视目标全部护甲。',{guaranteedCritical:true,ignoreArmor:true},true],['zhuge-eight-trigrams','八卦阵','red','受到物理技能时有50%概率闪避。',{physicalDodgeBonus:.5},true],['diaochan-grace','闭月流风','gold','受到物理技能时额外增加15%闪避率。',{physicalDodgeBonus:.15}],['menghuo-strength','南中雄威','gold','受到物理伤害减少12%，物理伤害提高10%。',{physicalReduction:.12,physicalBonus:.1}],['huatuo-healer','青囊济世','red','治疗效果提高35%。',{healingBonus:.35},true],['dongzhuo-soldier','西凉旧将','gold','物理伤害提高12%，受到物理伤害减少10%。',{physicalBonus:.12,physicalReduction:.1}]
  ];
- for(const [id,name,quality,description,stats,exclusive]of rows)P.definitions[id]={id,name,quality,description,stats,triggers:[],...(exclusive?{exclusive:true}:{})};
- P.definitions['luoyang-possession']={id:'luoyang-possession',name:'诡影附身',quality:'red',exclusive:true,description:'最大生命提高200%，免疫眩晕，仍可被破甲、麻痹和持续伤害影响。',stats:{healthMultiplier:3},triggers:[]};
+ // 本表是武将招牌特质；强度品质与“角色专属”的身份分别记录。
+ for(const [id,name,quality,description,stats,exclusive=true]of rows)P.definitions[id]={id,name,quality,description,stats,triggers:[],...(exclusive?{exclusive:true}:{})};
+ P.definitions['luoyang-possession']={id:'luoyang-possession',name:'诡影附身',quality:'white',temporary:true,enemyOnly:true,description:'最大生命提高200%，免疫眩晕，仍可被破甲、麻痹和持续伤害影响。',stats:{healthMultiplier:3},triggers:[]};
  const api={ids:rows.map(r=>r[0])};root.ChapterTraits=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
 
@@ -7868,38 +7898,38 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  K.landmark('wulin','乌林','chibi',-62,-38);K.landmark('liang-camp','下邳军营','xiapi',-48,-38,'camp');
  R('xunyu','长安访书',{
   rumor:S('changan','向荀彧询问书房里的争执','xunyu',[
-   ['npc','这些书上都留着原主人的姓名，怎么能说搬走就搬走？先把书放下，我去找人来认领，别真拿去垫了马厩。'],['hero','先生在找什么书？我可以帮着找找。刚才他们往哪边搬了？'],['npc','有《治论》《仇国论》，还有《乾象历注》《左氏春秋》和《战国策》。这些年搬家逃难，书也散了，我想尽量找齐，留给以后读书的人。']],[N('向书贩询问下落','dealer')]),
+   ['npc','这些书上都留着原主人的姓名，怎么能说搬走就搬走？先把书放下，我去找人来认领，别真拿去垫了马厩。'],['hero','文若先生在找什么书？我可以帮着找找。刚才他们往哪边搬了？'],['npc','有《治论》《仇国论》，还有《乾象历注》《左氏春秋》和《战国策》。这些年搬家逃难，书也散了，我想尽量找齐，留给以后读书的人。']],[N('向书贩询问下落','dealer')]),
   dealer:S('changan','向书贩打听被扣下的旧书','book-dealer',[
    ['npc','《治论》还在我这里，另外四本装在一辆书车上，被一伙逃兵扣在蓝田的院子里了。能把车要回来，这本我也愿意送给先生。'],['hero','他们只扣了车，还是连送书的人也一起抓了？'],['npc','我的伙计也没回来。他说去跟那些人讲讲道理，我等到现在，一点消息都没有。劳烦你们过去看看，别让他出了事。']],[N('前往蓝田寻找书车','cart')]),
   cart:S('changan-county','救回书贩伙计，取回书车','bandit-chief',[
    ['npc','车上有什么都归我们了。想把那个人带走，就拿钱来换。别跟我说这些破书值多少钱，我不听这个。'],['hero','墙角坐着的应该就是那个伙计，他好像受了伤。我们先把他救出来，书车等会儿再推走。']],[F('救出伙计','cart')]),
   return:S('changan','将五部旧书交给荀彧','xunyu',[
    ['npc','你们总算回来了。听说伙计受了伤，我一直担心，他现在怎么样？书车也带回来了？这趟真是辛苦你们了。'],['hero','伤口已经包扎过了，书也没少。先生接下来准备去哪里？我们正想找人帮忙，许昌那边也缺能出主意的人。']],[N('与荀彧商议去留','freed')]),
-  freed:End('xunyu','changan',[['npc','我本来就准备去许昌，只是一直放不下这些书。现在书找齐了，我也能放心出门。你们要是不嫌麻烦，我想一起走。'],['hero','当然欢迎。正好路上有不少事情想请教先生，我们也能互相照应。']])
+  freed:End('xunyu','changan',[['npc','我本来就准备去许昌，只是一直放不下这些书。现在书找齐了，我也能放心出门。你们要是不嫌麻烦，我想一起走。'],['hero','当然欢迎。正好路上有不少事情想请教文若先生，我们也能互相照应。']])
  },{cart:{stage:['cart'],next:'return',title:'蓝田书车',sceneId:'farmland',count:3,enemyKind:'bandit',effects:{items:{'xunyu-books':5}}}});
  R('jiaxu','宛城疑盒',{
   rumor:S('wan','查看宛城门口的围城告示','jiaxu',[
-   ['npc','郭汜派人送来的告示，要城里拿粮食换他退兵。仓里剩下的粮本来就不多，真交出去，百姓接下来吃什么？'],['hero','不能把粮都交给他。先生在这里站了这么久，是不是已经想到办法了？'],['npc','我有个主意，不过还得先去跟张绣商量。你愿意帮忙的话，陪我去一趟府里，等他答应了，我再告诉你怎么做。']],[N('陪贾诩进入太守府','mansion')]),
+   ['npc','郭汜派人送来的告示，要城里拿粮食换他退兵。仓里剩下的粮本来就不多，真交出去，百姓接下来吃什么？'],['hero','不能把粮都交给他。文和先生在这里站了这么久，是不是已经想到办法了？'],['npc','我有个主意，不过还得先去跟张将军商量。你愿意帮忙的话，陪我去一趟府里，等他答应了，我再告诉你怎么做。']],[N('陪贾诩进入太守府','mansion')]),
   mansion:S('wan','等候贾诩与张绣商议','jiaxu',[
-   ['npc','张绣已经答应了，会留在府里安排城中的事。我带这只盒子去见郭汜，出城的路被他的人盯着，还得请你们护送一程。'],['hero','你准备把这只盒子送给郭汜？里面到底装了什么？'],['npc','是份他一定想亲自打开的礼。先别在这里掀盖子，等到了他面前，你站到我身后就好。']],[F('护送贾诩出城','escape')]),
+   ['npc','张将军已经答应了，会留在府里安排城中的事。我带这只盒子去见郭汜，出城的路被他的人盯着，还得请你们护送一程。'],['hero','你准备把这只盒子送给郭汜？里面到底装了什么？'],['npc','是份他一定想亲自打开的礼。先别在这里掀盖子，等到了他面前，你站到我身后就好。']],[F('护送贾诩出城','escape')]),
   camp:S('wan-county','将木盒送到郭汜营中','guosi',[
    ['npc','你说这是张绣的首级？把盒子放过来，我要亲自看清楚，别想拿别人的脑袋骗我。'],['jiaxu','郭将军既然要亲自看，那就请靠近一些。你们往我身后站，盒盖打开以后，千万别伸手。'],['hero','盒子里的弩箭打中他了！他的手下已经围过来了，我们挡住营门，别让他们追进城去。']],[F('击退郭汜','camp')]),
   return:S('wan','向贾诩问明木盒的来历','jiaxu',[
-   ['npc','你别担心，张绣还在府里。盒子里装的是机关弩。郭汜一听我带来了首级，就以为城里的人已经互相残杀，连盒子都没让手下先查。'],['hero','你早一点告诉我，我也不至于一路都在担心。下次再做这么危险的事，可得先跟我们商量。'],['npc','这回是我没说明白，叫你们跟着担心了。幸亏有你们挡着，我抱着那么重的盒子，一个人可跑不回来。']],[N('与贾诩商议去留','freed')]),
-  freed:End('jiaxu','wan',[['npc','郭汜退兵以后，城里暂时能安稳些了。我准备去许昌见见曹操。你们救人的时候还顾着别伤到百姓，我想跟你们一起走一段。'],['hero','我们正缺一个能商量事情的人，先生愿意同行当然好。不过以后有什么打算，得先告诉大家。']])
+   ['npc','你别担心，张将军还在府里。盒子里装的是机关弩。郭汜一听我带来了首级，就以为城里的人已经互相残杀，连盒子都没让手下先查。'],['hero','你早一点告诉我，我也不至于一路都在担心。下次再做这么危险的事，可得先跟我们商量。'],['npc','这回是我没说明白，叫你们跟着担心了。幸亏有你们挡着，我抱着那么重的盒子，一个人可跑不回来。']],[N('与贾诩商议去留','freed')]),
+  freed:End('jiaxu','wan',[['npc','郭汜退兵以后，城里暂时能安稳些了。我准备去许昌拜见曹公。你们救人的时候还顾着别伤到百姓，我想跟你们一起走一段。'],['hero','我们正缺一个能商量事情的人，先生愿意同行当然好。不过以后有什么打算，得先告诉大家。']])
  },{escape:{stage:['mansion','escape'],next:'camp',title:'宛城脱身',sceneId:'market-street',count:3},camp:{stage:['camp'],next:'return',title:'郭汜营中',sceneId:'bandit-camp',named:[['guosi',10,'front']]}});
  R('zhangliao','虎牢守将',{
   rumor:S('hulao','与虎牢守将张辽交谈','zhangliao',[
-   ['npc','前面就是虎牢关了。你们是来做什么的？如果要投军，先去关外登记，别带着人直接往里走。'],['hero','张将军，我见过你手下的兵，他们肯让百姓过路，也没抢过东西。既然你也不愿意做这些事，为什么还要替董卓守关？'],['npc','董卓的命令，我也不是每一条都肯听。可你想劝我离开，总得让我知道，你们有没有本事保护愿意跟着走的人。']],[F('与张辽切磋','duel')]),
+   ['npc','前面就是虎牢关了。你们是来做什么的？如果要投军，先去关外登记，别带着人直接往里走。'],['hero','文远将军，我见过你手下的兵，他们肯让百姓过路，也没抢过东西。既然你也不愿意做这些事，为什么还要替董卓守关？'],['npc','董卓的命令，我也不是每一条都肯听。可你想劝我离开，总得让我知道，你们有没有本事保护愿意跟着走的人。']],[F('与张辽切磋','duel')]),
   after:S('hulao','听张辽说明守关的缘由','zhangliao',[
    ['npc','我最放心不下的，是关外这些百姓。换了别人来守，他们还能不能平安过路，就不好说了。可你说得也对，总不能一直这样拖下去。'],['hero','可以跟副将商量好，留下愿意照顾百姓的人守关。其他弟兄如果想走，我们再帮他们找个落脚的地方，总能有个办法。']],[N('与张辽商议去留','freed')]),
   freed:End('zhangliao','hulao',[['npc','我已经跟副将谈过了，他答应照常放行百姓。想走的弟兄也收拾好了行装，听说许昌正在招人，我准备带他们去看看。'],['hero','我可以替你们引荐。你先跟我们同行，弟兄们也能有人照应，到了许昌再一起商量。']])
  },{duel:{stage:['rumor','duel'],next:'after',title:'虎牢切磋',sceneId:'rural-road',duel:'zhangliao'}});
  R('xiahoudun','下邳军情',{
   rumor:S('xuchang','向司马懿询问下邳军情','simayi',[
-   ['npc','夏侯惇带兵去了下邳。高顺把通往城门的路堵住了，很多逃难的百姓困在外面，他送来了几封求援信。'],['hero','我们可以过去帮忙。夏侯将军驻扎在哪里？我先去找他问清楚情况。'],['npc','他的营地就在下邳城外，门口挂着夏侯的旗。到了先找他，城门那边还在交战，不要直接过去。']],[N('前往下邳军营','camp',{requires:{recruits:{wei:3}}})]),
+   ['npc','元让带兵去了下邳。高顺把通往城门的路堵住了，很多逃难的百姓困在外面，他送来了几封求援信。'],['hero','我们可以过去帮忙。夏侯将军驻扎在哪里？我先去找他问清楚情况。'],['npc','他的营地就在下邳城外，门口挂着夏侯的旗。到了先找他，城门那边还在交战，不要直接过去。']],[N('前往下邳军营','camp',{requires:{recruits:{wei:3}}})]),
   camp:S('liang-camp','与夏侯惇商议接应乡民','xiahoudun',[
-   ['npc','是司马懿请你们来的吧？高顺不肯开城门，百姓的车又堵在路中间。我正缺人帮忙，得先把这些人送到安全的地方。'],['hero','我们去侧门附近看看。你带人护送车队，等守军往那边调动，我们再从侧面把他们拦住。']],[F('接应城外乡民','approach')]),
+   ['npc','是仲达请你们来的吧？高顺不肯开城门，百姓的车又堵在路中间。我正缺人帮忙，得先把这些人送到安全的地方。'],['hero','我们去侧门附近看看。你带人护送车队，等守军往那边调动，我们再从侧面把他们拦住。']],[F('接应城外乡民','approach')]),
   gate:S('xiapi','突破高顺守军','gaoshun',[
    ['npc','前面退下来的人到我这里集合！弓手上城墙，看住侧面的路，不准让他们冲进城门。'],['xiahoudun','百姓已经让开了，你们还想拦着不放？跟我一起往前，把城门打开，别再让车堵在外面！']],[F('夺下城门','gate')]),
   recovery:S('liang-camp','探望眼伤初愈的夏侯惇','xiahoudun',[
@@ -7913,13 +7943,13 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
    ['hero','不是这三国中的任何一国，后来建立了晋朝，开国皇帝姓司马。不过那是我原来世界的历史，这里会不会一样，我真的不知道。'],['npc','你倒是坦白，也不怕我听完以后起别的心思。放心，我不会因为一场梦和几句话，就把没发生的事当成自己的安排。']],[N('与司马懿商议同行','freed')]),
   caution:S('xuchang','与司马懿商议眼前的事','simayi',[
    ['hero','我不想用后来的结局劝你做什么。张角现在还活着，三国却已经建立了，光是这一点就完全对不上。我们还是先看眼前的事情吧。'],['npc','也好，那就先说洛阳。你们找了这么多人，接下来准备怎样对付董卓？我想跟你们走一趟，亲自看看情况。']],[N('与司马懿商议同行','freed')]),
-  freed:End('simayi','xuchang',[['npc','城里的事务我已经交给主簿，你们以后引荐的人，他也会照常接待。我这边可以动身了，什么时候出发？'],['hero','等大家准备好就走。路上如果还有想问的，你尽管问，我知道多少就说多少，不知道的也不会乱编。']])
+  freed:End('simayi','xuchang',[['npc','城里的事务我已经交给主簿，你们以后引荐的人，他也会照常接待。我这边可以动身了，什么时候出发？'],['hero','仲达先生，等大家准备好就走。路上如果还有想问的，你尽管问，我知道多少就说多少，不知道的也不会乱编。']])
  },{},{viaCourt:true});
  R('caocao','乌林归路',{
   rumor:S('xuchang','向司马懿询问曹操的行踪','simayi',[
-   ['npc','曹操在乌林遇到了董卓的追兵，和身边的护卫走散了。来送信的人也受了伤，只知道他最后退进了林子，到现在还没有新的消息。'],['hero','我们去找他。追兵既然封住了正路，还有没有别的路能进那片林子？'],['npc','从赤壁北边有一条小路，可以绕进乌林。找到人以后往河边走，我会安排船在那里等，尽量别跟追兵纠缠太久。']],[N('赶往乌林接应','meet',{requires:{recruits:{wei:5}}})]),
+   ['npc','主公在乌林遇到了董卓的追兵，和身边的护卫走散了。来送信的人也受了伤，只知道他最后退进了林子，到现在还没有新的消息。'],['hero','我们去找他。追兵既然封住了正路，还有没有别的路能进那片林子？'],['npc','从赤壁北边有一条小路，可以绕进乌林。找到人以后往河边走，我会安排船在那里等，尽量别跟追兵纠缠太久。']],[N('赶往乌林接应','meet',{requires:{recruits:{wei:5}}})]),
   meet:S('wulin','找到被追兵截住的曹操','caocao',[
-   ['npc','你们来得可真及时。我刚说这条路偏僻，追兵应该找不到，前面就放起了箭。今日这话说得，实在有些丢人。'],['hero','你还能开玩笑，看来没有伤到要紧的地方。后面也有追兵，我们先从前面冲出去，到了河边再聊。']],[F('护住曹操','ambush')]),
+   ['npc','你们来得可真及时。我刚说这条路偏僻，追兵应该找不到，前面就放起了箭。今日这话说得，实在有些丢人。'],['hero','曹公还能开玩笑，看来没有伤到要紧的地方。后面也有追兵，我们先从前面冲出去，到了河边再聊。']],[F('护住曹操','ambush')]),
   ford:S('wulin','穿过乌林河汊','caocao',[
    ['npc','你看这片芦苇，正好能藏弓手。要是我来追人，大概也会选在这里……你怎么突然停下了？'],['hero','因为芦苇里真的有人！先退到车后面，我们把渡口的路清出来，别让他们把船夺走。']],[F('夺回渡船','ford')]),
   road:S('wulin','击退追到渡口的骑兵','caocao',[
@@ -7927,7 +7957,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   freed:End('caocao','xuchang',[['npc','你们为了接我出来，跟着跑了这么远，这份人情我记得。洛阳那边如果要用兵，别急着独自去闯，叫上我一起商量。'],['hero','那就先把身上的伤养好。以后真要去洛阳，还得请你帮忙看看敌人的布置，总比我们自己摸索强。']])
  },{ambush:{stage:['meet','ambush'],next:'ford',title:'乌林伏兵',sceneId:'forest-path',count:3,guest:'caocao'},ford:{stage:['ford'],next:'road',title:'河汊争渡',sceneId:'river-dock',count:4,guest:'caocao'},road:{stage:['road'],next:'return',title:'乌林归路',sceneId:'rural-road',count:4,guest:'caocao'}},{viaCourt:true});
  const H=typeof module!=='undefined'&&module.exports?require('./hero-quests.js'):root.HeroQuests;
- H.definitions.caocao.stages.return=S('xuchang','将曹操送回许昌','caocao',[['npc','总算到许昌了。先把伤兵送进去，后面的车都跟上了吗？派个人到城门口等着，别让落在后头的人找不到地方。'],['hero','最后一辆车也到了，大家都在。我们进去吧，司马懿一直在等你回来，我也好跟他说一声人已经平安了。']],[N('与曹操商议下一步','freed',{effects:{rest:true}})]);
+ H.definitions.caocao.stages.return=S('xuchang','将曹操送回许昌','caocao',[['npc','总算到许昌了。先把伤兵送进去，后面的车都跟上了吗？派个人到城门口等着，别让落在后头的人找不到地方。'],['hero','最后一辆车也到了，大家都在。我们进去吧，仲达先生一直在等你回来，我也好跟他说一声人已经平安了。']],[N('与曹操商议下一步','freed',{effects:{rest:true}})]);
  if(typeof module!=='undefined'&&module.exports)module.exports=true;
 })(globalThis);
 
@@ -7946,7 +7976,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
    ['npc','如果两国都缺粮，眼前只剩一座粮仓，谁把粮运走，另一边的百姓就要挨饿。你带着人到了那里，会先处理什么？']],[N('先分出救急的粮，再谈归属','three'),N('先让双方的乡民退开','three')]),
   three:S('chengdu','回答诸葛亮关于归途的问题','zhugeliang',[
    ['npc','最后一个问题，跟你自己有关。假如那些先生现在就能送你回家，但这里还有人等着你帮忙，你准备怎么跟他们说？'],['hero','我会想回去，但也不能突然就走了。至少得把答应过的事情安排好，跟大家说明白，再决定什么时候离开。'],['npc','有你这句话，我就放心些了。我不指望你一个人解决所有事情，只希望遇到难处时，大家还能坐下来商量。']],[N('与诸葛亮商议同行','freed')]),
-  freed:End('zhugeliang','chengdu',[['npc','府里的事情已经有人接手，我可以陪你们出去看看。你知道后来的历史，我熟悉这里的情况，路上应该能帮上忙。'],['hero','那太好了。我们常常到了地方才发现事情跟想的不一样，有你在，遇到拿不准的事也能商量。']])
+  freed:End('zhugeliang','chengdu',[['npc','府里的事情已经有人接手，我可以陪你们出去看看。你知道后来的历史，我熟悉这里的情况，路上应该能帮上忙。'],['hero','那太好了。我们常常到了地方才发现事情跟想的不一样，有孔明先生在，遇到拿不准的事也能商量。']])
  },{},{viaCourt:true});
  R('guanyu','解良西行',{
   rumor:S('xieliang','查看解良面摊前的争执','guanyu',[
@@ -7958,7 +7988,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   two:S('guan-road','护住车队，通过第二关','guanyu',[
    ['npc','后面那辆车的轮轴松了，我刚替他们修好。你去告诉车夫别停在关口，我在这里拦住这些人，等车过去再走。'],['hero','你别一个人留在这里，我们一起挡着。让车夫照顺序往前走，谁也别落到队伍后面。']],[F('通过第二关','pass-two')]),
   three:S('guan-road','挡住截断官道的追兵','river-guard',[
-   ['npc','前面的关口传来消息了，就是这支车队！把他们拦下来，一个也不准放过去！'],['hero','他们收到消息，连老人和孩子都不肯放了。关将军，我们先打通车队前面的路，跑开的士兵就别追了。']],[F('通过第三关','pass-three')]),
+   ['npc','前面的关口传来消息了，就是这支车队！把他们拦下来，一个也不准放过去！'],['hero','他们收到消息，连老人和孩子都不肯放了。云长，我们先打通车队前面的路，跑开的士兵就别追了。']],[F('通过第三关','pass-three')]),
   four:S('guan-road','保护随行乡民通过第四关','guanyu',[
    ['npc','父母刚在车上睡着，叫车夫慢一点过桥。桥头还有一队兵，我过去看看，你帮我照看一下后面的车。'],['hero','我会看着的。你先别走太远，他们要是肯放行最好，不肯的话，我们再一起想办法。']],[F('守住桥头','pass-four')]),
   five:S('guan-road','突破最后一道关口','river-guard',[
@@ -7973,12 +8003,12 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   meet:S('xiapi-county','与城外的张飞交谈','zhangfei',[
    ['npc','谁让你来找我的？你回去告诉他们，下邳是我弄丢的，我知道自己没脸见人，就别再来劝了。'],['hero','我还不知道发生了什么，怎么替你回话？你总得先告诉我，你跟他们闹了什么别扭。'],['npc','这事你去成都问就知道了，我不想再说。让我一个人待会儿吧，今天真的不想见人。']],[N('到成都询问此事','letter')]),
   letter:S('chengdu','向诸葛亮转达张飞的近况','zhugeliang',[
-   ['npc','原来张飞去了那里，大家找了他很久。刘备留了一封信，一直没机会送出去，你既然见到他，能不能再替我们跑一趟？'],['hero','可以，我会亲手交给他。不过他现在好像很怕见你们，要是看了信还不肯回来，我该怎么劝？'],['npc','你先让他把信看完。刘备没有怪他，大家只是担心他的安危，也还在等他一起把下邳的事情处理好。']],[N('带信回良成','return',{effects:{items:{'zhangfei-letter':1}}})]),
+   ['npc','原来翼德去了那里，大家找了他很久。主公留了一封信，一直没机会送出去，你既然见到他，能不能再替我们跑一趟？'],['hero','可以，我会亲手交给他。不过他现在好像很怕见你们，要是看了信还不肯回来，我该怎么劝？'],['npc','你先让他把信看完。主公没有怪他，大家只是担心他的安危，也还在等他一起把下邳的事情处理好。']],[N('带信回良成','return',{effects:{items:{'zhangfei-letter':1}}})]),
   return:S('xiapi-county','将书信交给张飞','zhangfei',[
-   ['npc','怎么又是你？我不是说了不回去吗？你们再这样一趟趟地来，我可真要赶人了。'],['hero','刘备让我带了封信过来，我得亲手交给你。你先把酒放下，看完以后还想让我走，我就不再劝了。']],[{label:'请张飞看信',routes:[{if:{partyAny:['guanyu','liubei']},next:'read'},{if:{},battle:'duel'}]}]),
+   ['npc','怎么又是你？我不是说了不回去吗？你们再这样一趟趟地来，我可真要赶人了。'],['hero','玄德公有封信给你，我得亲手交给你。你先把酒放下，看完以后还想让我走，我就不再劝了。']],[{label:'请张飞看信',routes:[{if:{partyAny:['guanyu','liubei']},next:'read'},{if:{},battle:'duel'}]}]),
   read:S('xiapi-county','等张飞读完书信','zhangfei',[
    ['npc','大哥连我吃没吃饭都还惦记着……我一直以为，他最不想见的就是我，回来也只会问我怎么丢了城。'],['hero','信里都写得这么明白了，你也该回去见见他。就算还有什么难受的，也比一个人在这里喝酒强。'],['npc','你说得对，我不能一直让大哥担心。等我把东西收拾好就走，这坛酒也不喝了。']],[N('与张飞商议去留','freed')]),
-  freed:End('zhangfei','xiapi-county',[['npc','以后你们要去哪里，叫上我一起。该我出力的事情，我不会再躲着，也不想再让大家因为找我来回奔波。'],['hero','那我们等你一起出发。身上的伤也让郎中看看，路上先别喝酒，别又把伤口弄坏了。']])
+  freed:End('zhangfei','xiapi-county',[['npc','以后你们要去哪里，叫上我一起。该我出力的事情，我不会再躲着，也不想再让大家因为找我来回奔波。'],['hero','翼德，那我们等你一起出发。身上的伤也让郎中看看，路上先别喝酒，别又把伤口弄坏了。']])
  },{duel:{stage:['return','duel'],next:'read',title:'良成切磋',sceneId:'farmland',duel:'zhangfei'}});
  R('machao','武威旧枪',{
   rumor:S('wuwei','向酒馆中的马超问明缘由','machao',[
@@ -7988,14 +8018,14 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   inner:S('ma-residence','从堂内守军手中取回旧枪','river-guard',[
    ['npc','他们已经进院子了！看住堂里的兵器，别让人靠近枪架，快去叫其他人过来！'],['hero','我们只是来取回马家的旧枪。你们把东西交出来，我们拿到就走，没有必要再动手。']],[F('取回飞翼枪','inner')]),
   return:S('wuwei','将飞翼枪交给马超','machao',[
-   ['npc','真的是这杆枪，连枪尾的绑绳都没换。小时候父亲怕我握不稳，亲手替我缠的，我那时候还嫌他缠得难看。'],['hero','你拿起来试试，看有没有哪里损坏。旧宅里的事也不用你一个人处理，以后想回去，我们还能陪你去看看。'],['npc','没有损坏，拿在手里还是跟从前一样。谢谢你们替我跑这一趟，我去跟掌柜把酒钱结了，不能再一直坐在这里。']],[N('与马超商议去留','freed')]),
+   ['npc','真的是这杆枪，连枪尾的绑绳都没换。小时候父亲怕我握不稳，亲手替我缠的，我那时候还嫌他缠得难看。'],['hero','孟起，你拿起来试试，看有没有哪里损坏。旧宅里的事也不用你一个人处理，以后想回去，我们还能陪你去看看。'],['npc','没有损坏，拿在手里还是跟从前一样。谢谢你们替我跑这一趟，我去跟掌柜把酒钱结了，不能再一直坐在这里。']],[N('与马超商议去留','freed')]),
   freed:End('machao','wuwei',[['npc','飞翼枪我已经收拾好了。你们愿意替一个刚认识的人取回旧物，我也想陪你们走一段，看看有没有能帮上的地方。'],['hero','那就一起出发。武威还有不少人记挂着你，等事情告一段落，我们再回来看看他们。']])
  },{house:{stage:['house'],next:'inner',title:'马家旧宅',sceneId:'city-frontier',count:3},inner:{stage:['inner'],next:'return',title:'旧宅取枪',sceneId:'market-street',count:4,effects:{items:{'flying-spear':1}}}});
  R('liubei','江夏脱身',{
   rumor:S('chengdu','向诸葛亮询问刘备的行踪','zhugeliang',[
-   ['npc','刘备去了江夏，想跟当地的人商量怎样安置逃难的百姓。原本隔几天就有信，这回却迟迟没送来，我有些担心。'],['hero','我们可以过去找他。要是只是事情忙，也能带个消息回来，免得你们一直在这里等。'],['npc','那就麻烦你们了。江夏有人不愿意收留那些百姓，他可能跟人争执过。见到他以后，先问问最近有没有遇到麻烦。']],[N('前往江夏拜访','feast',{requires:{recruits:{shu:5}}})]),
+   ['npc','主公去了江夏，想跟当地的人商量怎样安置逃难的百姓。原本隔几天就有信，这回却迟迟没送来，我有些担心。'],['hero','我们可以过去找他。要是只是事情忙，也能带个消息回来，免得你们一直在这里等。'],['npc','那就麻烦你们了。江夏有人不愿意收留那些百姓，他可能跟人争执过。见到他以后，先问问最近有没有遇到麻烦。']],[N('前往江夏拜访','feast',{requires:{recruits:{shu:5}}})]),
   feast:S('jiangxia','赴江夏府中的晚宴','liubei',[
-   ['npc','你们从成都过来了？诸葛先生的信我已经收到了。明天陪我去看看安置百姓的地方吧，今晚先坐下一起吃饭。'],['hero','刘将军，门外刚换了一批守军。端菜的那个人袖子里还藏着刀，我看这顿饭不能再吃了。'],['npc','我也看见了。先别把厅里的人惊着，你帮忙带靠门的客人出去，我去叫后面几桌的人离开。']],[F('护住宴中众人','feast')]),
+   ['npc','你们从成都过来了？孔明的信我已经收到了。明天陪我去看看安置百姓的地方吧，今晚先坐下一起吃饭。'],['hero','玄德公，门外刚换了一批守军。端菜的那个人袖子里还藏着刀，我看这顿饭不能再吃了。'],['npc','我也看见了。先别把厅里的人惊着，你帮忙带靠门的客人出去，我去叫后面几桌的人离开。']],[F('护住宴中众人','feast')]),
   escape:S('jiangxia','设法离开被封锁的江夏府','liubei',[
    ['npc','正门已经被他们堵住了。管事告诉我，后院以前有条搬运货物的暗道，只是不知道这些年有没有堵上。'],['hero','我们去后院看看。这里还有不会武艺的客人，能找到别的出口，最好别带着大家从正门硬冲。']],[N('打开暗道机关','road',{puzzle:true}),F('由正门突围','front')],{puzzleTitle:'江夏暗道'}),
   road:S('jiangxia-county','接应落在后面的乡民','liubei',[
@@ -8015,26 +8045,26 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  K.landmark('north-tribe','北地部落','jinyang',-58,-42);K.landmark('shanyue','山越林地','wuling',38,48);K.landmark('bagua-stones','八卦石阵','yiling',-42,42);
  R('zhouyu','焦尾余音',{
   rumor:S('jianye','与周瑜聊聊失散的古琴','zhouyu',[
-   ['npc','鲁肃来信说，你们帮他把粮食送到了。我这里还有一件事想托你留意：一张从洛阳流出来的古琴，琴尾被火烧过，你们在外面有没有听人提起？'],['hero','你说的是焦尾琴？这个名字我听过，可没想到它也会落到外面。你知道现在是谁拿着吗？'],['npc','原来是蔡家收藏的，战乱以后就找不到了。最近有人说在北边见过，我想试着找回来，等遇到蔡家的人，也能替他们留住一件旧物。']],[N('到邺城打听古琴下落','inquiry',{requires:{recruits:{wu:3}}})]),
+   ['npc','子敬来信说，你们帮他把粮食送到了。我这里还有一件事想托你留意：一张从洛阳流出来的古琴，琴尾被火烧过，你们在外面有没有听人提起？'],['hero','你说的是焦尾琴？这个名字我听过，可没想到它也会落到外面。你知道现在是谁拿着吗？'],['npc','原来是蔡家收藏的，战乱以后就找不到了。最近有人说在北边见过，我想试着找回来，等遇到蔡家的人，也能替他们留住一件旧物。']],[N('到邺城打听古琴下落','inquiry',{requires:{recruits:{wu:3}}})]),
   inquiry:S('ye','向北地行商打听焦尾琴','book-dealer',[
    ['npc','我见过那张琴，外面包着旧绢，琴尾确实有烧过的痕迹。后来让一个往晋阳去的客人买走了，他好像住在北地部落。'],['hero','那个人是做买卖的，还是自己喜欢这张琴？我们过去以后，还能不能从他手里买回来？'],['npc','看着不像商人，他抱着琴很小心。我也没问他的打算，你们到部落里找管马场的主人问问，应该能找到。']],[N('前往北地部落','tribe')]),
   tribe:S('north-tribe','与部落主人商议古琴的去处','stable-master',[
-   ['npc','琴在我这里，只是我们都不会弹，放久了也是可惜。你说周瑜认得它，那我愿意转给他，不过当时买琴的花费，还得请你们帮我补上。'],['hero','这是应该的。你说个合适的价钱吧，要是还有别的事情需要我们帮忙，也可以一起商量。'],['npc','价钱我已经跟管事说了。要是你们带的钱不够，也可以陪我的人切磋一场，他们见到远来的朋友，总想比比本事。']],[N('以五百文赎回古琴','return',{price:500,effects:{items:{'jiaowei-qin':1}}}),F('应下比试','trial')]),
+   ['npc','琴在我这里，只是我们都不会弹，放久了也是可惜。你说周公瑾认得它，那我愿意转给他，不过当时买琴的花费，还得请你们帮我补上。'],['hero','这是应该的。你说个合适的价钱吧，要是还有别的事情需要我们帮忙，也可以一起商量。'],['npc','价钱我已经跟管事说了。要是你们带的钱不够，也可以陪我的人切磋一场，他们见到远来的朋友，总想比比本事。']],[N('以五百文赎回古琴','return',{price:500,effects:{items:{'jiaowei-qin':1}}}),F('应下比试','trial')]),
   return:S('jianye','将焦尾琴交给周瑜','zhouyu',[
-   ['npc','就是这张，你看琴尾修补的地方，我以前见过。还好琴身没有裂，换好弦以后应该就能弹了。你们这么远跑一趟，实在辛苦。'],['hero','能找对就好。一路上我们都怕磕坏它，连放上车都要多垫一层布。等你修好了，也弹一段给我们听听吧。'],['npc','当然可以。我先把弦调好，你们进屋喝点茶，今晚就在这里歇着，我也想听听你们在北边遇到了什么事。']],[N('与周瑜商议同行','freed')]),
+   ['npc','就是这张，你看琴尾修补的地方，我以前见过。还好琴身没有裂，换好弦以后应该就能弹了。你们这么远跑一趟，实在辛苦。'],['hero','能找对就好。一路上我们都怕磕坏它，连放上车都要多垫一层布。等公瑾修好了，也弹一段给我们听听吧。'],['npc','当然可以。我先把弦调好，你们进屋喝点茶，今晚就在这里歇着，我也想听听你们在北边遇到了什么事。']],[N('与周瑜商议同行','freed')]),
   freed:End('zhouyu','jianye',[['npc','城里的事务已经交代给主簿了，我想跟你们一起出去。一直坐在这里等消息，有些事情总不如亲自去看，顺便也能帮你们找找人。'],['hero','我们欢迎。琴就先留在府里吧，往后还要赶路，带着它确实不好照顾，回来再听你弹。']])
  },{trial:{stage:['tribe','trial'],next:'return',title:'北地比试',sceneId:'farmland',count:3,enemyKind:'bandit',effects:{items:{'jiaowei-qin':1}}}},{viaCourt:true});
  R('huanggai','武陵山路',{
   rumor:S('wuling','与准备进山的黄盖交谈','huanggai',[
-   ['npc','山里已经有几拨人没回来了。这伙人以前只抢货，如今连采药的乡民也抓，家里人等得着急，我准备亲自进去找找。'],['hero','我们跟你一起去。山里的岔路多，有没有熟悉道路的人能带路？免得人还没找到，我们先走散了。'],['npc','吕蒙熟悉那片山，前几天却自己跑了进去，也没回来。到了林口先找他的踪迹，看见有人招手也别急着跟，先分清是不是他。']],[N('随黄盖进入林地','entrance')]),
+   ['npc','山里已经有几拨人没回来了。这伙人以前只抢货，如今连采药的乡民也抓，家里人等得着急，我准备亲自进去找找。'],['hero','我们跟你一起去。山里的岔路多，有没有熟悉道路的人能带路？免得人还没找到，我们先走散了。'],['npc','子明熟悉那片山，前几天却自己跑了进去，也没回来。到了林口先找他的踪迹，看见有人招手也别急着跟，先分清是不是他。']],[N('随黄盖进入林地','entrance')]),
   entrance:S('shanyue','穿过有毒烟的林口','huanggai',[
    ['npc','大家把口鼻遮住，先停在高处！沟里有人在放烟，下面看不清路。去叫住后面的乡兵，别再让他们往沟里走了。'],['hero','我看见放烟的人了，就在那片石头后面。我们从上面绕过去，先拦住他，不能让烟继续往沟里灌。']],[F('打开林口','entrance')]),
   rescue:S('shanyue','救出被困的吕蒙和乡民','lvmeng',[
-   ['npc','黄将军，我在这里！后面的木棚还关着几个乡亲，门从外面锁了，我受了伤，实在打不开。'],['huanggai','听见了，你先过来，别再拿那条伤胳膊硬撑。人既然找到了，我们会把他们一起带出去，你不用再往棚子里钻。'],['hero','我去把木棚的门打开。你们帮忙守着这条路，里面如果有人走不动，就先扶到桥边等。']],[F('救出被扣的乡民','rescue')]),
+   ['npc','公覆将军，我在这里！后面的木棚还关着几个乡亲，门从外面锁了，我受了伤，实在打不开。'],['huanggai','听见了，你先过来，别再拿那条伤胳膊硬撑。人既然找到了，我们会把他们一起带出去，你不用再往棚子里钻。'],['hero','我去把木棚的门打开。你们帮忙守着这条路，里面如果有人走不动，就先扶到桥边等。']],[F('救出被扣的乡民','rescue')]),
   retreat:S('shanyue','护送伤者退出山越林地','huanggai',[
    ['npc','乡亲们都出来了，你们扶着伤者先走。我在这里看着，等最后一个人过桥再跟上。'],['hero','这座桥太窄，真有人追来，你一个人不好退。我们一起留下，等伤者过完桥，再一起走。']],[F('护住归路','retreat')]),
   return:S('wuling','将吕蒙与乡民交给医者','huanggai',[
-   ['npc','郎中，先看看吕蒙的胳膊。他在山里耽误了好几天，刚才还一直说自己没事，我看他连手都抬不起来了。'],['hero','其他人也都送到城里了。我让人去通知他们的家里，晚些就有人来接，今晚大家都能有地方歇着。']],[N('与黄盖商议去留','freed',{effects:{rest:true}})]),
+   ['npc','郎中，先看看子明的胳膊。他在山里耽误了好几天，刚才还一直说自己没事，我看他连手都抬不起来了。'],['hero','其他人也都送到城里了。我让人去通知他们的家里，晚些就有人来接，今晚大家都能有地方歇着。']],[N('与黄盖商议去留','freed',{effects:{rest:true}})]),
   freed:End('huanggai','wuling',[['npc','山口我已经安排了人巡查，乡亲们再进山采药，也能放心些。你们要是还往外走，带上我吧，在这里等消息，我反倒坐不住。'],['hero','那就一起走。我们在山里能平安出来，多亏你熟悉情况，以后路上也请你多照应大家。']])
  },{entrance:{stage:['entrance'],next:'rescue',title:'山越林口',sceneId:'forest-path',count:3,enemyKind:'bandit',guest:'huanggai'},rescue:{stage:['rescue'],next:'retreat',title:'林中救人',sceneId:'bandit-camp',count:4,enemyKind:'bandit',guest:'huanggai',effects:{flags:{lvmengSaved:true},stages:{lvmeng:'study'}}},retreat:{stage:['retreat'],next:'return',title:'山路断后',sceneId:'forest-path',count:4,enemyKind:'bandit',guests:['huanggai','lvmeng']}});
  R('lvmeng','吴下读书',{
@@ -8043,7 +8073,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   waiting:S('wuling','协助黄盖，从山越林地救出吕蒙','village-aunt',[
    ['npc','黄将军已经来过了，说找到吕蒙就马上送回来。我在这里等着，你们进山也要小心，别为了赶路把自己也搭进去。']],[N('得知吕蒙已平安后再谈','study',{requires:{flags:{lvmengSaved:true}}})]),
   study:S('wuling','听吕蒙说起进山的经过','lvmeng',[
-   ['npc','我以为路熟，进去就能把人带出来。谁知道他们在沟里放了烟，我连退回来的路都看不清，这才知道自己想得太简单了。'],['hero','黄将军也是担心你，才劝你多看看兵书。以后去救人，不能只认得路，还得想想对方会把人藏在哪里、准备怎么拦我们。'],['npc','我想学，就是有些字认不全，自己看书很费劲。你愿不愿意陪我到书摊找找？我有不懂的地方，也能跟你请教。']],[N('陪吕蒙寻书','books')]),
+   ['npc','我以为路熟，进去就能把人带出来。谁知道他们在沟里放了烟，我连退回来的路都看不清，这才知道自己想得太简单了。'],['hero','公覆将军也是担心你，才劝你多看看兵书。以后去救人，不能只认得路，还得想想对方会把人藏在哪里、准备怎么拦我们。'],['npc','我想学，就是有些字认不全，自己看书很费劲。你愿不愿意陪我到书摊找找？我有不懂的地方，也能跟你请教。']],[N('陪吕蒙寻书','books')]),
   books:S('wuling','向书贩借阅三部兵书','book-dealer',[
    ['npc','这三部我都有，《孙子兵法》《黄石兵书》《六韬》。你想认真读，我可以先借给你，包好带回去，看完再还就行。'],['lvmeng','我会好好保管的。遇到不认识的字，能不能记下来回来问你？我不想随便猜一个意思，反而把书读错了。']],[N('借书研读，再到教场试演','practice')]),
   practice:S('wuling-county','陪吕蒙试演读过的阵势','lvmeng',[
@@ -8052,7 +8082,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  },{practice:{stage:['practice'],next:'freed',title:'武陵演阵',sceneId:'farmland',count:3,enemyKind:'bandit'}});
  R('luxun','石阵困客',{
   rumor:S('bagua-stones','与被困在石阵中的陆逊交谈','luxun',[
-   ['npc','你们先停一下，别顺着我的脚印走！我已经绕回来三次了，每次都走到这块石头旁边，里面的路肯定有问题。'],['hero','你是怎么进来的？困在这里多久了，身上还有没有水和吃的？'],['npc','天刚亮就进来了，本来只是想看看这些石柱。柱上刻着诸葛先生的名字，我试了半天也没找到机关，你们能不能替我到成都问问他？']],[N('前往成都请教','master'),N('请同行的诸葛亮指路','freed',{requires:{partyAny:['zhugeliang']}})]),
+   ['npc','你们先停一下，别顺着我的脚印走！我已经绕回来三次了，每次都走到这块石头旁边，里面的路肯定有问题。'],['hero','你是怎么进来的？困在这里多久了，身上还有没有水和吃的？'],['npc','天刚亮就进来了，本来只是想看看这些石柱。柱上刻着孔明先生的名字，我试了半天也没找到机关，你们能不能替我到成都问问他？']],[N('前往成都请教','master'),N('请同行的诸葛亮指路','freed',{requires:{partyAny:['zhugeliang']}})]),
   master:S('chengdu','向诸葛亮请教石阵的出口','zhugeliang',[
    ['npc','原来有人困在那座石阵里。那是我以前教学生辨认方向时布置的，出口就在南边。中间的石柱要先移开两侧，不能直接往前推。'],['hero','明白了，我回去按你说的试试。他从早上困到现在，水也快喝完了，我们得尽快把人带出来。']],[N('回石阵开启机关','puzzle')]),
   puzzle:S('bagua-stones','移动石柱，打开石阵出口','luxun',[
@@ -8070,7 +8100,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  },{dock:{stage:['dock'],next:'spar',title:'柴桑渡船',sceneId:'river-dock',count:4,enemyKind:'bandit',guest:'sunshangxiang'},spar:{stage:['spar'],next:'freed',title:'江东切磋',sceneId:'farmland',duel:'sunshangxiang',acceptDefeat:true}});
  R('sunquan','柴桑解围',{
   rumor:S('jianye','向周瑜询问孙权的消息','zhouyu',[
-   ['npc','柴桑的信已经断了几天。孙权正在那边安置流民，袁术和严白虎却把人围在城外，连运人的船都不肯放过。'],['hero','我们过去看看。他们既然是两路人，总不可能什么事情都商量好了，也许能找到办法把人接出来。'],['npc','我也是这么想的。这里有几封之前送来的军报，你们带上，到了以后先看清他们驻扎的位置，不要直接冲进围兵中间。']],[N('赶往柴桑','plan',{requires:{recruits:{wu:5}}})]),
+   ['npc','柴桑的信已经断了几天。主公正在那边安置流民，袁术和严白虎却把人围在城外，连运人的船都不肯放过。'],['hero','我们过去看看。他们既然是两路人，总不可能什么事情都商量好了，也许能找到办法把人接出来。'],['npc','我也是这么想的。这里有几封之前送来的军报，你们带上，到了以后先看清他们驻扎的位置，不要直接冲进围兵中间。']],[N('赶往柴桑','plan',{requires:{recruits:{wu:5}}})]),
   plan:S('chaisang','与孙权商议解围之策','sunquan',[
    ['npc','你们能进城，真是帮了大忙。袁术和严白虎的人彼此防着，却都不肯放我们的船走。城里每天都有人来问，什么时候才能送家人离开。'],['hero','先别急，我们陪你把城外的布置看一遍。既然他们互相提防，就有可能只顾自己，顾不上替另一边拦人。']],[{label:'商议出城接应',routes:[{if:{partyAny:['zhouyu','luxun','lusu']},next:'rift'},{if:{},next:'ambush'}]}]),
   rift:S('chaisang','趁两路敌军争执时接应船只','sunquan',[
@@ -8080,7 +8110,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   retreat:S('chaisang','突破追到江岸的敌军','sunquan',[
    ['npc','乡亲们已经上船，后面只剩一辆车和护送的人。你们先往岸边靠，我去看看车轮是不是卡住了，别让他们落下。'],['hero','我们陪你一起过去。车上还有伤者，等把车推到岸边，再一起上船，不用急着分开走。']],[F('守住江岸','retreat')]),
   return:S('jianye','护送孙权回到建业','sunquan',[
-   ['npc','渡口已经有人来迎接了，乡亲们的住处也在安排。管事问，等大家休息好了，能不能请你们一起吃顿饭，当面说声谢谢。'],['hero','吃饭的事晚些再说，大家一路都没睡好，先让他们住下来吧。你也去歇一会儿，码头这边我们还能帮着看。']],[N('与孙权商议下一步','freed',{effects:{rest:true,flags:{sunquanSafe:true}}})]),
+   ['npc','渡口已经有人来迎接了，乡亲们的住处也在安排。管事问，等大家休息好了，能不能请你们一起吃顿饭，当面说声谢谢。'],['hero','吃饭的事晚些再说，大家一路都没睡好，先让他们住下来吧。孙将军也去歇一会儿吧，码头这边我们还能帮着看。']],[N('与孙权商议下一步','freed',{effects:{rest:true,flags:{sunquanSafe:true}}})]),
   freed:End('sunquan','jianye',[['npc','城里我已经安排好了，接下来想跟你们出去走走。你们替江东跑了这么多地方，我也该亲自去了解大家遇到的麻烦，不能总等别人送信来。'],['hero','那我们一起出发。路上正好商量一下洛阳的事情，也看看还有没有愿意跟我们一起做事的人。']])
  },{rift:{stage:['rift'],next:'return',title:'柴桑解围',sceneId:'river-dock',named:[['yuanshu',10,'back'],['yanbaihu',10,'front']],guest:'sunquan'},ambush:{stage:['ambush'],next:'retreat',title:'柴桑伏兵',sceneId:'forest-path',count:4,guest:'sunquan'},retreat:{stage:['retreat'],next:'return',title:'江岸断后',sceneId:'river-dock',count:5,guest:'sunquan'}},{viaCourt:true});
  if(typeof module!=='undefined'&&module.exports)module.exports=true;
@@ -8100,18 +8130,18 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   gift:S('luoyang','将赤兔带到温侯府','lvbu',[
    ['npc','真的是赤兔！我找了这么久，没想到是你们把它送来。先进来坐，我让人去准备水和草料，这一路没出什么事吧？'],['hero','马和看马的孩子都找回来了。马场主人说它还没认主，你先别急着骑，让它在这里熟悉几天，免得受惊伤人。'],['npc','我养过不少马，知道该怎么照顾它。你们帮了这么大的忙，这块令牌拿着吧，下次进来找我，给门口的人看就行。']],[N('与吕布聊聊洛阳近况','worry',{effects:{items:{'lvbu-token':1},flags:{redRabbitGift:true}}})]),
   worry:S('luoyang','听吕布说起董卓近日的反常','lvbu',[
-   ['npc','董卓这几天像换了个人。昨天才答应给百姓放粮，今天却叫人去烧城外的粮仓。我去问个明白，守卫竟然连门都不让我进。'],['hero','你手下的将士也收到这些命令了吗？他们跟你这么久，应该也不愿意做这种事吧？'],['npc','他们当然不愿意，已经有好几个人来问我该怎么办。我想带他们离开，又不能叫他们出了城连住处都没有，这件事一直没安排好。']],[N('去天香阁找貂蝉商议','waiting',{effects:{stages:{diaochan:'request'}}})]),
+   ['npc','太师这几天像换了个人。昨天才答应给百姓放粮，今天却叫人去烧城外的粮仓。我去问个明白，守卫竟然连门都不让我进。'],['hero','你手下的将士也收到这些命令了吗？他们跟你这么久，应该也不愿意做这种事吧？'],['npc','他们当然不愿意，已经有好几个人来问我该怎么办。我想带他们离开，又不能叫他们出了城连住处都没有，这件事一直没安排好。']],[N('去天香阁找貂蝉商议','waiting',{effects:{stages:{diaochan:'request'}}})]),
   waiting:S('luoyang','与貂蝉商议如何劝说吕布','palace-steward',[
    ['npc','吕将军在后院等着。你们如果已经跟貂蝉姑娘谈好了，就请她一起过来，我会把旁边的人支开，让你们能好好说话。']],[N('得知两人决定后再会','freed',{requires:{flags:{lvbuConvinced:true}}})]),
   freed:End('lvbu','xinye',[['npc','新野的住处不大，弟兄们倒都睡得踏实。人已经安顿好了，我也能出门。你们要去洛阳对付董卓的话，记得来叫我，我还有话想亲自问他。'],['hero','我们会来找你的。你也不用急着马上赶路，先把大家安顿好，准备好了再一起出发。']])
  },{horse:{stage:['stable','horse'],next:'gift',title:'西羌寻马',sceneId:'rural-road',count:4,enemyKind:'bandit',effects:{items:{redRabbit:1}}}});
  R('diaochan','天香旧事',{
   rumor:S('luoyang','与天香阁的貂蝉交谈','diaochan',[
-   ['npc','你们能进吕布的府里？我正想找人打听他的情况，可外面一直有人看着，我自己不方便过去。'],['hero','可以先告诉我，你为什么要找他吗？我得把事情问清楚，总不能什么都不知道就带你进去。'],['npc','我原本想找机会杀了他。他替董卓领兵，我一直以为他们是一伙的，可最近又听说，他为了百姓跟董卓争执，我不知道该信哪一种说法。']],[N('先问清她的打算','request')]),
+   ['npc','你们能进温侯府？我正想找人打听他的情况，可外面一直有人看着，我自己不方便过去。'],['hero','可以先告诉我，你为什么要找他吗？我得把事情问清楚，总不能什么都不知道就带你进去。'],['npc','我原本想找机会杀了他。他替董卓领兵，我一直以为他们是一伙的，可最近又听说，他为了百姓跟董卓争执，我不知道该信哪一种说法。']],[N('先问清她的打算','request')]),
   request:S('luoyang','与貂蝉商议劝离董卓','diaochan',[
-   ['npc','董卓的人给我家里惹过不少祸，我不是无缘无故恨他们。只是如果吕布真的不愿意再帮董卓，我也想先听他亲口说清楚。'],['hero','那我们陪你去见他，把以前和现在的事情都问明白。不过这次是去谈话，你先把兵器收好，别一句话没说就动起手来。']],[N('带貂蝉入府交谈','persuade',{requires:{flags:{redRabbitGift:true}},effects:{stages:{lvbu:'waiting'}}}),N('先向府中管事核实','inquiry')]),
+   ['npc','董卓的人给我家里惹过不少祸，我不是无缘无故恨他们。只是如果吕将军真的不愿意再帮董卓，我也想先听他亲口说清楚。'],['hero','那我们陪你去见他，把以前和现在的事情都问明白。不过这次是去谈话，你先把兵器收好，别一句话没说就动起手来。']],[N('带貂蝉入府交谈','persuade',{requires:{flags:{redRabbitGift:true}},effects:{stages:{lvbu:'waiting'}}}),N('先向府中管事核实','inquiry')]),
   inquiry:S('luoyang','向管事核实府中近况','palace-steward',[
-   ['npc','这事是真的。吕将军替城外的人求情，回来以后气得饭也没吃。他已经在考虑带人走了，只是担心弟兄们没有地方安顿。'],['hero','谢谢你告诉我这些。我回去跟貂蝉说，让她先把自己的顾虑问清楚。要是能好好谈，就没必要让双方都提心吊胆。']],[N('回天香阁与貂蝉商议','request')]),
+   ['npc','这事是真的。吕将军替城外的人求情，回来以后气得饭也没吃。他已经在考虑带人走了，只是担心弟兄们没有地方安顿。'],['hero','谢谢你告诉我这些。我回去跟貂蝉姑娘说，让她先把自己的顾虑问清楚。要是能好好谈，就没必要让双方都提心吊胆。']],[N('回天香阁与貂蝉商议','request')]),
   persuade:S('luoyang','陪貂蝉与吕布把话说清','lvbu',[
    ['npc','我知道你一直在打听我，也大概知道为什么。既然今天肯坐下来谈，我们就把话说明白。你们想知道什么，直接问吧。'],['diaochan','我想知道，你还准备替董卓做事吗？如果不愿意，我们能不能一起离开洛阳？留在这里，我每天都担心有人被抓进府里。'],['hero','新野有人答应借出几间房，弟兄们也可以暂时住下。你不用因为没地方去就一直留在这里，先离开，再慢慢商量以后的事。'],['npc','既然住处有了，我就去安排弟兄们出城。我不想再替他传那些连自己都不肯照办的命令，也想弄清楚他到底出了什么问题。']],[N('约在新野再会','freed',{effects:{flags:{lvbuConvinced:true},stages:{lvbu:'freed'}}})]),
   freed:End('diaochan','xinye',[['npc','到了新野以后，我终于能安心睡一夜了。以前总听着外面的马蹄声，生怕又有人来敲门。等休息好了，我也想出去看看。'],['hero','你愿意的话，可以跟我们一起走。想再多休息几天也没关系，我们以后经过新野，还会来看看你们。']])
@@ -8131,11 +8161,11 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   rumor:S('nanman','与拦在寨口的孟获交涉','menghuo',[
    ['npc','你们也是北边来的？先别往寨子里走！前几天才来过一群人，说借个地方歇脚，转头就把粮仓里的东西抢了。'],['hero','我们是路过这里，不是来抢东西的。你先让身后的人站远一点，老人和孩子都在旁边，有什么疑问，我们可以慢慢说。'],['npc','他们上次也这么说！我现在谁也不信。你们真有本事，就先跟我比一场，别只会站在这里说好听的。']],[F('在寨口接下挑战','first')]),
   elder:S('nanman','向寨老询问部落中的病症','southern-elder',[
-   ['npc','你们别怪他这么着急。寨里很多人又冷又热，躺了好几天，粮食还被外面的人扣着，他一见生人就怕又出了事。'],['hero','病了多久，附近还有别的村子出现这种情况吗？我认识华佗，可以把你们说的情况告诉他，请他过来看看。'],['npc','那太好了，我们自己也说不清这是什么病。我去把哪家有人生病、病了几天都记下来，你带给大夫看看。']],[N('再与孟获谈谈病人的事','second')]),
+   ['npc','你们别怪他这么着急。寨里很多人又冷又热，躺了好几天，粮食还被外面的人扣着，他一见生人就怕又出了事。'],['hero','病了多久，附近还有别的村子出现这种情况吗？我认识华大夫，可以把你们说的情况告诉他，请他过来看看。'],['npc','那太好了，我们自己也说不清这是什么病。我去把哪家有人生病、病了几天都记下来，你带给大夫看看。']],[N('再与孟获谈谈病人的事','second')]),
   second:S('nanman','说服孟获让医者入寨','menghuo',[
    ['npc','寨里有人说，病就是外面的人带进来的。我不懂治病，也不敢随便放人进去，你们总得让我知道，是真的愿意留下来帮忙。'],['hero','我们既然答应去请大夫，就不会说完就走。你要比试，我们可以陪你，但别堵在病人门口，到外面的空地上说。']],[F('接下第二场挑战','second')]),
   third:S('nanman-woods','击退拦在请医路上的孟获','menghuo',[
-   ['npc','事情还没说清楚，你们怎么就准备出寨了？不是说要留下帮忙吗？'],['hero','我们得出去请华佗，他不会自己知道这里有人生病。你再拦着，今天就走不了多远了，不如早点让我们去，把大夫接来。']],[F('打开请医的路','third')]),
+   ['npc','事情还没说清楚，你们怎么就准备出寨了？不是说要留下帮忙吗？'],['hero','我们得出去请华大夫，他不会自己知道这里有人生病。你再拦着，今天就走不了多远了，不如早点让我们去，把大夫接来。']],[F('打开请医的路','third')]),
   doctor:S('xiangyang-county','请华佗前往南中诊病','huatuo',[
    ['npc','这些症状我听明白了，但只听人转述，还不能随便开药。我跟你们亲自去一趟，先等我把药箱收拾好，路上再把细节告诉我。'],['hero','寨里的老人把病人的住处都记下来了，我们带着这份记录去，到了就能先看最严重的几家，不用再耽误时间。']],[N('护送华佗前往南中','fourth')]),
   fourth:S('nanman','护住随行医者进入部落','menghuo',[
@@ -8154,7 +8184,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   rumor:S('julu','向巨鹿乡民询问旱情','village-aunt',[
    ['npc','井里的水比昨天还少，田里的庄稼也快晒死了。我们听说张角先生能帮忙，派人去营里请，可到现在还没有等到回信。'],['hero','我认识张先生，这就替你们去问问。剩下的水先省着用，别把喝的也拿去浇田，家里人受不了的。']],[N('回营向张角求助','camp')]),
   camp:S('camp','与张角商议巨鹿旱情','zhangjiao',[
-   ['npc','巨鹿的情况我已经听说了，正准备过去。书里有个祈雨的法子，我想试试。符纸和法子我备好了，还缺清香和一只海螺，要请你帮着找找。'],['hero','我去附近问问。营里也安排些人先过去吧，井要加深，沟渠要清，不管雨能不能求来，这些事情都得有人做。'],['npc','我已经在安排了，让张梁带人先去帮忙。你找到东西以后直接到巨鹿，我们在那里等你，不用再绕回营地。']],[N('到许家村借清香','incense',{effects:{items:{'rain-paper':3}}})]),
+   ['npc','巨鹿的情况我已经听说了，正准备过去。书里有个祈雨的法子，我想试试。符纸和法子我备好了，还缺清香和一只海螺，要请你帮着找找。'],['hero','我去附近问问。营里也安排些人先过去吧，井要加深，沟渠要清，不管雨能不能求来，这些事情都得有人做。'],['npc','我已经在安排了，让三弟带人先去帮忙。你找到东西以后直接到巨鹿，我们在那里等你，不用再绕回营地。']],[N('到许家村借清香','incense',{effects:{items:{'rain-paper':3}}})]),
   incense:S('xujia','向守庙老人借一束清香','temple-keeper',[
    ['npc','庙里还有香，你拿去吧。也替我跟巨鹿的乡亲说一声，真到没水喝的时候，可以把老人和孩子先送到这里，庙里还能住几家人。'],['hero','谢谢你，我会把这句话带到。巨鹿那边有了消息，我们再派人回来告诉你，借走的东西也会记着。']],[N('到邺城寻海螺','conch',{effects:{items:{'rain-incense':1}}})]),
   conch:S('ye','向乡人借海螺','village-aunt',[
@@ -8221,9 +8251,9 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  lu.stages.gift.npc.choices=[N('问问吕布在担心什么','worry',{effects:{items:{'lvbu-token':1},flags:{redRabbitGift:true,lvbuMet:true}}})];
  lu.stages.worry.npc.choices=[N('找管事核实被扣的百姓','witness')];
  lu.stages.witness=S('luoyang','向管事了解天香阁的求助','palace-steward',[
-  ['npc','城外有几户替府里织布的人，被抓去补征粮的数。天香阁的貂蝉姑娘认识他们，昨天送来一封信，想求将军救人。'],['hero','吕布知道吗？为什么没去见她？'],['npc','信被太师府的人截下了，是阁里的侍女又抄一份送来的。我怕牵连她，没敢直接回信。你们愿意跑一趟，就告诉她，将军并没有答应抓这些人。']],[N('带口信去见貂蝉','waiting',{effects:{flags:{diaochanLead:true},stages:{diaochan:'rumor'}}})]);
+  ['npc','城外有几户替府里织布的人，被抓去补征粮的数。天香阁的貂蝉姑娘认识他们，昨天送来一封信，想求将军救人。'],['hero','温侯知道这封信吗？为什么没去见她？'],['npc','信被太师府的人截下了，是阁里的侍女又抄一份送来的。我怕牵连她，没敢直接回信。你们愿意跑一趟，就告诉她，将军并没有答应抓这些人。']],[N('带口信去见貂蝉','waiting',{effects:{flags:{diaochanLead:true},stages:{diaochan:'rumor'}}})]);
  lu.stages.waiting=S('xinye','等部众安顿后，与吕布商议同行','lvbu',[
-  ['npc','我答应离开董卓，不等于把手下的人交给另一位主公。先让大家有饭吃、有地方睡，再谈以后。'],['hero','我们正陪貂蝉处理这些事。等最后几户人家也到了，我再来找你，不会把人领出来就不管了。']],[N('安顿好众人，再与吕布交谈','trial-talk',{requires:{flags:{lvbuConvinced:true}},effects:{rest:true}})]);
+  ['npc','我答应离开董卓，不等于把手下的人交给另一位主公。先让大家有饭吃、有地方睡，再谈以后。'],['hero','我们正陪貂蝉姑娘处理这些事。等最后几户人家也到了，我再来找你，不会把人领出来就不管了。']],[N('安顿好众人，再与吕布交谈','trial-talk',{requires:{flags:{lvbuConvinced:true}},effects:{rest:true}})]);
  lu.stages['trial-talk']=S('xinye','与吕布约定同行的条件','lvbu',[
   ['npc','住处和粮食都到了，我没想到你们真会一户户把人接齐。可你们接下来要去洛阳，那里的仗不是救几辆车这么简单。'],['hero','我知道你在担心什么。如果我们连眼前这支队伍都带不好，就算你来了，也不过是把所有危险推给你。'],['npc','那就在营外试一场。你带平常同行的人，我也带两个亲卫，用自己的兵器，不让你故意占便宜。打不过就先去练，什么时候准备好了都能再来，我不会因为你输一场就不认人。']],[N('准备好后接受考验','trial')]);
  battle('lvbu','trial','xinye','lvbu','通过吕布的实战考验',[
@@ -8231,7 +8261,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  lu.stages.freed.npc.turns=[{speaker:'npc',text:'行，我跟你们走。不是因为赤兔，是因为你们答应照顾的人，最后都没有落下。到了洛阳，我也要当面问清楚，那些命令到底是谁下的。'},{speaker:'hero',text:'那就一起去。弟兄们留在这里照顾家人，有事随时回来。我们要做的事还很多，路上慢慢商量。'}];
  di.visibility={any:[{flags:{diaochanLead:true}},{chapterComplete:true}]};di.title='天香阁来信';
  di.stages.rumor=S('luoyang','把管事的口信带给貂蝉','diaochan',[
-  ['npc','你们是替吕将军来的？我等了两天，差点以为那封信根本没有送到。'],['hero','信被太师府截过一次。府里的管事让我来告诉你，吕布没有同意抓人。你先说说，被带走的是什么人？'],['npc','有替这里织布的姐妹，还有她们的家人。征粮的人说她们少交了，可收粮的凭据还在我这里。我要的不是一句安慰，是把这些人找回来。']],[N('看过收粮凭据，再想办法','request')]);
+  ['npc','你们是替吕将军来的？我等了两天，差点以为那封信根本没有送到。'],['hero','信被太师府截过一次。府里的管事让我来告诉你，温侯没有同意抓人。你先说说，被带走的是什么人？'],['npc','有替这里织布的姐妹，还有她们的家人。征粮的人说她们少交了，可收粮的凭据还在我这里。我要的不是一句安慰，是把这些人找回来。']],[N('看过收粮凭据，再想办法','request')]);
  di.stages.request=S('luoyang','与貂蝉查清被扣者的去处','diaochan',[
   ['npc','这张是已经交过粮的凭据，另一张却说她们欠粮。上面的日期只差一天，根本是换个人再收一次。'],['hero','别先拿去衙门争，开文书的人可能就是同一伙。我们找运粮的车夫问问，先知道人被送到了哪里。'],['npc','车夫每天在城外歇脚，我认得他。他以前给我们搬过布，不愿意得罪官兵，但应该肯把看见的事情告诉我。']],[N('陪貂蝉去找车夫','inquiry')]);
  di.stages.inquiry=S('luoyang-county','向车夫核实被扣乡民的下落','boatman',[
@@ -8255,9 +8285,9 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  ]);
  before('jiaxu','mansion',[
   ['watch','wan-county','camp-scout','查清郭汜封路的兵力',[
-   ['npc','他们守着运粮的大路，小路却没几个人。前日还进村抢了两辆车，营里缺粮不是假的。'],['hero','那就不能把城里的粮全交出去。我回去告诉贾先生，让城里先把难民接到内街，免得一动手就堵在门口。']]],
+   ['npc','他们守着运粮的大路，小路却没几个人。前日还进村抢了两辆车，营里缺粮不是假的。'],['hero','那就不能把城里的粮全交出去。我回去告诉文和先生，让城里先把难民接到内街，免得一动手就堵在门口。']]],
   ['evacuate','wan','jiaxu','先安顿城门附近的百姓',[
-   ['npc','你查到他们缺粮，这一点很要紧。我会让张绣把粮车留在城内，空车调到门外，免得他们看见车就想抢。'],['hero','还有，之后无论用什么计，先告诉我们怎么退。我们肯陪你出去，但不能连带着谁回来都不清楚。'],['npc','这回说清楚：盒里是机关，不是真首级。我引郭汜靠近，你们守侧门，听见弩响就带我撤。城门内的人也会接应，不让你们独自挡一营兵。']]]
+   ['npc','你查到他们缺粮，这一点很要紧。我会请张将军把粮车留在城内，空车调到门外，免得他们看见车就想抢。'],['hero','还有，之后无论用什么计，先告诉我们怎么退。我们肯陪你出去，但不能连带着谁回来都不清楚。'],['npc','这回说清楚：盒里是机关，不是真首级。我引郭汜靠近，你们守侧门，听见弩响就带我撤。城门内的人也会接应，不让你们独自挡一营兵。']]]
  ]);
  before('zhangliao','freed',[
   ['orders','hulao','camp-scout','核实虎牢关外的扣车命令',[
@@ -8282,7 +8312,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  battle('simayi','grain-seizure','xuchang-county','bandit-chief','追回被扣的救济粮',[
   ['npc','粮已经入了这里的账，谁来查都没用！你们拿着司马先生的纸，就想直接搬走？'],['hero','村里的人还没吃上饭，账却已经全结清了。今天你们得把粮和那本账一起交出来。']],'grain-judgment',{count:5,kind:null,scene:'farmland'});
  H.definitions.simayi.stages['grain-judgment']=S('xuchang','与司马懿核对追回的粮与名册','simayi',[
-  ['npc','粮袋、手印和押车人的口供都对上了。我原本想看看，你遇到两种说法，会不会急着挑一句合自己心意的。你却真把粮给人送回去了。'],['hero','他们不能等我们辩明白以后再吃饭。账要查，眼前的人也得管，少做哪一件都不行。'],['npc','好。府里的事交给主簿，我跟你们走一段。以后我有判断，你们也尽管查，不必只因为我叫司马懿就全信。']],[N('商量同行的安排','freed')]);
+  ['npc','粮袋、手印和押车人的口供都对上了。我原本想看看，你遇到两种说法，会不会急着挑一句合自己心意的。你却真把粮给人送回去了。'],['hero','他们不能等我们辩明白以后再吃饭。账要查，眼前的人也得管，少做哪一件都不行。'],['npc','好。府里的事交给主簿，我跟你们走一段。以后我有判断，你们也尽管查，不必只因为是我说的就全信。']],[N('商量同行的安排','freed')]);
  before('caocao','freed',[
   ['survivors','xuchang','camp-scout','核对乌林护卫的归队名册',[
    ['npc','最后那条船也到了，还少两个报信的人。他们不是落在追兵手里，是去上游找先前被冲散的伤兵，还没回城。'],['hero','把能认出的名字先记上，派熟悉渡口的人去接。别今天进了城，明天就再没人问他们去了哪里。']]],
@@ -8305,7 +8335,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   ['testimony','suiyang','liu-widow','让获救母子与雇工当面核对旧账',[
    ['npc','他们少算的工钱，账房都认下了，田契也交回来了。典大哥替我们挡了这么多回，最后反倒让你们去救他，我心里实在过意不去。'],['dianwei','你别这么说。是我一急就冲进去，差点连你们的账都没拿出来。以后遇到事，我先跟大家商量，不再只顾自己抡兵器。'],['hero','母子有人照看，账也留下了副本。把这些交代清楚，咱们再谈出门的事。']]]
  ]);
- dw.stages.freed.npc.turns=[{speaker:'npc',text:'母子都安顿下来了，邻家也留着账的副本，李家再想编借口也得先问问大家。我想去许昌看看，听说曹操正在找人。'},{speaker:'hero',text:'那就先同行。你身上的伤还要换药，路上不用一个人硬撑；往后遇到难处，也先跟我们说一声。'},{speaker:'npc',text:'好，这回听你们的。救人不是只把门砸开，后面的事也得一起办妥。'}];
+ dw.stages.freed.npc.turns=[{speaker:'npc',text:'母子都安顿下来了，邻家也留着账的副本，李家再想编借口也得先问问大家。我想去许昌看看，听说曹公正在找人。'},{speaker:'hero',text:'那就先同行。你身上的伤还要换药，路上不用一个人硬撑；往后遇到难处，也先跟我们说一声。'},{speaker:'npc',text:'好，这回听你们的。救人不是只把门砸开，后面的事也得一起办妥。'}];
  before('huangzhong','freed',[
   ['horse-return','changsha','stable-master','核对失马，归还浏阳被抢的马匹',[
    ['npc','马身上都有各家的烙记，不能因为黄将军的马找到了，剩下几匹就全算官府的。还有一匹是乡里借来耕地的。'],['huangzhong','你说得对，按记号一家家还。我的马放在最后，先把耕地那匹送回去，田里的活等不得。']]],
@@ -8332,7 +8362,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  ]);
  before('ganning','freed',[
   ['crew','xinye','boatman','确认甘宁部众和被扣船只的下落',[
-   ['npc','甘宁出来了，可一半弟兄还在东边的旧渡口躲着。他们不敢进城，也不知道牢里的人到底有没有救成。'],['hero','你带个能认人的去报平安。甘宁，你先别急着报仇，大家凑齐，再把那条官船上的账说清楚。'],['ganning','我听你的。那些人是跟着我来招安才中了圈套，我得先把他们带回去。']]],
+   ['npc','甘大哥出来了，可一半弟兄还在东边的旧渡口躲着。他们不敢进城，也不知道牢里的人到底有没有救成。'],['hero','你带个能认人的去报平安。兴霸，你先别急着报仇，大家凑齐，再把那条官船上的账说清楚。'],['ganning','我听你的。那些人是跟着我来招安才中了圈套，我得先把他们带回去。']]],
   ['ledger','xinye','ganning','让甘宁说明官船旧案与今后的去向',[
    ['npc','官船运的是扣下来的救济粮，账册藏在船板下面。我拿它逼过县尉，却没想到连累弟兄陪我坐牢。'],['hero','账留一份给城里的书吏，另一份交到建业。你自己以前抢过的商船也不能只字不提，愿意重新开始，就得把该还的慢慢还。'],['npc','我认。船上的货先抵给受过害的人，弟兄们愿意回家的给他们盘缠。我跟你走，不是换个名号接着在江上收钱。']]]
  ]);
@@ -8350,7 +8380,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  const gy=H.definitions.guanyu;gy.stages.pass.npc.choices=[N('核验令牌，带车队通过第一关','two',{requires:{items:{'lvbu-token':1}}}),N('请吕布核实车队身份','two',{requires:{partyAny:['lvbu']}}),F('保护车队通过第一关','pass-one')];
  before('guanyu','freed',[
   ['parents-home','chengdu','village-aunt','陪关羽父母安顿新住处',[
-   ['npc','一路都怕拖累他，夜里咳一声，他就下车来问。如今到了这里，你劝劝他，别每回出门都想着家里没人照应。'],['guanyu','父亲腿脚不便，我怕这里的门槛高。刚请木匠改好了，邻家也留了口信，有事可以到府里找人。'],['hero','二老住得习惯最要紧。关将军，等饭做好，我们一起吃一顿，你也坐下歇会儿，别又站在院子里。']]],
+   ['npc','一路都怕拖累他，夜里咳一声，他就下车来问。如今到了这里，你劝劝他，别每回出门都想着家里没人照应。'],['guanyu','父亲腿脚不便，我怕这里的门槛高。刚请木匠改好了，邻家也留了口信，有事可以到府里找人。'],['hero','二老住得习惯最要紧。云长，等饭做好，我们一起吃一顿，你也坐下歇会儿，别又站在院子里。']]],
   ['road-meaning','chengdu','guanyu','听关羽说起西行途中遇到的人',[
    ['npc','原想只带父母走，最后却跟了这么多乡亲。过桥时有人替我们修车，也有人把自己的水分出来，我记着这些人。'],['hero','以后再带人赶路，就照这次一样，别把走得慢的落下。我们想找的同伴，也正是愿意这么做的人。'],['npc','那我愿意跟你们同行。父母已经安顿好，眼前再有谁遇上这种事，我不能只当没看见。']]]
  ]);
@@ -8358,7 +8388,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   ['village-apology','xiapi-county','village-aunt','陪张飞向受惊的乡民解释赔礼',[
    ['npc','张将军能打，我们知道。可他喝醉摔坏了桥头的栏杆，孩子现在都不敢从那里过。他要走，好歹先把这件事办了。'],['zhangfei','这事是我不对。我带人把木料抬来，怎么修请你们熟悉桥的人说，不能随便钉两根就算。'],['hero','我也留下帮忙。先把桥修好，别让乡亲们每天都得绕远路。']]],
   ['village-bridge','xiapi-county','zhangfei','修好桥头护栏后，与张飞谈谈',[
-   ['npc','大哥信里没骂我，只问我吃饭没有、住在哪里。我原先憋着一肚子气，今天抬完木料才觉得，自己把事想拧了。'],['hero','你要回去，当面把话说清楚就行。别让关心你的人一直托别人找，也别用酒把难受拖下去。'],['npc','好，我先回信报平安。往后跟你们出门，喝酒的事你看着我，再摔东西，我自己修。']]]
+   ['npc','大哥信里没骂我，只问我吃饭没有、住在哪里。我原先憋着一肚子气，今天抬完木料才觉得，自己把事想拧了。'],['hero','翼德，你要回去，当面把话说清楚就行。别让关心你的人一直托别人找，也别用酒把难受拖下去。'],['npc','好，我先回信报平安。往后跟你们出门，喝酒的事你看着我，再摔东西，我自己修。']]]
  ]);
  before('machao','freed',[
   ['old-retainer','wuwei','ma-old-soldier','向马家旧部问清旧宅被占的经过',[
@@ -8367,7 +8397,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  battle('machao','retainer-rescue','ma-residence','river-guard','救出马家旧部',[
   ['npc','刚拿了枪又回来？你们再往里走，这几个人就别想出去！'],['machao','他们只是替家里看门，没有得罪过你们。把门打开，我就在这里，不会拿老人替自己挡刀。']],'retainer-home',{count:5,kind:null,guest:'machao',scene:'city-frontier'});
  H.definitions.machao.stages['retainer-home']=S('wuwei','将获救旧部安置到安全住处','machao',[
-  ['npc','人都接回来了，粮仓钥匙交给了愿意照管的老人。我把以前留下的东西分了些给他们，先把这个冬天过好。'],['hero','枪找回来以后，你总算肯抬头看看周围了。那些人等的也不是你一个人冲进去打赢，是想知道你还会回来。'],['npc','这次记住了。你们以后要救谁，我跟着去，也把人安顿好再走。']],[N('与马超谈谈同行','freed')]);
+  ['npc','人都接回来了，粮仓钥匙交给了愿意照管的老人。我把以前留下的东西分了些给他们，先把这个冬天过好。'],['hero','孟起，枪找回来以后，你总算肯抬头看看周围了。那些人等的也不是你一个人冲进去打赢，是想知道你还会回来。'],['npc','这次记住了。你们以后要救谁，我跟着去，也把人安顿好再走。']],[N('与马超谈谈同行','freed')]);
  before('liubei','feast',[
   ['jiangxia-guest','jiangxia','evacuee','先了解江夏安置百姓的争议',[
    ['npc','刘将军想把河边的空屋借给我们，当地几家却不答应。他们说我们住下就要分粮，昨晚连进城的路都堵了。'],['hero','住处没谈好，怎么先办起宴席来了？'],['npc','说是请两边坐下讲清楚。刘将军不想让我们在外面再等，可我看守卫带得比平常多，你们进去提醒他，凡事小心些。']]]
@@ -8388,18 +8418,18 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  battle('zhouyu','river-night','chaisang','bandit-chief','截住以假灯号劫船的水贼',[
   ['npc','那条船上怎么没人？后面的，先别靠过去，岸边有人！'],['zhouyu','客船都进内湾了。守住船夫退回来的水口，别让他们再往乡亲那边冲。']],'river-aftermath',{count:5,guest:'zhouyu',scene:'river-dock'});
  H.definitions.zhouyu.stages['river-aftermath']=S('jianye','与周瑜安排水道巡守','zhouyu',[
-  ['npc','原来是个被辞退的引水人，把旧灯号卖给了水贼。船夫已经认出他，之后换信号也会由两边一起确认，不能只凭一盏灯。'],['hero','今晚没丢船，也没把百姓留在岸边等。等这里有人轮守，你再跟我们出去，才不用走一半又担心后面。'],['npc','都已安排好了。还有件事，琴已经修好，今晚再忙也该弹给你们听。这回你们坐下，我不会又叫人把船牵出来了。']],[N('与周瑜商议同行','freed')]);
+  ['npc','原来是个被辞退的引水人，把旧灯号卖给了水贼。船夫已经认出他，之后换信号也会由两边一起确认，不能只凭一盏灯。'],['hero','今晚没丢船，也没把百姓留在岸边等。公瑾，等这里有人轮守，你再跟我们出去，才不用走一半又担心后面。'],['npc','都已安排好了。还有件事，琴已经修好，今晚再忙也该弹给你们听。这回你们坐下，我不会又叫人把船牵出来了。']],[N('与周瑜商议同行','freed')]);
  before('huanggai','entrance',[
   ['mountain-witness','wuling','herbalist','请熟悉山路的药夫指出安全入口',[
-   ['npc','正面的沟口以前能走，最近他们堆了湿草，专等有人进沟再点火。吕蒙认得的是旧路，恐怕就是在那里吃了亏。'],['huanggai','那就从上坡看清再下去。先救人，别为了抓放烟的那几个，把被困的人又丢在沟里。']]]
+   ['npc','正面的沟口以前能走，最近他们堆了湿草，专等有人进沟再点火。吕将军认得的是旧路，恐怕就是在那里吃了亏。'],['huanggai','那就从上坡看清再下去。先救人，别为了抓放烟的那几个，把被困的人又丢在沟里。']]]
  ]);
  before('huanggai','freed',[
   ['mountain-care','wuling','huanggai','确认获救者得到医治与家人接应',[
-   ['npc','乡兵愿意轮班守林口，采药的人也学会结伴走。吕蒙的伤慢慢养，你别看他又想拿剑，郎中还没许他抬那条胳膊。'],['hero','我会提醒他。你也让人替换着守，不能靠一个老将军每天进山，才让所有人安心。'],['npc','你说得对，老将也得肯把事情教给年轻人。这里有人接手，我就跟你们去外面走走。']]]
+   ['npc','乡兵愿意轮班守林口，采药的人也学会结伴走。子明的伤慢慢养，你别看他又想拿剑，郎中还没许他抬那条胳膊。'],['hero','我会提醒他。你也让人替换着守，不能靠一个老将军每天进山，才让所有人安心。'],['npc','你说得对，老将也得肯把事情教给年轻人。这里有人接手，我就跟你们去外面走走。']]]
  ]);
  before('lvmeng','freed',[
   ['lesson','wuling','lvmeng','复盘演阵中没有守住的侧路',[
-   ['npc','我刚才只顾着追前面那个人，把侧面让空了。书里那句别贪眼前的小利，我认得每个字，做起来还是忘。'],['hero','那就再看一次刚才站的位置。以后真遇到人退，不要先问追不追，先问后面的队友有没有人照应。'],['npc','记下了。附近药车明天过山口，我们不妨陪着走一段，这次不演，真替乡亲把那条侧路守好。']],[N('陪吕蒙护送药车','escort-lesson')]]
+   ['npc','我刚才只顾着追前面那个人，把侧面让空了。书里那句别贪眼前的小利，我认得每个字，做起来还是忘。'],['hero','子明，那就再看一次刚才站的位置。以后真遇到人退，不要先问追不追，先问后面的队友有没有人照应。'],['npc','记下了。附近药车明天过山口，我们不妨陪着走一段，这次不演，真替乡亲把那条侧路守好。']],[N('陪吕蒙护送药车','escort-lesson')]]
  ]);
  battle('lvmeng','escort-lesson','wuling-county','lvmeng','护住药车经过山口',[
   ['npc','前面的人在引我们追，右边却有人往车后绕。大家别散，先把车送过狭口，我来守右边。'],['hero','这回看清楚了。等车过了，咱们一起退，不留谁独自断后。']],'lesson-done',{count:4,guest:'lvmeng',scene:'forest-path'});
@@ -8407,7 +8437,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   ['npc','这一次没有人受伤，药车也准时送到了。读书不是为了让别人说我懂得多，是为了再进山时不把人带到险处。'],['hero','那就把书继续带着。路上遇到不会的，大家一起问，肯认自己没弄明白，比装懂强。']],[N('与吕蒙商议同行','freed')]);
  before('luxun','freed',[
   ['stone-reason','bagua-stones','luxun','问清陆逊进入石阵的原因',[
-   ['npc','我不是只想逞强。旁边运粮的人说，见过一个孩子在石阵边玩，我想进去找，结果自己绕不出来。后来才知道孩子早已回家。'],['hero','那得先去问明白。你困在里面，外面的人要是也进来找，又会把别人带进去。']]],
+   ['npc','我不是只想逞强。旁边运粮的人说，见过一个孩子在石阵边玩，我想进去找，结果自己绕不出来。后来才知道孩子早已回家。'],['hero','伯言，那得先去问明白。你困在里面，外面的人要是也进来找，又会把别人带进去。']]],
   ['stone-warning','yiling','village-aunt','核实孩子平安，给石阵留下醒目标记',[
    ['npc','孩子就在家里，鞋坏了才绕远路回来。你们真进去找了？我得叫他来赔个不是，害大家担心这么久。'],['luxun','不用责怪他，是我没先问清。阵口我会加上木栏和指路牌，让过路的人知道哪里能走，不能只想着自己认得方向。'],['hero','标记立好了，再请附近的人一起看看。只要下个人不用再进去绕一整天，这趟就没白忙。']]]
  ]);
@@ -8417,7 +8447,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  ]);
  before('sunquan','plan',[
   ['outer-scout','chaisang','camp-scout','核实柴桑两路围兵的布置',[
-   ['npc','袁术占着上游粮路，严白虎守下游渡口，两边各收各的东西。昨天因为一条粮船吵过，直到夜里都没一起换岗。'],['hero','我们把哪边换岗、哪边扣船记下来，再去见孙权。先找能把乡亲送走的口子，不急着把两路兵都引到自己面前。']]]
+   ['npc','袁术占着上游粮路，严白虎守下游渡口，两边各收各的东西。昨天因为一条粮船吵过，直到夜里都没一起换岗。'],['hero','我们把哪边换岗、哪边扣船记下来，再去见孙将军。先找能把乡亲送走的口子，不急着把两路兵都引到自己面前。']]]
  ]);
  before('sunquan','freed',[
   ['river-return','jianye','sunquan','与孙权清点撤回的船只与伤者',[
@@ -8431,7 +8461,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
    ['npc','醒来以后能认人，也能说清疼在哪里，今天还得留在这里观察。方子交给医馆，没学过的人不能拿回去自己照着试。'],['hero','这几天我们跑了不少路，现在看着他能跟家里人说话，才觉得药篮真送到了该送的地方。'],['npc','我也一样。这里的医者已经学会记录和照看，我才放心跟你们出门，不让他们只拿着一张方子就不知该怎么办。']]]
  ]);
  const mh=H.definitions.menghuo;
- mh.stages.second.npc.turns=[{speaker:'npc',text:'寨老跟我说了病人的事。以前来的人也说要治病，拿了粮就走，我才一直不敢信。你们真能请来大夫，我让人陪着带路。'},{speaker:'hero',text:'先把重病的人搬到干燥处。我们出去请华佗，你愿意来就带路，别再拿比试耽误病人。'}];mh.stages.second.npc.choices=[N('请孟获带路，到林口查看','third')];
+ mh.stages.second.npc.turns=[{speaker:'npc',text:'寨老跟我说了病人的事。以前来的人也说要治病，拿了粮就走，我才一直不敢信。你们真能请来大夫，我让人陪着带路。'},{speaker:'hero',text:'先把重病的人搬到干燥处。我们出去请华大夫，你愿意来就带路，别再拿比试耽误病人。'}];mh.stages.second.npc.choices=[N('请孟获带路，到林口查看','third')];
  mh.stages.third=S('nanman-woods','清除堵住请医道路的劫粮者','bandit-chief',[
   ['npc','又想从这里出去？上次留下的粮还不够，再交一袋才准过！'],['menghuo','就是你们冒充来治病的人，拿完粮又守在这里抢。今天把路让开，我要去请真正的大夫。']],[F('清出请医的道路','third')]);
  mh.battles.third={stage:['third'],next:'doctor',title:'林口劫粮者',count:4,enemyKind:'bandit',level:10,sceneId:'forest-path',guest:'menghuo'};
@@ -8493,6 +8523,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  t.battles['jianye-duel']={stage:['jianye-duel'],next:'freed',title:'建业教场',sceneId:'farmland',duel:'taishici',solo:true,boss:true,scaleToHero:true,trainingWeapon:'练武木刀',trainingSkills:[{base:'sword-cut',name:'横刀试招'}],effects:{flags:{taishiciTrialWon:true}}};
  t.stages.freed.place='jianye';t.stages.freed.npc.turns=[{speaker:'npc',text:'这场我认输。你没有让同伴下场，受了伤也没乱掉，跟我在北海认识的还是同一个人。以后要一起走，我愿意。'},{speaker:'hero',text:'那我们先把伤处理好，再商量往哪里去。你在建业还有要交代的事，我们等你办完。'}];
  for(const key of ['jianye-meet','jianye-duel','freed'])t.stages[key].recommendedLevel=10;
+ t.battles['jianye-duel'].temporaryPassives=['enemy-healing-suppression','enemy-wipe-120'];t.stages.freed.npc.choices.find(c=>c.recruit===false).label='留在建业';
  t.recruitRequires={flags:{taishiciTrialWon:true},hint:'太史慈已约在建业教场，单挑获胜后才能邀请同行。'};t.recruitRedirect='jianye-meet';
  // 各条路线保留不同的考验，文士与医者不硬套武力单挑。
  Object.assign(H.definitions.zhangliao.battles.duel,{solo:true,boss:true,scaleToHero:true,trainingWeapon:'练武弩',trainingSkills:[{base:'sword-cut',name:'校场试射'}]});
@@ -8521,6 +8552,8 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   ['rounds-handover','xiangyang-county','huatuo','完成宜城送药，将巡诊簿交给华佗',[
    ['npc','两户人家的情况，都交给药徒记好了吗？有这份记录，之后接手的大夫才知道该留意什么，我也能放心出门。']],[Go('拿出巡诊簿，交代病情','freed',{requires:{items:{'rounds-journal':1},hint:'先完成“宜城送药”，回药徒处交付，取得巡诊簿。'}})]]
  ]);
+ // 固定编成让玩家能观察、辨认和重试，不在每次开战时重新抽敌人。
+ for(const [id,phase,roles]of [['xuchu','temple',[null,null,'caster']],['taishici','depot',[null,null,'medic']],['ganning','breach',[null,null,null,'caster','medic']],['maliang','medicine',[null,'healer',null]],['zhouyu','river-night',[null,null,'witch',null,'healer']],['zhugeliang','water-timber',[null,null,'caster',null,'medic']],['simayi','grain-seizure',[null,null,'witch',null,'medic']]])H.definitions[id].battles[phase].enemyRoles=roles;
  // 石阵解围不是递交一封信；陆逊会参与一次真正的守路行动。
  Stories.before('luxun','freed',[
   ['road-warning','yiling','evacuee','与陆逊接应被堵在山口的乡民',[
@@ -8537,6 +8570,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  // 通常冲突以三人以下的小队为主，劫狱外院等明确配置保留四人。
  for(const d of Object.values(H.definitions))for(const f of Object.values(d.battles))if(d.id!=='ganning'&&f.count===4&&!f.boss&&!f.duel&&!f.roster&&!f.named)f.count=3;
  N.storyBattles.escort.count=3;
+ for(const d of Object.values(H.definitions)){const at=d.stages.freed?.place||d.place;if(at===d.home)for(const choice of d.stages.freed?.npc?.choices||[])if(choice.recruit===false)choice.label='留在'+root.WorldData.placeMap[d.home].name;}
  const api={version:1};root.RecruitmentChallenges=api;if(node)module.exports=api;
 })(globalThis);
 
@@ -8561,7 +8595,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
  const phases={
   vanguard:{title:'关前先锋',sceneId:'rural-road',next:'garrison',speaker:'huaxiong',lines:['各路人马终于到齐了？那就别再说什么借路，想进洛阳，先打赢我华雄。后面的兵都站好了，今天谁也不许往回跑！'],roster:[['huaxiong','front'],['soldier','back'],['soldier','back']]},
   garrison:{title:'陷阵守军',sceneId:'city-frontier',next:'gate',speaker:'gaoshun',lines:['前面退下来的人到我身后集合，受伤的先撤进去。弩手看住两侧，别为了追一个人跑出去，把关门前的阵势守好！'],roster:[['gaoshun','front'],['crossbow','back'],['crossbow','back']]},
-  gate:{title:'温侯拦关',sceneId:'city-frontier',next:'street',speaker:'lvbu',lines:['我知道你们迟早会来。董卓最近确实有些反常，我也想问个明白，可我还守着这道门。你们想过去，先拿出本事让我看看。'],roster:[['lvbu','front'],['soldier','back'],['soldier','back']]},
+  gate:{title:'温侯拦关',sceneId:'city-frontier',next:'street',speaker:'lvbu',lines:['我知道你们迟早会来。太师最近确实有些反常，我也想问个明白，可我还守着这道门。你们想过去，先拿出本事让我看看。'],roster:[['lvbu','front'],['soldier','back'],['soldier','back']]},
   street:{title:'洛阳街垒',sceneId:'market-street',next:'advisor',speaker:'lijue',lines:['街口都让他们打进来了，再退就只剩太师府了！郭汜，你带人看住右边的小巷，别让他们从屋后绕过去，我们在这里把人拦住！'],roster:[['lijue','front'],['guosi','front'],['assassin','back']]},
   advisor:{title:'府前毒阵',sceneId:'city-north',next:'dongzhuo',speaker:'liru',lines:['外面的守军居然没能拦住你们，看来我得亲自招待了。院门已经关好，几位既然进来了，就在这里多待一会儿，别急着去见董太师。'],roster:[['guard','front'],['guard','front'],['liru','back']]},
   dongzhuo:{title:'太师府决战',sceneId:'city-north',next:'aftermath',speaker:'dongzhuo',lines:['一路打到这里，就以为我只能坐着等你们来问话？既然都来了，谁也别想再轻轻松松走出去，进来让我看看你们的本事！'],roster:[['dongzhuo','front']]}
@@ -8691,6 +8725,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     prepareRecruit(raw){
       const u=copy(raw),id=u.characterId||u.id;
       if(u.passives?.includes('enemy-stun-resistance')){u.passives=u.passives.filter(id=>id!=='enemy-stun-resistance');u.statusImmunities=u.statusImmunities?.filter(id=>id!=='stun');}
+      const passiveDefinitions=(node?require('./passives.js'):root.BattlePassives).definitions;u.passives=(u.passives||[]).filter(id=>typeof id==='string'&&!passiveDefinitions[id]?.enemyOnly&&!id.startsWith('enemy-status-immunity:'));if(u.observationEnemy||u.side==='enemy'){u.statusImmunities=[];delete u.boss;delete u.side;}delete u.observationEnemy;
       if(id==='zhaoyun'||!u.baseAttributes||!u.potentials)return u;
       const old=I.apply(u),attributes=G.attributesAt(u.baseAttributes,u.potentials,this.character.level),ratio=u.startSoldiers==null?1:clampTroops(u.startSoldiers,old.maxSoldiers)/old.maxSoldiers;
       Object.assign(u,{level:this.character.level,experience:0,experienceVersion:2,attributes,recruitLevelVersion:1},attributes);delete u.maxSoldiers;delete u.equipmentBase;
@@ -8829,7 +8864,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     npcUnit(id){
       this.syncCompanionLevels();const member=this.members().find(u=>u.id===id)||this.state.residents[id];if(member)return copy(member);
       if(['zhangjiao','zhangbao','zhangliang'].includes(id)){const P=node?require('./prologue.js'):root.PengpaiPrologue;return P.general(id,10);}
-      if(H.definitions[id]){const d=H.definitions[id],phase=Object.keys(d.battles).find(k=>d.battles[k].stage.includes(this.state.heroQuests[id].stage)&&d.battles[k].duel),fight=d.battles[phase];const u=Recruitment.companion(id,this.character.level);return fight?.duel?{...Recruitment.enemies(id,phase,this.character.level)[0],id,characterId:id}:u;}const questNpc=Object.keys(H.definitions).map(id=>H.npc(id,this.state.heroQuests[id])).find(n=>n?.id===id&&n.observe);if(questNpc)return {...H.enemies(1)[0],id:questNpc.id,name:questNpc.name};if(id==='zhaoyun')return this.zhaoYunUnit();if(id==='zhenji')return this.zhenJiUnit();return null;
+      if(H.definitions[id]){const d=H.definitions[id],phase=Object.keys(d.battles).find(k=>d.battles[k].duel&&(d.battles[k].stage.includes(this.state.heroQuests[id].stage)||d.stages[this.state.heroQuests[id].stage]?.npc?.choices?.some(c=>d.battles[k].stage.includes(c.next)))),fight=d.battles[phase];const u=Recruitment.companion(id,this.character.level);return fight?.duel?{...Recruitment.enemies(id,phase,this.character.level)[0],id,characterId:id,observationEnemy:true}:u;}const questNpc=Object.keys(H.definitions).map(id=>H.npc(id,this.state.heroQuests[id])).find(n=>n?.id===id&&n.observe);if(questNpc)return {...H.enemies(1)[0],id:questNpc.id,name:questNpc.name};if(id==='zhaoyun')return this.zhaoYunUnit();if(id==='zhenji')return this.zhenJiUnit();return null;
     }
     startChangshan(){
       const q=this.state.quests.changshan;if(this.state.nodeId!=='changshan'||!(q.stage==='available'||q.zhaoInvitation)||this.state.companions.some(u=>u.id==='zhaoyun')||this.pending||this.journey||!this.canRecruit())return false;const u=this.zhaoYunUnit();
@@ -8854,9 +8889,9 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     }
     inviteResident(id){this.syncCompanionLevels();const u=this.state.residents[id];if(!u||u.homeNode!==this.state.nodeId||this.pending||this.journey||this.state.companions.some(c=>c.id===id)||!this.canRecruit())return false;this.state.companions.push(copy(u));this.state.troops[id]=u.startSoldiers??E.maxHealth(u.constitution);if(u.condition)this.state.conditions[id]=u.condition;if(this.state.activeIds.length<this.activeLimit())this.state.activeIds.push(id);delete this.state.residents[id];return true;}
     campAdvice(){
-      if(!Object.values(this.state.trainingWins).some(Boolean))return ['我还是担心你在路上碰到乱兵。要是不急着走，先去教场找张梁练练吧，他就在那边，想试什么兵器都能陪你，不会的也可以问他。'];
-      if(this.state.quests.changshan.stage!=='complete')return [{available:'常山就在营地西北边，离得不远。前些天来投宿的人说，赵云在那里照顾逃难的乡亲，应该就是你想找的人，你可以先过去问问。',entry:'你要找的赵云就在常山村里。到了跟乡亲们打听一下，他们都认得他，也知道他平时在哪里帮忙。',supplies:this.state.quests.changshan.healerJoined?'甄姑娘已经平安救出来了，你们可以和赵云一起把粮运回去。常山那边等了这么久，最好早些让乡亲们收到消息，别继续担心。':'中山的粮食一直没送到，看来不是临时耽误。你和赵云一起过去，把仓守找来问问，看看是路不通，还是粮车出了事情。',rescue:'听说甄姑娘被带去了毋极，你们先去找人。张宝这里还有一些药，路上如果需要，可以回来拿，别让伤者一直拖着。',escort:'能把粮找回来就好。回常山的时候慢一点，车上还有伤者，中途觉得不舒服就停下来歇歇，不用为了赶路一直颠着他们。',return:'到了常山先找里正，让他叫人卸粮、分发。大家已经等了很久，村口一下围太多人，反而容易把车上的伤者挤着。',decision:'常山的事情暂时安排好了，你们也能歇一会儿。赵云以后准备去哪里，你问过没有？既然一起忙了这么久，也该坐下来好好聊聊。'}[this.state.quests.changshan.stage]||'你这趟出去还顺利吗？遇到什么不好处理的事情，告诉我们听听，能帮忙的地方，我们再一起想办法。'];
-      if(!this.state.visited.includes('changshan'))return ['我听说赵云还在常山照顾流民，你可以先去村里找他。路上要是受伤，记得回来让张宝看看，不要觉得回来一趟麻烦就硬撑。'];
+      if(!Object.values(this.state.trainingWins).some(Boolean))return ['我还是担心你在路上碰到乱兵。要是不急着走，先去教场找我三弟练练吧，他就在那边，想试什么兵器都能陪你，不会的也可以问他。'];
+      if(this.state.quests.changshan.stage!=='complete')return [{available:'常山就在营地西北边，离得不远。前些天来投宿的人说，赵子龙在那里照顾逃难的乡亲，应该就是你想找的人，你可以先过去问问。',entry:'你要找的赵子龙就在常山村里。到了跟乡亲们打听一下，他们都认得他，也知道他平时在哪里帮忙。',supplies:this.state.quests.changshan.healerJoined?'甄姑娘已经平安救出来了，你们可以和子龙一起把粮运回去。常山那边等了这么久，最好早些让乡亲们收到消息，别继续担心。':'中山的粮食一直没送到，看来不是临时耽误。你和子龙一起过去，把仓守找来问问，看看是路不通，还是粮车出了事情。',rescue:'听说甄姑娘被带去了毋极，你们先去找人。我二弟这里还有一些药，路上如果需要，可以回来拿，别让伤者一直拖着。',escort:'能把粮找回来就好。回常山的时候慢一点，车上还有伤者，中途觉得不舒服就停下来歇歇，不用为了赶路一直颠着他们。',return:'到了常山先找里正，让他叫人卸粮、分发。大家已经等了很久，村口一下围太多人，反而容易把车上的伤者挤着。',decision:'常山的事情暂时安排好了，你们也能歇一会儿。子龙以后准备去哪里，你问过没有？既然一起忙了这么久，也该坐下来好好聊聊。'}[this.state.quests.changshan.stage]||'你这趟出去还顺利吗？遇到什么不好处理的事情，告诉我们听听，能帮忙的地方，我们再一起想办法。'];
+      if(!this.state.visited.includes('changshan'))return ['我听说赵子龙还在常山照顾流民，你可以先去村里找他。路上要是受伤，记得回来让我二弟看看，不要觉得回来一趟麻烦就硬撑。'];
       if(this.coalitionReady())return ['魏、蜀、吴都有了愿意帮忙的人，现在可以认真商量怎么对付董卓了。你先去跟各家负责的人谈谈，确定谁能出兵、谁来接应，再到洛阳去。'];
       const clue=D.clues.filter(c=>H.definitions[c.id]&&!this.state.recruits[c.faction].includes(c.id)&&!this.state.visited.includes(c.place)).sort((a,b)=>(this.findRoute(a.place)?.distance??Infinity)-(this.findRoute(b.place)?.distance??Infinity))[0];
       return [clue?clue.text:'你最近跑了不少地方，先在营里歇歇吧。找人的事情不用每次都急着赶路，遇到愿意聊天的乡亲，多问问附近的消息，也许就能有线索。'];
@@ -8925,11 +8960,11 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
         return {id:'camp-training',title:training.label,scene:Scenes.arrange(copy(D.townScenes.camp),enemies),allies:[...this.trainingAllies(training),...extraAllies],enemies,passives:heroPassives(),rules:{difficulty:this.character.difficulty,partySlots:this.activeLimit(),bossBattle:!!training.rivals,level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true,seed:this.pending.seed}};
       }
       if(['story','side'].includes(this.pending.kind)){
-        const p=this.pending,data=p.kind==='story'?N.storyBattles[p.phase]:N.sideQuests.find(q=>q.id===p.questId),level=this.enemyLevel(),count=p.kind==='story'?data.count:data.rounds===5?[2,3,2,3,5][this.state.quests.side[data.id].wins]:[2,3,5][Math.min(2,this.state.quests.side[data.id].wins)],enemies=(data.bossId?Optional.roster(data.bossId):N.bandits(level,count,p.kind==='story'&&['grain','escort'].includes(p.phase))).map((u,i)=>({...(data.bossId?u:this.scaleEnemy(u)),...(root.CharacterAssets?root.CharacterAssets.resolve(u.characterId):{}),id:'local-enemy-'+i}));
+        const p=this.pending,data=p.kind==='story'?N.storyBattles[p.phase]:N.sideQuests.find(q=>q.id===p.questId),level=this.enemyLevel(),count=p.kind==='story'?data.count:data.rounds===5?[2,3,2,3,5][this.state.quests.side[data.id].wins]:[2,3,5][Math.min(2,this.state.quests.side[data.id].wins)],enemies=(data.bossId?Optional.roster(data.bossId):N.mixRoster(N.bandits(level,count,p.kind==='story'&&['grain','escort'].includes(p.phase)),p.kind==='side'&&level>=3?N.mixedRoles(count,E.seedNumber(p.questId)+this.state.quests.side[p.questId].wins):null)).map((u,i)=>({...(data.bossId?u:this.scaleEnemy(u)),...(root.CharacterAssets?root.CharacterAssets.resolve(u.characterId):{}),id:'local-enemy-'+i}));
         return {id:'local-'+p.kind,title:data.title,scene:Scenes.arrange(Scenes.get(data.sceneId||'rural-road'),enemies),allies:[...this.storyAllies(p.phase),...extraAllies],enemies,passives:heroPassives(),rules:{difficulty:this.character.difficulty,partySlots:this.activeLimit(),bossBattle:!!data.bossId,allySp:0,hit:true,critical:true,seed:p.seed}};
       }
       const troops=this.members(),allies=this.state.activeIds.map(id=>troops.find(u=>u.id===id)).filter(Boolean),encounter=D.encounters[this.pending.encounterId];if(!encounter)throw new Error('遭遇配置不存在');
-      const count=encounter.count||D.placeMap[this.pending.to].encounterCount||1,enemies=Array.from({length:count},(_,i)=>{const unit=copy(encounter.roster[i%encounter.roster.length]),art=root.CharacterAssets?.manifest.characters[unit.characterId]?root.CharacterAssets.resolve(unit.characterId):{};return {...this.scaleEnemy(unit),...art,id:encounter.id+'-'+i};});
+      const count=encounter.count||D.placeMap[this.pending.to].encounterCount||1,enemies=N.mixRoster(Array.from({length:count},(_,i)=>{const unit=copy(encounter.roster[i%encounter.roster.length]),art=root.CharacterAssets?.manifest.characters[unit.characterId]?root.CharacterAssets.resolve(unit.characterId):{};return {...this.scaleEnemy(unit),...art,id:encounter.id+'-'+i};}),this.enemyLevel()>=3?N.mixedRoles(count,E.seedNumber(this.pending.seed)):null,{army:encounter.id==='patrol'}).map(u=>({...u,...(root.CharacterAssets?.manifest.characters[u.characterId]?root.CharacterAssets.resolve(u.characterId):{})}));
       const passives=heroPassives();
       return {id:'road-encounter',title:encounter.title,scene:Scenes.arrange(copy(encounter.scene),enemies),allies:[...allies,...extraAllies],enemies,passives,rules:{...copy(encounter.rules),difficulty:this.character.difficulty,partySlots:this.activeLimit(),seed:this.pending.seed}};
     }
@@ -8978,8 +9013,8 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   if(!u){this.closeWorldPanel();return;}
   const previewKey=JSON.stringify(u);if(p.previewKey!==previewKey){p.previewKey=previewKey;p.previewCache=this.memberPreview(u);}const preview=p.previewCache,actor=preview.unit(u.id),current=preview.effective(actor),ids=actor.skills,passives=root.PengpaiRules.sortPassives(actor.passives,preview.passives),c=this.ctx;
   const showPotential=!!u.potentials&&(!p.readonly||root.CharacterGrowth.isGeneral(u)),statsH=108,showExperience=members.some(member=>member.id===u.id);
-  const compact=this.h<640,width=Math.min(560,this.w-16),inner=width-28,headerH=compact?44:48,skillSize=compact?48:52,skillRowH=compact?60:64,footerH=compact?42:46,barH=showExperience?(compact?32:36):17,skillCols=Math.min(3,Math.max(1,ids.length)),skillRows=Math.ceil(ids.length/skillCols),passiveCols=4,passiveRows=Math.ceil(passives.length/passiveCols);
-  const fixed=headerH+skillRows*skillRowH+passiveRows*24+statsH+4+barH+footerH,modelH=clamp(Math.min(440,inner*1.18,this.h-16-fixed),180,440),contentH=modelH+skillRows*skillRowH+passiveRows*24+statsH+4+barH;
+  const compact=this.h<640,width=Math.min(560,this.w-16),inner=width-28,headerH=compact?44:48,skillSize=compact?48:52,skillRowH=compact?60:64,footerH=compact?42:46,barH=showExperience?(compact?32:36):17,skillCols=Math.min(3,Math.max(1,ids.length)),skillRows=Math.ceil(ids.length/skillCols),passiveH=root.PengpaiUI.passiveHeight(passives.map(id=>preview.passives[id]),width-28);
+  const fixed=headerH+skillRows*skillRowH+passiveH+statsH+4+barH+footerH,modelH=clamp(Math.min(440,inner*1.18,this.h-16-fixed),180,440),contentH=modelH+skillRows*skillRowH+passiveH+statsH+4+barH;
   const f=this.frame(u.name+'  '+u.level+'级',fixed+modelH,{titleAlign:'center',maxWidth:560,inset:8,verticalInset:8}),left=f.x+14,top=f.y+headerH,bottom=f.y+f.h-footerH,slotSize=Math.min(46,Math.floor(modelH/4)-5),slotGap=Math.min(12,(modelH-slotSize*4)/3),equipmentOffset=(modelH-slotSize*4-slotGap*3)/2,proto=root.BattleSystem.CanvasBattle.prototype;
   const teammates=p.readonly?[]:[...this.model.partyGroups().active,...this.model.partyGroups().reserve];
   if(teammates.length>1&&teammates.some(member=>member.id===u.id))for(const [delta,glyph,label]of [[-1,'‹','上一位队友'],[1,'›','下一位队友']]){const index=teammates.findIndex(member=>member.id===u.id);this.button(glyph,f.x+f.w/2+(delta<0?-102:72),f.y+9,30,30,()=>this.openCharacter(teammates[(index+delta+teammates.length)%teammates.length].id,p.previous));this.hits.at(-1).label=label;}
@@ -9003,7 +9038,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
   });
   y+=skillRows*skillRowH;
   root.PengpaiUI.passiveButtons(this,passives.map(id=>preview.passives[id]),left,y,inner,passive=>this.openPassiveInfo(passive,p));
-  y+=passiveRows*24;
+  y+=passiveH;
   const gap=12,cw=(inner-gap)/2,pairs=[['war','武力','constitution','体质'],['intelligence','智力','armor','护甲'],['technique','技巧','resistance','抗性'],['speed','速度',...(u.statusImmunities?.includes('stun')?['stunProtection','抗晕']:[])]];
   this.box(left,y,inner,statsH,'#091d26','#37545e',3);
   pairs.forEach((row,i)=>{const yy=y+i*27+13.5;for(let col=0;col<row.length/2;col++){const x=left+col*(cw+gap),key=row[col*2],label=row[col*2+1],potential=showPotential?u.potentials?.[key]:null;if(potential!=null){this.text(label+' '+Number(current[key].toFixed(2)),x+6,yy,14,'#eddfc0');this.text(potential+'(+'+Number(root.CharacterGrowth.growthPerLevel(potential).toFixed(2))+')',x+cw-6,yy,14,'#d6bb8b','right');}else{this.text(label,x+6,yy,14,'#a9bec3');this.text(key==='stunProtection'?'抵抗':Number(current[key].toFixed(2)),x+cw-6,yy,16,'#eddfc0','right');}}});
@@ -9296,7 +9331,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     }
     openCharacter(id,previous=null){this.panel={type:'character',unitId:id,previous};}
     openItemDetail(item,options={}){this.notice=null;this.panel={type:'itemDetail',item,previous:this.panel,...options};}
-    memberPreview(id){const unit=typeof id==='object'?id:this.model.members().find(u=>u.id===id)||this.model.npcUnit(id);return new root.BattleEngine.Battle({allies:[unit],enemies:[],rules:{tacticsEnemyCount:5},passives:root.WorldModel.heroPassives?.()});}
+    memberPreview(id){const unit=typeof id==='object'?id:this.model.members().find(u=>u.id===id)||this.model.npcUnit(id);return new root.BattleEngine.Battle({allies:unit.observationEnemy||unit.side==='enemy'?[]:[unit],enemies:unit.observationEnemy||unit.side==='enemy'?[unit]:[],rules:{tacticsEnemyCount:5},passives:root.WorldModel.heroPassives?.()});}
     openMemberTactics(id,previous){
       const proto=root.BattleSystem.CanvasBattle.prototype,editor=Object.assign(Object.create(proto),{canvas:this.canvas,ctx:this.ctx,image:src=>this.image(src),w:this.w,h:this.h,hits:[],textTextures:new Map(),dpr:this.dpr||1,panel:null,aim:null,battle:this.memberPreview(id),options:{onTacticsSave:unit=>{this.model.saveTactics(unit);this.save();}}});
       const unit=editor.battle.unit(id);unit.soldiers=Math.max(1,unit.soldiers);editor.openTactics(unit);const outer={type:'tacticsEditor',editor,previous};editor.closePanel=()=>{proto.closePanel.call(editor);if(!editor.panel)this.panel=previous||null;};this.panel=outer;
@@ -9306,7 +9341,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
       if(npc.questId){const data=root.NearbyContent.sideQuests.find(t=>t.id===npc.questId);this.speak(npc,{lines:[data.id==='grain-escort'?'粮车就在我们这里。你们想把粮带走，先看看能不能从我们手里抢回去，别站在这里说废话！':'这段路现在由我们守着，想过去就把东西留下。要是不肯交，那就别怪我们动手了！'],choices:[{label:'剿匪',action:()=>{if(this.model.beginSideBattle(data.id))this.startBattle();}},{label:'离开',dismiss:true,action:()=>this.closeDialogue()}]});return true;}const N=root.NearbyContent,q=this.model.state.quests.changshan;
       if(npc.id==='changshan-elder'&&q.stage==='return'){this.speak(npc,{lines:['你们总算回来了！刚才村口又闹起来，我还怕伤着车上的人。先把粮车推进院里吧，我叫乡亲们来帮忙卸。','这一趟让你们费心了，今晚就在村里歇着吧。住处已经收拾好了，乡亲们也想请大家吃顿饭，当面说声谢谢。'],onComplete:()=>{this.model.advanceChangshan();this.save();this.questDialogue(D.questNpcs.zhaoyun);}});return true;}
       if(npc.id==='grain-steward'&&q.stage==='supplies'){
-        if(!q.healerJoined)this.speak(npc,{lines:['赵云，你们来了，我正愁找不到人帮忙。贼不光占了粮仓，还把甄姑娘和几个伤者抓走了，说要让甄家拿粮来换人。','他们把人带到了毋极，赶车的跟过去打听了消息。你们先去找他，仓里的粮暂时搬不完，我留在这里看着，有变化就叫人通知你们。'],choices:[{label:'赶往毋极救人',action:()=>{q.stage='rescue';this.save();this.closeDialogue();}}]});
+        if(!q.healerJoined)this.speak(npc,{lines:['赵将军，你们来了，我正愁找不到人帮忙。贼不光占了粮仓，还把甄姑娘和几个伤者抓走了，说要让甄家拿粮来换人。','他们把人带到了毋极，赶车的跟过去打听了消息。你们先去找他，仓里的粮暂时搬不完，我留在这里看着，有变化就叫人通知你们。'],choices:[{label:'赶往毋极救人',action:()=>{q.stage='rescue';this.save();this.closeDialogue();}}]});
         else this.speak(npc,{lines:[q.grainWins?'前院剩下的人都退到后仓去了，我看见他们在往门口堆东西。里面全是粮袋，你们进去时慢一点，别让灯火碰上了。':'甄姑娘也回来了，救出来的伤者都安顿好了吗？仓里还有人守着，前院人数少一点，可以先从这边进去，再想办法进后仓。'],choices:[{label:q.grainWins?'夺取后仓':'夺取前仓',action:()=>{if(this.model.beginStoryBattle('grain'))this.startBattle();}},{label:'稍后再来',action:()=>this.closeDialogue()}]});return true;
       }
       if(npc.id==='refugee-laborer'&&q.stage==='rescue'){this.speak(npc,{lines:['是中山的仓守叫你们来的吧？甄姑娘就在祠堂后院，跟几个伤者关在一起。我刚才还听见她在跟守卫争，要他们拿水进去。','车停在墙后，等你们把门口的人拦住，我就进去接伤者。先让他们上车，我们再一起走，免得一直留在院子里被人抓住。'],choices:[{label:'救出甄姑娘',action:()=>{if(this.model.beginStoryBattle('rescue'))this.startBattle();else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}},{label:'先整顿一下',action:()=>this.closeDialogue()}]});return true;}
@@ -9329,7 +9364,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     suggestedDestination(){return this.model.questDestination();}
     closeWorldPanel(){if(this.panel?.type==='party')PartyInput.cancel(this);if(this.panel?.type==='reward'){this.finishReward();return;}if(this.panel?.type==='tacticsEditor'){this.panel.editor.closePanel();return;}const previous=this.panel?.previous||null;if(previous?.type==='npcDialogue'){this.dialogue=previous.dialogue;this.panel=null;}else this.panel=previous;}
     interact(npc){const court=Object.values(root.FactionCourts.definitions).find(d=>d.id===(npc.courtId||npc.id));if(court&&!this.model.state.courtDreams[court.id]&&!npc.delegate){this.showCourtDream(npc,court);return;}this.dialogue=null;this.npcInteraction={id:npc.id,offered:false};this.speak(npc);}
-    observeNpc(npc){const unit=this.model.npcUnit(npc.id);if(!unit)return;const previous=this.dialogue?{type:'npcDialogue',dialogue:this.dialogue}:null,preview=new root.BattleEngine.Battle({allies:[unit],enemies:[]});this.dialogue=null;this.panel={type:'character',unitId:unit.id,unit:preview.unit(unit.id),readonly:true,previous};}
+    observeNpc(npc){const unit=this.model.npcUnit(npc.id);if(!unit)return;const previous=this.dialogue?{type:'npcDialogue',dialogue:this.dialogue}:null,preview=this.memberPreview(unit);this.dialogue=null;this.panel={type:'character',unitId:unit.id,unit:preview.unit(unit.id),readonly:true,previous};}
     progress(state=this.model.snapshot()){return {storyVersion:2,stage:'world',index:0,dreamChoice:root.PengpaiPrologue.checkpoint(this.options.progress).dreamChoice,preparation:{},world:copy(state)};}
     save(state){this.character=this.model.character;try{this.options.store.save(this.options.slot,this.character,this.progress(state));this.saveError=false;}catch{this.saveError=true;}}
     viewMembers(){const s=this.model.state,key=JSON.stringify([this.model.character,s.companions,s.weapon,s.weaponType,s.heroEquipment,s.troops,s.conditions,s.tactics]);if(this.memberSnapshot?.key!==key)this.memberSnapshot={key,units:this.model.members()};return this.memberSnapshot.units;}
@@ -9484,7 +9519,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
       const q=this.model.state.quests.changshan,stage=q.stage;
       if(npc.id==='zhaoyun'&&['available','entry'].includes(stage)){this.startChangshanArrival();return;}
       if(npc.id==='zhaoyun'&&q.zhaoInvitation){this.offerZhaoJourney();return;}
-      if(npc.id==='zhaoyun'&&stage==='decision'){this.speak(npc,{lines:['粮食分下去了，甄姑娘也留了药，乡亲们终于能安心歇几天。这次要不是你帮忙，救人和运粮赶在一起，我一个人确实照顾不过来。','我一直想去成都看看，听说刘备在那里安置了不少流民。现在村里的事安排好了，如果你还缺人，我可以先陪你走一段，等到了那边再一起去见他。'],choices:[{label:'留下同行（推荐）',action:()=>this.finishZhaoQuest(true)},{label:'先去成都',action:()=>this.finishZhaoQuest(false)}]});return;}
+      if(npc.id==='zhaoyun'&&stage==='decision'){this.speak(npc,{lines:['粮食分下去了，甄姑娘也留了药，乡亲们终于能安心歇几天。这次要不是你帮忙，救人和运粮赶在一起，我一个人确实照顾不过来。','我一直想去成都看看，听说玄德公在那里安置了不少流民。现在村里的事安排好了，如果你还缺人，我可以先陪你走一段，等到了那边再一起去见他。'],choices:[{label:'留下同行（推荐）',action:()=>this.finishZhaoQuest(true)},{label:'先去成都',action:()=>this.finishZhaoQuest(false)}]});return;}
       if(npc.id==='zhaoyun'){this.speak(npc,{lines:[{supplies:'中山有座粮仓，之前答应送粮到常山，后来却一直没有消息。我想过去问问，你愿不愿意一起？路上多个人，也能互相照应。',rescue:'仓守说，赶车的人已经跟到毋极去了，知道甄姑娘被关在哪里。我们先去找他，把人救出来，粮仓那边再回来处理。',escort:'粮都装好了，伤者也坐上了车。你在前面带路，我在后面照看，要是有人喊停，就等一等，别让车夫为了赶路把伤者颠坏了。',return:'乡亲们出来迎接了，我们先把粮车推进院子。里正知道哪几户急着用粮，让他安排分发，别全堵在村口。',complete:'这几天已经有人在修农具，商量着什么时候回田里看看了。能重新种地，大家就不用总靠别人送粮，我也能放心一些。'}[stage]||'稍等我一会儿，我去问问乡亲们还缺什么，确认都安排好就回来。']});return;}
       this.nearbyDialogue(npc);
     }
@@ -9508,7 +9543,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
       const choices=[...data.choices.map((choice,index)=>({label:choice.label+(choice.price?' · '+choice.price+'文':''),action:()=>{
         if(!this.model.chooseHeroQuest(id,index,stage)){this.notify(this.model.lastQuestError||'暂时不能进行。');return;}
         this.dialogue=null;this.save();if(choice.puzzle){this.panel={type:'slidingPuzzle',questId:id};return;}if(this.model.pending){this.startBattle();return;}
-        if(this.model.state.heroQuests[id].stage==='complete')this.speak({...npc,name:d.name||'甘宁',art:id},{lines:[choice.recruit?'我把东西收拾好就来。你们在门口歇一会儿，不用急着先走，有什么要带的也可以一起检查。':'那就'+D.placeMap[d.home||'jianye'].name+'等你们过来找我。路上多保重，以后还需要人帮忙，直接到这里叫我就好。']});
+        if(this.model.state.heroQuests[id].stage==='complete')this.speak({...npc,name:d.name||'甘宁',art:id},{lines:[choice.recruit?'我把东西收拾好就来。你们在门口歇一会儿，不用急着先走，有什么要带的也可以一起检查。':((d.home||'jianye')===this.model.state.nodeId?'我就留在':'我先回')+D.placeMap[d.home||'jianye'].name+'等你们。路上多保重，以后还需要人帮忙，来找我就好。']});
         else if(root.HeroQuests.place(id,this.model.state.heroQuests[id])===this.model.state.nodeId)this.heroQuestDialogue({...root.HeroQuests.npc(id,this.model.state.heroQuests[id]),selectedQuest:true});
       }})),...(forced?[]:[{label:'暂且离开',dismiss:true,action:()=>this.closeDialogue()}])];
       if(!forced&&this.npcInteraction?.id===npc.id&&!this.npcInteraction.offered&&this.model.npcUnit(npc.id)){this.npcInteraction.offered=true;choices.splice(Math.max(0,choices.length-1),0,{label:'观察',action:()=>this.observeNpc(npc)});}
@@ -9635,7 +9670,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
     drawPassiveInfo(){
       const p=this.panel,passive=p.passive,inner=Math.min(460,this.w-28)-44,c=this.ctx;c.font=`14px ${UI.font}`;
       const lines=UI.wrapLines(c,passive.description,inner),f=this.frame(passive.name,112+lines.length*24),top=f.y+54,bottom=f.y+f.h-16;let y=top+15-(p.scroll||0);
-      c.save();c.beginPath();c.rect(f.x,top,f.w,bottom-top);c.clip();this.text(passive.exclusive?'专属特质':root.PengpaiRules.QUALITIES[passive.quality]?.name+'品质',f.x+22,y,14,UI.passiveColor(passive));y+=32;
+      c.save();c.beginPath();c.rect(f.x,top,f.w,bottom-top);c.clip();this.text(passive.temporary?'临时特质 · 仅本场战斗':passive.exclusive?'专属特质':root.PengpaiRules.QUALITIES[passive.quality]?.name+'品质',f.x+22,y,14,UI.passiveColor(passive));y+=32;
       for(const line of lines){this.text(line,f.x+22,y,14,'#d2e0df');y+=24;}c.restore();p.maxScroll=Math.max(0,y+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);
     }
     showReward(reward){this.panel={type:'reward',reward:copy(reward),started:performance.now(),scroll:0};this.animate();}
@@ -9714,7 +9749,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
       if(context.kind==='story'){
         if(!victory){this.speak(D.questNpcs.zhaoyun,{lines:['先别追了，都退回来！大家身上都有伤，再打下去只会越来越难照顾。等包扎好，我们再想想该从哪边过去。']});return;}
         if(context.phase==='entry'){
-          this.playConversation([{npc:D.questNpcs.zhaoyun,lines:['刚才有没有伤着？让我看看。一直顾着把他们赶走，还没问你的名字。我叫赵云，最近在村里帮着照顾那些逃难来的乡亲。']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['你就是常山赵云？我叫'+this.character.name+'，从黄巾营地来的，本来就是想来找你。刚进村就听见这边吵起来，正想打听怎么回事，他们就拦着不让走了。']},{npc:D.questNpcs.zhaoyun,lines:['原来你是来找我的，那正好留下坐坐。先到乡医那里，让他把伤检查一下，等大家都安顿好，我们再慢慢聊。']}],()=>{this.model.rest();this.save();if(this.model.state.quests.changshan.zhaoInvitation)this.offerZhaoJourney();});return;
+          this.playConversation([{npc:D.questNpcs.zhaoyun,lines:['刚才有没有伤着？让我看看。一直顾着把他们赶走，还没问你的名字。我叫赵云，字子龙。最近在村里帮着照顾那些逃难来的乡亲。']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['你就是赵子龙？我叫'+this.character.name+'，从黄巾营地来的，本来就是想来找你。刚进村就听见这边吵起来，正想打听怎么回事，他们就拦着不让走了。']},{npc:D.questNpcs.zhaoyun,lines:['原来你是来找我的，那正好留下坐坐。先到乡医那里，让他把伤检查一下，等大家都安顿好，我们再慢慢聊。']}],()=>{this.model.rest();this.save();if(this.model.state.quests.changshan.zhaoInvitation)this.offerZhaoJourney();});return;
         }
         if(context.phase==='grain'&&this.model.state.quests.changshan.healerJoined){this.model.rest();this.save();}
         if(context.phase==='grain'&&this.model.state.quests.changshan.healerDecision){this.offerZhenStay();return;}
@@ -9807,7 +9842,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
       line('zuoci','他们都有自己的打算，你把人拉到一起，也不能让他们都听你的。现在打仗的地方更多了，原来的办法又用不了，你准备怎么收拾？','zuoci'),
       line('yuji','好了，别当着他的面吵。人已经来了，让他先问吧。','yuji'),
       line('hero','这是哪儿？我刚才不是在营里睡觉吗？','nanhua'),
-      line('yuji','你还在营帐里睡着，不用怕，我们只是通过这个梦跟你谈话。我叫于吉，刚才在说话的是左慈，另一位是南华。','yuji'),
+      line('yuji','你还在营帐里睡着，不用怕，我们只是通过这个梦跟你谈话。我叫于吉，刚才说话的是左元放，另一位是南华。','yuji'),
       line('nanhua','今天让你受了不少惊吓，还挨了顿打，实在对不住。','nanhua'),
       line('hero','等一下，你们知道我挨打了？那我到这个地方来，也跟你们有关系？','nanhua'),
       line('nanhua','你会来到这里，是我们做的。我们想找一个精通三国历史、从未来来的人，帮忙找到那些还没有出名的将领，最后找到了你。','nanhua'),
@@ -9823,8 +9858,8 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
       line('nanhua','我们找你，不是因为你现在就能带兵打仗，而是你知道这些人的经历。许多能做事的人还留在乡里，如果有人找到他们，帮他们解决眼前的困难，就能慢慢把人手聚起来。','nanhua'),
       line('yuji','你可以先帮魏、蜀、吴找些愿意做事的人，等他们有了足够的人手，我们再想办法请几家一起商量出兵，对付控制朝廷的董卓。','yuji'),
       line('hero','这么说，有些原本该跟着曹操、刘备的人，现在还没去？','yuji'),
-      line('zuoci','对，许褚还在谯县帮村里守粮，甘宁也还在江上活动。这些人暂时没有去你熟悉的那些地方，可他们的本事还在，你比我们更知道该去哪里打听。','zuoci'),
-      line('nanhua','先从近的地方试试吧，赵云就在常山照顾逃难的百姓。常山离营地不远，你能先在那里熟悉一下情况，不用马上跑遍天下。','nanhua'),
+      line('zuoci','对，许仲康还在谯县帮村里守粮，甘兴霸也还在江上活动。这些人暂时没有去你熟悉的那些地方，可他们的本事还在，你比我们更知道该去哪里打听。','zuoci'),
+      line('nanhua','先从近的地方试试吧，赵子龙就在常山照顾逃难的百姓。常山离营地不远，你能先在那里熟悉一下情况，不用马上跑遍天下。','nanhua'),
       line('hero','人是能找到，可我跟他们非亲非故的，凭什么劝他们走？','nanhua'),
       line('yuji','先去见一面，问问他们遇到了什么困难。能帮的事情就帮一帮，熟悉以后再谈以后的打算，愿意跟着走的人，也可以先和你同行。','yuji'),
       {...line('nanhua','我们知道这趟有危险，不能让你白白承担。等这里的事情办好，我们会负责送你回去，让你能重新见到家里人，这件事一定会做到。','nanhua'),choices:[{id:'gold',label:'那可不够，还要十万两黄金'},{id:'stay',label:'我不想回去'}]}
@@ -9851,7 +9886,7 @@ if(modal.type==='about'){const f=this.modalFrame('关于异界三国',284);let y
       line('hero','送我回去本来就是你们该做的。我还得替你们跑遍各地，弄不好连命都搭进去。事情办成以后，再给我十万两黄金，怎么样？','nanhua'),
       line('zuoci','你这价钱开得可不低。南华，这笔账可得算在你头上。','zuoci'),
       line('nanhua','是我把你带到这里，不能再让你只替我们冒险。十万两黄金，我答应你，送你回去的事情也一定会办，不会说完就算了。','nanhua'),
-      line('hero','那就说好了，你们三个人都听见了。我先到常山找找赵云，至于后面能做到哪一步，还得见了人、弄清情况再说。','nanhua'),
+      line('hero','那就说好了，你们三个人都听见了。我先到常山找找子龙，至于后面能做到哪一步，还得见了人、弄清情况再说。','nanhua'),
       line('yuji','我们都记着。路上遇到跟历史不一样的事情，先问清楚，别只因为知道他在书里是什么样，就觉得现在也一定一样。','yuji'),dreamEnding
     ],
     stay:[

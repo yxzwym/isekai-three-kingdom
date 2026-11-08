@@ -6,14 +6,18 @@
   function wrapLines(ctx,value,width){const lines=[];let row='';for(const ch of String(value)){if(row&&ctx.measureText(row+ch).width>width){if(/[，。！？、；：）》」』】,.!?;:]/u.test(ch)){const chars=Array.from(row),last=chars.pop();if(chars.length)lines.push(chars.join(''));row=last+ch;}else if(/[（《「『【(]$/u.test(row)){const chars=Array.from(row),last=chars.pop();if(chars.length)lines.push(chars.join(''));row=last+ch;}else{lines.push(row);row=ch;}}else row+=ch;}if(row)lines.push(row);return lines;}
   function singleChoiceHit(hits,width,height,choices){if(choices.length===1)hits.unshift({x:0,y:0,w:width,h:height,action:choices[0].action});}
   const EXCLUSIVE_COLOR='#b69cff';
-  function passiveColor(passive,qualities=root.PengpaiRules?.QUALITIES){return passive.exclusive?EXCLUSIVE_COLOR:qualities?.[passive.quality]?.color||'#c4d5d3';}
-  function passiveButtons(view,passives,x,y,width,onSelect){
-    const cellW=width/4;
-    passives.forEach((passive,i)=>{const row=Math.floor(i/4),count=Math.min(4,passives.length-row*4),cw=cellW-6,xx=x+(width-count*cellW)/2+i%4*cellW+3,yy=y+row*24+2,tint=passiveColor(passive);
-      view.box(xx,yy,cw,20,'#112932',tint,3);view.text(passive.name,xx+cw/2,yy+10,14,tint,'center');
-      view.hits.push({x:xx,y:yy,w:cw,h:20,label:passive.name,action:()=>onSelect(passive)});
-    });
-    return Math.ceil(passives.length/4)*24;
+  function passiveColor(passive,qualities=root.PengpaiRules?.QUALITIES){return passive.temporary?(qualities?.white?.color||'#d5dedf'):passive.exclusive?EXCLUSIVE_COLOR:qualities?.[passive.quality]?.color||'#c4d5d3';}
+  function passiveRows(passives,width){
+    const rows=[],chars=Math.max(1,Math.floor((width/4-10)/14));let y=0;
+    for(let i=0;i<passives.length;i+=4){const items=passives.slice(i,i+4).map(passive=>{const letters=Array.from(passive.name),lines=[];for(let n=0;n<letters.length;n+=chars)lines.push(letters.slice(n,n+chars).join(''));return{passive,lines,h:20+(lines.length-1)*18+(passive.temporary?20:0)};}),h=Math.max(...items.map(item=>item.h))+4;rows.push({items,y,h});y+=h;}return rows;
   }
-  const api={font,textSize,wrapLines,singleChoiceHit,EXCLUSIVE_COLOR,passiveColor,passiveButtons};root.PengpaiUI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const passiveHeight=(passives,width)=>passiveRows(passives,width).reduce((n,row)=>n+row.h,0);
+  function passiveButtons(view,passives,x,y,width,onSelect){
+    const cellW=width/4,rows=passiveRows(passives,width);
+    for(const row of rows)row.items.forEach(({passive,lines,h},i)=>{const cw=cellW-6,xx=x+(width-row.items.length*cellW)/2+i*cellW+3,yy=y+row.y+(row.h-4-h)/2+2,tint=passiveColor(passive);
+      view.box(xx,yy,cw,h,'#112932',tint,3);lines.forEach((line,n)=>view.text(line,xx+cw/2,yy+10+n*18,14,tint,'center'));if(passive.temporary)view.text('临时',xx+cw/2,yy+h-10,14,tint,'center');
+      view.hits.push({x:xx,y:yy,w:cw,h,label:passive.name,action:()=>onSelect(passive)});
+    });return rows.reduce((n,row)=>n+row.h,0);
+  }
+  const api={font,textSize,wrapLines,singleChoiceHit,EXCLUSIVE_COLOR,passiveColor,passiveButtons,passiveHeight};root.PengpaiUI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

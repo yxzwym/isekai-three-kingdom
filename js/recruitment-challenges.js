@@ -28,6 +28,7 @@
  t.battles['jianye-duel']={stage:['jianye-duel'],next:'freed',title:'建业教场',sceneId:'farmland',duel:'taishici',solo:true,boss:true,scaleToHero:true,trainingWeapon:'练武木刀',trainingSkills:[{base:'sword-cut',name:'横刀试招'}],effects:{flags:{taishiciTrialWon:true}}};
  t.stages.freed.place='jianye';t.stages.freed.npc.turns=[{speaker:'npc',text:'这场我认输。你没有让同伴下场，受了伤也没乱掉，跟我在北海认识的还是同一个人。以后要一起走，我愿意。'},{speaker:'hero',text:'那我们先把伤处理好，再商量往哪里去。你在建业还有要交代的事，我们等你办完。'}];
  for(const key of ['jianye-meet','jianye-duel','freed'])t.stages[key].recommendedLevel=10;
+ t.battles['jianye-duel'].temporaryPassives=['enemy-healing-suppression','enemy-wipe-120'];t.stages.freed.npc.choices.find(c=>c.recruit===false).label='留在建业';
  t.recruitRequires={flags:{taishiciTrialWon:true},hint:'太史慈已约在建业教场，单挑获胜后才能邀请同行。'};t.recruitRedirect='jianye-meet';
  // 各条路线保留不同的考验，文士与医者不硬套武力单挑。
  Object.assign(H.definitions.zhangliao.battles.duel,{solo:true,boss:true,scaleToHero:true,trainingWeapon:'练武弩',trainingSkills:[{base:'sword-cut',name:'校场试射'}]});
@@ -56,6 +57,8 @@
   ['rounds-handover','xiangyang-county','huatuo','完成宜城送药，将巡诊簿交给华佗',[
    ['npc','两户人家的情况，都交给药徒记好了吗？有这份记录，之后接手的大夫才知道该留意什么，我也能放心出门。']],[Go('拿出巡诊簿，交代病情','freed',{requires:{items:{'rounds-journal':1},hint:'先完成“宜城送药”，回药徒处交付，取得巡诊簿。'}})]]
  ]);
+ // 固定编成让玩家能观察、辨认和重试，不在每次开战时重新抽敌人。
+ for(const [id,phase,roles]of [['xuchu','temple',[null,null,'caster']],['taishici','depot',[null,null,'medic']],['ganning','breach',[null,null,null,'caster','medic']],['maliang','medicine',[null,'healer',null]],['zhouyu','river-night',[null,null,'witch',null,'healer']],['zhugeliang','water-timber',[null,null,'caster',null,'medic']],['simayi','grain-seizure',[null,null,'witch',null,'medic']]])H.definitions[id].battles[phase].enemyRoles=roles;
  // 石阵解围不是递交一封信；陆逊会参与一次真正的守路行动。
  Stories.before('luxun','freed',[
   ['road-warning','yiling','evacuee','与陆逊接应被堵在山口的乡民',[
@@ -72,5 +75,6 @@
  // 通常冲突以三人以下的小队为主，劫狱外院等明确配置保留四人。
  for(const d of Object.values(H.definitions))for(const f of Object.values(d.battles))if(d.id!=='ganning'&&f.count===4&&!f.boss&&!f.duel&&!f.roster&&!f.named)f.count=3;
  N.storyBattles.escort.count=3;
+ for(const d of Object.values(H.definitions)){const at=d.stages.freed?.place||d.place;if(at===d.home)for(const choice of d.stages.freed?.npc?.choices||[])if(choice.recruit===false)choice.label='留在'+root.WorldData.placeMap[d.home].name;}
  const api={version:1};root.RecruitmentChallenges=api;if(node)module.exports=api;
 })(globalThis);

@@ -27,5 +27,6 @@
   const skills=Object.fromEntries(Object.entries(definitions).filter(([,s])=>s.period).map(([id,s])=>['status-'+id,{id:'status-'+id,name:s.name,kind:s.healing?'heal':'tactic',side:s.healing?'ally':'enemy',scope:'single',cost:0,reactionOnly:true,vfx:s.healing?'heal':id==='burn'?'fire':['poison','plague'].includes(id)?'wood':'physical'}]));
   skills['status-reflect']={id:'status-reflect',name:'反伤',kind:'physical',damageType:'true',side:'enemy',scope:'single',cost:0,reactionOnly:true};
   skills['passive-counter']={id:'passive-counter',name:'以逸待劳',kind:'physical',side:'enemy',scope:'single',cost:0,reactionOnly:true};
+  skills['enemy-wipe']={id:'enemy-wipe',name:'绝境一击',kind:'tactic',damageType:'true',side:'enemy',scope:'all',cost:0,reactionOnly:true};
   const api={definitions,skills};root.BattleStatuses=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

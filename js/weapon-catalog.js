@@ -263,14 +263,7 @@
         "scope": "single",
         "cost": 0,
         "cooldown": 1.2,
-        "effects": [
-          {
-            "id": "stun",
-            "duration": 5,
-            "chance": 0.7,
-            "stun": true
-          }
-        ],
+        "effects": [],
         "scaling": {
           "war": 2
         },
@@ -333,14 +326,7 @@
         "scope": "single",
         "cost": 0,
         "cooldown": 1.2,
-        "effects": [
-          {
-            "id": "stun",
-            "duration": 5,
-            "chance": 0.7,
-            "stun": true
-          }
-        ],
+        "effects": [],
         "scaling": {
           "war": 2.4
         },

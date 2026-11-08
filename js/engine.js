@@ -75,7 +75,7 @@
         u.level = attr(u.level ?? (u.side === 'enemy' ? this.config.enemyLevel || this.config.level : this.config.level));
         u.skills = Array.isArray(u.skills) ? u.skills.filter(id=>this.skills[id]&&!this.skills[id].reactionOnly) : [];
         u.passives = Array.isArray(u.passives) ? [...new Set(u.passives)].filter(id=>this.passives[id]&&(!this.passives[id].enemyOnly||u.side==='enemy')) : [];
-        if(u.side==='enemy'&&u.statusImmunities?.includes('stun'))u.passives=[...new Set([...u.passives,'enemy-stun-resistance'])];
+        if(u.side==='enemy'&&!u.passives.includes('enemy-negative-immunity'))for(const immunity of u.statusImmunities||[]){const id=immunity==='stun'?'enemy-stun-resistance':'enemy-status-immunity:'+immunity;if(!this.passives[id]){const name=STATES.definitions[immunity]?.name||immunity;this.passives[id]={id,name:name+'免疫',quality:'white',temporary:true,enemyOnly:true,description:'本场战斗免疫'+name+'。',stats:{},triggers:[]};}u.passives=[...new Set([...u.passives,id])];}
         u.priorities = Array.isArray(u.priorities) ? u.priorities.map(r=>normalizeRule(r,this.skills[r.skill])) : [];
         u.targetRule=u.targetRule||(u.side==='enemy'?'random':'lowestCurrent');u.lastSingleSkill=null;u.lastManualSkill=null;
         u.maxSoldiers=u.healthOverride!=null?attr(u.healthOverride):Math.max(1,Math.floor(u.baseMaxHealth*(PASSIVES.statsFor(u,this.passives).healthMultiplier||1)));
@@ -89,6 +89,8 @@
         return u;
       });
       this.unitIndex=new Map(this.units.map(u=>[u.id,u]));
+      this.healingAuras=this.units.filter(u=>PASSIVES.statsFor(u,this.passives).opponentHealingMultiplier!==undefined);
+      this.battleTimers=this.units.flatMap(u=>u.passives.flatMap(id=>(this.passives[id]?.triggers||[]).filter(t=>t.on==='battleTime').map(trigger=>({unit:u,id,trigger,fired:false}))));
       this.initialTroops = { ally: this.total('ally'), enemy: this.total('enemy') };
       this.emit('system', { text: `${this.scenario.title}，双方就位。` });
     }
@@ -107,6 +109,7 @@
       let iterations = 0;
       while (this.accumulator + 1e-9 >= .02 && this.status === 'running' && iterations++ < 50000) {
         this.accumulator -= .02; this.tick++; this.time = this.tick * .02;
+        this.tickBattleTimers();if(this.status!=='running')break;
         for(const u of this.units)this.tickStatuses(u);if(this.status!=='running')break;
         for (const u of this.units) if (u.soldiers > 0&&!this.stunned(u)) {if(u.progress!==u.progressStamp)u.waitTime=u.progress*u.interval;u.interval=interval(this.effective(u),this.config,u.lastSkillDelay);u.waitTime+=.02;const raw=Math.min(1,u.waitTime/u.interval);u.progress=Math.max(u.progress,raw);u.progressStamp=u.progress;if(!u.ready&&u.waitTime>=u.interval-1e-9)u.readyTick=this.tick;u.ready=u.waitTime>=u.interval-1e-9;}
         if(stopWhen?.()){this.accumulator=0;break;}
@@ -139,6 +142,13 @@
     gainShield(source,target,amount){
       if(amount<=0||target.dead)return;let status=target.statuses.find(s=>s.id==='passiveShield');if(status)status.amount+=amount;else{status={id:'passiveShield',name:'护盾',shield:true,amount,source:source.id,permanent:true,expiresAt:Infinity};target.statuses.push(status);}this.emit('status',{actor:source.id,target:target.id,status:copy(status)});
     }
+    healingFactor(target){return (this.healingAuras||[]).reduce((n,u)=>Math.min(n,u.side!==target.side&&u.soldiers>0?(PASSIVES.statsFor(u,this.passives).opponentHealingMultiplier??1):1),1);}
+    tickBattleTimers(){
+      for(const timer of this.battleTimers){const {unit:u,id,trigger}=timer;if(timer.fired||u.soldiers<=0||this.time+1e-9<trigger.after)continue;timer.fired=true;if(trigger.effect!=='wipeOpponents')continue;
+        const results=[];for(const target of this.targetable(u.side==='enemy'?'ally':'enemy')){const amount=target.maxSoldiers*10,result=this.damageUnit(u,target,amount,{ignoreWounds:true,fatal:true});results.push({target:target.id,targetName:target.name,...result,damageType:'true',healing:false,amount,raw:amount});}
+        this.emit('action',{actor:u.id,actorName:u.name,side:u.side,passive:id,skill:'enemy-wipe',skillName:'绝境一击',reaction:true,scope:'all',cost:0,results});this.checkEnd();if(this.status!=='running')return;
+      }
+    }
     healingPassives(owner,target){
       for(const id of owner.passives)for(const trigger of this.passives[id]?.triggers||[]){
         if(trigger.on!=='heal'||trigger.effect!=='cleanse')continue;const removed=[];
@@ -158,27 +168,30 @@
     stunned(u){return u.statuses.some(s=>s.stun&&s.expiresAt>this.time);}
     addStatus(source,target,effect,skill={}){
       const base=STATES.definitions[effect.id]||{},definition={...copy(base),...copy(effect)},id=definition.id||skill.id;
+      const protection=PASSIVES.statsFor(target,this.passives);if((definition.stun||id==='stun')&&protection.immuneStun)return null;
+      const harmful=definition.negative||definition.harmful||definition.stun||definition.period&&!definition.healing||definition.attribute&&Number(definition.amount)<0||Object.entries(definition).some(([key,value])=>key.endsWith('Multiplier')&&Number(value)<1);
+      if(harmful&&protection.immuneNegative)return null;
       if(target.dead||(target.soldiers<=0&&!(target.wounded&&definition.period&&!definition.healing))||((target.statusImmunities||[]).includes(id)||definition.stun&&(target.statusImmunities||[]).includes('stun')))return null;
       if(definition.chance!==undefined){const chance=clamp(Number(definition.chance)-(source.side!==target.side?this.effective(target).resistance/1000:0),0,1);if(this.rng()>=chance)return null;}
       const owner=this.effective(source),coefficient=Number(definition.coefficient)||0;
-      let amount=Number(definition.amount??((Number(definition.base)||0)+coefficient*(owner[definition.stat||'technique']??0)))||0;if(definition.healing&&definition.period)amount*=1+(owner.healingBonus||0);if(definition.negative)amount=-Math.abs(amount);
+      let amount=Number(definition.amount??((Number(definition.base)||0)+coefficient*(owner[definition.stat||'technique']??0)))||0;if(definition.healing&&definition.period)amount*=1+(owner.healingBonus||0);if(definition.negative)amount=-Math.abs(amount);if(amount<0&&protection.immuneNegative)return null;
       const previous=target.statuses.find(s=>s.id===id),origin=skill.id||id,maxStacks=Math.max(1,Number(definition.maxStacks)||1),same=previous?.origin===origin;
       const status={...definition,id,name:definition.name||skill.name||id,source:source.id,origin,amount,...(definition.reflectFormula?{reflect:(Number(definition.reflectFormula.base)||0)+(Number(definition.reflectFormula.coefficient)||0)*(owner[definition.reflectFormula.stat||'technique']??0)}:{}),stacks:same?Math.min(maxStacks,(previous.stacks||1)+1):1,expiresAt:this.time+Math.max(.02,Number(definition.duration)||5),nextTick:this.time+(Number(definition.period)||1)};
       target.statuses=target.statuses.filter(s=>s.id!==id);target.statuses.push(status);this.emit('status',{actor:source.id,target:target.id,status:copy(status)});return status;
     }
     resetProgress(u){u.progress=0;u.progressStamp=0;u.waitTime=0;u.ready=false;u.readyTick=null;u.queued=null;}
     healUnit(source,target,amount){
-      const before=target.soldiers;if(target.dead)return {before,after:before,actual:0};
-      const actual=Math.min(Math.max(0,Math.floor(amount)),target.maxSoldiers-before),recovered=!!target.wounded&&actual>0;target.soldiers+=actual;source.stats.healing+=actual;
+      const before=target.soldiers;amount=Math.max(0,Math.floor(amount*this.healingFactor(target)));if(target.dead)return {before,after:before,actual:0,amount:0};
+      const actual=Math.min(amount,target.maxSoldiers-before),recovered=!!target.wounded&&actual>0;target.soldiers+=actual;source.stats.healing+=actual;
       const shieldRate=PASSIVES.statsFor(source,this.passives).overhealShield||0;if(shieldRate>0)this.gainShield(source,target,Math.floor(Math.max(0,amount-actual)*shieldRate));
       if(recovered){target.wounded=false;target.condition='healthy';this.resetProgress(target);target.lastSkillDelay=0;target.interval=interval(this.effective(target),this.config,0);}
-      return {before,after:target.soldiers,actual,recovered};
+      return {before,after:target.soldiers,actual,recovered,amount};
     }
-    damageUnit(source,target,amount,{periodic=false,ignoreWounds=false}={}){
+    damageUnit(source,target,amount,{periodic=false,ignoreWounds=false,fatal=false}={}){
       const before=target.soldiers;if(target.dead)return {before,after:before,actual:0,dead:true};
       if(target.wounded&&!ignoreWounds&&this.rng()<.5){target.stats.dodges++;return {before,after:before,actual:0,miss:'闪避',woundDodge:true};}
-      let remaining=Math.max(0,Math.floor(amount)),absorbed=0;for(const shield of target.statuses.filter(s=>s.shield)){const used=Math.min(shield.amount,remaining);shield.amount-=used;remaining-=used;absorbed+=used;}target.statuses=target.statuses.filter(s=>!s.shield||s.amount>0);
-      const actual=Math.min(before,remaining);target.soldiers-=actual;source.stats.damage+=actual;target.stats.received+=actual;const after=target.soldiers,restored=this.survive(target);
+      let remaining=fatal?Math.max(0,target.soldiers):Math.max(0,Math.floor(amount)),absorbed=0;for(const shield of target.statuses.filter(s=>s.shield&&!fatal)){const used=Math.min(shield.amount,remaining);shield.amount-=used;remaining-=used;absorbed+=used;}target.statuses=target.statuses.filter(s=>!s.shield||s.amount>0);
+      const actual=Math.min(before,remaining);target.soldiers-=actual;source.stats.damage+=actual;target.stats.received+=actual;const after=target.soldiers,restored=fatal?null:this.survive(target);
       if(target.soldiers===0){
         target.dead=!!(target.wounded||!target.woundsEnabled||ignoreWounds||(periodic&&this.rng()>=.5));target.wounded=!target.dead;target.condition=target.dead?'dead':'wounded';this.resetProgress(target);
         if(target.dead){source.stats.kills++;target.statuses=[];}
@@ -190,7 +203,7 @@
       for(const status of [...u.statuses])if(status.period){while(status.nextTick<=this.time+1e-9&&status.nextTick<=status.expiresAt+1e-9&&!u.dead){
         status.nextTick+=status.period;if(status.healing&&u.wounded)continue;
         const source=this.unit(status.source)||u,amount=Math.max(1,Math.floor(Math.abs(status.amount)*(status.stacks||1)*(status.healing?1:this.effective(source).damageMultiplier))),result=status.healing?this.healUnit(source,u,amount):this.damageUnit(source,u,amount,{periodic:true}),{restored,...detail}=result;
-        this.emit('action',{actor:source.id,actorName:source.name,side:source.side,skill:'status-'+status.id,skillName:status.name,scope:'single',cost:0,periodic:true,results:[{target:u.id,targetName:u.name,...detail,damageType:this.skills['status-'+status.id]?.kind,healing:!!status.healing,raw:amount,amount,factors:[],formula:'持续状态每秒结算'}]});this.healthChanged(u,result.before,result.after);this.restoredHealth(restored);this.checkEnd();if(this.status!=='running')return;
+        this.emit('action',{actor:source.id,actorName:source.name,side:source.side,skill:'status-'+status.id,skillName:status.name,scope:'single',cost:0,periodic:true,results:[{target:u.id,targetName:u.name,...detail,damageType:this.skills['status-'+status.id]?.kind,healing:!!status.healing,raw:status.healing?result.amount:amount,amount:status.healing?result.amount:amount,factors:[],formula:'持续状态每秒结算'}]});this.healthChanged(u,result.before,result.after);this.restoredHealth(restored);this.checkEnd();if(this.status!=='running')return;
       }}
       const old=u.statuses.length;u.statuses=u.statuses.filter(s=>s.expiresAt>this.time+1e-9);if(u.statuses.length!==old)this.invalidateAI();
     }
@@ -232,7 +245,7 @@
     }
     targetPool(u,skill,scope=skill.scope||'single'){
       const side=skill.side==='enemy'?(u.side==='ally'?'enemy':'ally'):u.side,pool=skill.side==='self'?[u]:skill.kind==='buff'?this.living(side):this.targetable(side);
-      if(scope!=='single'||skill.side!=='enemy'||!['physical','tactic'].includes(skill.kind)||skill.ignoreTaunt)return pool;
+      if(scope!=='single'||skill.side!=='enemy'||!['physical','tactic'].includes(skill.kind)||skill.ignoreTaunt||PASSIVES.statsFor(u,this.passives).ignoreTaunt)return pool;
       const taunted=pool.filter(t=>t.statuses.some(s=>s.taunt&&s.expiresAt>this.time));return taunted.length?taunted:pool;
     }
     validate(u, skillId, targetId, scope = 'single') {
@@ -336,12 +349,12 @@
         const {restored,...detail}=result;if(restored)restores.push(restored);if(result.miss)miss=result.miss;healthChanges.push({unit:target,before,after:target.soldiers});
         if(!healing&&!miss){drain+=Math.floor(calc.amount*((Number(skill.lifesteal)||0)+(skill.kind==='physical'?(actor.physicalLifesteal||0):0)));const reflect=target.soldiers>0?target.statuses.reduce((n,s)=>n+(Number(s.reflect)||0),0):0;if(skill.kind==='physical'&&target.soldiers>0){const p=PASSIVES.statsFor(target,this.passives);if(p.counterChance&&this.rng()<p.counterChance)counters.push({source:target,multiplier:p.counterMultiplier||.5});}if(reflect>0)reflections.push({source:target,amount:Math.floor(result.actual*reflect*this.effective(target).damageMultiplier)});}
         if(!miss&&!target.dead)for(const effect of skill.effects||[])if(effect.recipient!=='self')this.addStatus(u,target,effect,skill);
-        event.results.push({target:target.id,targetName:target.name,...detail,healing,miss,critical:!miss&&critical,multiplier,random,...calc});
+        event.results.push({target:target.id,targetName:target.name,...detail,healing,miss,critical:!miss&&critical,multiplier,random,...calc,...(healing?{amount:result.amount,raw:result.amount}:{})});
       }
       for(const effect of skill.effects||[])if(effect.recipient==='self')this.addStatus(u,u,effect,skill);
       if (skill.element === 'fire') this.fireCount++;
-      if(drain>0&&u.soldiers>0){const before=u.soldiers,actual=Math.min(drain,u.maxSoldiers-before);u.soldiers+=actual;u.stats.healing+=actual;healthChanges.push({unit:u,before,after:u.soldiers});event.results.push({target:u.id,targetName:u.name,before,after:u.soldiers,actual,healing:true,raw:drain,amount:drain,factors:[],formula:'吸血回复'});}
-      const regen=Math.floor(u.maxSoldiers*(PASSIVES.statsFor(u,this.passives).actionRegen||0));if(regen>0&&u.soldiers>0){const result=this.healUnit(u,u,regen);event.results.push({target:u.id,targetName:u.name,...result,healing:true,raw:regen,amount:regen,formula:'行动回复'});healthChanges.push({unit:u,before:result.before,after:result.after});}
+      if(drain>0&&u.soldiers>0){const result=this.healUnit(u,u,drain);healthChanges.push({unit:u,before:result.before,after:result.after});event.results.push({target:u.id,targetName:u.name,...result,healing:true,raw:result.amount,factors:[],formula:'吸血回复'});}
+      const regen=Math.floor(u.maxSoldiers*(PASSIVES.statsFor(u,this.passives).actionRegen||0));if(regen>0&&u.soldiers>0){const result=this.healUnit(u,u,regen);event.results.push({target:u.id,targetName:u.name,...result,healing:true,raw:result.amount,amount:result.amount,formula:'行动回复'});healthChanges.push({unit:u,before:result.before,after:result.after});}
       const delay=this.config.skillDelays?.[skillId]??skill.cooldown??0;
       u.progress = 0;u.progressStamp=0;u.waitTime=0;u.lastSkillDelay=Number(delay)||0; u.ready = false; u.readyTick=null; u.interval = interval(this.effective(u), this.config, delay);
       event.skillDelay = Number(delay) || 0;

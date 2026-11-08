@@ -6,7 +6,7 @@
     'thunder-renewal':{id:'thunder-renewal',name:'雷公助我',scope:'single',kind:'heal',cost:0,side:'self',reactionOnly:true}
   };
   const definitions={
-    'enemy-stun-resistance':{id:'enemy-stun-resistance',name:'眩晕抵抗',quality:'white',enemyOnly:true,temporary:true,description:'免疫眩晕。',stats:{},triggers:[]},
+    'enemy-stun-resistance':{id:'enemy-stun-resistance',name:'免疫眩晕',quality:'white',enemyOnly:true,temporary:true,description:'本场战斗免疫眩晕。离开战斗后失效。',stats:{immuneStun:true},triggers:[]},
     'xuchu-tiger':{id:'xuchu-tiger',name:'虎痴悍勇',quality:'gold',description:'物理伤害提高12%。',stats:{physicalBonus:.12},triggers:[]},
     'dianwei-guard':{id:'dianwei-guard',name:'恶来护主',quality:'gold',description:'受到的物理伤害减少12%。',stats:{physicalReduction:.12},triggers:[]},
     'huangzhong-veteran':{id:'huangzhong-veteran',name:'老当益壮',quality:'gold',description:'物理伤害提高12%。',stats:{physicalBonus:.12},triggers:[]},
@@ -24,6 +24,12 @@
     'zhaoyun-courage':{id:'zhaoyun-courage',name:'一身是胆',quality:'red',exclusive:true,description:'生命每损失1%，造成的伤害提高0.5%，最多提高50%。',stats:{missingHealthDamageBonus:.5},triggers:[]},
     'zhaoyun-seven-crossings':{id:'zhaoyun-seven-crossings',name:'七进七出',quality:'red',exclusive:true,description:'受伤或治疗使生命越过25%、50%、75%时，立即充满当前行动进度。',stats:{},triggers:[{on:'healthCrossing',thresholds:[.25,.5,.75],direction:'both',effect:'fillProgress'}]}
   };
+  for(const [id,name,description,stats]of [
+    ['enemy-negative-immunity','百邪不侵','本场战斗免疫一切负面状态，包括眩晕、麻痹、持续伤害和属性衰减。增益与治疗不受影响。',{immuneNegative:true}],
+    ['enemy-healing-suppression','压制回复','存活期间，敌方的治疗、回春和吸血回复效果降低75%。本场战斗结束后失效。',{opponentHealingMultiplier:.25}],
+    ['enemy-ignore-taunt','无视嘲讽','本场战斗的攻击不受嘲讽影响，可以越过嘲讽者选择其他目标。',{ignoreTaunt:true}]
+  ])definitions[id]={id,name,description,stats,quality:'white',enemyOnly:true,temporary:true,triggers:[]};
+  for(const seconds of [60,120,180,300,600]){const id='enemy-wipe-'+seconds;definitions[id]={id,name:'限时决战',quality:'white',enemyOnly:true,temporary:true,description:'开战'+seconds/60+'分钟后释放绝境一击，击败敌方全体，重伤者也无法幸免。在期限内击败此人可阻止释放。',stats:{},triggers:[{on:'battleTime',after:seconds,effect:'wipeOpponents'}]};}
   definitions['thunder-lord-tutorial']={...JSON.parse(JSON.stringify(definitions['thunder-lord'])),id:'thunder-lord-tutorial',tutorialOnly:true,basePassive:'thunder-lord',description:'闪避率增加25个百分点；闪避后电击攻击者；濒死时恢复全部生命。',triggers:[...definitions['thunder-lord'].triggers,{on:'lethal',effect:'restoreFull',skill:'thunder-renewal'}]};
   // 英雄天赋与兵器分开管理；普通杂兵不会自动获得这些特性。
   const heroDefaults={
@@ -98,6 +104,11 @@
     zhenji:[['serenity','静水凝心','blue','受到的计策伤害减少8%。',{tacticReduction:.08}]]
   };
   for(const [hero,rows]of Object.entries(additions))for(const [suffix,name,quality,description,stats]of rows){const id=hero+'-'+suffix;definitions[id]={id,name,quality,description,stats,triggers:[]};}
+  // 人物名号、事迹与门派绑定的特质显示专属紫；普通资质仍按品质着色。
+  for(const id of ['xuchu-tiger','dianwei-guard','huangzhong-veteran','taishici-bold','maliang-white-brow','lusu-generous','ganning-brocade',
+    'liubei-fortitude','caocao-ambition','xiahoudun-defiance','guanyu-overawe','guanyu-martial','zhangfei-ferocity','machao-swift',
+    'zhouyu-elegance','zhouyu-steady','lvmeng-discipline','lvmeng-ambush','lvbu-flying','zhuge-divine','menghuo-endure',
+    'zhangjiao-taiping','zhangjiao-clarity','zhangbao-salve','dianwei-fury','ganning-night-raid','xuchu-steadfast'])definitions[id].exclusive=true;
   function forUnit(unit){
     const existing=Array.isArray(unit.passives)?unit.passives.filter(id=>!definitions[id]?.enemyOnly||unit.side==='enemy'):[];
     // 教学专用的不败版本不叠加正式英雄天赋，避免改变新手战的节奏。

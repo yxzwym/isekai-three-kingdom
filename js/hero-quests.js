@@ -35,8 +35,8 @@
   freed:{objective:'与甘宁商议去留',npc:{id:'ganning',name:'甘宁',art:'ganning',observe:true,...talk(
    ['npc','你居然真的把我救出来了。你走了那么久，我还以为外头出了事，或者你听说了我的底细，不肯再回来帮忙了。'],
    ['hero','我答应出去想办法，当然得回来告诉你结果。现在人平安出来了，你有没有地方能去，弟兄们还找得到吗？'],
-   ['npc','我得先给他们送个消息，免得他们也闯进来送死。之后想去建业找孙权，问问他肯不肯收我们。这次我会先把话问清楚，不会再傻乎乎地直接去喝酒了。'],
-   ['hero','我们也准备去各地走走，找愿意一起对付董卓的人。你想去江东的话，可以先跟着我们，到了建业再一起去见孙权。'],
+   ['npc','我得先给他们送个消息，免得他们也闯进来送死。之后想去建业拜见孙将军，问问他肯不肯收我们。这次我会先把话问清楚，不会再傻乎乎地直接去喝酒了。'],
+   ['hero','我们也准备去各地走走，找愿意一起对付董卓的人。你想去江东的话，可以先跟着我们，到了建业再一起去拜见孙将军。'],
    ['npc','好，我先托人告诉弟兄们，让他们去江边等消息。你们现在方便的话，我就一起走；人手已经够了，我先去建业，往后你们也能在那里找到我。']),choices:[{label:'留下同行',recruit:true},{label:'先去建业',recruit:false}]}},
   complete:{objective:'甘宁已脱困，愿为吴国效力'}
  },battles:{breach:{stage:['plan','breach'],next:'cell',title:'新野衙门',sceneId:'market-street',count:4},cell:{stage:['cell'],next:'freed',title:'牢房突围',sceneId:'county-prison',count:5}},source:'https://article.ali213.net/html/1241_9.html'};

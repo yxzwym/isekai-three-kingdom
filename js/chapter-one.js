@@ -8,7 +8,7 @@
  const phases={
   vanguard:{title:'关前先锋',sceneId:'rural-road',next:'garrison',speaker:'huaxiong',lines:['各路人马终于到齐了？那就别再说什么借路，想进洛阳，先打赢我华雄。后面的兵都站好了，今天谁也不许往回跑！'],roster:[['huaxiong','front'],['soldier','back'],['soldier','back']]},
   garrison:{title:'陷阵守军',sceneId:'city-frontier',next:'gate',speaker:'gaoshun',lines:['前面退下来的人到我身后集合，受伤的先撤进去。弩手看住两侧，别为了追一个人跑出去，把关门前的阵势守好！'],roster:[['gaoshun','front'],['crossbow','back'],['crossbow','back']]},
-  gate:{title:'温侯拦关',sceneId:'city-frontier',next:'street',speaker:'lvbu',lines:['我知道你们迟早会来。董卓最近确实有些反常，我也想问个明白，可我还守着这道门。你们想过去，先拿出本事让我看看。'],roster:[['lvbu','front'],['soldier','back'],['soldier','back']]},
+  gate:{title:'温侯拦关',sceneId:'city-frontier',next:'street',speaker:'lvbu',lines:['我知道你们迟早会来。太师最近确实有些反常，我也想问个明白，可我还守着这道门。你们想过去，先拿出本事让我看看。'],roster:[['lvbu','front'],['soldier','back'],['soldier','back']]},
   street:{title:'洛阳街垒',sceneId:'market-street',next:'advisor',speaker:'lijue',lines:['街口都让他们打进来了，再退就只剩太师府了！郭汜，你带人看住右边的小巷，别让他们从屋后绕过去，我们在这里把人拦住！'],roster:[['lijue','front'],['guosi','front'],['assassin','back']]},
   advisor:{title:'府前毒阵',sceneId:'city-north',next:'dongzhuo',speaker:'liru',lines:['外面的守军居然没能拦住你们，看来我得亲自招待了。院门已经关好，几位既然进来了，就在这里多待一会儿，别急着去见董太师。'],roster:[['guard','front'],['guard','front'],['liru','back']]},
   dongzhuo:{title:'太师府决战',sceneId:'city-north',next:'aftermath',speaker:'dongzhuo',lines:['一路打到这里，就以为我只能坐着等你们来问话？既然都来了，谁也别想再轻轻松松走出去，进来让我看看你们的本事！'],roster:[['dongzhuo','front']]}

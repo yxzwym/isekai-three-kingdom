@@ -32,7 +32,7 @@
     }
     openCharacter(id,previous=null){this.panel={type:'character',unitId:id,previous};}
     openItemDetail(item,options={}){this.notice=null;this.panel={type:'itemDetail',item,previous:this.panel,...options};}
-    memberPreview(id){const unit=typeof id==='object'?id:this.model.members().find(u=>u.id===id)||this.model.npcUnit(id);return new root.BattleEngine.Battle({allies:[unit],enemies:[],rules:{tacticsEnemyCount:5},passives:root.WorldModel.heroPassives?.()});}
+    memberPreview(id){const unit=typeof id==='object'?id:this.model.members().find(u=>u.id===id)||this.model.npcUnit(id);return new root.BattleEngine.Battle({allies:unit.observationEnemy||unit.side==='enemy'?[]:[unit],enemies:unit.observationEnemy||unit.side==='enemy'?[unit]:[],rules:{tacticsEnemyCount:5},passives:root.WorldModel.heroPassives?.()});}
     openMemberTactics(id,previous){
       const proto=root.BattleSystem.CanvasBattle.prototype,editor=Object.assign(Object.create(proto),{canvas:this.canvas,ctx:this.ctx,image:src=>this.image(src),w:this.w,h:this.h,hits:[],textTextures:new Map(),dpr:this.dpr||1,panel:null,aim:null,battle:this.memberPreview(id),options:{onTacticsSave:unit=>{this.model.saveTactics(unit);this.save();}}});
       const unit=editor.battle.unit(id);unit.soldiers=Math.max(1,unit.soldiers);editor.openTactics(unit);const outer={type:'tacticsEditor',editor,previous};editor.closePanel=()=>{proto.closePanel.call(editor);if(!editor.panel)this.panel=previous||null;};this.panel=outer;
@@ -42,7 +42,7 @@
       if(npc.questId){const data=root.NearbyContent.sideQuests.find(t=>t.id===npc.questId);this.speak(npc,{lines:[data.id==='grain-escort'?'粮车就在我们这里。你们想把粮带走，先看看能不能从我们手里抢回去，别站在这里说废话！':'这段路现在由我们守着，想过去就把东西留下。要是不肯交，那就别怪我们动手了！'],choices:[{label:'剿匪',action:()=>{if(this.model.beginSideBattle(data.id))this.startBattle();}},{label:'离开',dismiss:true,action:()=>this.closeDialogue()}]});return true;}const N=root.NearbyContent,q=this.model.state.quests.changshan;
       if(npc.id==='changshan-elder'&&q.stage==='return'){this.speak(npc,{lines:['你们总算回来了！刚才村口又闹起来，我还怕伤着车上的人。先把粮车推进院里吧，我叫乡亲们来帮忙卸。','这一趟让你们费心了，今晚就在村里歇着吧。住处已经收拾好了，乡亲们也想请大家吃顿饭，当面说声谢谢。'],onComplete:()=>{this.model.advanceChangshan();this.save();this.questDialogue(D.questNpcs.zhaoyun);}});return true;}
       if(npc.id==='grain-steward'&&q.stage==='supplies'){
-        if(!q.healerJoined)this.speak(npc,{lines:['赵云，你们来了，我正愁找不到人帮忙。贼不光占了粮仓，还把甄姑娘和几个伤者抓走了，说要让甄家拿粮来换人。','他们把人带到了毋极，赶车的跟过去打听了消息。你们先去找他，仓里的粮暂时搬不完，我留在这里看着，有变化就叫人通知你们。'],choices:[{label:'赶往毋极救人',action:()=>{q.stage='rescue';this.save();this.closeDialogue();}}]});
+        if(!q.healerJoined)this.speak(npc,{lines:['赵将军，你们来了，我正愁找不到人帮忙。贼不光占了粮仓，还把甄姑娘和几个伤者抓走了，说要让甄家拿粮来换人。','他们把人带到了毋极，赶车的跟过去打听了消息。你们先去找他，仓里的粮暂时搬不完，我留在这里看着，有变化就叫人通知你们。'],choices:[{label:'赶往毋极救人',action:()=>{q.stage='rescue';this.save();this.closeDialogue();}}]});
         else this.speak(npc,{lines:[q.grainWins?'前院剩下的人都退到后仓去了，我看见他们在往门口堆东西。里面全是粮袋，你们进去时慢一点，别让灯火碰上了。':'甄姑娘也回来了，救出来的伤者都安顿好了吗？仓里还有人守着，前院人数少一点，可以先从这边进去，再想办法进后仓。'],choices:[{label:q.grainWins?'夺取后仓':'夺取前仓',action:()=>{if(this.model.beginStoryBattle('grain'))this.startBattle();}},{label:'稍后再来',action:()=>this.closeDialogue()}]});return true;
       }
       if(npc.id==='refugee-laborer'&&q.stage==='rescue'){this.speak(npc,{lines:['是中山的仓守叫你们来的吧？甄姑娘就在祠堂后院，跟几个伤者关在一起。我刚才还听见她在跟守卫争，要他们拿水进去。','车停在墙后，等你们把门口的人拦住，我就进去接伤者。先让他们上车，我们再一起走，免得一直留在院子里被人抓住。'],choices:[{label:'救出甄姑娘',action:()=>{if(this.model.beginStoryBattle('rescue'))this.startBattle();else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}},{label:'先整顿一下',action:()=>this.closeDialogue()}]});return true;}
@@ -65,7 +65,7 @@
     suggestedDestination(){return this.model.questDestination();}
     closeWorldPanel(){if(this.panel?.type==='party')PartyInput.cancel(this);if(this.panel?.type==='reward'){this.finishReward();return;}if(this.panel?.type==='tacticsEditor'){this.panel.editor.closePanel();return;}const previous=this.panel?.previous||null;if(previous?.type==='npcDialogue'){this.dialogue=previous.dialogue;this.panel=null;}else this.panel=previous;}
     interact(npc){const court=Object.values(root.FactionCourts.definitions).find(d=>d.id===(npc.courtId||npc.id));if(court&&!this.model.state.courtDreams[court.id]&&!npc.delegate){this.showCourtDream(npc,court);return;}this.dialogue=null;this.npcInteraction={id:npc.id,offered:false};this.speak(npc);}
-    observeNpc(npc){const unit=this.model.npcUnit(npc.id);if(!unit)return;const previous=this.dialogue?{type:'npcDialogue',dialogue:this.dialogue}:null,preview=new root.BattleEngine.Battle({allies:[unit],enemies:[]});this.dialogue=null;this.panel={type:'character',unitId:unit.id,unit:preview.unit(unit.id),readonly:true,previous};}
+    observeNpc(npc){const unit=this.model.npcUnit(npc.id);if(!unit)return;const previous=this.dialogue?{type:'npcDialogue',dialogue:this.dialogue}:null,preview=this.memberPreview(unit);this.dialogue=null;this.panel={type:'character',unitId:unit.id,unit:preview.unit(unit.id),readonly:true,previous};}
     progress(state=this.model.snapshot()){return {storyVersion:2,stage:'world',index:0,dreamChoice:root.PengpaiPrologue.checkpoint(this.options.progress).dreamChoice,preparation:{},world:copy(state)};}
     save(state){this.character=this.model.character;try{this.options.store.save(this.options.slot,this.character,this.progress(state));this.saveError=false;}catch{this.saveError=true;}}
     viewMembers(){const s=this.model.state,key=JSON.stringify([this.model.character,s.companions,s.weapon,s.weaponType,s.heroEquipment,s.troops,s.conditions,s.tactics]);if(this.memberSnapshot?.key!==key)this.memberSnapshot={key,units:this.model.members()};return this.memberSnapshot.units;}
@@ -220,7 +220,7 @@
       const q=this.model.state.quests.changshan,stage=q.stage;
       if(npc.id==='zhaoyun'&&['available','entry'].includes(stage)){this.startChangshanArrival();return;}
       if(npc.id==='zhaoyun'&&q.zhaoInvitation){this.offerZhaoJourney();return;}
-      if(npc.id==='zhaoyun'&&stage==='decision'){this.speak(npc,{lines:['粮食分下去了，甄姑娘也留了药，乡亲们终于能安心歇几天。这次要不是你帮忙，救人和运粮赶在一起，我一个人确实照顾不过来。','我一直想去成都看看，听说刘备在那里安置了不少流民。现在村里的事安排好了，如果你还缺人，我可以先陪你走一段，等到了那边再一起去见他。'],choices:[{label:'留下同行（推荐）',action:()=>this.finishZhaoQuest(true)},{label:'先去成都',action:()=>this.finishZhaoQuest(false)}]});return;}
+      if(npc.id==='zhaoyun'&&stage==='decision'){this.speak(npc,{lines:['粮食分下去了，甄姑娘也留了药，乡亲们终于能安心歇几天。这次要不是你帮忙，救人和运粮赶在一起，我一个人确实照顾不过来。','我一直想去成都看看，听说玄德公在那里安置了不少流民。现在村里的事安排好了，如果你还缺人，我可以先陪你走一段，等到了那边再一起去见他。'],choices:[{label:'留下同行（推荐）',action:()=>this.finishZhaoQuest(true)},{label:'先去成都',action:()=>this.finishZhaoQuest(false)}]});return;}
       if(npc.id==='zhaoyun'){this.speak(npc,{lines:[{supplies:'中山有座粮仓，之前答应送粮到常山，后来却一直没有消息。我想过去问问，你愿不愿意一起？路上多个人，也能互相照应。',rescue:'仓守说，赶车的人已经跟到毋极去了，知道甄姑娘被关在哪里。我们先去找他，把人救出来，粮仓那边再回来处理。',escort:'粮都装好了，伤者也坐上了车。你在前面带路，我在后面照看，要是有人喊停，就等一等，别让车夫为了赶路把伤者颠坏了。',return:'乡亲们出来迎接了，我们先把粮车推进院子。里正知道哪几户急着用粮，让他安排分发，别全堵在村口。',complete:'这几天已经有人在修农具，商量着什么时候回田里看看了。能重新种地，大家就不用总靠别人送粮，我也能放心一些。'}[stage]||'稍等我一会儿，我去问问乡亲们还缺什么，确认都安排好就回来。']});return;}
       this.nearbyDialogue(npc);
     }
@@ -244,7 +244,7 @@
       const choices=[...data.choices.map((choice,index)=>({label:choice.label+(choice.price?' · '+choice.price+'文':''),action:()=>{
         if(!this.model.chooseHeroQuest(id,index,stage)){this.notify(this.model.lastQuestError||'暂时不能进行。');return;}
         this.dialogue=null;this.save();if(choice.puzzle){this.panel={type:'slidingPuzzle',questId:id};return;}if(this.model.pending){this.startBattle();return;}
-        if(this.model.state.heroQuests[id].stage==='complete')this.speak({...npc,name:d.name||'甘宁',art:id},{lines:[choice.recruit?'我把东西收拾好就来。你们在门口歇一会儿，不用急着先走，有什么要带的也可以一起检查。':'那就'+D.placeMap[d.home||'jianye'].name+'等你们过来找我。路上多保重，以后还需要人帮忙，直接到这里叫我就好。']});
+        if(this.model.state.heroQuests[id].stage==='complete')this.speak({...npc,name:d.name||'甘宁',art:id},{lines:[choice.recruit?'我把东西收拾好就来。你们在门口歇一会儿，不用急着先走，有什么要带的也可以一起检查。':((d.home||'jianye')===this.model.state.nodeId?'我就留在':'我先回')+D.placeMap[d.home||'jianye'].name+'等你们。路上多保重，以后还需要人帮忙，来找我就好。']});
         else if(root.HeroQuests.place(id,this.model.state.heroQuests[id])===this.model.state.nodeId)this.heroQuestDialogue({...root.HeroQuests.npc(id,this.model.state.heroQuests[id]),selectedQuest:true});
       }})),...(forced?[]:[{label:'暂且离开',dismiss:true,action:()=>this.closeDialogue()}])];
       if(!forced&&this.npcInteraction?.id===npc.id&&!this.npcInteraction.offered&&this.model.npcUnit(npc.id)){this.npcInteraction.offered=true;choices.splice(Math.max(0,choices.length-1),0,{label:'观察',action:()=>this.observeNpc(npc)});}
@@ -371,7 +371,7 @@
     drawPassiveInfo(){
       const p=this.panel,passive=p.passive,inner=Math.min(460,this.w-28)-44,c=this.ctx;c.font=`14px ${UI.font}`;
       const lines=UI.wrapLines(c,passive.description,inner),f=this.frame(passive.name,112+lines.length*24),top=f.y+54,bottom=f.y+f.h-16;let y=top+15-(p.scroll||0);
-      c.save();c.beginPath();c.rect(f.x,top,f.w,bottom-top);c.clip();this.text(passive.exclusive?'专属特质':root.PengpaiRules.QUALITIES[passive.quality]?.name+'品质',f.x+22,y,14,UI.passiveColor(passive));y+=32;
+      c.save();c.beginPath();c.rect(f.x,top,f.w,bottom-top);c.clip();this.text(passive.temporary?'临时特质 · 仅本场战斗':passive.exclusive?'专属特质':root.PengpaiRules.QUALITIES[passive.quality]?.name+'品质',f.x+22,y,14,UI.passiveColor(passive));y+=32;
       for(const line of lines){this.text(line,f.x+22,y,14,'#d2e0df');y+=24;}c.restore();p.maxScroll=Math.max(0,y+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);
     }
     showReward(reward){this.panel={type:'reward',reward:copy(reward),started:performance.now(),scroll:0};this.animate();}
@@ -450,7 +450,7 @@
       if(context.kind==='story'){
         if(!victory){this.speak(D.questNpcs.zhaoyun,{lines:['先别追了，都退回来！大家身上都有伤，再打下去只会越来越难照顾。等包扎好，我们再想想该从哪边过去。']});return;}
         if(context.phase==='entry'){
-          this.playConversation([{npc:D.questNpcs.zhaoyun,lines:['刚才有没有伤着？让我看看。一直顾着把他们赶走，还没问你的名字。我叫赵云，最近在村里帮着照顾那些逃难来的乡亲。']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['你就是常山赵云？我叫'+this.character.name+'，从黄巾营地来的，本来就是想来找你。刚进村就听见这边吵起来，正想打听怎么回事，他们就拦着不让走了。']},{npc:D.questNpcs.zhaoyun,lines:['原来你是来找我的，那正好留下坐坐。先到乡医那里，让他把伤检查一下，等大家都安顿好，我们再慢慢聊。']}],()=>{this.model.rest();this.save();if(this.model.state.quests.changshan.zhaoInvitation)this.offerZhaoJourney();});return;
+          this.playConversation([{npc:D.questNpcs.zhaoyun,lines:['刚才有没有伤着？让我看看。一直顾着把他们赶走，还没问你的名字。我叫赵云，字子龙。最近在村里帮着照顾那些逃难来的乡亲。']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['你就是赵子龙？我叫'+this.character.name+'，从黄巾营地来的，本来就是想来找你。刚进村就听见这边吵起来，正想打听怎么回事，他们就拦着不让走了。']},{npc:D.questNpcs.zhaoyun,lines:['原来你是来找我的，那正好留下坐坐。先到乡医那里，让他把伤检查一下，等大家都安顿好，我们再慢慢聊。']}],()=>{this.model.rest();this.save();if(this.model.state.quests.changshan.zhaoInvitation)this.offerZhaoJourney();});return;
         }
         if(context.phase==='grain'&&this.model.state.quests.changshan.healerJoined){this.model.rest();this.save();}
         if(context.phase==='grain'&&this.model.state.quests.changshan.healerDecision){this.offerZhenStay();return;}

@@ -12,7 +12,7 @@
   const calculated=(value,formula)=>n(value)+(formula?'（'+formula+'）':'');
   function statusText(effect,actor){
     const s={...S.definitions[effect.id],...effect},name=s.name||effect.id;
-    const healingFactor=s.healing&&s.period?1+(actor.healingBonus||0):1,amount=Math.abs(Number(s.amount??((s.base||0)+(s.coefficient||0)*(actor[s.stat||'technique']??0))))*healingFactor,duration=s.duration?'，持续'+n(s.duration)+'秒':'',multipliers=Object.keys(attributes).filter(key=>s[key+'Multiplier']!==undefined);
+    const healingFactor=s.healing&&s.period?(1+(actor.healingBonus||0))*(actor.healingReceivedMultiplier??1):1,amount=Math.abs(Number(s.amount??((s.base||0)+(s.coefficient||0)*(actor[s.stat||'technique']??0))))*healingFactor,duration=s.duration?'，持续'+n(s.duration)+'秒':'',multipliers=Object.keys(attributes).filter(key=>s[key+'Multiplier']!==undefined);
     let detail='';
     if(s.period)detail='每'+n(s.period)+'秒'+(s.healing?'回复':'损失')+calculated(Math.max(1,Math.floor(amount)),healingFactor===1?effectFormula(s):'（'+(effectFormula(s)||n(amount/healingFactor))+'）×'+n(healingFactor))+'点生命';
     else if(s.stun)detail='使目标无法行动';
@@ -29,13 +29,13 @@
     let action;
     if(buff)action='对'+target+'施放'+(skill.buff?.name||skill.name);
     else {
-      const value=E.calculate({attacker:actor,target:{armor:0,resistance:0,species:'none'},skill}).amount;
-      const factor=heal?1+(actor.healingBonus||0):(1+(actor[skill.kind==='physical'?'physicalBonus':'tacticBonus']||0))*(actor.damageMultiplier??1),formula=skillFormula(skill).replace('武器威力',actor.weaponPower!==undefined&&actor.weaponPower!==actor.attack?'武器威力×'+n(actor.weaponPower/Math.max(1,actor.attack)):'武器威力'),displayed=calculated(value,factor===1?formula:'（'+formula+'）×'+n(factor));action=heal?'为'+target+'回复'+displayed+'点生命':'对'+target+'造成'+displayed+'点'+(skill.kind==='physical'?'物理':'计策')+'伤害';
+      const received=heal&&b.healingFactor?b.healingFactor(u):1,value=Math.floor(E.calculate({attacker:actor,target:{armor:0,resistance:0,species:'none'},skill}).amount*received);
+      const factor=heal?(1+(actor.healingBonus||0))*received:(1+(actor[skill.kind==='physical'?'physicalBonus':'tacticBonus']||0))*(actor.damageMultiplier??1),formula=skillFormula(skill).replace('武器威力',actor.weaponPower!==undefined&&actor.weaponPower!==actor.attack?'武器威力×'+n(actor.weaponPower/Math.max(1,actor.attack)):'武器威力'),displayed=calculated(value,factor===1?formula:'（'+formula+'）×'+n(factor));action=heal?'为'+target+'回复'+displayed+'点生命':'对'+target+'造成'+displayed+'点'+(skill.kind==='physical'?'物理':'计策')+'伤害';
     }
     const attached=effects.filter(e=>e.id!==skill.buff?.id).map(e=>(e.chance===undefined?'附加':n(e.chance*100)+'%几率附加')+(S.definitions[e.id]?.name||e.name||e.id));
     lines.push(action+(attached.length?'，'+attached.join('，'):'')+'。');
     if(skill.buff?.taunt)lines.push('嘲讽：成为敌方单体技能的攻击目标，持续'+n(skill.buff.duration)+'秒。');
-    for(const effect of effects)lines.push(statusText(effect,actor));
+    for(const effect of effects)lines.push(statusText(effect,{...actor,healingReceivedMultiplier:b.healingFactor?b.healingFactor(u):1}));
     if(['physical','tactic'].includes(skill.kind)){lines.push('基础命中率：'+n((skill.hitChance??.4)*100)+'%');lines.push('基础暴击率：'+n((skill.criticalChance||0)*100)+'%');}
     if(skill.lifesteal)lines.push('将伤害的'+n(skill.lifesteal*100)+'%转化为自身生命。');
     const races={humanoid:'人型生物',beast:'野兽',dragon:'龙',spirit:'灵体',dark:'黑暗生物'};for(const [tag,value]of Object.entries(skill.raceBonuses||{}))lines.push('对'+(races[tag]||tag)+'额外造成'+n(value*100)+'%伤害。');
