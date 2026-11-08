@@ -63,3 +63,27 @@ test('网页入口只含一个有内容版本的脚本；小包逐项保持与�
  const root=path.resolve(__dirname,'..'),html=fs.readFileSync(path.join(root,'index.html'),'utf8'),scripts=[...html.matchAll(/<script[^>]+src="([^"]+)"/g)];assert.equal(scripts.length,1);const runtime=fs.readFileSync(path.join(root,'assets/runtime/game.js'));assert.equal(scripts[0][1],'./assets/runtime/game.js?v='+crypto.createHash('sha256').update(runtime).digest('hex').slice(0,12));assert.ok(!html.includes('BattleEmbeddedAssets'));
  const context={};vm.runInNewContext(fs.readFileSync(path.join(root,'assets/runtime-manifest.js'),'utf8'),{globalThis:context});const packs=new Map();for(const f of context.GameAssetManifest.filter(f=>f.pack)){let data=packs.get(f.pack.src);if(!data){data=fs.readFileSync(path.join(root,f.pack.src));packs.set(f.pack.src,data);assert.equal(crypto.createHash('sha256').update(data).digest('hex').slice(0,12),f.pack.revision);}assert.equal(data.length,f.pack.bytes);assert.ok(data.subarray(f.pack.offset,f.pack.offset+f.pack.length).equals(fs.readFileSync(path.join(root,f.src))));}assert.ok(packs.size>=4);assert.ok(context.GameAssetManifest.filter(f=>f.src.endsWith('/main-menu.webp')).reduce((n,f)=>n+f.bytes,0)<500000);
 });
+
+test('后台只占一个并发槽，当前资源可越过后台下载队列立即开始',async()=>{
+ let release,start;const gate=new Promise(r=>release=r),began=new Promise(r=>start=r),calls=[],files=Array.from({length:4},(_,i)=>({src:'bg-'+i+'.webp',bytes:100}));const loader=createLoader({fetch:async(src,options)=>{calls.push([src,options.priority]);if(src==='bg-0.webp'){start();await gate;}return response();},decode:image});
+ const background=loader.prefetch(files);await began;await loader.ensure({src:'urgent.webp',bytes:100});assert.deepEqual(calls,[['bg-0.webp','low'],['urgent.webp','high']]);assert.ok(loader.peek('urgent.webp'));release();await background;assert.ok(files.every(f=>loader.downloaded(f.src)));assert.ok(files.every(f=>!loader.peek(f.src)));assert.equal(calls.length,5);
+});
+test('点到尚在后台解码队列中的图片会提升优先级，复用原任务且不重复下载',async()=>{
+ let release,start;const gate=new Promise(r=>release=r),began=new Promise(r=>start=r),calls=[],files=['a','b','c'].map(id=>({src:id+'.webp',bytes:100})),loader=createLoader({fetch:async(src,options)=>{calls.push([src,options.priority]);if(src==='a.webp'){start();await gate;}return response();},decode:image});
+ const background=loader.preload(files,{priority:2});await began;await loader.ensure(files[2]);assert.deepEqual(calls,[['a.webp','low'],['c.webp','high']]);release();await background;assert.equal(calls.length,3);assert.equal(loader.peek('c.webp').size,100);
+});
+test('后台下载完整资源包而不解码远处人物，进入场景时只需从已有字节解码',async()=>{
+ const calls=[],decoded=[],files=[{src:'a.webp',bytes:3,pack:{src:'actors.bin',revision:'v1',bytes:8,offset:0,length:3}},{src:'b.webp',bytes:5,pack:{src:'actors.bin',revision:'v1',bytes:8,offset:3,length:5}}],loader=createLoader({manifest:()=>files,fetch:async src=>{calls.push(src);return new Response(new Uint8Array(8));},decode:async(blob,src)=>{decoded.push(src);return image(blob,src);}});
+ await loader.prefetch(files);assert.equal(calls.length,1);assert.equal(decoded.length,0);assert.ok(files.every(f=>loader.downloaded(f.src)));await loader.ensure(files[1]);assert.equal(calls.length,1);assert.deepEqual(decoded,['b.webp']);assert.equal(loader.peek('b.webp').size,5);
+});
+test('后台失败不挡住其他资源，前台明确重试后恢复，不在后台反复请求坏包',async()=>{
+ const attempts={};const loader=createLoader({fetch:async src=>{attempts[src]=(attempts[src]||0)+1;if(src==='bad.webp'&&attempts[src]===1)throw Error('offline');return response();},decode:image}),result=await loader.prefetch([{src:'bad.webp',bytes:100},{src:'good.webp',bytes:100}]);assert.equal(result.failed,1);await loader.ensure({src:'good.webp',bytes:100});await assert.rejects(loader.ensure({src:'bad.webp',bytes:100}));assert.equal(attempts['bad.webp'],1);await loader.preload([{src:'bad.webp',bytes:100}]);assert.equal(attempts['bad.webp'],2);assert.ok(loader.peek('bad.webp'));
+});
+test('本地文件和单文件内嵌图片不重复进行后台字节下载',async()=>{
+ let calls=0;const files=[{src:'local.webp',bytes:100}],local=createLoader({protocol:()=> 'file:',fetch:async()=>{calls++;throw Error('no file fetch');}});assert.equal((await local.prefetch(files)).count,0);assert.equal(calls,0);
+ const previous=globalThis.BattleEmbeddedAssets;try{globalThis.BattleEmbeddedAssets={'local.webp':'data:image/webp;base64,embedded'};const embedded=createLoader({fetch:async()=>{calls++;return response();}});assert.equal((await embedded.prefetch(files)).count,0);assert.ok(embedded.downloaded('local.webp'));assert.equal(calls,0);}finally{globalThis.BattleEmbeddedAssets=previous;}
+});
+
+test('同包多张背景图片下载失败时整包只请求一次，不逐张反复重试',async()=>{
+ let calls=0;const files=Array.from({length:8},(_,i)=>({src:i+'.webp',bytes:10,pack:{src:'scene.bin',bytes:80,offset:i*10,length:10}})),loader=createLoader({fetch:async()=>{calls++;throw Error('offline');},decode:image});await assert.rejects(loader.preload(files,{priority:2}));assert.equal(calls,1);const result=await loader.prefetch(files);assert.equal(result.failed,1);assert.equal(calls,1);
+});

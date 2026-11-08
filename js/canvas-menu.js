@@ -31,7 +31,7 @@
     }
     heading(title,subtitle){this.text(title,this.w/2,35,20,WHITE,'center',true);if(subtitle)this.text(subtitle,this.w/2,64,12,MUTED);}
     footer(back,next,disabled=false){const y=this.h-53,w=this.w;if(next){this.button('上一步',20,y,88,36,back,{plain:true});this.button(next,120,y,w-140,36,()=>this.next(),{active:true,disabled});}else this.button('返回主菜单',24,y,w-48,36,()=>this.go('main'),{plain:true});}
-    go(screen){this.hits=[];this.press=null;this.screen=screen;this.canvas.dataset.menuScreen=screen;this.modal=null;this.toast=null;this.focus=-1;if(screen!=='appearance'){if(this.input){this.input.hidden=true;this.input.blur();}this.canvas.focus({preventScroll:true});}this.resize();}
+    go(screen){if(screen==='create'||screen==='load')root.GameAssetLoader?.warmGroups?.(['creation']).catch(()=>{});else if(screen==='appearance')root.GameAssetLoader?.warmGroups?.(['road','interface']).catch(()=>{});this.hits=[];this.press=null;this.screen=screen;this.canvas.dataset.menuScreen=screen;this.modal=null;this.toast=null;this.focus=-1;if(screen!=='appearance'){if(this.input){this.input.hidden=true;this.input.blur();}this.canvas.focus({preventScroll:true});}this.resize();}
     startNew(){this.draft={difficulty:'normal',appearance:R.APPEARANCES[1].id,name:'',roll:R.rollHero('normal')};this.go('create');}
     next(){if(this.modal)return;if(this.screen==='create'&&this.draft.roll)this.go('appearance');else if(this.screen==='appearance')this.confirmCreation();}
     confirmCreation(){if(this.screen!=='appearance'||this.modal||!this.draft.roll)return;this.draft.name=R.heroName(this.input?.value??this.draft.name);this.input?.blur();this.canvas.focus({preventScroll:true});this.modal={type:'save'};this.focus=-1;this.invalidate();}

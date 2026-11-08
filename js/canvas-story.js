@@ -37,7 +37,7 @@
       if(t){const progress=Math.max(0,Math.min(1,(now-t.start)/t.duration)),smooth=progress*progress*(3-2*progress);c.save();c.globalAlpha=t.phase==='out'?smooth:1-smooth;c.fillStyle='#000';c.fillRect(0,0,this.w,this.h);c.restore();}
     }
     mountStage(stage,index=0){
-      clearTimeout(this.timer);this.panel=null;this.detailPress=null;cancelAnimationFrame(this.fogRaf);this.fogRaf=0;this.view?.destroy();this.view=null;this.failure=false;this.progress=P.checkpoint({...this.progress,stage,index});this.save();this.canvas.dataset.storyStage=stage;if(stage==='departure')root.GameAssetLoader?.warmMap?.();
+      clearTimeout(this.timer);this.panel=null;this.detailPress=null;cancelAnimationFrame(this.fogRaf);this.fogRaf=0;this.view?.destroy();this.view=null;this.failure=false;this.progress=P.checkpoint({...this.progress,stage,index});this.save();this.canvas.dataset.storyStage=stage;const upcoming=stage==='camp'?['camp','dream']:stage==='dream'||stage==='dawn'||stage==='departure'?['camp','interface','map']:['road','interface',...(['first-fight','aftermath','manual-fight','reinforcements','prepare','squad-fight'].includes(stage)?['camp']:[])];root.GameAssetLoader?.warmGroups?.(upcoming).catch(()=>{});if(stage==='departure')root.GameAssetLoader?.warmMap?.();
       if(stage==='world'){Promise.resolve().then(()=>{if(!this.disposed)this.options.onWorld?.(this.progress);});return;}
       if(['first-fight','manual-fight','prepare','squad-fight'].includes(stage)){
         const prepare=stage==='prepare',scenario=P.createBattle(stage,this.character,this.progress.preparation),settings=this.store.settings();
@@ -49,6 +49,7 @@
         });
         this.view.prepared=!!this.progress.preparation._reviewed;return;
       }
+      const actors=[...new Set((P.linesFor(stage,this.progress)||[]).map(row=>row.speaker==='hero'?'hero':row.partner).filter(Boolean))],portraits=actors.map(id=>P.assets(id,this.character.appearance).fullbody?.src).filter(Boolean);root.GameAssetLoader?.preload?.(portraits,{priority:1}).catch(()=>{});
       this.resize();
     }
     text(value,x,y,size=16,color='#f1ece2',align='left'){size=UI.textSize(size);const c=this.ctx;c.font=`${size}px ${FONT}`;c.fillStyle=color;c.textBaseline='middle';c.textAlign=align;c.fillText(value,x,y);}

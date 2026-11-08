@@ -5,6 +5,7 @@
   const name = new URLSearchParams(location.search).get('scenario');
   let storage;try{storage=window.localStorage;}catch{storage={getItem(){return null;},setItem(){throw new Error('浏览器存储不可用');}};}
   const store=new PengpaiRules.SaveStore(storage);
+  GameAssetLoader.startBackground?.();
   if(!name){
     const canvas=document.getElementById('battleCanvas'),input=document.getElementById('heroName');let screen;
     const menu=()=>{screen?.destroy();screen=PengpaiMenu.mount(canvas,{store,nameInput:input,onCharacterCreated:(character,slot)=>story(character,slot),onLoad:(save,slot)=>story(save.character,slot,save.progress)});window.pengpaiGame=screen;};
