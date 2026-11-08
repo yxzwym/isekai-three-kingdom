@@ -8,6 +8,17 @@
  ['sunquan-command','坐镇江东','gold','受到的物理和计策伤害减少8%。',{physicalReduction:.08,tacticReduction:.08}],['zhouyu-flames','赤焰周郎','gold','计策伤害提高18%。',{tacticBonus:.18}],['huanggai-veteran','铁骨老将','gold','受到的物理伤害减少15%。',{physicalReduction:.15}],['lvmeng-study','刮目相看','gold','物理和计策伤害提高10%。',{physicalBonus:.1,tacticBonus:.1}],['luxun-fire','连营烈火','gold','计策伤害提高18%。',{tacticBonus:.18}],['sunshangxiang-bow','弓腰姬','gold','物理伤害提高15%。',{physicalBonus:.15}],
  ['lvbu-peerless','天下无双','red','物理技能必定暴击，无视目标全部护甲。',{guaranteedCritical:true,ignoreArmor:true},true],['zhuge-eight-trigrams','八卦阵','red','受到物理技能时有50%概率闪避。',{physicalDodgeBonus:.5},true],['diaochan-grace','闭月流风','gold','受到物理技能时额外增加15%闪避率。',{physicalDodgeBonus:.15}],['menghuo-strength','南中雄威','gold','受到物理伤害减少12%，物理伤害提高10%。',{physicalReduction:.12,physicalBonus:.1}],['huatuo-healer','青囊济世','red','治疗效果提高35%。',{healingBonus:.35},true],['dongzhuo-soldier','西凉旧将','gold','物理伤害提高12%，受到物理伤害减少10%。',{physicalBonus:.12,physicalReduction:.1}]
  ];
+ rows.push(
+  ['guanlu-star','星罗推演','gold','技能命中率增加12个百分点。',{hitBonus:.12}],
+  ['guanlu-calm','静心观象','blue','受到的计策伤害减少8%。',{tacticReduction:.08},false],
+  ['guanlu-frost','寒息凝神','gold','计策伤害提高12%。',{tacticBonus:.12},false],
+  ['zhurong-hunter','南中猎影','gold','技能暴击率增加12个百分点。',{criticalBonus:.12}],
+  ['zhurong-footwork','踏林疾行','blue','速度提高8%。',{speedMultiplier:1.08},false],
+  ['zhurong-vigor','百猎磨锋','green','物理伤害提高5%。',{physicalBonus:.05},false],
+  ['huangyueying-craft','工巧天成','gold','物理伤害忽略目标8点护甲。',{armorPenetration:8}],
+  ['huangyueying-aim','凝神校准','blue','技能命中率增加10个百分点。',{hitBonus:.1},false],
+  ['huangyueying-mechanism','机括娴熟','gold','速度提高10%。',{speedMultiplier:1.1},false]
+ );
  // 本表是武将招牌特质；强度品质与“角色专属”的身份分别记录。
  for(const [id,name,quality,description,stats,exclusive=true]of rows)P.definitions[id]={id,name,quality,description,stats,triggers:[],...(exclusive?{exclusive:true}:{})};
  P.definitions['luoyang-possession']={id:'luoyang-possession',name:'诡影附身',quality:'white',temporary:true,enemyOnly:true,description:'最大生命提高200%，免疫眩晕，仍可被破甲、麻痹和持续伤害影响。',stats:{healthMultiplier:3},triggers:[]};

@@ -8,7 +8,7 @@
     xuchu:[65,96,36],dianwei:[56,95,35],huangzhong:[86,93,60],maliang:[46,23,85],taishici:[82,93,66],zhangjiao:[86,25,86],zhangbao:[83,71,81],zhangliang:[78,80,68],zhenji:[15,4,71],zhaoyun:[91,96,76],zhouyu:[97,71,96],huanggai:[79,83,65],ganning:[86,94,76],lusu:[80,56,92],zhugeliang:[92,38,100],caocao:[96,72,91],zhangliao:[93,92,78],xuhuang:[88,90,74],yujin:[84,78,70],caoren:[89,86,56],sunquan:[76,67,80],lvbu:[87,100,26]
   };
   // 武智沿用人物档案；体质按战斗定位单独设定，速度与技巧使用各自的固定规则。
-  const AGILITY_PROFILES={zhenji:{base:12,potential:80},diaochan:{base:12,potential:85},sunshangxiang:{base:12,potential:90}};
+  const AGILITY_PROFILES={zhenji:{base:12,potential:80},diaochan:{base:12,potential:85},sunshangxiang:{base:12,potential:90},zhurong:{base:12,potential:90},huangyueying:{base:12,potential:75}};
   const derivedPotential=reference=>Math.round((Math.max(1,reference-20)+Math.min(100,reference+10))/2);
   function generalProfile(id,base){const [command,war,intelligence]=GENERAL_POTENTIALS[id],agility=AGILITY_PROFILES[id];if(agility)base=[...base.slice(0,3),agility.base,base[4]];return profile(base,[war,intelligence,Professions.definitions[id]?.constitution??command,agility?.potential??derivedPotential(war),derivedPotential(intelligence)]);}
   // 1级裸属性与成长潜力独立；换武器不会改写人物的成长曲线。

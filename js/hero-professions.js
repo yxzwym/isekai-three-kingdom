@@ -8,6 +8,7 @@
   ['zhugeliang','fan',60],['zhouyu','fan',62],['luxun','fan',58],['zhangjiao','staff',68],['yuanshu','staff',55],
   ['simayi','banner',58],['jiaxu','banner',52],['liru','banner',50],['maliang','gourd',58],['huatuo','gourd',60],
   ['lusu','scripture',65],['xunyu','scripture',55],['zhangbao','scripture',65],['zhenji','needle',60],
+  ['guanlu','whisk',58],['zhurong','dagger',70],['huangyueying','cannon',62],
   ['diaochan','shortBlade',52],['huangzhong','bow',72],['sunshangxiang','bow',65],['zhangliao','crossbow',78],
   ['dianwei','axe',98],['menghuo','axe',100],['yanbaihu','axe',88],['xuchu','hammer',100]
  ];

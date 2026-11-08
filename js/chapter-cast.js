@@ -7,7 +7,8 @@
   ['caocao','曹操','wei','sword','xuchang'],['simayi','司马懿','wei','banner','xuchang'],['xiahoudun','夏侯惇','wei','blade','xuchang'],['zhangliao','张辽','wei','crossbow','xuchang'],['xunyu','荀彧','wei','scripture','xuchang'],['jiaxu','贾诩','wei','banner','xuchang'],
   ['sunquan','孙权','wu','sword','jianye'],['zhouyu','周瑜','wu','staff','jianye'],['huanggai','黄盖','wu','shield','jianye'],['lvmeng','吕蒙','wu','sword','jianye'],['luxun','陆逊','wu','staff','jianye'],['sunshangxiang','孙尚香','wu','bow','jianye'],
   ['lvbu','吕布','other','spear','xinye'],['diaochan','貂蝉','other','shortBlade','xinye'],['menghuo','孟获','other','axe','nanman'],['huatuo','华佗','other','gourd','xiangyang-county'],['zhangjiao','张角','yellow','staff','camp'],['zhangbao','张宝','yellow','scripture','camp'],['dongzhuo','董卓','other','blade','luoyang'],
-  ['huaxiong','华雄','dong','blade','hulao'],['gaoshun','高顺','dong','shield','xiapi'],['liru','李儒','dong','banner','luoyang'],['lijue','李傕','dong','spear','luoyang'],['guosi','郭汜','dong','blade','luoyang'],['yuanshu','袁术','dong','staff','chaisang'],['yanbaihu','严白虎','dong','axe','chaisang'],['zhangxiu','张绣','other','spear','wan']
+  ['huaxiong','华雄','dong','blade','hulao'],['gaoshun','高顺','dong','shield','xiapi'],['liru','李儒','dong','banner','luoyang'],['lijue','李傕','dong','spear','luoyang'],['guosi','郭汜','dong','blade','luoyang'],['yuanshu','袁术','dong','staff','chaisang'],['yanbaihu','严白虎','dong','axe','chaisang'],['zhangxiu','张绣','other','spear','wan'],
+  ['guanlu','管辂','wei','whisk','pingyuan'],['zhurong','祝融','other','dagger','nanman'],['huangyueying','黄月英','shu','cannon','xiangyang']
  ];
  const definitions=Object.fromEntries(entries.map(([id,name,country,type,home])=>[id,{id,name,country,type,home,level:10}]));
  const clone=value=>JSON.parse(JSON.stringify(value));
@@ -21,6 +22,9 @@
  Object.assign(definitions.luxun,{type:'fan',weapon:{id:'luxun-featherfan',name:'青竹扇',type:'fan',skills:[{base:'staff-fire',name:'火伏计'},{base:'staff-flame',name:'连营焚野'}]},passives:['luxun-fire']});
  Object.assign(definitions.huatuo,{passives:['huatuo-healer']});
  Object.assign(definitions.dongzhuo,{passives:['dongzhuo-soldier']});
+ Object.assign(definitions.guanlu,{passives:['guanlu-star','guanlu-calm','guanlu-frost']});
+ Object.assign(definitions.zhurong,{passives:['zhurong-hunter','zhurong-footwork','zhurong-vigor']});
+ Object.assign(definitions.huangyueying,{passives:['huangyueying-craft','huangyueying-aim','huangyueying-mechanism']});
  const ordinary={liubei:['liubei-kind'],caocao:['caocao-cunning'],simayi:['simayi-deep'],sunquan:['sunquan-command'],xiahoudun:['xiahoudun-stalwart'],zhangliao:['zhangliao-assault'],xunyu:['xunyu-counsel'],jiaxu:['jiaxu-poison'],huanggai:['huanggai-veteran'],lvmeng:['lvmeng-study'],sunshangxiang:['sunshangxiang-bow'],diaochan:['diaochan-grace'],menghuo:['menghuo-strength'],zhangbao:[]};
  for(const [id,passives]of Object.entries(ordinary))definitions[id].passives=passives;
  for(const [id,d]of Object.entries(definitions))d.passives=root.BattlePassives.forUnit({...d,characterId:id});

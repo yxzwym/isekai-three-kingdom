@@ -1,0 +1,26 @@
+[
+  {
+    "id": "guanlu",
+    "prompt": "Use case: stylized-concept. Asset: transparent full-body character cutout for Chinese Three Kingdoms RPG. Polished semi-realistic painted Chinese action RPG illustration, realistic face, elaborate tactile fabrics and metal, crisp readable face, proportionate head, no tiny head. Front three-quarter standing, entire head and both feet inside image, tall portrait 2:3 framing, figure fills height with minimal empty margins. Warm clean lighting, grounded natural balanced stance. Actual transparent alpha background, no scenery, no floor, no text or logo. Chinese Han-era fantasy only, no western armor, no gunpowder rifle, no extra people. Subject: 管辂, handsome young adult Chinese male diviner aged about 28, calm observant expressive face, tied black hair and small Taoist scholar crown. Layered ivory and muted teal Han robes with subtle cloud embroidery and dark sash, slim shoulders, blue tassels, no armor. One hand correctly grips a wood-handled white horsehair fly whisk (拂尘), bristles hanging in a gentle curve near side of body; free hand carries a small folded divination scroll. Refined grounded human scholar, no huge magic circles or halo.",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-d6537956-7591-4b41-b7bd-83299e413946.png",
+    "extractionPrompt": "保留人物与器械，去除人物外的光晕、布景和地面，输出透明背景。",
+    "tool": "imagegen (built-in)",
+    "savedAsset": "/Users/administrator/Dev/isekai-three-kingdom/assets/characters/guanlu/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "zhurong",
+    "prompt": "Use case: stylized-concept. Asset: transparent full-body character cutout for Chinese Three Kingdoms RPG. Polished semi-realistic painted Chinese action RPG illustration, realistic face, elaborate tactile fabrics and metal, crisp readable face, proportionate head, no tiny head. Front three-quarter standing, entire head and both feet inside image, tall portrait 2:3 framing, figure fills height with minimal empty margins. Warm clean lighting, grounded natural balanced stance. Actual transparent alpha background, no scenery, no floor, no text or logo. Chinese Han-era fantasy only, no western armor, no gunpowder rifle, no extra people. Subject: 祝融, beautiful strong adult Chinese southern tribal warrior woman aged 27, confident alert eyes, dark hair braided with modest copper beads, athletic body. Tasteful fitted red-brown and deep green Chinese southern woven warrior tunic, layered leather waist panels, exposed forearms, practical boots and copper ornaments, no western bikini armor. One hand correctly grips a short broad Chinese dagger by its handle, blade pointed diagonally OUTWARD away from body, other hand relaxed at waist, no giant sword or spear. Strong and elegant, readable natural pose.",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-da1839be-4032-40ad-9968-15b7b5fab6d2.png",
+    "extractionPrompt": "保留人物与器械，去除人物外的光晕、布景和地面，输出透明背景。",
+    "tool": "imagegen (built-in)",
+    "savedAsset": "/Users/administrator/Dev/isekai-three-kingdom/assets/characters/zhurong/classic/fullbody-v1.webp"
+  },
+  {
+    "id": "huangyueying",
+    "prompt": "Use case: stylized-concept. Asset: transparent full-body character cutout for Chinese Three Kingdoms RPG. Polished semi-realistic painted Chinese action RPG illustration, realistic face, elaborate tactile fabrics and metal, crisp readable face, proportionate head, no tiny head. Front three-quarter standing, entire head and both feet inside image, tall portrait 2:3 framing, figure fills height with minimal empty margins. Warm clean lighting, grounded natural balanced stance. Actual transparent alpha background, no scenery, no floor, no text or logo. Chinese Han-era fantasy only, no western armor, no gunpowder rifle, no extra people. Subject: 黄月英, beautiful adult Chinese woman engineer aged 25, thoughtful lively eyes, black hair in practical half-up bun with bronze hairpin. Ornate pale gold and muted jade green Han-style workshop robes, fitted layered sleeves, leather tool pouch with measuring ruler, elegant classical Chinese costume with practical details, no western goggles. She cradles a small bronze-and-wood cylindrical siege launcher (ancient fantasy hand-held artillery 炮) horizontally across her waist, both hands naturally supporting its weight; dark open muzzle points outward to side, exposed wooden braces and bronze bands, no modern rifle, no giant cannon, no explosive effects. Face and body remain unobstructed.",
+    "source": "/Users/administrator/.codex/generated_images/01a19a30-928a-7e93-a9b1-38688ce0ce44/exec-8fbc7786-9671-4d8f-ae91-75a0551414b7.png",
+    "extractionPrompt": "保留人物与器械，去除人物外的光晕、布景和地面，输出透明背景。",
+    "tool": "imagegen (built-in)",
+    "savedAsset": "/Users/administrator/Dev/isekai-three-kingdom/assets/characters/huangyueying/classic/fullbody-v1.webp"
+  }
+]
