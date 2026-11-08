@@ -10155,4 +10155,3 @@ globalThis.GameAssetManifest=[{"src":"./assets/game/main-menu.webp","bytes":3933
   window.battleDemo = BattleSystem.mount(document.getElementById('battleCanvas'), scenario,{autoStart:name!=='preparation',profile:new URLSearchParams(location.search).has('profile'),...settings,difficulty:previewHero.difficulty});
   }
 })();
-
