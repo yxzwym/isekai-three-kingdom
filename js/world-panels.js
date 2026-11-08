@@ -13,9 +13,10 @@
   if(!u){this.closeWorldPanel();return;}
   const previewKey=JSON.stringify(u);if(p.previewKey!==previewKey){p.previewKey=previewKey;p.previewCache=this.memberPreview(u);}const preview=p.previewCache,actor=preview.unit(u.id),current=preview.effective(actor),ids=actor.skills,passives=root.PengpaiRules.sortPassives(actor.passives,preview.passives),c=this.ctx;
   const showPotential=!!u.potentials&&(!p.readonly||root.CharacterGrowth.isGeneral(u)),statsH=108,showExperience=this.options?.showExperience!==false&&members.some(member=>member.id===u.id);
-  const compact=this.h<640,width=Math.min(560,this.w-16),inner=width-28,headerH=compact?44:48,skillSize=compact?48:52,skillRowH=compact?60:64,footerH=compact?42:46,barH=showExperience?(compact?32:36):17,skillCols=Math.min(3,Math.max(1,ids.length)),skillRows=Math.ceil(ids.length/skillCols),passiveH=root.PengpaiUI.passiveHeight(passives.map(id=>preview.passives[id]),width-28);
+  const compact=this.h<640,width=Math.min(560,this.w-16),inner=width-28,headerH=compact?64:68,skillSize=compact?48:52,skillRowH=compact?60:64,footerH=compact?42:46,barH=showExperience?(compact?32:36):17,skillCols=Math.min(3,Math.max(1,ids.length)),skillRows=Math.ceil(ids.length/skillCols),passiveH=root.PengpaiUI.passiveHeight(passives.map(id=>preview.passives[id]),width-28);
   const fixed=headerH+skillRows*skillRowH+passiveH+statsH+4+barH+footerH,modelH=clamp(Math.min(440,inner*1.18,this.h-16-fixed),180,440),contentH=modelH+skillRows*skillRowH+passiveH+statsH+4+barH;
   const f=this.frame(u.name+'  '+u.level+'级',fixed+modelH,{titleAlign:'center',maxWidth:560,inset:8,verticalInset:8}),left=f.x+14,top=f.y+headerH,bottom=f.y+f.h-footerH,slotSize=Math.min(46,Math.floor(modelH/4)-5),slotGap=Math.min(12,(modelH-slotSize*4)/3),equipmentOffset=(modelH-slotSize*4-slotGap*3)/2,proto=root.BattleSystem.CanvasBattle.prototype;
+  const profession=I.profession(u),type=profession?C.types.find(t=>t.id===profession.weaponType):null,group=C.groups.find(g=>g.id===type?.group);this.text(type?group.name+' · '+type.name:'自由职业',f.x+f.w/2,f.y+51,14,'#cbb586','center');
   const teammates=p.readonly?[]:[...this.model.partyGroups().active,...this.model.partyGroups().reserve];
   if(teammates.length>1&&teammates.some(member=>member.id===u.id))for(const [delta,glyph,label]of [[-1,'‹','上一位队友'],[1,'›','下一位队友']]){const index=teammates.findIndex(member=>member.id===u.id);this.button(glyph,f.x+f.w/2+(delta<0?-102:72),f.y+9,30,30,()=>this.openCharacter(teammates[(index+delta+teammates.length)%teammates.length].id,p.previous));this.hits.at(-1).label=label;}
   p.maxScroll=Math.max(0,contentH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);let y=top-p.scroll;const headerHits=this.hits.length;
@@ -102,16 +103,16 @@
  function preferences(v,p){return p.preferences||(p.preferences=v.inventoryPreferences||(v.inventoryPreferences={qualities:[],slot:'all',types:[],sortBy:'quality',descending:true}));}
  function itemDetail(){
   const p=this.panel,item=p.equipped&&!p.readonly?this.model.equipped(p.unitId,p.slot):p.item;if(!item){this.closeWorldPanel();return;}
-  const labels={war:'武力',intelligence:'智力',constitution:'体质',speed:'速度',technique:'技巧',armor:'护甲',resistance:'抗性'},rows=[];
+  const labels={war:'武力',intelligence:'智力',constitution:'体质',speed:'速度',technique:'技巧',armor:'护甲',resistance:'抗性',healingBonus:'治疗效果',hitBonus:'命中率',criticalBonus:'暴击率',dodge:'闪避率',armorPenetration:'忽视护甲',resistancePenetration:'忽视抗性',physicalLifesteal:'物理吸血',unload:'卸力'},rows=[];
   const classification=C.classification(item);if(classification){rows.push(['职业',classification.group?.name||'其他']);rows.push(['流派',classification.type.name]);}
   if(item.slot==='weapon'||item.type)rows.push(['武器威力',item.power??item.attack??p.fallbackPower??0]);
-  for(const [key,value]of Object.entries(item.attributes||{}))rows.push([labels[key]||key,(value>=0?'+':'')+value]);if(item.statusImmunities?.includes('poison'))rows.push(['状态免疫','中毒']);
+  for(const [key,value]of Object.entries(item.attributes||{}))rows.push([labels[key]||key,(value>=0?'+':'')+(['healingBonus','hitBonus','criticalBonus','dodge','physicalLifesteal'].includes(key)?Math.round(value*100)+'%':value)]);if(item.statusImmunities?.length)rows.push(['状态免疫',item.statusImmunities.map(id=>root.BattleStatuses.definitions[id]?.name||id).join('、')]);if(item.unique)rows.push(['获取',item.acquisition]);
   if(item.questItem)rows.push(['用途','任务道具']);
   const target=this.model.members().find(u=>u.id===(p.unitId||'hero')),canAct=!item.questItem&&!p.readonly&&!this.model.pending&&!this.model.journey;let action,label;
   if(canAct&&p.transaction==='buy'){label='购买 '+item.price+'文';action=()=>{if(this.model.buyItem(item.templateId)){this.save();this.panel=p.previous;this.notify('已购入 '+item.name);}else this.notify('铜钱不足。');};}
   else if(canAct&&p.transaction==='sell'&&this.model.state.inventory.some(i=>i.uid===item.uid)){label='出售 '+I.sellPrice(item)+'文';action=()=>{if(this.model.sellItem(item.uid)){this.save();this.panel=p.previous;this.notify('已出售 '+item.name);}};}
   else if(canAct&&target&&p.equipped){label='卸下';action=()=>{if(this.model.changeEquipment(target.id,p.slot,null)){this.save();this.panel=p.previous;}};}
-  else if(canAct&&target&&this.model.state.inventory.some(i=>i.uid===item.uid)){const slot=p.slot||(item.slot==='accessory'?(!target.equipment?.accessory1?'accessory1':'accessory2'):item.slot);if(I.compatible(item,slot)){label='装备';action=()=>{if(this.model.changeEquipment(target.id,slot,item.uid)){this.save();this.panel=p.previous?.slot&&p.previous.previous?.type==='character'?p.previous.previous:p.previous;}};}}
+  else if(canAct&&target&&this.model.state.inventory.some(i=>i.uid===item.uid)){const slot=p.slot||(item.slot==='accessory'?(!target.equipment?.accessory1?'accessory1':'accessory2'):item.slot);if(I.compatible(item,slot)&&I.canEquip(target,item)){label='装备';action=()=>{if(this.model.changeEquipment(target.id,slot,item.uid)){this.save();this.panel=p.previous?.slot&&p.previous.previous?.type==='character'?p.previous.previous:p.previous;}};}}
   const canReplace=canAct&&target&&p.equipped;
   this.ctx.font='14px '+root.PengpaiUI.font;const descriptionH=item.description?root.PengpaiUI.wrapLines(this.ctx,item.description,Math.min(380,this.w-28)-40).length*22+12:0;
   const f=this.frame('',118+rows.length*32+descriptionH+(p.transaction?28:0)+(action?54:0)+(canReplace?44:0),{closable:false,maxWidth:380}),left=f.x+20,w=f.w-40;
@@ -124,8 +125,8 @@
   this.hits.unshift({x:0,y:0,w:this.w,h:this.h,label:'关闭装备详情',action:()=>this.closeWorldPanel()});
  }
  function inventory(){
-  const p=this.panel,shop=p.type==='shop',selling=shop&&p.shopMode==='sell',prefs=preferences(this,p),source=shop&&!selling?(p.shopItems||=Object.keys(I.templates).map(id=>I.create(id,'white','shop-'+id))):shop||p.slot?this.model.state.inventory:[...this.model.state.inventory,...root.StoryRules.itemRecords(this.model)],query={...prefs,slot:p.slot||prefs.slot,types:p.slot&&p.slot!=='weapon'?[]:prefs.types},queryKey=JSON.stringify(query);
-  if(p.itemSource!==source||p.itemLength!==source.length||p.queryKey!==queryKey){p.itemSource=source;p.itemLength=source.length;p.queryKey=queryKey;p.items=I.select(source,query);}
+  const p=this.panel,shop=p.type==='shop',selling=shop&&p.shopMode==='sell',prefs=preferences(this,p),source=shop&&!selling?(p.shopItems||=I.shopTemplates().map(id=>I.create(id,'white','shop-'+id))):shop||p.slot?this.model.state.inventory:[...this.model.state.inventory,...root.StoryRules.itemRecords(this.model)],query={...prefs,slot:p.slot||prefs.slot,types:p.slot&&p.slot!=='weapon'?[]:prefs.types},queryKey=JSON.stringify(query);
+  if(p.itemSource!==source||p.itemLength!==source.length||p.queryKey!==queryKey){p.itemSource=source;p.itemLength=source.length;p.queryKey=queryKey;p.items=I.select(source,query).filter(item=>!p.slot||I.canEquip(this.model.members().find(u=>u.id===p.unitId),item));}
   const items=p.items;if(p.selected&&!items.some(item=>item.uid===p.selected))p.selected=null;
   const f=this.frame(p.slot?'选择'+slots.find(s=>s[0]===p.slot)[1]:shop?(selling?'出售':'购买'):'背包',600),left=f.x+16,w=f.w-32,c=this.ctx,top=f.y+(shop?122:82),bottom=f.y+f.h-(selling?64:16),cols=Math.max(3,Math.floor(w/76)),cw=(w-8*(cols-1))/cols,rowH=100;
   iconButton(this,'筛选',f.x+f.w-120,f.y+9,30,()=>{this.panel={type:'inventoryFilter',inventory:p,previous:p,scroll:0};},!!(prefs.qualities.length||prefs.types.length||prefs.slot!=='all'));

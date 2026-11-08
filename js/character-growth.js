@@ -1,14 +1,16 @@
 (function(root){
   'use strict';
+  const Professions=typeof module!=='undefined'&&module.exports?require('./hero-professions.js'):root.HeroProfessions;
   const ATTRIBUTES=[['war','武力'],['intelligence','智力'],['constitution','体质'],['speed','速度'],['technique','技巧']],KEYS=ATTRIBUTES.map(([id])=>id);
   const vector=(war,intelligence,constitution,speed,technique)=>({war,intelligence,constitution,speed,technique});
   const profile=(base,potentials)=>({baseAttributes:vector(...base),potentials:vector(...potentials)});
   const GENERAL_POTENTIALS={
     xuchu:[65,96,36],dianwei:[56,95,35],huangzhong:[86,93,60],maliang:[46,23,85],taishici:[82,93,66],zhangjiao:[86,25,86],zhangbao:[83,71,81],zhangliang:[78,80,68],zhenji:[15,4,71],zhaoyun:[91,96,76],zhouyu:[97,71,96],huanggai:[79,83,65],ganning:[86,94,76],lusu:[80,56,92],zhugeliang:[92,38,100],caocao:[96,72,91],zhangliao:[93,92,78],xuhuang:[88,90,74],yujin:[84,78,70],caoren:[89,86,56],sunquan:[76,67,80],lvbu:[87,100,26]
   };
-  // 潜力顺序：统率、武力、智力；速度和技巧按固定规则计算。
+  // 武智沿用人物档案；体质按战斗定位单独设定，速度与技巧使用各自的固定规则。
+  const AGILITY_PROFILES={zhenji:{base:12,potential:80},diaochan:{base:12,potential:85},sunshangxiang:{base:12,potential:90}};
   const derivedPotential=reference=>Math.round((Math.max(1,reference-20)+Math.min(100,reference+10))/2);
-  function generalProfile(id,base){const [command,war,intelligence]=GENERAL_POTENTIALS[id];return profile(base,[war,intelligence,command,derivedPotential(war),derivedPotential(intelligence)]);}
+  function generalProfile(id,base){const [command,war,intelligence]=GENERAL_POTENTIALS[id],agility=AGILITY_PROFILES[id];if(agility)base=[...base.slice(0,3),agility.base,base[4]];return profile(base,[war,intelligence,Professions.definitions[id]?.constitution??command,agility?.potential??derivedPotential(war),derivedPotential(intelligence)]);}
   // 1级裸属性与成长潜力独立；换武器不会改写人物的成长曲线。
   const PROFILES={
     hero:profile([10,10,10,10,10],[50,50,50,50,50]),
@@ -44,8 +46,11 @@
     lvbu:generalProfile('lvbu',[14,4,12,11,10])
   };
   function normalizeKnownPotentials(unit){
-    const id=unit.characterId||unit.id;if(unit.potentialRevision>=2||!GENERAL_POTENTIALS[id]||!unit.potentials)return unit;
-    const next=clone(unit);if(!(unit.potentialRevision>=1))for(const key of ['war','intelligence'])next.potentials[key]=PROFILES[id].potentials[key];for(const key of ['constitution','speed','technique'])next.potentials[key]=PROFILES[id].potentials[key];next.potentialRevision=2;return next;
+    const id=unit.characterId||unit.id;let next=unit;
+    if(!(unit.potentialRevision>=2)&&GENERAL_POTENTIALS[id]&&unit.potentials){next=clone(unit);if(!(unit.potentialRevision>=1))for(const key of ['war','intelligence'])next.potentials[key]=PROFILES[id].potentials[key];for(const key of ['constitution','speed','technique'])next.potentials[key]=PROFILES[id].potentials[key];next.potentialRevision=2;}
+    if(AGILITY_PROFILES[id]&&next.agilityRevision!==1&&next.baseAttributes&&next.potentials){next=clone(next);next.baseAttributes.speed=Math.max(next.baseAttributes.speed||1,AGILITY_PROFILES[id].base);next.potentials.speed=Math.max(next.potentials.speed||1,AGILITY_PROFILES[id].potential);const attributes=attributesAt(next.baseAttributes,next.potentials,next.level);next.attributes={...next.attributes,speed:attributes.speed};next.speed=attributes.speed;next.agilityRevision=1;}
+    const profession=Professions.forUnit(unit);if(profession&&next.constitutionRevision!==1&&next.baseAttributes&&next.potentials){next=clone(next);next.potentials.constitution=profession.constitution;const attributes=attributesAt(next.baseAttributes,next.potentials,next.level);next.attributes={...next.attributes,constitution:attributes.constitution};next.constitution=attributes.constitution;next.constitutionRevision=1;delete next.maxSoldiers;}
+    return next;
   }
   const clone=x=>JSON.parse(JSON.stringify(x)),positive=value=>Math.max(1,Math.floor(Number(value)||1)),level=value=>positive(value);
   const growthPerLevel=potential=>positive(potential)*.04;
@@ -57,7 +62,7 @@
   function create(id,currentLevel=1,overrides={}){
     const preset=PROFILES[id];if(!preset)throw new TypeError('未知成长档案：'+id);
     const baseAttributes=clone(overrides.baseAttributes||preset.baseAttributes),potentials=clone(overrides.potentials||preset.potentials),current=level(currentLevel),attributes=attributesAt(baseAttributes,potentials,current);
-    return {growthVersion:1,potentialRevision:2,level:current,baseAttributes,potentials,attributes,...attributes};
+    return {growthVersion:1,potentialRevision:2,...(Professions.definitions[id]?{constitutionRevision:1}:{}),...(AGILITY_PROFILES[id]?{agilityRevision:1}:{}),level:current,baseAttributes,potentials,attributes,...attributes};
   }
   function characterAt(character,currentLevel=character.level||1){
     const values=create('hero',currentLevel,{baseAttributes:character.baseAttributes||PROFILES.hero.baseAttributes,potentials:character.potentials||PROFILES.hero.potentials});
@@ -72,5 +77,5 @@
   }
   const GENERAL_IDS=['xuchu','dianwei','huangzhong','maliang','taishici','hero','zhangjiao','zhangbao','zhangliang','zhaoyun','zhenji','zhouyu','huanggai','ganning','lusu','zhugeliang','caocao','zhangliao','xuhuang','yujin','caoren','sunquan','lvbu'];
   const isGeneral=unit=>unit.unitType==='general'||GENERAL_IDS.includes(unit.characterId||unit.id);
-  const api={GENERAL_IDS,isGeneral,ATTRIBUTES,KEYS,PROFILES,GENERAL_POTENTIALS,derivedPotential,normalizeKnownPotentials,growthPerLevel,attributesAt,create,characterAt,normalizeCharacter,validGrowth};root.CharacterGrowth=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const api={GENERAL_IDS,isGeneral,ATTRIBUTES,KEYS,PROFILES,GENERAL_POTENTIALS,AGILITY_PROFILES,derivedPotential,normalizeKnownPotentials,growthPerLevel,attributesAt,create,characterAt,normalizeCharacter,validGrowth};root.CharacterGrowth=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

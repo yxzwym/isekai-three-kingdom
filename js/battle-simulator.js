@@ -29,7 +29,7 @@
   }
   function equipmentCatalog(){
     const result=[];
-    for(const id of Object.keys(I.templates))for(const quality of Object.keys(I.qualities))result.push(I.create(id,quality,'sim:'+id+':'+quality));
+    for(const id of Object.keys(I.templates))for(const quality of (I.templates[id].unique?[I.templates[id].quality]:Object.keys(I.qualities)))result.push(I.create(id,quality,'sim:'+id+':'+quality));
     const seen=new Set();for(const hero of heroes){const weapon=createHero(hero.id).weapon;if(!weapon||!W.special(weapon)||seen.has(weapon.id))continue;seen.add(weapon.id);result.push({...clone(weapon),slot:'weapon',quality:weapon.quality||'green',uid:'sim:special:'+weapon.id});}
     return result;
   }
@@ -39,7 +39,7 @@
       this.storage=storage;let saved;try{saved=JSON.parse(storage?.getItem(KEY)||'null');}catch{}saved=saved?.version===1?saved:{};
       this.level=level(saved.level);this.bossId=knownBoss(saved.bossId)?saved.bossId:'chapter:dongzhuo';this.difficulty=saved.difficulty==='hell'?'hell':'normal';this.records={};this.attempt=0;this.revision=0;
       this.selected=Array.isArray(saved.selected)?[...new Set(saved.selected.filter(knownHero))].slice(0,R.PARTY_LIMIT):['zhaoyun','zhenji','zhangbao','zhangliang'];
-      for(const [id,record]of Object.entries(saved.records||{}))if(knownHero(id))try{const u=createHero(id,level(record.level));if(record.weapon===null)u.weapon=null;else if(record.weapon&&typeof record.weapon==='object'){W.forWeapon(record.weapon);u.weapon=I.weaponRecord(record.weapon,u.attack);}if(record.equipment&&typeof record.equipment==='object')u.equipment=clone(record.equipment);if(record.weaponProficiencies)u.weaponProficiencies=clone(record.weaponProficiencies);u.skills=W.forWeapon(u.weapon);this.records[id]={unit:u,tactics:record.tactics?clone(record.tactics):null};}catch{}
+      for(const [id,record]of Object.entries(saved.records||{}))if(knownHero(id))try{const u=createHero(id,level(record.level));if(record.weapon===null)u.weapon=null;else if(record.weapon&&typeof record.weapon==='object'&&I.canEquip(u,record.weapon)){W.forWeapon(record.weapon);u.weapon=I.weaponRecord(record.weapon,u.attack);}if(record.equipment&&typeof record.equipment==='object')u.equipment=clone(record.equipment);if(record.weaponProficiencies)u.weaponProficiencies=clone(record.weaponProficiencies);u.skills=W.forWeapon(u.weapon);this.records[id]={unit:u,tactics:record.tactics?clone(record.tactics):null};}catch{}
       this.world=new World(heroCharacter(this.level),{introStep:2,nodeId:'camp',inside:true,outfitted:true});
       const world=this.world,members=world.members.bind(world),changeEquipment=world.changeEquipment.bind(world);
       world.members=()=>members().filter(u=>world.state.activeIds.includes(u.id));

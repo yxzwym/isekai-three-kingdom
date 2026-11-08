@@ -2,7 +2,7 @@
  'use strict';
  const node=typeof module!=='undefined'&&module.exports,G=node?require('./character-growth.js'):root.CharacterGrowth,W=node?require('./weapon-skills.js'):root.WeaponSkills,I=node?require('./items.js'):root.ItemCatalog;
  const talk=(...rows)=>({turns:rows.map(([speaker,text])=>({speaker,text})),lines:rows.map(row=>row[1])});
- const definition={id:'ganning',title:'江上锦帆',category:'story',recommendedLevel:10,country:'wu',place:'xinye',start:'rumor',stages:{
+ const definition={id:'ganning',name:'甘宁',title:'江上锦帆',category:'story',recommendedLevel:10,country:'wu',place:'xinye',start:'rumor',stages:{
   locked:{objective:''},
   rumor:{objective:'前往新野查探消息',npc:{id:'ganning-neighbor',name:'街坊',art:'villager',...talk(
    ['hero','大叔，我想打听件事。衙门门口怎么围着那么多人，里面是出了什么事吗？'],

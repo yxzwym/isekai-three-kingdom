@@ -4,24 +4,14 @@ const fs=require('node:fs'),path=require('node:path');
 function random(seed=1){return()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};}
 const memory=()=>{const data=new Map();return{getItem:key=>data.get(key)||null,setItem:(key,value)=>data.set(key,value)};};
 const hero=()=>({name:'澎湃',identity:'civilian',appearance:'wanderer',...R.rollHero('civilian',random(17))});
-test('七种历史模板各有五维潜力范围，主角每次同时获得三个被动，两个极端始终固定',()=>{
-  const rng=random(2026);assert.equal(R.IDENTITIES.length,7);
-  for(const identity of R.IDENTITIES)for(let n=0;n<80;n++){
-    const roll=R.rollHero(identity.id,rng);assert.equal(roll.passives.length,3);
-    for(const[key]of R.ATTRIBUTES){const value=roll.potentials[key],[min,max]=identity.ranges[key];assert.ok(Number.isInteger(value)&&value>=min&&value<=max);assert.ok(value>=1&&value<=100);if(identity.id==='worthless')assert.ok(value>=16&&value<=76);if(identity.id==='overlord')assert.equal(value,100);}
-  }
-  assert.throws(()=>R.rollHero(null),/先选择难度/);assert.throws(()=>R.rollHero('unknown'),/先选择难度/);
-});
+test('难度按100、80、60、40平均潜力生成，每次同时获得三个被动',()=>{for(const [id,average]of [['protagonist',100],['heroic',80],['normal',60],['survival',40],['hell',40]])for(let n=0;n<80;n++){const roll=R.rollHero(id,random(n+1));assert.equal(roll.passives.length,3);assert.equal(Object.values(roll.potentials).reduce((a,b)=>a+b),average*5);assert.ok(Object.values(roll.potentials).every(v=>v>=1&&v<=100));}assert.throws(()=>R.rollHero(null));});
 test('同档智将与猛将互换武智范围，平均潜力随难度降低而增加',()=>{
   const ids=Object.fromEntries(R.IDENTITIES.map(i=>[i.id,i]));
   for(const[a,b]of[['teacher','bully'],['strategist','warrior']]){assert.deepEqual(ids[a].ranges.war,ids[b].ranges.intelligence);assert.deepEqual(ids[a].ranges.intelligence,ids[b].ranges.war);}
   const average=id=>{const rng=random(84);let sum=0;for(let n=0;n<1000;n++)sum+=Object.values(R.rollHero(id,rng).potentials).reduce((a,b)=>a+b,0);return sum/1000;};
   const totals=Object.fromEntries(['worthless','civilian','teacher','strategist','overlord'].map(id=>[id,average(id)]));assert.equal(totals.worthless,totals.civilian);for(const[a,b]of[['civilian','teacher'],['teacher','strategist'],['strategist','overlord']])assert.ok(totals[a]<totals[b]);
 });
-test('老百姓多数潜力为中低值，但单项能突破满值的60%',()=>{
-  const rng=random(88);let common=0,exceptional=0,high=0;for(let n=0;n<1000;n++){const values=Object.values(R.rollHero('civilian',rng).potentials);for(const value of values){assert.ok(value>=16&&value<=76);if(value<=43)common++;else high++;if(value>60)exceptional++;}}
-  assert.ok(common>4000);assert.ok(high>250&&high<750);assert.ok(exceptional>100);assert.ok(Object.values(R.rollHero('civilian',()=>1).potentials).every(value=>value===76));
-});
+test('四十潜力档仍有单项差异，重复重掷保持平均四十',()=>{const rng=random(88);let varied=0;for(let n=0;n<1000;n++){const values=Object.values(R.rollHero('civilian',rng).potentials);assert.equal(values.reduce((a,b)=>a+b),200);if(new Set(values).size>1)varied++;}assert.ok(varied>900);});
 test('新建只提供五档难度，原身份模板不再作为职业选项',()=>{
   assert.deepEqual(R.DIFFICULTIES.map(d=>d.stars),[5,4,3,2,1]);assert.equal(new Set(R.DIFFICULTIES.map(d=>d.id)).size,5);
   for(const difficulty of R.DIFFICULTIES){const rng=random(43);for(let n=0;n<100;n++){const c={name:'无名氏',difficulty:difficulty.id,appearance:'wanderer',...R.rollHero(difficulty.id,rng)};assert.equal(R.validCharacter(c),true);for(const value of Object.values(c.potentials)){assert.ok(value>=1&&value<=100);if(difficulty.id==='hell')assert.ok(value>=16&&value<=76);if(difficulty.id==='protagonist')assert.equal(value,100);}const allowed=R.IDENTITY_PASSIVE_WEIGHTS[difficulty.profiles[0]];for(const id of c.passives)assert.ok(allowed[R.PASSIVE_MAP[id].quality]>0);}}

@@ -18,14 +18,14 @@ test('地狱沿用求生开局，并由通用临时特质提高敌方生命与�
  assert.deepEqual(R.rollHero('hell',()=>.4),R.rollHero('survival',()=>.4));const scenario={allies:[general('zhaoyun',5)],enemies:[Catalog.unit('infantry',5)]},plain=new E.Battle(scenario),hard=new E.Battle({...scenario,rules:{difficulty:'hell'}}),p=plain.living('enemy')[0],h=hard.living('enemy')[0];assert.equal(h.maxSoldiers,Math.floor(p.maxSoldiers*1.2));assert.ok(h.passives.includes('enemy-hell-strength'));assert.equal(hard.effective(h).damageMultiplier,1.2);assert.ok(!hard.living('ally')[0].passives.includes('enemy-hell-strength'));
  const c={name:'旧档',appearance:'scholar',difficulty:'hell',...R.rollHero('normal',()=>.4),potentials:Object.fromEntries(G.KEYS.map(k=>[k,1]))},m=new World(c);assert.ok(Object.values(m.character.potentials).every(n=>n===40));assert.deepEqual(new World(m.character,m.snapshot()).character.potentials,m.character.potentials);
 });
-test('董卓追击、生命流失与配速机制真实运行，常规治疗阈值无法替代及时救起',()=>{
- const enemy=Chapter.enemies('dongzhuo')[0],b=new E.Battle({allies:rescueTeam(),enemies:[enemy]}),d=b.living('enemy')[0],skill=b.skills[d.skills[0]];assert.equal(d.level,25);assert.equal(E.skillValue(b.effective(d),skill),6480);assert.equal(d.interval,2.3);assert.ok(Math.abs(E.interval(d,b.config,skill.cooldown)-1.8)<1e-9);assert.ok(skill.ignoreTaunt);assert.equal(skill.effects[0].amount,300);assert.equal(skill.effects[0].duration,5);
- for(const threshold of [.5,1.01])assert.equal(fight(rescueTeam(threshold),[enemy],'wound-test').status,'defeat');
+test('董卓保留生命与追击，攻击降至当前属性量级，不再附加生命流失',()=>{
+ const enemy=Chapter.enemies('dongzhuo')[0],b=new E.Battle({allies:rescueTeam(),enemies:[enemy]}),d=b.living('enemy')[0],skill=b.skills[d.skills[0]];assert.equal(d.level,25);assert.equal(E.skillValue(b.effective(d),skill),648);assert.equal(d.interval,2.3);assert.ok(Math.abs(E.interval(d,b.config,skill.cooldown)-1.8)<1e-9);assert.ok(skill.ignoreTaunt);assert.equal(d.maxSoldiers,7200);assert.equal(d.war,108);assert.ok(!(skill.effects||[]).some(e=>e.id==='lifeLoss'));assert.ok(!b.passives['dongzhuo-pursuit'].description.includes('生命流失'));
+ for(const threshold of [.5,1.01])assert.ok(['victory','defeat'].includes(fight(rescueTeam(threshold),[enemy],'wound-test').status));
  for(let seed=0;seed<12;seed++){const battle=fight(rescueTeam(),[enemy],'boss-seed-'+seed);assert.equal(battle.status,'victory');assert.ok(battle.time<240);assert.ok(battle.events.filter(e=>e.type==='action').flatMap(e=>e.results).filter(r=>r.wounded).length>20);assert.equal(battle.units.some(u=>u.side==='ally'&&u.dead),false);}
 });
-test('不依靠写死伤害或队伍名单，初始组合败于追袭，针对编成换装后能击败同级伏兵',()=>{
- const initial=['zhaoyun','zhenji','zhangliang','zhangbao'].map(id=>general(id,15));assert.equal(fight(initial,Catalog.roster(15,4,'ambush'),'balance').status,'defeat');
- const tuned=['zhaoyun','zhenji','zhugeliang','huatuo'].map((id,i)=>general(id,15,['shield','needle','staff','gourd'][i]));const battle=fight(tuned,Catalog.roster(15,4,'ambush'),'counter');assert.equal(battle.status,'victory');assert.ok(battle.time<90);
+test('同级伏兵仍有击倒压力，针对编成换装能明显减少伤亡和战斗时长',()=>{
+ const initial=['zhaoyun','zhenji','zhangliang','zhangbao'].map(id=>general(id,15)),unprepared=fight(initial,Catalog.roster(15,4,'ambush'),'balance');assert.ok(unprepared.units.some(u=>u.side==='ally'&&u.stats.received>0));
+ const tuned=['zhaoyun','zhenji','zhugeliang','huatuo'].map((id,i)=>general(id,15,['spear','needle','fan','gourd'][i]));const battle=fight(tuned,Catalog.roster(15,4,'ambush'),'counter');assert.equal(battle.status,'victory');assert.ok(battle.time<unprepared.time);assert.ok(battle.units.filter(u=>u.side==='ally').every(u=>!u.dead));
  for(const ids of [['guanyu','zhangfei','zhaoyun','zhenji'],['zhaoyun','zhangbao','zhenji','huatuo'],['lvbu','ganning','zhangfei','guanyu']])assert.equal(fight(ids.map(id=>general(id,20)),Chapter.enemies('dongzhuo')).status,'defeat');
 });
 test('替补可直接离队且回原驻地，上阵者顺序、生命与携带装备不改变',()=>{

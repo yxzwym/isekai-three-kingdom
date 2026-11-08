@@ -49,14 +49,14 @@
         });
         this.view.prepared=!!this.progress.preparation._reviewed;return;
       }
-      const actors=[...new Set((P.linesFor(stage,this.progress)||[]).map(row=>row.speaker==='hero'?'hero':row.partner).filter(Boolean))],portraits=actors.map(id=>P.assets(id,this.character.appearance).fullbody?.src).filter(Boolean);root.GameAssetLoader?.preload?.(portraits,{priority:1}).catch(()=>{});
+      const actors=[...new Set((P.linesFor(stage,this.progress)||[]).map(row=>row.speaker==='hero'?'hero':row.partner).filter(Boolean))],portraits=actors.map(id=>P.assets(id,this.character.appearance,true).fullbody?.src).filter(Boolean);root.GameAssetLoader?.preload?.(portraits,{priority:1}).catch(()=>{});
       this.resize();
     }
     text(value,x,y,size=16,color='#f1ece2',align='left'){size=UI.textSize(size);const c=this.ctx;c.font=`${size}px ${FONT}`;c.fillStyle=color;c.textBaseline='middle';c.textAlign=align;c.fillText(value,x,y);}
     box(x,y,w,h,fill='#0c1d26ed',stroke='#b6a17a'){const c=this.ctx;c.fillStyle=fill;c.beginPath();c.roundRect(x,y,w,h,5);c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
     button(label,x,y,w,h,action){this.box(x,y,w,h);this.text(label,x+w/2,y+h/2,15,'#e7d4b0','center');this.hits.push({x,y,w,h,action:()=>{root.GameAudio?.play('ui');action();}});}
     bust(id,side,top,active){
-      if(!id)return;const art=P.assets(id,this.character.appearance).fullbody,img=this.image(art?.src);if(!img)return;
+      if(!id)return;const early=this.progress&&typeof this.progress==='object'&&!['departure','world','complete'].includes(this.progress.stage)&&(this.progress.stage!=='dawn'||this.progress.index<3),art=P.assets(id,this.character.appearance,early).fullbody,img=this.image(art?.src);if(!img)return;
       if(!this.busts.has(art.src)){const crop=art.dialogueCrop||root.CharacterAssets.bustCrop(img.naturalWidth,img.naturalHeight),cache=document.createElement('canvas');cache.width=Math.round(crop.width);cache.height=Math.round(crop.height);const c=cache.getContext('2d');c.drawImage(img,crop.x,crop.y,crop.width,crop.height,0,0,cache.width,cache.height);const fade=c.createLinearGradient(0,0,0,cache.height);fade.addColorStop(0,'#000');fade.addColorStop(.65,'#000');fade.addColorStop(1,'#0000');c.globalCompositeOperation='destination-in';c.fillStyle=fade;c.fillRect(0,0,cache.width,cache.height);this.busts.set(art.src,cache);}
       const bust=this.busts.get(art.src),height=Math.min(330,this.h*.42),width=height*bust.width/bust.height,x=side==='left'?-width*.1:this.w-width*.9,c=this.ctx;c.save();c.globalAlpha=active?1:.55;c.drawImage(bust,x,top-height+70,width,height);c.restore();
     }

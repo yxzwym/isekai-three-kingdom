@@ -9,7 +9,7 @@ function ready(b, id) { const u = b.unit(id); u.ready = true; u.progress = 1; re
 function simulate(config = {}) { const b = makeBattle(config); b.start(); while (b.status === 'running' && b.time < 360) b.advance(.1); return b; }
 
 test('五维潜力采用100基准，等级通过成长属性影响战斗',()=>{
- assert.equal(D.REINFORCEMENTS.find(u=>u.id==='lvbu').potentials.war,100);assert.equal(D.ENEMIES.find(u=>u.id==='caocao').potentials.constitution,96);assert.equal(E.attr(0),1);assert.equal(E.attr(-1),1);assert.equal(E.attr(300),300);
+ assert.equal(D.REINFORCEMENTS.find(u=>u.id==='lvbu').potentials.war,100);assert.equal(D.ENEMIES.find(u=>u.id==='caocao').potentials.constitution,80);assert.equal(E.attr(0),1);assert.equal(E.attr(-1),1);assert.equal(E.attr(300),300);
 });
 test('每点体质提供十点生命，突破初始范围仍保持相同公式',()=>{
  for(const con of [1,20,100,255,300,3000])assert.equal(E.maxHealth(con),con*10);assert.equal(E.maxSoldiers(1,100),E.maxSoldiers(99,100));

@@ -4601,8 +4601,8 @@
     plan('blade','sword','刀','warrior','剑豪','精准强攻','朴刀',['破甲刀','鹰落斩','杀机暴起']),
     plan('spear','spear','枪','warrior','圣龙将军','守御反击','木杆枪'),
     plan('shield','greatShield','盾','warrior','黑骑士','铁壁削弱','包铁盾'),
-    plan('fan','fan','扇','mage','传奇法师','雷法济世','羽扇',['奔雷诀','惊雷阵','清风化雨']),
-    plan('staff','staff','杖','mage','岩浆法师','烈焰术法','木杖'),
+    plan('fan','staff','扇','mage','岩浆法师','烈焰术法','羽扇',['火羽诀','烈焰连营','清风化雨']),
+    plan('staff','fan','杖','mage','传奇法师','雷法济世','木杖',['奔雷诀','惊雷阵','甘霖术']),
     plan('whisk','whisk','拂尘','mage','霜寒法师','霜寒禁法','拂尘'),
     plan('banner','banner','法幡','mage','血法师','血咒夺生','素幡'),
     plan('gourd','gourd','药葫芦','mage','巫医','蛊毒回春','药葫芦'),
@@ -4616,7 +4616,8 @@
     plan('axe','blade','斧','berserker','狂战神','重斧强攻','铁斧',['横斧斩','乾坤一击','回旋斩']),
     plan('hammer','hammer','锤','berserker','火刑官','焚邪火刑','铁锤')
   ];
-  for(const type of types)if(type.id==='fan')for(const list of [type.skills,type.daySkills])for(const skill of list)if(skill.kind==='tactic')skill.element='thunder';
+  for(const type of types)if(type.id==='staff')for(const list of [type.skills,type.daySkills])for(const skill of list)if(skill.kind==='tactic')skill.element='thunder';
+  for(const type of types)if(type.id==='staff')for(const list of [type.skills,type.daySkills])for(const skill of list)skill.effects=(skill.effects||[]).map(e=>e.id==='burn'?{id:'paralysis',duration:e.duration||8,chance:e.chance??1,negative:true,speedMultiplier:.7}:e);
   const aliases={halberd:'spear',qin:'fan',talisman:'scripture',dualSword:'sword',greatShield:'shield',bell:'banner',drum:'gourd',club:'needle',throwingKnife:'shortBlade',dart:'shortBlade',hook:'dagger',repeatingCrossbow:'cannon',greatBow:'crossbow'};
   const legacyAliases={...aliases};
   function groupedTypes(){const result=groups.map(group=>({...group,types:types.filter(type=>type.group===group.id)})),other=types.filter(type=>!groups.some(group=>group.id===type.group));if(other.length)result.push({id:'other',name:'其他',types:other});return result.filter(group=>group.types.length);}

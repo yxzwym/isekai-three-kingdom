@@ -119,9 +119,9 @@
       if(!this.ended&&!['ready','running'].includes(b.status)){this.ended=true;if(b.status==='victory'||b.status==='defeat')root.GameAudio?.play(b.status);this.resultAt=now+(b.status==='victory'&&[...this.enemyDefeats.values()].some(t=>now-t<500)?500:0);if(!this.options.hideResult&&now>=this.resultAt)this.panel={type:'result'};const result=b.export();this.canvas.dispatchEvent(new CustomEvent('battlecomplete',{detail:result}));this.options.onComplete?.(result,this);}
       this.floats=this.floats.filter(f=>now-f.born<1100);const limit=Math.max(96,b.units.length*10);if(this.floats.length>limit)this.floats.splice(0,this.floats.length-limit);
     }
-    text(text,x,y,size=14,color='#dce6e5',align='center'){
-      size=UI.textSize(size);text=String(text);const key=size+'|'+color+'|'+text;let image=this.textTextures.get(key);
-      if(!image){const canvas=document.createElement('canvas'),c=canvas.getContext('2d');c.font=`${size}px ${font}`;const w=Math.ceil(c.measureText(text).width+10),h=Math.ceil(size*1.8+6);canvas.width=Math.ceil(w*this.dpr);canvas.height=Math.ceil(h*this.dpr);c.setTransform(this.dpr,0,0,this.dpr,0,0);c.font=`${size}px ${font}`;c.textAlign='left';c.textBaseline='middle';c.fillStyle=color;c.shadowColor='#000';c.shadowBlur=3*this.dpr;c.fillText(text,5,h/2);image={canvas,w,h};if(this.textTextures.size>=384)this.textTextures.delete(this.textTextures.keys().next().value);this.textTextures.set(key,image);}
+    text(text,x,y,size=14,color='#dce6e5',align='center',bold=false){
+      size=UI.textSize(size);text=String(text);const key=Number(bold)+'|'+size+'|'+color+'|'+text;let image=this.textTextures.get(key);
+      if(!image){const canvas=document.createElement('canvas'),c=canvas.getContext('2d');c.font=`${bold?'700 ':'400 '}${size}px ${font}`;const w=Math.ceil(c.measureText(text).width+10),h=Math.ceil(size*1.8+6);canvas.width=Math.ceil(w*this.dpr);canvas.height=Math.ceil(h*this.dpr);c.setTransform(this.dpr,0,0,this.dpr,0,0);c.font=`${bold?'700 ':'400 '}${size}px ${font}`;c.textAlign='left';c.textBaseline='middle';c.fillStyle=color;c.shadowColor='#000';c.shadowBlur=3*this.dpr;c.fillText(text,5,h/2);image={canvas,w,h};if(this.textTextures.size>=384)this.textTextures.delete(this.textTextures.keys().next().value);this.textTextures.set(key,image);}
       const left=align==='left'?x-5:align==='right'?x-image.w+5:x-image.w/2;this.ctx.drawImage(image.canvas,Math.round(left*this.dpr)/this.dpr,Math.round((y-image.h/2)*this.dpr)/this.dpr,image.w,image.h);
     }
     box(x,y,w,h,fill='#0b222cf2',stroke='#507984',radius=3) {
@@ -141,7 +141,7 @@
       for(const r of this.rects)this.drawUnit(r.unit,r,now);
       this.drawTargeting(now);if(this.options.effects!==false)this.vfx.draw(c,this.rectMap,now);this.drawReadySkills(now);if(this.battle.status==='ready')this.drawPreparation();
       const floatRows=new Map();for(const f of this.floats)floatRows.set(f.id,Math.max(floatRows.get(f.id)||0,f.lane||0));
-      for(const f of this.floats){const r=this.rectMap.get(f.id);if(!r||now<f.born)continue;const progress=(now-f.born)/1100,pop=f.type==='skill'?1:1+.25*Math.sin(Math.PI*Math.min(1,progress*5));c.save();c.globalAlpha=1-progress;const face=this.visuals.get(f.id)?.dst||r.figure,x=face.x+face.w/2,y=Math.max(24,Math.min(this.h-24-(floatRows.get(f.id)||0)*28,face.y-10))+(f.lane||0)*28-progress*28;c.translate(x,y);c.scale(pop,pop);this.text(f.text,0,0,Math.min(f.type==='skill'?14:f.critical?25:22,r.w*(f.type==='skill'?.2:.33)),f.color);c.restore();}
+      for(const f of this.floats){const r=this.rectMap.get(f.id);if(!r||now<f.born)continue;const progress=(now-f.born)/1100,pop=f.type==='skill'?1:1+.25*Math.sin(Math.PI*Math.min(1,progress*5));c.save();c.globalAlpha=1-progress;const face=this.visuals.get(f.id)?.dst||r.figure,x=face.x+face.w/2,y=Math.max(24,Math.min(this.h-24-(floatRows.get(f.id)||0)*28,face.y-10))+(f.lane||0)*28-progress*28;c.translate(x,y);c.scale(pop,pop);this.text(f.text,0,0,14,f.color,'center',!!f.critical);c.restore();}
       if(this.battle.status==='running'&&this.scenario.hint&&!this.allies.some(u=>u.stats.actions>0||u.ready)){this.box(24,h/2-22,w-48,44,'#091e29d9','#8d9a8e');this.text(this.scenario.hint,w/2,h/2,14,'#f2dfb8');}
       if(this.panel)this.drawPanel();
       this.drawNotice(now);

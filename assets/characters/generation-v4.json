@@ -1,0 +1,174 @@
+{
+  "tool": "built-in image_gen",
+  "assets": [
+    {
+      "id": "ganning",
+      "path": "./assets/characters/ganning/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "xuchu",
+      "path": "./assets/characters/xuchu/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "huangzhong",
+      "path": "./assets/characters/huangzhong/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "dianwei",
+      "path": "./assets/characters/dianwei/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "maliang",
+      "path": "./assets/characters/maliang/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "taishici",
+      "path": "./assets/characters/taishici/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "lusu",
+      "path": "./assets/characters/lusu/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "zhenji",
+      "path": "./assets/characters/zhenji/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "zhaoyun",
+      "path": "./assets/characters/zhaoyun/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "zhangliang",
+      "path": "./assets/characters/zhangliang/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "xunyu",
+      "path": "./assets/characters/xunyu/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "xiahoudun",
+      "path": "./assets/characters/xiahoudun/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "jiaxu",
+      "path": "./assets/characters/jiaxu/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "simayi",
+      "path": "./assets/characters/simayi/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "zhangliao",
+      "path": "./assets/characters/zhangliao/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "caocao",
+      "path": "./assets/characters/caocao/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "zhugeliang",
+      "path": "./assets/characters/zhugeliang/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "guanyu",
+      "path": "./assets/characters/guanyu/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "zhangfei",
+      "path": "./assets/characters/zhangfei/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "liubei",
+      "path": "./assets/characters/liubei/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "machao",
+      "path": "./assets/characters/machao/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "zhouyu",
+      "path": "./assets/characters/zhouyu/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "huanggai",
+      "path": "./assets/characters/huanggai/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "lvmeng",
+      "path": "./assets/characters/lvmeng/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "sunquan",
+      "path": "./assets/characters/sunquan/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "luxun",
+      "path": "./assets/characters/luxun/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "diaochan",
+      "path": "./assets/characters/diaochan/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "huatuo",
+      "path": "./assets/characters/huatuo/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "lvbu",
+      "path": "./assets/characters/lvbu/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "menghuo",
+      "path": "./assets/characters/menghuo/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "zhangbao",
+      "path": "./assets/characters/zhangbao/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "zhangjiao",
+      "path": "./assets/characters/zhangjiao/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "dongzhuo",
+      "path": "./assets/characters/dongzhuo/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "enemy-wolf",
+      "path": "./assets/characters/enemy-wolf/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "enemy-soldier",
+      "path": "./assets/characters/enemy-soldier/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "enemy-cultist",
+      "path": "./assets/characters/enemy-cultist/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "modern-male",
+      "path": "./assets/characters/modern-male/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "modern-female",
+      "path": "./assets/characters/modern-female/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "enemy-sorcerer",
+      "path": "./assets/characters/enemy-sorcerer/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "enemy-archer",
+      "path": "./assets/characters/enemy-archer/classic/fullbody-v4.webp"
+    },
+    {
+      "id": "sunshangxiang",
+      "path": "./assets/characters/sunshangxiang/classic/fullbody-v4.webp"
+    }
+  ],
+  "prompts": {
+    "heroes": "Single full body Chinese Three Kingdoms character, character-appropriate Han dynasty armor or refined robes, equipped with assigned profession weapon, anatomically correct grip on hilt or shaft, never touching blade edge. Coherent polished semi-realistic Chinese action RPG painted illustration. Full figure standing 3/4 frontal pose, large readable face near top, feet near bottom, entire weapon visible, fine realistic fabrics and metal, natural proportions. Transparent cutout background, no scenery, no text.",
+    "modern": "Handsome/beautiful 24 year old Chinese modern traveler, casual jacket, shirt, trousers and walking shoes, no weapons. Full body transparent cutout, same semi-realistic painted RPG style.",
+    "enemies": "Single full body Han dynasty sorcerer, archer, cultist, infantry or wild wolf. Clear role-specific weapon and silhouette, realistic painted Chinese historical RPG style, transparent background, no text."
+  }
+}

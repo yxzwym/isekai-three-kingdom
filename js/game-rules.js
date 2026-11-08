@@ -327,7 +327,7 @@
     const difficulty=getDifficulty(difficultyId);if(!difficulty)throw new TypeError('请先选择难度');
     const profileId=difficultyId==='worthless'?'civilian':IDENTITIES.some(i=>i.id===difficultyId)?difficultyId:difficulty.profiles.length===1?difficulty.profiles[0]:difficulty.profiles[randomInt(0,difficulty.profiles.length-1,rng)];
     const identity=IDENTITIES.find(i=>i.id===profileId);
-    const growth=G.characterAt({potentials:Object.fromEntries(ATTRIBUTES.map(([key])=>[key,rollAttribute(identity,key,rng)]))},1);
+    const average={hell:40,survival:40,normal:60,heroic:80,protagonist:100}[difficulty.id],values=ATTRIBUTES.map(()=>average===100?100:randomInt(average-15,average+15,rng));let delta=average*values.length-values.reduce((a,b)=>a+b,0);for(let i=0;delta&&i<1000;i++){const k=i%values.length,step=Math.sign(delta);if(values[k]+step>=1&&values[k]+step<=100){values[k]+=step;delta-=step;}}const growth=G.characterAt({potentials:Object.fromEntries(ATTRIBUTES.map(([key],i)=>[key,values[i]]))},1);
     return {...growth,weaponCatalogVersion:1,weaponProficiencies:Object.fromEntries(WEAPON_TYPES.map(type=>[type.id,0])),passives:rollPassives(rng,3,difficulty.passiveWeights)};
   }
   const segments=text=>typeof Intl.Segmenter==='function'?Array.from(new Intl.Segmenter('zh',{granularity:'grapheme'}).segment(text),s=>s.segment):Array.from(text);

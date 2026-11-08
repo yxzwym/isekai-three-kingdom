@@ -13,7 +13,8 @@
    for(const stage of Object.values(d.stages||{}))if(stage.npc?.choices?.some(c=>c.battle===phase))stage.recommendedLevel=f.level;
   }if(d.id==='lvbu')d.battles.trial.temporaryPassives=[...(d.battles.trial.temporaryPassives||[]),'enemy-trial-armor'];if(d.id==='ganning'){d.battles.breach.count=5;d.battles.breach.pattern='shieldwall';d.battles.cell.count=5;d.battles.cell.pattern='siege';}if(d.id==='taishici')for(const key of ['jianye-meet','jianye-duel','freed'])d.stages[key].recommendedLevel=12;route++;
  }
- for(const q of N.sideQuests){q.fixedCombatLevel=Math.min(20,q.bossId?Math.max(10,q.recommendedLevel||10):Math.max(q.recommendedLevel||3,P.regionLevel(q.place)));q.recommendedLevel=q.fixedCombatLevel;}
- for(const [id,b]of Object.entries(N.storyBattles)){b.fixedCombatLevel={entry:2,rescue:3,grain:4,escort:5}[id]||3;b.recommendedLevel=b.fixedCombatLevel;}
+ const early={'grain-escort':3,'cs-blackwood':3,'clear-mountain':3,'trade-road':4,'ye-quarry':5};
+ for(const q of N.sideQuests){if(q.dungeon)continue;if(early[q.id]){q.fixedCombatLevel=q.recommendedLevel=early[q.id];q.pattern='earlyPhysical';continue;}q.fixedCombatLevel=Math.min(20,q.bossId?Math.max(10,q.recommendedLevel||10):Math.max(q.recommendedLevel||3,P.regionLevel(q.place)));q.recommendedLevel=q.fixedCombatLevel;}
+ for(const [id,b]of Object.entries(N.storyBattles)){b.fixedCombatLevel={entry:2,rescue:2,grain:3,escort:3}[id]||3;b.recommendedLevel=b.fixedCombatLevel;}
  const api={levels};root.EncounterBalance=api;if(node)module.exports=api;
 })(globalThis);

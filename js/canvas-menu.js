@@ -43,7 +43,7 @@
     drawMain(){const w=this.w,h=this.h;this.ctx.save();this.ctx.shadowColor='#000c';this.ctx.shadowBlur=16;this.text('异界三国',w/2,h*.24,Math.min(52,w*.135),GOLD,'center',true);this.ctx.restore();const bw=Math.min(254,w-96),x=(w-bw)/2,start=h*.49,gap=Math.min(58,(h*.43)/5);const buttons=[['新游戏',()=>this.startNew()],['载入游戏',()=>this.go('load')],['战斗模拟',()=>this.options.onSimulation?.()],['设置',()=>{this.modal={type:'settings'};}],['关于',()=>{this.modal={type:'about'};}]];buttons.forEach(([label,action],i)=>this.button(label,x,start+i*gap,bw,43,action,{active:i===0,plain:i>0}));}
     difficultyStars(count,right,y){const c=this.ctx,size=14,gap=5,color=['','#6ecb8d','#77b7ed','#e5c16d','#ec9a66','#ef716d'][count];c.save();c.fillStyle=color;for(let i=0;i<count;i++){const x=right-size/2-(count-1-i)*(size+gap);c.beginPath();for(let point=0;point<10;point++){const angle=-Math.PI/2+point*Math.PI/5,r=point%2?size*.22:size*.5,px=x+Math.cos(angle)*r,py=y+Math.sin(angle)*r;if(point)c.lineTo(px,py);else c.moveTo(px,py);}c.closePath();c.fill();}c.restore();}
     creationLayout(){
-      const tight=this.h<620,gap=tight?8:this.h<740?10:12,footerY=this.h-53,attributeTop=tight?106:114,available=footerY-12-attributeTop-44-gap*2,attributeRowH=clamp(Math.floor(available*.44/6),24,44),passiveTitleY=attributeTop+attributeRowH*6+22,passiveTop=passiveTitleY+20,cardH=(footerY-12-passiveTop-gap*2)/3;
+      const tight=this.h<620,gap=tight?8:this.h<740?10:12,footerY=this.h-53,attributeTop=tight?106:114,available=footerY-12-attributeTop-44-gap*2,attributeRowH=clamp(Math.floor(available*.44/6),24,44),passiveTitleY=attributeTop+attributeRowH*6+22,passiveTop=passiveTitleY+20,cardH=Math.min(76,(footerY-12-passiveTop-gap*2)/3);
       return {tight,gap,cardH,footerY,passiveTop,passiveTitleY,attributeTop,attributeRowH};
     }
     drawAttributeSummary(character,top=114,rowH=31){
@@ -51,7 +51,7 @@
       this.box(x,top,w,height,'#10252ddf','#536b70',4);c.fillStyle='#29414aaa';c.fillRect(x+1,top+1,w-2,rowH-1);c.strokeStyle='#4b656b99';c.lineWidth=1;c.beginPath();
       for(const xx of edges.slice(1,-1)){c.moveTo(xx,top);c.lineTo(xx,top+height);}for(let row=1;row<=R.ATTRIBUTES.length;row++){const yy=top+row*rowH;c.moveTo(x,yy);c.lineTo(x+w,yy);}c.stroke();
       ['属性','当前','潜力'].forEach((label,i)=>this.text(label,(edges[i]+edges[i+1])/2,top+rowH/2,14,MUTED));
-      R.ATTRIBUTES.forEach(([key,label],i)=>{const cy=top+rowH*(i+1.5),potential=character.potentials[key],valueY=cy-(rowH>=30?3:0);this.text(label,(edges[0]+edges[1])/2,cy,14,WHITE);this.text(character.attributes[key],(edges[1]+edges[2])/2,cy,16,WHITE);this.text(potential,(edges[2]+edges[3])/2,valueY,16,GOLD);
+      R.ATTRIBUTES.forEach(([key,label],i)=>{const cy=top+rowH*(i+1.5),potential=character.potentials[key],valueY=cy-(rowH>=30?3:0);this.text(label,(edges[0]+edges[1])/2,cy,14,WHITE);this.text(character.attributes[key],(edges[1]+edges[2])/2,cy,16,WHITE);this.text(potential+'(+'+Number((potential*.04).toFixed(2))+')',(edges[2]+edges[3])/2,valueY,14,GOLD);
         if(rowH>=30){const bx=edges[2]+14,bw=edges[3]-edges[2]-28,by=cy+rowH/2-7;c.fillStyle='#293d44';c.fillRect(bx,by,bw,3);c.fillStyle='#c7a76d';c.fillRect(bx,by,bw*clamp(potential/100,0,1),3);}
       });
     }
@@ -68,7 +68,7 @@
       this.heading('创建人物');this.button('‹',16,18,32,34,()=>this.go('main'),{plain:true});
       const difficultyY=layout.tight?58:60,difficultyH=layout.tight?36:42;this.box(16,difficultyY,w-32,difficultyH,'#13242be6','#8b826c',3);this.text(difficulty.name,28,difficultyY+(layout.tight?10:12),14,WHITE,'left',true);this.text('难度',28,difficultyY+difficultyH-10,14,MUTED,'left');this.difficultyStars(difficulty.stars,70+difficulty.stars*19,difficultyY+difficultyH-10);this.ctx.strokeStyle=GOLD;this.ctx.lineWidth=1.5;this.ctx.beginPath();this.ctx.moveTo(w-36,difficultyY+difficultyH/2-3);this.ctx.lineTo(w-31,difficultyY+difficultyH/2+2);this.ctx.lineTo(w-26,difficultyY+difficultyH/2-3);this.ctx.stroke();
       this.hits.push({x:16,y:difficultyY,w:w-32,h:difficultyH,label:'选择难度 '+difficulty.name,action:()=>{this.modal={type:'difficulty'};}});
-      this.drawAttributeSummary(this.draft.roll,layout.attributeTop,layout.attributeRowH);this.text('特质',16,layout.passiveTitleY,14,MUTED,'left');this.drawCreationPassives(this.draft.roll,layout);
+      if(difficulty.id==='hell')this.text('敌人全面加强',w-48,difficultyY+difficultyH/2,14,'#f28b78','right');this.drawAttributeSummary(this.draft.roll,layout.attributeTop,layout.attributeRowH);this.text('特质',16,layout.passiveTitleY,14,MUTED,'left');this.drawCreationPassives(this.draft.roll,layout);
       this.button('重掷',16,layout.footerY,96,36,()=>this.roll(),{plain:true});this.button('下一步',124,layout.footerY,w-140,36,()=>this.next(),{active:true});
     }
     drawAppearance(){

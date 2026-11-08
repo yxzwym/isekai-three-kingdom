@@ -38,7 +38,7 @@
     for(const effect of effects)lines.push(statusText(effect,{...actor,healingReceivedMultiplier:b.healingFactor?b.healingFactor(u):1}));
     if(['physical','tactic'].includes(skill.kind)){lines.push('基础命中率：'+n((skill.hitChance??.4)*100)+'%');lines.push('基础暴击率：'+n((skill.criticalChance||0)*100)+'%');}
     if(skill.lifesteal)lines.push('将伤害的'+n(skill.lifesteal*100)+'%转化为自身生命。');
-    const races={humanoid:'人型生物',beast:'野兽',dragon:'龙',spirit:'灵体',dark:'黑暗生物'};for(const [tag,value]of Object.entries(skill.raceBonuses||{}))lines.push('对'+(races[tag]||tag)+'额外造成'+n(value*100)+'%伤害。');
+    const races={humanoid:'人型生物',beast:'野兽',dragon:'龙',spirit:'灵体',dark:'妖物'};for(const [tag,value]of Object.entries(skill.raceBonuses||{}))lines.push('对'+(races[tag]||tag)+'额外造成'+n(value*100)+'%伤害。');
     if(skill.ignoreTaunt)lines.push('无视嘲讽。');
     const delay=b.config.skillDelays?.[skill.id]??skill.cooldown??0;
     if(delay)lines.push('冷却时间'+(delay<0?'减少':'增加')+n(Math.abs(delay))+'秒。');
