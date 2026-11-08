@@ -1,0 +1,73 @@
+{
+  "date": "2026-11-08",
+  "baseline": "f22d5eab246065e8760621428a528ac53f46bc62",
+  "environment": "Chrome headless without GPU; Python HTTP/1 server, uncompressed responses, fresh browser contexts",
+  "network": {
+    "downloadMbps": 10,
+    "latencyMs": 100
+  },
+  "runs": [
+    {
+      "name": "before",
+      "timeMs": 24790,
+      "requests": 164,
+      "bodyBytes": 29064930,
+      "imageRequests": 98,
+      "errors": []
+    },
+    {
+      "name": "after",
+      "timeMs": 1772,
+      "requests": 3,
+      "bodyBytes": 1497209,
+      "imageRequests": 1,
+      "errors": []
+    }
+  ],
+  "improvement": {
+    "timePercent": 93,
+    "initialBytesPercent": 95
+  },
+  "tests": {
+    "passed": 489,
+    "failed": 0
+  },
+  "browser": {
+    "checks": [
+      "主菜单仅解码1张图；随机潜力页不下载造型；选择造型下载小包，503后点击重试恢复8张造型",
+      "刷新后已缓存的主菜单图片不重新下载",
+      "场景资源未就绪时战斗计时为0；加载后正常进入手动教学",
+      "后期存档的城镇、NPC与队伍按需加载；大地图材质就绪后重建缓存",
+      "按需加载后任务、人物与装备图标正常显示",
+      "file://源码入口使用本地图片，仍可正常打开",
+      "离线单文件保留全部内嵌素材，双击仍可启动",
+      "HTTP访问/dist/跳转轻量网页入口，保留场景参数"
+    ],
+    "errors": [],
+    "warmMenu": [
+      {
+        "transfer": 0,
+        "body": 393398
+      }
+    ]
+  },
+  "prologue": {
+    "battles": 3,
+    "errors": [],
+    "metrics": {
+      "battle": {
+        "n": 200,
+        "mean": 0.32849999964237214,
+        "p95": 0.6000000238418579,
+        "max": 26.80000001192093
+      },
+      "panel-mapIntro": {
+        "n": 4,
+        "mean": 13.899999991059303,
+        "p95": 55.39999997615814,
+        "max": 55.39999997615814
+      }
+    }
+  },
+  "imageQuality": "Original image bytes and dimensions unchanged; packs validated byte-for-byte."
+}

@@ -46,6 +46,7 @@
       this.canvas=canvas;this.ctx=canvas.getContext('2d');this.options=options;this.visuals=new Map();this.textTextures=new Map();this.spriteBuilds=0;this.dpr=1;this.background=null;this.ariaLabel='';this.metrics=options.profile?new Presentation.FrameStats():null;this.images=new Map();this.imageIds=new WeakMap();this.imageSerial=0;this.sprites=new Map();this.hits=[];this.floats=[];this.vfx=new root.BattleVFX.BattleEffects();this.aim=null;this.panel=null;this.focus=-1;this.disposed=false;
       this.click=this.click.bind(this);this.key=this.key.bind(this);this.resize=this.resize.bind(this);this.frame=this.frame.bind(this);
       this.down=this.down.bind(this);this.up=this.up.bind(this);this.move=this.move.bind(this);this.cancel=this.cancel.bind(this);this.context=e=>e.preventDefault();this.wheel=e=>{if(['tactics','inspect','skillInfo','passiveInfo'].includes(this.panel?.type)){e.preventDefault();this.panel.scroll=clamp(this.panel.scroll+e.deltaY,0,this.panel.maxScroll||0);}};
+      root.GameAssetLoader?.track?.(this,{onReady:()=>{this.buildBackground();this.preparePortraits();}});
       canvas.addEventListener('pointerdown',this.down);canvas.addEventListener('pointerup',this.up);canvas.addEventListener('pointermove',this.move);canvas.addEventListener('pointercancel',this.cancel);canvas.addEventListener('contextmenu',this.context);canvas.addEventListener('wheel',this.wheel,{passive:false});canvas.addEventListener('keydown',this.key);
       this.observer=new ResizeObserver(this.resize);this.observer.observe(canvas);
       this.load(scenario);this.resize();this.lastTime=performance.now();this.raf=requestAnimationFrame(this.frame);
@@ -53,11 +54,11 @@
     load(scenario) {
       this.battle=new root.BattleEngine.Battle(scenario);this.scenario=scenario;this.seen=0;this.ended=false;this.enemyDefeats=new Map();this.resultAt=0;this.panel=null;this.floats=[];this.aim=null;this.activeManual=null;this.selectionKey=null;this.preparationHintDismissed=false;this.health=new Map(this.battle.units.map(u=>[u.id,new Presentation.HealthTrack(u.soldiers,u.maxSoldiers)]));this.vfx=new root.BattleVFX.BattleEffects();
       for(const u of this.battle.units){const id=u.characterId||u.id,record=root.CharacterAssets?.manifest.characters[id];if(record){const art=root.CharacterAssets.resolve(id,record.variants[u.variant]?u.variant:undefined);u.portrait??=art.portrait;u.fullbody??=art.fullbody;}}
-      const urls=[scenario.scene?.background,...this.battle.units.map(u=>(u.side==='enemy'?u.fullbody||u.portrait:u.portrait)?.src)].filter(Boolean);
+      const urls=[...(root.GameAssetManifest||[]).filter(f=>f.src.includes('/ui/')).map(f=>f.src),scenario.scene?.background,...this.battle.units.map(u=>(u.side==='enemy'?u.fullbody||u.portrait:u.portrait)?.src)].filter(Boolean);
       urls.forEach(src=>this.image(src));this.visuals.clear();this.vfx.prepare([...this.battle.units.flatMap(u=>u.skills.map(id=>root.BattleVFX.kindOf(this.battle.skills[id]))),'thunder']);this.updateLayout();this.buildBackground();this.preparePortraits();if(this.options.autoStart!==false)this.battle.start();return this;
     }
     image(src) {
-      if(!src) return null;const loaded=root.GameAssetLoader?.get(src);if(loaded){if(!this.imageIds.has(loaded))this.imageIds.set(loaded,++this.imageSerial);return loaded;}
+      if(!src) return null;const loaded=root.GameAssetLoader?.get(src,this);if(root.GameAssetLoader&&!loaded)return null;if(loaded){if(!this.imageIds.has(loaded))this.imageIds.set(loaded,++this.imageSerial);return loaded;}
       if(!this.images.has(src)){const img=new Image();this.imageIds.set(img,++this.imageSerial);img.onload=()=>{if(!this.disposed){this.buildBackground();this.preparePortraits();}};img.src=root.BattleEmbeddedAssets?.[src]||src;this.images.set(src,img);}
       const img=this.images.get(src);return img.complete&&img.naturalWidth?img:null;
     }
@@ -99,7 +100,7 @@
     frame(now) {
       if(this.disposed) return;
       const delta=Math.max(0,(now-this.lastTime)/1000);this.lastTime=now;
-      const started=this.metrics?performance.now():0;this.battle.advance(delta,this.manualPauseEnabled()?()=>this.manualReadyActors().length>0:undefined);
+      const started=this.metrics?performance.now():0;if(!this.assetsLoading)this.battle.advance(delta,this.manualPauseEnabled()?()=>this.manualReadyActors().length>0:undefined);
       this.processEvents(now);if(this.disposed)return;this.vfx.prewarm(2);const updated=this.metrics?performance.now():0;this.draw(now);if(this.metrics){const ended=performance.now(),report=this.metrics.add(ended-started,updated-started,ended-updated,delta*1000,now);if(report)this.canvas.dataset.frameStats=JSON.stringify({...report,actions:this.battle.actionCount,vfx:this.vfx.items.length,spritesBuilt:this.spriteBuilds,fxTextures:this.vfx.cacheInfo().textures});}if(!this.disposed)this.raf=requestAnimationFrame(this.frame);
     }
     processEvents(now){

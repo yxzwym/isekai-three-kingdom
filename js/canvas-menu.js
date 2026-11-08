@@ -11,6 +11,7 @@
       this.canvas=canvas;this.canvas.dataset.menuScreen='main';this.ctx=canvas.getContext('2d');this.options=options;this.assets=options.assets||root.PengpaiAssets;this.input=options.nameInput;
       this.store=options.store;this.settings=this.store.settings();this.screen='main';this.modal=null;this.draft={difficulty:'normal',appearance:R.APPEARANCES[1].id,name:'',roll:null};this.images=new Map();this.hits=[];this.focus=-1;this.raf=0;this.disposed=false;
       this.resize=this.resize.bind(this);this.down=this.down.bind(this);this.move=this.move.bind(this);this.up=this.up.bind(this);this.key=this.key.bind(this);this.cancel=()=>{this.press=null;};
+      root.GameAssetLoader?.track?.(this,{onReady:()=>{this.background=null;}});
       for(const [name,handler]of[['pointerdown',this.down],['pointermove',this.move],['pointerup',this.up],['pointercancel',this.cancel],['keydown',this.key]])canvas.addEventListener(name,handler);
       this.onInput=()=>{if(!this.composing){const next=R.sanitizeName(this.input.value);this.input.value=next;this.draft.name=next;this.invalidate();}};
       this.startComposition=()=>{this.composing=true;};this.endComposition=()=>{this.composing=false;this.onInput();};
@@ -18,7 +19,7 @@
       this.inputKey=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();this.confirmCreation();}};this.input?.addEventListener('keydown',this.inputKey);
       this.observer=new ResizeObserver(this.resize);this.observer.observe(canvas);this.image(this.assets.background);this.resize();
     }
-    image(src){if(!src)return null;const loaded=root.GameAssetLoader?.get(src);if(loaded)return loaded;if(!this.images.has(src)){const img=new Image();img.onload=()=>{this.background=null;this.invalidate();};img.onerror=()=>this.invalidate();img.src=root.BattleEmbeddedAssets?.[src]||src;this.images.set(src,img);}const img=this.images.get(src);return img.complete&&img.naturalWidth?img:null;}
+    image(src){if(!src)return null;if(root.GameAssetLoader)return root.GameAssetLoader.get(src,this)||null;if(!this.images.has(src)){const img=new Image();img.onload=()=>{this.background=null;this.invalidate();};img.onerror=()=>this.invalidate();img.src=root.BattleEmbeddedAssets?.[src]||src;this.images.set(src,img);}const img=this.images.get(src);return img.complete&&img.naturalWidth?img:null;}
     resize(){Object.assign(this,Viewport.resize(this.canvas,this.ctx));this.background=null;this.invalidate();}
     invalidate(){if(this.disposed||this.raf)return;this.raf=requestAnimationFrame(now=>{this.raf=0;this.draw(now);if(this.toast?.until>now)this.invalidate();});}
     text(value,x,y,size=14,color=WHITE,align='center',serif=false){size=UI.textSize(size);const c=this.ctx;c.font=`${size*this.settings.menuScale}px ${serif?SERIF:FONT}`;c.textBaseline='middle';c.textAlign=align;c.fillStyle=color;c.fillText(String(value),x,y);}

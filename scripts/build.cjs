@@ -1,20 +1,31 @@
-// Keep each bitmap embedded once, even when many characters reference an atlas.
-const fs=require('node:fs'),path=require('node:path');
-const crypto=require('node:crypto');
-const root=path.resolve(__dirname,'..');
-const manifest=require('./sync-assets.cjs');
-const read=file=>fs.readFileSync(path.join(root,file),'utf8');
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const root=path.resolve(__dirname,'..'),manifest=require('./sync-assets.cjs'),files=require('./runtime-files.cjs');
+const read=file=>fs.readFileSync(path.join(root,file),'utf8'),hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex').slice(0,12);
 const gameAssets=JSON.parse(read('assets/game/manifest.json'));
 fs.writeFileSync(path.join(root,'assets/game/manifest.js'),`// Generated from manifest.json.\nglobalThis.PengpaiAssets=${JSON.stringify(gameAssets)};\n`);
-const files=['js/canvas-viewport.js','assets/characters/manifest.js','js/character-assets.js','js/rules.js','js/character-growth.js','js/experience.js','js/proficiency.js','js/data.js','js/passives.js','js/weapon-catalog.js','js/game-rules.js','js/statuses.js','js/equipment.js','js/weapon-skills.js','js/items.js','js/nearby-content.js','js/hero-quests.js','js/battle-scenes.js','js/engine.js','js/ui-theme.js','js/rpg-icons.js','js/skill-icons.js','js/asset-loader.js','js/presentation.js','js/canvas-effects.js','js/skill-info.js','js/canvas-battle.js','assets/game/manifest.js','js/canvas-menu.js','js/world-land.js','js/world-geography.js','js/world-locations.js','js/world-map-layout.js','js/world-data.js','js/quest-progression.js','js/timed-choice.js','js/minigames.js','js/recruitment-content.js','js/optional-battles.js','js/courts.js','js/story-rules.js','js/chapter-statistics.js','js/chapter-traits.js','js/chapter-cast.js','js/chapter-quest-kit.js','js/chapter-quests-wei.js','js/chapter-quests-shu.js','js/chapter-quests-wu.js','js/chapter-quests-other.js','js/recruitment-stories.js','js/recruitment-challenges.js','js/chapter-recruitment.js','js/chapter-one.js','js/world.js','js/world-panels.js','js/party-controls.js','js/world-map-art.js','js/travel-motion.js','js/town-layout.js','js/canvas-world.js','js/prologue.js','js/canvas-story.js','assets/runtime-manifest.js','js/app.js'];
-let html=read('index.html').replace('<link rel="stylesheet" href="./styles.css">',()=>`<style>${read('styles.css')}</style>`);
-for(const file of files)html=html.replace(`  <script defer src="./${file}"></script>\n`,'');
-const refs=new Set();
-refs.add(gameAssets.background);for(const art of Object.values(gameAssets.protagonists)){if(art.src)refs.add(art.src);if(art.portrait?.src)refs.add(art.portrait.src);}
-for(const c of Object.values(manifest.characters))for(const art of Object.values(c.variants))for(const role of ['portrait','fullbody'])if(art[role]?.src)refs.add(art[role].src);
+const refs=new Set([gameAssets.background]);
+for(const art of Object.values(gameAssets.protagonists)){if(art.src)refs.add(art.src);if(art.portrait?.src)refs.add(art.portrait.src);}
+for(const character of Object.values(manifest.characters))for(const art of Object.values(character.variants))for(const role of ['portrait','fullbody'])if(art[role]?.src)refs.add(art[role].src);
 for(const file of files.filter(f=>f.startsWith('js/')))for(const match of read(file).matchAll(/['"](\.\/assets\/[^'"]+\.(?:png|jpe?g|webp))['"]/g))refs.add(match[1]);
-const registry=[...refs].map(src=>{const bytes=fs.readFileSync(path.join(root,src));return {src,bytes:bytes.length,revision:crypto.createHash('sha256').update(bytes).digest('hex').slice(0,12)};});
+const registry=[...refs].map(src=>{const bytes=fs.readFileSync(path.join(root,src));return{src,bytes:bytes.length,revision:hash(bytes)};});
+// Lossless transport packs: concatenate original WebP bytes, decode only requested
+// entries. Remaining heroes and locations keep independently cacheable images.
+const groupFor=src=>src.includes('/protagonists/')?'creation':src.includes('/ui/')?'interface':src.includes('/map/')?'map':
+ /\/characters\/(imperial-soldier|zhangjiao)\//.test(src)||src==='./assets/story/village-road-v3.webp'?'road':
+ /\/characters\/(zhangbao|zhangliang)\//.test(src)||src==='./assets/story/yellow-camp.webp'?'camp':
+ /\/characters\/(nanhua|yuji|zuoci)\//.test(src)?'dream':
+ /\/characters\/(villager|village-maiden|laborer|town-doctor|herbalist|merchant)\//.test(src)?'townspeople':null;
+const groups=new Map(),packDir=path.join(root,'assets/packs');fs.mkdirSync(packDir,{recursive:true});
+for(const file of registry){const group=groupFor(file.src);if(group){if(!groups.has(group))groups.set(group,[]);groups.get(group).push(file);}}
+for(const [group,entries]of groups){if(entries.length<2)continue;const data=Buffer.concat(entries.map(file=>fs.readFileSync(path.join(root,file.src)))),src='./assets/packs/'+group+'.bin',revision=hash(data);let offset=0;fs.writeFileSync(path.join(root,src),data);
+ for(const file of entries){file.pack={src,revision,bytes:data.length,offset,length:file.bytes};offset+=file.bytes;}}
 fs.writeFileSync(path.join(root,'assets/runtime-manifest.js'),`// Generated by scripts/build.cjs.\nglobalThis.GameAssetManifest=${JSON.stringify(registry)};\n`);
-const assets={};for(const src of refs){const ext=path.extname(src),mime=ext==='.png'?'image/png':ext==='.webp'?'image/webp':'image/jpeg';assets[src]=`data:${mime};base64,${fs.readFileSync(path.join(root,src)).toString('base64')}`;}
-const bundle=`<script>globalThis.BattleEmbeddedAssets=${JSON.stringify(assets)};</script>\n`+files.map(file=>`<script>\n${read(file).replace(/<\/script/gi,'<\\/script')}\n</script>`).join('\n');
-html=html.replace('</body>',()=>`${bundle}\n</body>`);fs.mkdirSync(path.join(root,'dist'),{recursive:true});fs.writeFileSync(path.join(root,'dist/index.html'),html);console.log(`Canvas 单文件构建完成 (${Buffer.byteLength(html)} bytes，${refs.size}张运行时图片)`);
+const template=read('scripts/page.html').replace('<link rel="stylesheet" href="./styles.css">',()=>`<style>${read('styles.css')}</style>`),runtime=files.map(file=>`// ${file}\n${read(file)}\n`).join('\n;\n'),runtimeDir=path.join(root,'assets/runtime');fs.mkdirSync(runtimeDir,{recursive:true});fs.writeFileSync(path.join(runtimeDir,'game.js'),runtime);
+fs.writeFileSync(path.join(root,'index.html'),template.replace('<!-- GAME_SCRIPTS -->',`<script defer src="./assets/runtime/game.js?v=${hash(runtime)}"></script>`));
+const assets={};for(const src of refs)assets[src]='data:image/webp;base64,'+fs.readFileSync(path.join(root,src)).toString('base64');
+const inline=`<script>globalThis.BattleEmbeddedAssets=${JSON.stringify(assets)};</script>\n`+files.map(file=>`<script>\n${read(file).replace(/<\/script/gi,'<\\/script')}\n</script>`).join('\n');
+// Opening /dist/ on a web server uses the lean web build; file:// remains a fully
+// self-contained download, with no fetch(file://) or external dependencies.
+const redirect=`<script>if(location.protocol!=='file:'&&/\\/dist\\/(?:index\\.html)?$/.test(location.pathname))location.replace('../'+location.search+location.hash);</script>`;
+const offline=template.replace('<!-- GAME_SCRIPTS -->',redirect).replace('</body>',()=>inline+'\n</body>');fs.mkdirSync(path.join(root,'dist'),{recursive:true});fs.writeFileSync(path.join(root,'dist/index.html'),offline);
+console.log(JSON.stringify({webHTMLBytes:Buffer.byteLength(fs.readFileSync(path.join(root,'index.html'))),runtimeBytes:Buffer.byteLength(runtime),startupImageBytes:registry.find(f=>f.src===gameAssets.background).bytes,images:registry.length,packs:groups.size,offlineBytes:Buffer.byteLength(offline)}));

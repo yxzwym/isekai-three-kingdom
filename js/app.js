@@ -1,6 +1,6 @@
 // Only the host chooses a fixture; the battle system accepts any scenario data.
 (function () {
-  GameAssetLoader.mount(document.getElementById('battleCanvas'),GameAssetManifest,start);
+  GameAssetLoader.mount(document.getElementById('battleCanvas'),GameAssetLoader.startupFiles?.()||GameAssetManifest,start);
   function start(){
   const name = new URLSearchParams(location.search).get('scenario');
   let storage;try{storage=window.localStorage;}catch{storage={getItem(){return null;},setItem(){throw new Error('浏览器存储不可用');}};}
