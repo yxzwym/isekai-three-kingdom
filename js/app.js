@@ -9,7 +9,8 @@
   GameAssetLoader.startBackground?.();
   if(!name){
     const canvas=document.getElementById('battleCanvas'),input=document.getElementById('heroName');let screen;
-    const menu=()=>{screen?.destroy();screen=PengpaiMenu.mount(canvas,{store,nameInput:input,onCharacterCreated:(character,slot)=>story(character,slot),onLoad:(save,slot)=>story(save.character,slot,save.progress)});window.pengpaiGame=screen;};
+    const menu=()=>{screen?.destroy();screen=PengpaiMenu.mount(canvas,{store,nameInput:input,onCharacterCreated:(character,slot)=>story(character,slot),onLoad:(save,slot)=>story(save.character,slot,save.progress),onSimulation:simulation});window.pengpaiGame=screen;};
+    const simulation=()=>{screen?.destroy();input.hidden=true;screen=BattleSimulationUI.mount(canvas,{store,onExit:menu});window.pengpaiGame=screen;};
     const world=(character,slot,progress)=>{screen?.destroy();input.hidden=true;const model=new WorldModel.World(character,progress?.world);if(!model.members()[0].weapon&&!model.state.outfitted){story(model.character,slot,{...progress,stage:'departure',world:model.snapshot()});return;}screen=WorldMap.mount(canvas,{store,character:model.character,slot,progress,model,onExit:menu});window.pengpaiGame=screen;};
     const story=(character,slot,progress)=>{if(progress?.stage==='world'){world(character,slot,progress);return;}screen?.destroy();input.hidden=true;screen=PengpaiStory.mount(canvas,{store,character,slot,progress,onExit:menu,onWorld:next=>world(character,slot,next)});window.pengpaiGame=screen;};
     menu();return;

@@ -12,7 +12,7 @@
   const p=this.panel,members=this.model.members(),u=p.unit||members.find(u=>u.id===p.unitId);
   if(!u){this.closeWorldPanel();return;}
   const previewKey=JSON.stringify(u);if(p.previewKey!==previewKey){p.previewKey=previewKey;p.previewCache=this.memberPreview(u);}const preview=p.previewCache,actor=preview.unit(u.id),current=preview.effective(actor),ids=actor.skills,passives=root.PengpaiRules.sortPassives(actor.passives,preview.passives),c=this.ctx;
-  const showPotential=!!u.potentials&&(!p.readonly||root.CharacterGrowth.isGeneral(u)),statsH=108,showExperience=members.some(member=>member.id===u.id);
+  const showPotential=!!u.potentials&&(!p.readonly||root.CharacterGrowth.isGeneral(u)),statsH=108,showExperience=this.options?.showExperience!==false&&members.some(member=>member.id===u.id);
   const compact=this.h<640,width=Math.min(560,this.w-16),inner=width-28,headerH=compact?44:48,skillSize=compact?48:52,skillRowH=compact?60:64,footerH=compact?42:46,barH=showExperience?(compact?32:36):17,skillCols=Math.min(3,Math.max(1,ids.length)),skillRows=Math.ceil(ids.length/skillCols),passiveH=root.PengpaiUI.passiveHeight(passives.map(id=>preview.passives[id]),width-28);
   const fixed=headerH+skillRows*skillRowH+passiveH+statsH+4+barH+footerH,modelH=clamp(Math.min(440,inner*1.18,this.h-16-fixed),180,440),contentH=modelH+skillRows*skillRowH+passiveH+statsH+4+barH;
   const f=this.frame(u.name+'  '+u.level+'级',fixed+modelH,{titleAlign:'center',maxWidth:560,inset:8,verticalInset:8}),left=f.x+14,top=f.y+headerH,bottom=f.y+f.h-footerH,slotSize=Math.min(46,Math.floor(modelH/4)-5),slotGap=Math.min(12,(modelH-slotSize*4)/3),equipmentOffset=(modelH-slotSize*4-slotGap*3)/2,proto=root.BattleSystem.CanvasBattle.prototype;
@@ -28,6 +28,7 @@
     else this.panel={type:'inventory',unitId:u.id,slot,scroll:0,previous:p};
    }});
   });
+  if(!p.readonly)this.options?.drawCharacterControls?.(this,{unit:u,frame:f,slotSize,y,modelH,inner,left,previous:p});
   const art=u.fullbody||(root.CharacterAssets?.manifest.characters[u.characterId||u.id]?root.CharacterAssets.resolve(u.characterId||u.id).fullbody:null),img=this.image(art?.src),modelBox={x:left+slotSize+8,y,w:inner-(slotSize+8)*2,h:modelH};
   if(img){const dst=root.BattleSystem.fitImage(img.naturalWidth,img.naturalHeight,modelBox),pose=root.BattlePresentation.idlePose({mode:'auto',soldiers:u.startSoldiers??u.soldiers??u.maxSoldiers,order:u.order||0},performance.now());c.save();c.translate(dst.x+dst.w/2,dst.y+dst.h);c.scale(pose.scale,1+(pose.scale-1)*2);c.drawImage(img,-dst.w/2,-dst.h,dst.w,dst.h);c.restore();}else this.text(u.name,f.x+f.w/2,y+modelH/2,20,'#ddd','center');
   y+=modelH;
@@ -48,12 +49,12 @@
   const footer=f.y+f.h-footerH+7,bw=(inner-14)/3;
   if(!p.readonly)this.button('技能设置',left,footer,bw,32,()=>this.openMemberTactics(u.id,p));
   this.button('详细属性',p.readonly?left:left+bw+7,footer,p.readonly?inner:bw,32,()=>{this.panel={type:'characterDetails',unitId:u.id,...(p.readonly?{unit:u,readonly:true}:{}),previous:p};});
-  if(!p.readonly)this.button('队伍设置',left+(bw+7)*2,footer,bw,32,()=>{this.panel={type:'memberActions',unitId:u.id,previous:p};});
+  if(!p.readonly)this.button(this.options?.memberAction?.label||'队伍设置',left+(bw+7)*2,footer,bw,32,()=>{if(this.options?.memberAction)this.options.memberAction.action(this,u,p);else this.panel={type:'memberActions',unitId:u.id,previous:p};});
  }
  function details(){
   const p=this.panel,u=p.unit||this.model.members().find(u=>u.id===p.unitId);if(!u){this.closeWorldPanel();return;}
   const previewKey=JSON.stringify(u);if(p.previewKey!==previewKey){p.previewKey=previewKey;p.previewCache=this.memberPreview(u);}const current=p.previewCache.effective(p.previewCache.unit(u.id)),showPotential=!p.readonly||root.CharacterGrowth.isGeneral(u);
-  const groups=C.groupedTypes(),columns=Math.min(3,Math.max(2,Math.floor((Math.min(460,this.w-28)-32)/100))),canLeave=!p.readonly&&u.id!=='hero'&&!u.guest,contentH=28+root.PengpaiRules.ATTRIBUTES.length*30+12+24+60+12+24+groups.reduce((n,g)=>n+28+Math.ceil(g.types.length/columns)*38+12,0);
+  const groups=C.groupedTypes(),columns=Math.min(3,Math.max(2,Math.floor((Math.min(460,this.w-28)-32)/100))),canLeave=this.options?.allowDismiss!==false&&!p.readonly&&u.id!=='hero'&&!u.guest,contentH=28+root.PengpaiRules.ATTRIBUTES.length*30+12+24+60+12+24+groups.reduce((n,g)=>n+28+Math.ceil(g.types.length/columns)*38+12,0);
   const f=this.frame(u.name+' · 详细属性',58+contentH+(canLeave?54:18)),left=f.x+20,w=f.w-40,top=f.y+58,bottom=f.y+f.h-(canLeave?54:18),c=this.ctx;
   p.maxScroll=Math.max(0,contentH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);let y=top-p.scroll;const beforeHits=this.hits.length;
   c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
