@@ -1,6 +1,15 @@
 (function(root){
   'use strict';
   const font='-apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+  const serif='"KaiTi","STKaiti","Songti SC","SimSun",serif';
+  function surface(c,x,y,w,h,fill='#151c1c',stroke='#605b49',radius=3){
+    if(!w||!h)return;
+    const matte=/^#(?:0[abc]|1[0123])/.test(fill)?'#141e20'+(fill.length===9?fill.slice(7):''):fill;
+    c.save();c.beginPath();c.roundRect(x,y,Math.max(0,w),Math.max(0,h),Math.min(radius,3));c.fillStyle=matte;c.fill();
+    if(stroke){c.strokeStyle=stroke;c.globalAlpha*=.72;c.lineWidth=1;c.stroke();}
+    if(w>230&&h>140){c.globalAlpha=.035;c.strokeStyle='#e6d6b3';c.beginPath();for(let i=0;i<64;i++){const xx=x+7+(i*73.13)%(w-14),yy=y+7+(i*37.77)%(h-14);c.moveTo(xx,yy);c.lineTo(Math.min(x+w-7,xx+3+i%9),yy+.4);}c.stroke();c.globalAlpha=.30;c.strokeStyle='#b19a6c';c.beginPath();for(const [xx,yy,dx,dy]of[[x+5,y+5,1,1],[x+w-5,y+5,-1,1],[x+5,y+h-5,1,-1],[x+w-5,y+h-5,-1,-1]]){c.moveTo(xx,yy+dy*12);c.lineTo(xx,yy);c.lineTo(xx+dx*12,yy);}c.stroke();}
+    c.restore();
+  }
   // 正文最低14px，按钮16px，页面标题20px；主菜单游戏名单独放大。
   const textSize=value=>value>25?value:value>=18?20:value>=15?16:14;
   function wrapLines(ctx,value,width){const lines=[];let row='';for(const ch of String(value)){if(row&&ctx.measureText(row+ch).width>width){if(/[，。！？、；：）》」』】,.!?;:]/u.test(ch)){const chars=Array.from(row),last=chars.pop();if(chars.length)lines.push(chars.join(''));row=last+ch;}else if(/[（《「『【(]$/u.test(row)){const chars=Array.from(row),last=chars.pop();if(chars.length)lines.push(chars.join(''));row=last+ch;}else{lines.push(row);row=ch;}}else row+=ch;}if(row)lines.push(row);return lines;}
@@ -20,5 +29,5 @@
       view.hits.push({x:xx,y:yy,w:cw,h,label:passive.name,action:()=>onSelect(passive)});
     });return rows.reduce((n,row)=>n+row.h,0);
   }
-  const api={font,textSize,wrapLines,singleChoiceHit,EXCLUSIVE_COLOR,passiveColor,passiveLabel,passiveButtons,passiveHeight};root.PengpaiUI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const api={font,serif,surface,textSize,wrapLines,singleChoiceHit,EXCLUSIVE_COLOR,passiveColor,passiveLabel,passiveButtons,passiveHeight};root.PengpaiUI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

@@ -191,18 +191,43 @@
   c.restore();this.hits=this.hits.filter((h,i)=>i<before||h.y>=start&&h.y+h.h<=bottom);
   const context=this.model.state.afterBattle,q=context?.kind==='side'?this.model.state.quests.side[context.questId]:null,data=context?.kind==='side'?root.NearbyContent.sideQuests.find(t=>t.id===context.questId):null,canContinue=q&&q.wins<data.rounds;this.button(canContinue?'继续剿匪':'继续',left,f.y+f.h-51,canContinue?(w-10)/2:w,36,()=>this.finishReward(canContinue?context.questId:null));if(canContinue)this.button('暂歇',left+(w+10)/2,f.y+f.h-51,(w-10)/2,36,()=>this.finishReward());
  }
+ function questTarget(view,q){const data=root.NearbyContent.sideQuests.find(t=>t.id===q.id);return q.id==='changshan'?view.model.questDestination():q.target||(q.accepted?data?.place:data?.giverPlace);}
+ function goQuest(view,q){const target=questTarget(view,q);if(!target)return;view.panel=null;if(target===view.model.state.nodeId){if(!view.model.state.inside)view.tryEnter();else{const npc=view.model.questNpc(q.id);if(npc)view.interact(npc);}}else{view.model.leave();view.save();view.travel(target);}view.invalidate();}
+ function taskRewards(view,q){
+  const d=root.NearbyContent.sideQuests.find(t=>t.id===q.id),hero=root.HeroQuests?.definitions[q.id],items=[];let money=d?.money||0;
+  if(d?.item)items.push(I.create(d.item,d.quality,'quest-preview-'+d.id));
+  for(const [id,quality]of I.rewards['hero:'+q.id]||[])items.push(I.create(id,quality,'quest-preview-'+id));
+  if(d?.effects?.items)for(const [id,count]of Object.entries(d.effects.items)){const record=root.StoryRules?.itemDefinitions[id];if(record)items.push({...record,id,count,slot:'quest',questItem:true,quality:'blue'});}
+  if(q.id.startsWith('report-'))money=view.model.pendingReports(q.id.slice(7)).length*root.FactionCourts.rewardPerHero;
+  return {money,items,recruits:q.id==='changshan'?[{id:'zhaoyun',name:'赵云'}]:hero?[{id:hero.id,name:hero.name}]:[]};
+ }
  function tasks(){
   const p=this.panel;this.model.readQuests();p.category||=this.model.state.questTab;
-  const quests=this.model.quests().filter(q=>q.category===p.category&&(q.category==='main'||q.id==='changshan'||q.heard||q.accepted||q.complete)),f=this.frame('任务',600),left=f.x+18,w=f.w-36,top=f.y+108,bottom=f.y+f.h-18,c=this.ctx,categories=[['main','主线'],['story','剧情'],['side','支线']],bw=(w-12)/3;
-  const layouts=quests.map(q=>{c.font=`14px ${root.PengpaiUI.font}`;const rows=root.PengpaiUI.wrapLines(c,(q.heard&&!q.accepted?'线索：':'')+q.objective,w-24);c.font=`13px ${root.PengpaiUI.font}`;const rewards=root.PengpaiUI.wrapLines(c,root.AdventureFeedback.questReward(this.model,q),w-24),rewardY=52+rows.length*23+6,buttonY=rewardY+rewards.length*20+8;return {q,rows,rewards,rewardY,buttonY,height:q.complete?52:buttonY+41};});
-  categories.forEach(([id,label],i)=>this.button(label,left+i*(bw+6),f.y+58,bw,33,()=>{p.category=id;p.scroll=0;this.model.state.questTab=id;this.save();},{active:p.category===id}));p.maxScroll=Math.max(0,layouts.reduce((n,l)=>n+l.height+12,0)-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);const before=this.hits.length;c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();let y=top-p.scroll;
-  for(const l of layouts){const q=l.q;this.box(left,y,w,l.height,'#102e39',q.complete?'#5b927b':'#4a6875');if(!q.complete)questIcon(this,q.taskStatus,left+9,y+9,25);this.text(q.title,left+(q.complete?12:43),y+(q.complete?26:22),16,'#e5d2a4');this.text(q.complete?'已完成':'推荐 '+q.recommendedLevel+' 级',left+w-12,y+(q.complete?26:22),14,q.complete?'#8ed6a8':'#b9c8c9','right');if(q.complete){y+=l.height+12;continue;}
-   l.rows.forEach((row,i)=>this.text(row,left+12,y+52+i*23,14,'#bdcdd0'));l.rewards.forEach((row,i)=>this.text(row,left+12,y+l.rewardY+i*20,13,'#e0c789'));
-   if(q.id==='coalition')this.text('魏 '+this.model.counts().wei+'/3　蜀 '+this.model.counts().shu+'/3　吴 '+this.model.counts().wu+'/3',left+12,y+l.buttonY+14,14,'#bcd1d5');
-   else{const data=root.NearbyContent.sideQuests.find(t=>t.id===q.id),target=q.id==='changshan'?this.model.questDestination():q.target||(q.accepted?data?.place:data?.giverPlace);if(target)this.button('前往 '+root.WorldData.placeMap[target].name,left+12,y+l.buttonY,w-24,29,()=>{this.panel=null;if(target===this.model.state.nodeId){if(!this.model.state.inside)this.tryEnter();else{const npc=this.model.questNpc(q.id);if(npc)this.interact(npc);}}else{this.model.leave();this.save();this.travel(target);}this.invalidate();});}y+=l.height+12;
-  }
+  const quests=this.model.quests().filter(q=>q.category===p.category&&(q.category==='main'||q.id==='changshan'||q.heard||q.accepted||q.complete)),f=this.frame('行旅手记',600),left=f.x+18,w=f.w-36,top=f.y+108,bottom=f.y+f.h-18,c=this.ctx,categories=[['main','主线'],['story','人物'],['side','委托']],bw=(w-12)/3;
+  categories.forEach(([id,label],i)=>this.button(label,left+i*(bw+6),f.y+61,bw,31,()=>{p.category=id;p.scroll=0;this.model.state.questTab=id;this.save();},{active:p.category===id}));
+  p.maxScroll=Math.max(0,quests.length*65-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);const before=this.hits.length;c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
+  quests.forEach((q,i)=>{const y=top+i*65-p.scroll,tint=q.complete?'#797a68':questColors[q.taskStatus]||'#b9a478';this.box(left,y,w,54,q.complete?'#171d1b':'#202624','#625f4b',2);c.fillStyle=tint;c.fillRect(left+1,y+13,2,28);this.text(q.title,left+16,y+27,16,q.complete?'#999a87':'#e6dcc2');this.text(q.complete?'✓':'›',left+w-16,y+27,20,tint,'center');this.hits.push({x:left,y,w,h:54,label:q.title,action:()=>{this.panel={type:'taskDetail',questId:q.id,previous:p,scroll:0};this.invalidate();}});});
+  if(!quests.length)this.text('此页尚无记事',left+w/2,top+76,16,'#8c8d7c','center');
   c.restore();this.hits=this.hits.filter((h,i)=>i<before||h.y>=top&&h.y+h.h<=bottom);
  }
- const handlers={character,characterDetails:details,tasks,party,memberActions,formation,inventory,inventoryFilter,inventorySort,shop:inventory,reward,itemDetail,bulkSell};
+ function taskDetail(){
+  const p=this.panel,q=this.model.quests().find(q=>q.id===p.questId);if(!q){this.closeWorldPanel();return;}
+  const rewards=taskRewards(this,q),data=root.NearbyContent.sideQuests.find(d=>d.id===q.id),c=this.ctx,measureW=Math.min(460,this.w-28)-44;c.font=`16px ${root.PengpaiUI.font}`;const objectiveRows=root.PengpaiUI.wrapLines(c,q.objective,measureW).length;c.font=`14px ${root.PengpaiUI.font}`;const descriptionRows=data?.description&&data.description!==q.objective?root.PengpaiUI.wrapLines(c,data.description,measureW).length:0,rewardCount=rewards.items.length+(rewards.money?1:0),height=62+51+29+objectiveRows*26+14+(descriptionRows?descriptionRows*24+20:0)+(data?64:0)+(q.id==='coalition'?42:0)+(rewardCount?48+Math.ceil(rewardCount/Math.max(3,Math.floor(measureW/86)))*96:0)+(rewards.recruits.length?24+rewards.recruits.length*88:0)+75;
+  const f=this.frame(q.title,Math.min(690,Math.max(400,height))),left=f.x+22,w=f.w-44,top=f.y+62,bottom=f.y+f.h-75,target=questTarget(this,q),place=root.WorldData.placeMap[target];
+  const oldHits=this.hits.length;c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();let y=top-(p.scroll||0);
+  this.text((q.complete?'已完成':q.taskStatus==='ready'?'可交付':'推荐 '+q.recommendedLevel+' 级')+(place?'  ·  '+place.name:''),left,y+12,14,'#ada88f');y+=51;
+  this.text('此刻要做的事',left,y,16,'#d8c18b');y=this.wrap(q.objective,left,y+29,w,{size:16,line:26,color:'#e0dfce'})+14;
+  if(data?.description&&data.description!==q.objective)y=this.wrap(data.description,left,y,w,{size:14,line:24,color:'#a6afa3'})+20;
+  if(data){const state=this.model.state.quests.side[q.id],value=Math.min(1,(state?.wins||0)/data.rounds);bar(this,left,y,w,5,value,'#b9a271');this.text((state?.wins||0)+' / '+data.rounds+' 战',left,y+23,14,'#bcb795');y+=64;}
+  if(q.id==='coalition'){this.text('魏 '+this.model.counts().wei+'/3    蜀 '+this.model.counts().shu+'/3    吴 '+this.model.counts().wu+'/3',left,y,16,'#c9b786');y+=42;}
+  if(rewards.money||rewards.items.length){this.text('完成回报',left,y,16,'#d8c18b');y+=24;const cols=Math.max(3,Math.floor(w/86)),cw=w/cols,entries=[...(rewards.money?[{money:rewards.money}]:[]),...rewards.items.map(item=>({item}))];
+   entries.forEach((entry,i)=>{const xx=left+i%cols*cw,yy=y+Math.floor(i/cols)*96,size=48;if(entry.money){this.box(xx+(cw-size)/2,yy+5,size,size,'#221f17','#a38d58',3);icon(this,'金币',xx+(cw-size)/2+6,yy+11,36);this.text(entry.money+' 文',xx+cw/2,yy+72,14,'#e0c58a','center');}else{const item=entry.item;itemIcon(this,item,xx+(cw-size)/2,yy+5,size);this.text(item.name,xx+cw/2,yy+72,14,color(item),'center');this.hits.push({x:xx,y:yy,w:cw,h:88,label:'奖励详情 '+item.name,action:()=>this.openItemDetail(item,{previous:p,readonly:true})});}});y+=Math.ceil(entries.length/cols)*96+24;
+  }
+  if(rewards.recruits.length){this.text('同行之缘',left,y,16,'#d8c18b');y+=24;for(const recruit of rewards.recruits){const art=root.CharacterAssets?.resolve(recruit.id)?.portrait;this.box(left,y,w,76,'#222825','#6b6951',3);if(art)this.portrait(art,left+10,y+10,54);this.text(recruit.name,left+78,y+27,18,'#dfcfaa');this.text('完成故事后，可商议同行',left+78,y+53,14,'#a6b3a4');y+=88;}}
+  if(!rewards.money&&!rewards.items.length&&!rewards.recruits.length){this.text('后续',left,y,16,'#d8c18b');y=this.wrap(q.id==='coalition'?'三国人手齐备后，洛阳战线将开启。':'完成眼前的事，继续新的旅程。',left,y+29,w,{size:14,line:24,color:'#abb4a5'});}
+  p.maxScroll=Math.max(0,y+(p.scroll||0)+12-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);c.restore();this.hits=this.hits.filter((hit,i)=>i<oldHits||hit.y>=top&&hit.y+hit.h<=bottom);
+  this.button(q.complete?'返回手记':place?'前往 '+place.name:'返回手记',left,f.y+f.h-56,w,36,()=>{if(q.complete||!place)this.panel=p.previous;else goQuest(this,q);this.invalidate();},{active:!q.complete&&!!place});
+ }
+ const handlers={character,characterDetails:details,tasks,party,memberActions,formation,inventory,inventoryFilter,inventorySort,shop:inventory,reward,taskDetail,itemDetail,bulkSell};
  const api={icon,iconButton,bar,itemIcon,questIcon,questColors,draw(v){const p=v.panel,fn=handlers[p?.type];if(!fn)return false;if(['itemDetail','bulkSell'].includes(p.type)&&handlers[p.previous?.type]){v.panel=p.previous;try{handlers[p.previous.type].call(v);}finally{v.panel=p;}}fn.call(v);return true;}};root.WorldPanels=api;if(node)module.exports=api;
 })(globalThis);

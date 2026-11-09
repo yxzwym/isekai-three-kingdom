@@ -52,13 +52,25 @@ test('任务回报预告读取真实钱物与阶段进度，不凭预览发奖�
  assert.match(F.questReward(w,{id:'changshan'}),/赵云/);assert.ok(!F.questReward(w,{id:'changshan'}).includes('董卓'));assert.equal(F.questReward(w,{id:'unknown'}),'');
 });
 
-test('任务目标与回报根据窄屏行数排版，前往按钮不压住长目标文字',()=>{
+test('任务列表只显示标题，详情展示图标奖励；查看奖励不改变进度、钱物',()=>{
  for(const width of [320,375,540]){
-  const w=new World(hero(),{introStep:2});w.state.quests.side['clear-mountain'].accepted=true;w.state.quests.side['clear-mountain'].heard=true;
-  const texts=[],buttons=[],cards=[],view={w:width,h:720,hits:[],panel:{type:'tasks',category:'side',scroll:0},model:w,ctx:{measureText:s=>({width:[...String(s)].length*14}),save(){},restore(){},beginPath(){},rect(){},clip(){}},frame(){return{x:14,y:18,w:width-28,h:684};},box(x,y,w,h){if(h>80)cards.push({x,y,w,h});},text(text,x,y){texts.push({text,x,y});},button(label,x,y,w,h){const b={label,x,y,w,h};this.hits.push(b);buttons.push(b);},image(){return null;}};
-  const old=global.RpgIcons;global.RpgIcons={draw(){}};try{Panels.draw(view);}finally{global.RpgIcons=old;}
-  const first=cards[0],button=buttons.find(b=>b.label.startsWith('前往 '));assert.ok(first&&button);const rewards=texts.filter(t=>t.y>first.y&&t.y<button.y&&t.text.includes('文'));assert.ok(rewards.length);assert.ok(button.y>=rewards[0].y+16);assert.ok(button.y+button.h<=first.y+first.h);
+  const w=new World(hero(),{introStep:2});w.state.quests.side['clear-mountain'].accepted=true;w.state.quests.side['clear-mountain'].heard=true;w.readQuests();const before=JSON.stringify(w.snapshot());
+  const texts=[],icons=[],view={w:width,h:720,hits:[],panel:{type:'tasks',category:'side',scroll:0},model:w,ctx:{measureText:s=>({width:[...String(s)].length*14}),save(){},restore(){},beginPath(){},rect(){},clip(){},fillRect(){}},frame(){this.hits=[];return{x:14,y:18,w:width-28,h:684};},box(){},text(text){texts.push(String(text));},button(label,x,y,w,h,action){this.hits.push({label,x,y,w,h,action});},image(){return null;},invalidate(){},wrap(text,x,y,width,{line=24}={}){const rows=global.PengpaiUI.wrapLines(this.ctx,text,width);rows.forEach(t=>texts.push(t));return y+rows.length*line;},openItemDetail(item,options){this.preview={item,options};}};
+  const old=global.RpgIcons;global.RpgIcons={draw(c,id){icons.push(id);},resolveItem:item=>item?.id||'empty'};
+  try{Panels.draw(view);assert.ok(texts.includes('山道清剿'));assert.ok(!texts.some(t=>t.includes('180')||t.includes('回报')||t.includes('前往中山')));
+   const parent=view.panel;view.hits.find(h=>h.label==='山道清剿').action();assert.equal(view.panel.type,'taskDetail');assert.equal(view.panel.previous,parent);texts.length=0;Panels.draw(view);assert.ok(texts.includes('完成回报'));assert.ok(texts.includes('180 文'));assert.ok(icons.includes('金币'));const item=view.hits.find(h=>h.label==='奖励详情 皮甲');assert.ok(item);item.action();assert.equal(view.preview.options.readonly,true);assert.equal(view.preview.options.previous.type,'taskDetail');assert.equal(JSON.stringify(w.snapshot()),before);
+  }finally{global.RpgIcons=old;}
  }
+});
+
+test('主菜单保留所有入口，继续旅程读取最新存档，手机按钮不越界、不重叠',()=>{
+ const {CanvasMenu}=require('../js/canvas-menu.js'),old=global.MenuScene;global.MenuScene={draw(){}};
+ try{for(const width of [320,405,540])for(const saved of [false,true]){
+  const loaded=[],slots=saved?[{savedAt:'2026-11-01T00:00:00Z'},{savedAt:'2026-11-09T00:00:00Z'},null]:[null,null,null];
+  const v=Object.assign(Object.create(CanvasMenu.prototype),{w:width,h:720,hits:[],ctx:{save(){},restore(){},fillRect(){},strokeRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){}},store:{slots:()=>slots},settings:{menuScale:1},options:{onLoad:(s,i)=>loaded.push(i)},text(){},startNew(){},go(){},focus:-1});
+  v.drawMain(0);for(const hit of v.hits){assert.ok(hit.x>=0&&hit.x+hit.w<=width);assert.ok(hit.y>=0&&hit.y+hit.h<=720);}for(const label of ['新游戏','载入游戏','战斗模拟','设置','关于'])assert.ok(v.hits.some(h=>h.label===label));
+  if(saved){v.hits.find(h=>h.label==='继续旅程').action();assert.deepEqual(loaded,[1]);}
+ }}finally{global.MenuScene=old;}
 });
 
 test('城内不遮挡人物，窗口切换产生的极小像素比例也能安全绘制背景',()=>{
