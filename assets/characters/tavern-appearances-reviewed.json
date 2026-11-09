@@ -1,0 +1,182 @@
+[
+  {
+    "id": "recruit-warrior-2",
+    "group": "warrior",
+    "gender": "male",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-warrior-2/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-warrior/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different young Chinese male guardsman aged 23, clean-shaven oval face, straight eyebrows, tightly tied topknot with a cloth band; charcoal and muted red Han lamellar armor with bronze fastenings, broad shoulder guards, red waist sash, sheathed straight sword at the waist. Upright calm stance with both hands relaxed. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-warrior-3",
+    "group": "warrior",
+    "gender": "female",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-warrior-3/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-warrior/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different beautiful adult Chinese female guardswoman aged 26, confident round face, black high ponytail with a copper hair clasp; indigo Han lamellar armor over ivory underclothes, bronze details, practical boots. A short sheathed straight sword on belt, one hand resting naturally on the sheath, no drawn blade. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-warrior-4",
+    "group": "warrior",
+    "gender": "female",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-warrior-4/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-warrior/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different beautiful adult Chinese female veteran aged 34, angular resolute face, braided hair tied up, wine-red and dark bronze Han armor, short dark cloak, dark sash. Slightly broad athletic build, small plain shield strapped to her back, sheathed sword at side, hands relaxed. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-mage-2",
+    "group": "mage",
+    "gender": "male",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-mage-2/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-mage/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different handsome adult Chinese male wandering scholar aged 24, clean-shaven elegant face, loose tied hair with a plain wooden hairpin; ivory and dark teal Han scholar robes, subtle bamboo embroidery, holding an open paper folding fan at chest height, no staff or sword. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-mage-3",
+    "group": "mage",
+    "gender": "female",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-mage-3/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-mage/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different beautiful adult Chinese female ritual scholar aged 25, bright delicate face, high hair bun and a silver crescent-shaped hairpin, muted violet and off-white layered Han robes with fine silver cloud embroidery. Holds a small closed bamboo scripture in both hands, no sword or giant magic effects. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-mage-4",
+    "group": "mage",
+    "gender": "female",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-mage-4/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-mage/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different beautiful adult Chinese female wandering ritualist aged 33, composed long face, long black hair half tied with a dark-red ribbon, dark sage-green and bronze embroidered Han robes with a broad sash, holds a plain wooden ritual staff naturally at her side by its grip, no glowing effects. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-healer-2",
+    "group": "healer",
+    "gender": "male",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-healer-2/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-healer/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different adult Chinese male physician aged 30, warm clean-shaven face, tidy topknot under a dark cloth cap, pale blue and ivory Han healer robes with a simple brown belt, holds a rolled cloth needle pouch and herb bundle, wooden medicine box on belt, no weapon. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-healer-3",
+    "group": "healer",
+    "gender": "male",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-healer-3/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-healer/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different adult Chinese male traveling doctor aged 48, friendly sturdy face, short neat black-and-grey beard, greying tied hair with bamboo hairpin, muted tan and dark-green Han robes, leather shoulder bag containing herbal packets, both hands naturally resting on the bag strap. No weapon. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-healer-4",
+    "group": "healer",
+    "gender": "female",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-healer-4/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-healer/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different beautiful adult Chinese female physician aged 29, mature graceful face, elaborate but restrained braided hair bun with a simple bronze hairpin, pale peach and cream Han robes with fine lotus embroidery, green sash, holding a compact lacquered medicine case by its handle, no weapon. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-assassin-2",
+    "group": "assassin",
+    "gender": "male",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-assassin-2/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-assassin/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different handsome adult Chinese male scout aged 25, sharp clean-shaven face, short high ponytail, navy and charcoal fitted Han traveling clothes and light leather bracers, muted blue scarf at shoulders. One short dagger safely sheathed at belt, hands relaxed, no mask covering his face. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-assassin-3",
+    "group": "assassin",
+    "gender": "male",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-assassin-3/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-assassin/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different adult Chinese male veteran scout aged 39, lean weathered angular face, short moustache, hair tied in a low knot, dark brown leather armor over earth-grey Han traveling clothes, ochre waist sash, naturally holds a short dagger BY ITS HANDLE pointed down to the side, not touching the blade. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-assassin-4",
+    "group": "assassin",
+    "gender": "female",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-assassin-4/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-assassin/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different beautiful adult Chinese female infiltrator aged 30, clear alert face, black hair in a short braided high bun with dark teal ribbon, deep teal and black fitted layered Han traveling dress with light leather forearm armor, knee-length split outer panels over trousers, sheathed dagger at belt, hands relaxed. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-ranger-2",
+    "group": "ranger",
+    "gender": "male",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-ranger-2/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-ranger/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different adult Chinese male frontier hunter aged 43, broad weathered face, short beard, black hair with faint grey tied under a simple dark headband, tan and rust-red practical Han hunting garments with leather shoulder guard, quiver on back. Carries a compact wooden Chinese crossbow lowered across the body, natural hands on wooden stock and foregrip, no finger on trigger. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-ranger-3",
+    "group": "ranger",
+    "gender": "female",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-ranger-3/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-ranger/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different beautiful adult Chinese female archer aged 23, lively confident face, black high ponytail with a green ribbon, muted jade-green and cream Han traveling clothes with leather arm guards, slim athletic physique. Holds traditional recurved bow vertically beside her by its center handle, quiver behind shoulder. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-ranger-4",
+    "group": "ranger",
+    "gender": "female",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-ranger-4/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-ranger/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different beautiful adult Chinese female veteran hunter aged 34, calm square-oval face, thick braided black hair, ochre and dark navy Han traveling clothing, short leather shoulder cape, practical boots. Small wooden Chinese crossbow strapped diagonally on her back, visible wooden stock; both hands relaxed at her belt. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-berserker-2",
+    "group": "berserker",
+    "gender": "male",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-berserker-2/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-berserker/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different adult Chinese male strongman aged 29, powerful tall broad-shouldered physique, clean-shaven broad face, short tied black hair, sleeveless dark navy padded Han vest with bronze shoulder plates, sturdy trousers and boots, dark burgundy sash. Holds a short heavy Chinese iron hammer by wooden handle at side, no oversized fantasy spikes. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-berserker-3",
+    "group": "berserker",
+    "gender": "female",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-berserker-3/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-berserker/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different beautiful adult Chinese female strongwoman aged 28, confident broad face, black hair tied high with ochre ribbon, visibly strong athletic arms, earth-red sleeveless Han padded tunic with bronze and leather shoulder armor, dark trousers and boots. Short Chinese iron axe held correctly by wooden handle beside leg, no giant fantasy weapon. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-berserker-4",
+    "group": "berserker",
+    "gender": "female",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-berserker-4/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/recruit-berserker/classic/fullbody-v1.webp",
+    "prompt": "Use case: stylized-concept, character identity variant. Use the supplied existing character ONLY as the exact visual art direction, rendering and framing reference. Create ONE new, recognizably different adult supporting character for the same Chinese Three Kingdoms RPG. Match its hand-painted semi-realistic Chinese RPG rendering, soft painted edges, calm neutral studio light, natural 7.5-head proportions, same large head-to-body ratio and feet-to-hair framing. Character fills 95% of a vertical 2:3 canvas; full hair and both feet remain visible, centered at the same scale. A different beautiful adult Chinese female veteran strongwoman aged 36, resolute angular face, thick braided black hair coiled in a bun, strong broad athletic build, dark jade-green and brown Han leather-and-lamellar armor, cream sash, sturdy trousers and boots. Compact iron war hammer sheathed in a belt loop at hip, both hands relaxed. Make the face and hairstyle clearly different from the reference and other variants. Chinese late-Han clothing, no Western fantasy costume, no modern items. Correct anatomy and natural grips; hands never hold weapon blades. Genuinely transparent background with clean alpha, no floor, scenery, shadows outside figure, halo, text or logo. Exactly one full-body character, no separate portrait, no collage.",
+    "reviewed": true
+  }
+]
