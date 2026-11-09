@@ -1,0 +1,2 @@
+# index.html hashes the generated bundle's exact bytes, including line endings.
+assets/runtime/game.js -text

@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..'),manifest=require('./sync-assets.cjs'),files=require('./runtime-files.cjs');
-const read=file=>fs.readFileSync(path.join(root,file),'utf8'),hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex').slice(0,12);
+const read=file=>fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n'),hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex').slice(0,12);
 const gameAssets=JSON.parse(read('assets/game/manifest.json'));
 fs.writeFileSync(path.join(root,'assets/game/manifest.js'),`// Generated from manifest.json.\nglobalThis.PengpaiAssets=${JSON.stringify(gameAssets)};\n`);
 const refs=new Set([gameAssets.background]);
