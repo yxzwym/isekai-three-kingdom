@@ -14,7 +14,7 @@
     }
     resize(){if(this.disposed||this.battle)return;Object.assign(this,root.CanvasViewport.resize(this.canvas,this.ctx));this.mapRect={x:0,y:0,w:this.w,h:this.h};this.backdropCache=null;this.invalidate();}
     save(){if(!this.session)return;this.session.save();this.character=this.model.character;this.previewRevision=-1;this.saveError=this.session.saveError;}
-    partyTop(){return Math.min(...root.BattleSystem.layout(this.w,this.h,root.PengpaiRules.PARTY_LIMIT,0).map(r=>r.y));}
+    partyTop(){return Math.min(...root.BattleSystem.layout(this.w,this.h,Math.max(1,this.session?.activeIds().length||4),0,null,this.session?.boss().limit||4).map(r=>r.y));}
     idleVisible(){return !this.disposed&&!this.battle;}
     preview(){if(this.previewRevision!==this.session.revision){this.previewBattle=new root.BattleEngine.Battle(this.session.scenario('simulation-preview'));this.previewRevision=this.session.revision;}return this.previewBattle;}
     chooseRoster(slot=null,previous=null){this.panel={type:'simRoster',slot,previous,filter:'all',scroll:0};}
@@ -35,7 +35,7 @@
     }
     drawEnemies(){
       const b=this.preview(),enemies=b.living('enemy'),top=172,bottom=this.partyTop()-88,h=bottom-top;
-      const rects=root.BattleSystem.layout(this.w,this.h,root.PengpaiRules.PARTY_LIMIT,enemies.length,root.BattleScenes.arrange(root.BattleScenes.get(this.session.boss().sceneId),enemies).enemyFormation).filter(r=>r.side==='enemy');
+      const rects=root.BattleSystem.layout(this.w,this.h,Math.max(1,this.session.activeIds().length),enemies.length,root.BattleScenes.arrange(root.BattleScenes.get(this.session.boss().sceneId),enemies).enemyFormation).filter(r=>r.side==='enemy');
       const first=Math.min(...rects.map(r=>r.y)),last=Math.max(...rects.map(r=>r.y+r.h)),scale=h/Math.max(1,last-first);
       for(const rect of rects){const u=enemies[rect.index],art=u.fullbody||u.portrait,img=this.image(art?.src),rowTop=top+(rect.y-first)*scale,above=rect.boss||rect.hudAbove,headroom=above?(rect.boss?22:36):0,box={x:rect.x,y:rowTop+headroom,w:rect.w,h:Math.max(12,rect.h*scale-headroom-(above?0:30))},dst=img?root.BattleSystem.fitImage(img.naturalWidth,img.naturalHeight,box):box,c=this.ctx;
         c.save();c.fillStyle='#02080c88';c.beginPath();c.ellipse(dst.x+dst.w/2,dst.y+dst.h-2,Math.min(dst.w*.36,58),Math.min(10,dst.w*.1),0,0,Math.PI*2);c.fill();if(img)c.drawImage(img,dst.x,dst.y,dst.w,dst.h);c.restore();
@@ -57,7 +57,7 @@
       });c.restore();this.clipHits(before,top,bottom);this.scrollTrack(f,top,bottom);
     }
     drawBosses(){
-      const p=this.panel,f=this.frame('选择Boss',590),left=f.x+16,w=f.w-32,tabs=[['all','全部'],['boss','首领'],['duel','单挑'],['luoyang','洛阳']];tabs.forEach(([id,name],i)=>this.button(name,left+i*w/4,f.y+55,w/4-5,30,()=>{p.filter=id;p.scroll=0;},{active:p.filter===id}));
+      const p=this.panel,f=this.frame('选择战斗',590),left=f.x+16,w=f.w-32,tabs=[['all','全部'],['war','大战'],['boss','首领'],['duel','单挑'],['luoyang','洛阳']];tabs.forEach(([id,name],i)=>this.button(name,left+i*w/tabs.length,f.y+55,w/tabs.length-5,30,()=>{p.filter=id;p.scroll=0;},{active:p.filter===id}));
       const list=S.bosses.filter(b=>p.filter==='all'||b.group===p.filter),top=f.y+96,bottom=f.y+f.h-16,rowH=65,c=this.ctx;p.maxScroll=Math.max(0,list.length*rowH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);const before=this.hits.length;c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
       list.forEach((b,i)=>{const y=top+i*rowH-p.scroll;if(y+58<top||y>bottom)return;const active=b.id===this.session.bossId;this.box(left,y,w,57,active?'#3f3b2a':'#112d37',active?'#d8bc77':'#4b6871',4);const info=this.bossDetails(b),art=info.portrait;this.portrait(art,left+7,y+6,44,{frame:false});this.text(b.title,left+62,y+17,16,'#e9d6ad');this.text(info.levels+'级 · '+(b.limit===1?'单人切磋':info.count+'名敌人'),left+62,y+40,14,'#b1c8cc');this.hits.push({x:left,y,w,h:57,label:'挑战 '+b.title,action:()=>{this.session.chooseBoss(b.id);this.save();this.panel=null;this.backdropCache=null;}});});c.restore();this.clipHits(before,top,bottom);this.scrollTrack(f,top,bottom);
     }
@@ -78,7 +78,7 @@
     }
     stopSimulation(){if(!this.battle)return;clearTimeout(this.resultTimer);for(const u of this.battle.battle.units.filter(u=>u.side==='ally'))this.model.saveTactics(u);this.save();this.battle.destroy();this.battle=null;this.session.rebuild();this.panel=null;this.resize();}
     drawResult(){
-      const p=this.panel,r=p.result,units=r.units.filter(u=>u.side==='ally'),f=this.frame(({victory:'模拟胜利',defeat:'模拟失利',draw:'双方倒下',retreated:'已撤退'})[r.result]||'模拟结束',390),left=f.x+20,w=f.w-40;this.text(clock(r.time),f.x+f.w/2,f.y+61,16,'#d9c49b','center');this.text('武将',left,f.y+92,14,'#a9c1c9');this.text('伤害',left+w*.52,f.y+92,14,'#a9c1c9','right');this.text('治疗',left+w*.79,f.y+92,14,'#a9c1c9','right');this.text('行动',left+w,f.y+92,14,'#a9c1c9','right');
+      const p=this.panel,r=p.result,units=r.units.filter(u=>u.side==='ally'),f=this.frame(({victory:'模拟胜利',defeat:'模拟失利',draw:'双方倒下',retreated:'已撤退'})[r.result]||'模拟结束',Math.min(650,205+units.length*41)),left=f.x+20,w=f.w-40;this.text(clock(r.time),f.x+f.w/2,f.y+61,16,'#d9c49b','center');this.text('武将',left,f.y+92,14,'#a9c1c9');this.text('伤害',left+w*.52,f.y+92,14,'#a9c1c9','right');this.text('治疗',left+w*.79,f.y+92,14,'#a9c1c9','right');this.text('行动',left+w,f.y+92,14,'#a9c1c9','right');
       units.forEach((u,i)=>{const y=f.y+114+i*41;this.box(left,y,w,34,'#112c36',null);this.text(u.name,left+7,y+17,14,'#e4d9bd');this.text(Math.floor(u.stats.damage),left+w*.52,y+17,14,'#e0b2ab','right');this.text(Math.floor(u.stats.healing),left+w*.79,y+17,14,'#93d4a5','right');this.text(u.stats.actions,left+w-4,y+17,14,'#c4d6dc','right');});
       this.button('调整配置',left,f.y+f.h-55,(w-10)/2,36,()=>{this.panel=null;});this.button('再次挑战',left+(w+10)/2,f.y+f.h-55,(w-10)/2,36,()=>this.startSimulation(),{active:true});
     }

@@ -9,6 +9,18 @@
  ['lvbu-peerless','天下无双','red','物理技能必定暴击，无视目标全部护甲。',{guaranteedCritical:true,ignoreArmor:true},true],['zhuge-eight-trigrams','八卦阵','red','受到物理技能时有50%概率闪避。',{physicalDodgeBonus:.5},true],['diaochan-grace','闭月流风','gold','受到物理技能时额外增加15%闪避率。',{physicalDodgeBonus:.15}],['menghuo-strength','南中雄威','gold','受到物理伤害减少12%，物理伤害提高10%。',{physicalReduction:.12,physicalBonus:.1}],['huatuo-healer','青囊济世','red','治疗效果提高35%。',{healingBonus:.35},true],['dongzhuo-soldier','西凉旧将','gold','物理伤害提高12%，受到物理伤害减少10%。',{physicalBonus:.12,physicalReduction:.1}]
  ];
  rows.push(
+  ['xuhuang-steady','治军严整','gold','技能命中率增加8个百分点。',{hitBonus:.08}],['xuhuang-martial','沉勇善战','blue','物理伤害提高8%。',{physicalBonus:.08},false],
+  ['yujin-discipline','持军有度','gold','受到的物理伤害减少10%。',{physicalReduction:.1}],['yujin-guard','久历军阵','blue','最大生命提高10%。',{healthMultiplier:1.1},false],
+  ['caoren-fortress','不动坚城','gold','受到的物理和计策伤害减少10%。',{physicalReduction:.1,tacticReduction:.1}],['caoren-tenacious','固守不退','gold','最大生命提高20%。',{healthMultiplier:1.2},false],
+  ['yuanshao-noble','四世三公','gold','受到的物理和计策伤害减少8%。',{physicalReduction:.08,tacticReduction:.08}],
+  ['yuanshao-command','从容督战','blue','技能命中率增加6个百分点。',{hitBonus:.06},false],
+  ['yuanshao-reserve','河北雄兵','gold','最大生命提高15%。',{healthMultiplier:1.15},false],
+  ['yanliang-might','河北骁将','gold','物理伤害提高15%。',{physicalBonus:.15}],
+  ['yanliang-iron','披坚执锐','blue','受到的物理伤害减少6%。',{physicalReduction:.06},false],
+  ['yanliang-strike','奋力破敌','gold','技能暴击率增加8个百分点。',{criticalBonus:.08},false],
+  ['wenchou-charge','铁骑争先','gold','速度提高12%。',{speedMultiplier:1.12}],
+  ['wenchou-vigor','勇悍难当','gold','物理伤害提高12%。',{physicalBonus:.12},false],
+  ['wenchou-guard','久经战阵','blue','受到的物理伤害减少6%。',{physicalReduction:.06},false],
   ['guanlu-star','星罗推演','gold','技能命中率增加12个百分点。',{hitBonus:.12}],
   ['guanlu-calm','静心观象','blue','受到的计策伤害减少8%。',{tacticReduction:.08},false],
   ['guanlu-frost','寒息凝神','gold','计策伤害提高12%。',{tacticBonus:.12},false],

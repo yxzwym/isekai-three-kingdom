@@ -19,7 +19,7 @@
   }
   function layout(width,height,allies,enemies,formation,allyColumns=PARTY_LIMIT) {
     // 单挑限制参战人数，不改变己方卡片宽度；扩编时仍可增加列数。
-    const configuredColumns=Number(allyColumns);allyColumns=Math.max(PARTY_LIMIT,Number.isFinite(configuredColumns)?Math.floor(configuredColumns):PARTY_LIMIT);
+    const configuredColumns=Number(allyColumns);allyColumns=Math.min(5,Math.max(PARTY_LIMIT,Math.min(allies,5),Number.isFinite(configuredColumns)?Math.floor(configuredColumns):PARTY_LIMIT));
     const rects=[],gap=3,groupWidth=Math.min(width-12,640);
     const indices=formation?[...(formation.back||[]),...(formation.front||[])]:[];
     const validFormation=indices.length===enemies&&new Set(indices).size===enemies&&indices.every(i=>Number.isInteger(i)&&i>=0&&i<enemies);

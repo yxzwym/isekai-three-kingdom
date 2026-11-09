@@ -8,7 +8,8 @@
   ['sunquan','孙权','wu','sword','jianye'],['zhouyu','周瑜','wu','staff','jianye'],['huanggai','黄盖','wu','shield','jianye'],['lvmeng','吕蒙','wu','sword','jianye'],['luxun','陆逊','wu','staff','jianye'],['sunshangxiang','孙尚香','wu','bow','jianye'],
   ['lvbu','吕布','other','spear','xinye'],['diaochan','貂蝉','other','shortBlade','xinye'],['menghuo','孟获','other','axe','nanman'],['huatuo','华佗','other','gourd','xiangyang-county'],['zhangjiao','张角','yellow','staff','camp'],['zhangbao','张宝','yellow','scripture','camp'],['dongzhuo','董卓','other','blade','luoyang'],
   ['huaxiong','华雄','dong','blade','hulao'],['gaoshun','高顺','dong','shield','xiapi'],['liru','李儒','dong','banner','luoyang'],['lijue','李傕','dong','spear','luoyang'],['guosi','郭汜','dong','blade','luoyang'],['yuanshu','袁术','dong','staff','chaisang'],['yanbaihu','严白虎','dong','axe','chaisang'],['zhangxiu','张绣','other','spear','wan'],
-  ['guanlu','管辂','wei','whisk','pingyuan'],['zhurong','祝融','other','dagger','nanman'],['huangyueying','黄月英','shu','cannon','xiangyang']
+  ['guanlu','管辂','wei','whisk','pingyuan'],['zhurong','祝融','other','dagger','nanman'],['huangyueying','黄月英','shu','cannon','xiangyang'],
+  ['xuhuang','徐晃','wei','spear','xuchang'],['yujin','于禁','wei','spear','xuchang'],['caoren','曹仁','wei','shield','xuchang'],['yuanshao','袁绍','other','sword','ye'],['yanliang','颜良','other','blade','ye'],['wenchou','文丑','other','spear','ye']
  ];
  const definitions=Object.fromEntries(entries.map(([id,name,country,type,home])=>[id,{id,name,country,type,home,level:10}]));
  const clone=value=>JSON.parse(JSON.stringify(value));
@@ -22,6 +23,10 @@
  Object.assign(definitions.luxun,{type:'fan',weapon:{id:'luxun-featherfan',name:'青竹扇',type:'fan',skills:[{base:'staff-fire',name:'火伏计'},{base:'staff-flame',name:'连营焚野'}]},passives:['luxun-fire']});
  Object.assign(definitions.huatuo,{passives:['huatuo-healer']});
  Object.assign(definitions.dongzhuo,{passives:['dongzhuo-soldier']});
+ Object.assign(definitions.xuhuang,{passives:['xuhuang-steady','xuhuang-martial']});Object.assign(definitions.yujin,{passives:['yujin-discipline','yujin-guard']});Object.assign(definitions.caoren,{passives:['caoren-fortress','caoren-tenacious']});
+ Object.assign(definitions.yuanshao,{passives:['yuanshao-noble','yuanshao-command','yuanshao-reserve']});
+ Object.assign(definitions.yanliang,{passives:['yanliang-might','yanliang-iron','yanliang-strike']});
+ Object.assign(definitions.wenchou,{passives:['wenchou-charge','wenchou-vigor','wenchou-guard']});
  Object.assign(definitions.guanlu,{passives:['guanlu-star','guanlu-calm','guanlu-frost']});
  Object.assign(definitions.zhurong,{passives:['zhurong-hunter','zhurong-footwork','zhurong-vigor']});
  Object.assign(definitions.huangyueying,{passives:['huangyueying-craft','huangyueying-aim','huangyueying-mechanism']});

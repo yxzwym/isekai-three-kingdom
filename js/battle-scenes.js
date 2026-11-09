@@ -18,7 +18,7 @@
   'county-prison':{id:'county-prison',name:'县衙牢房',background:'./assets/battles/county-prison-v1.webp',color:'#544e42'}
  };
  function get(id){if(!definitions[id])throw new TypeError('未登记的战斗场景：'+id);return {...definitions[id]};}
- function defaultFormation(count,leader=0){if(count===3||count===5)return {front:[leader],back:Array.from({length:count},(_,i)=>i).filter(i=>i!==leader)};if(count===6)return {front:[3,4,5],back:[0,1,2]};return null;}
+ function defaultFormation(count,leader=0){if(count===3||count===5)return {front:[leader],back:Array.from({length:count},(_,i)=>i).filter(i=>i!==leader)};if(count>=6&&count<=10){const back=Math.ceil(count/2);return {back:Array.from({length:back},(_,i)=>i),front:Array.from({length:count-back},(_,i)=>i+back)};}return null;}
  function arrange(scene,enemies){
   if(scene.enemyFormation||enemies.length<2)return scene;
   // 两人和四人直接横排，单位身上的前后排标记不拆散小队。

@@ -1,0 +1,128 @@
+[
+  {
+    "id": "sunshangxiang",
+    "name": "孙尚香",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/sunshangxiang/classic/fullbody-v5.webp",
+    "reference": null,
+    "prompt": "Use case: precise-object-edit. This is a limited weapon addition to the existing Chinese RPG character illustration. Keep the exact woman, face, hair, expression, silver-and-red armor design, colors, pose, proportions, painted rendering and entire figure unchanged. Add a traditional Chinese recurved bow held naturally in the lowered hand on image left, fingers correctly wrapped around the center grip, the bow vertically curved outward without covering her face or body. Add a modest quiver behind the shoulder. The hand on her hip stays unchanged. Do not replace the outfit, do not age the face, do not add gold heavy armor, do not photorealistically reinterpret. Preserve the existing transparent background, no backdrop or glow or floor, full feet and hair inside frame.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-warrior",
+    "name": "recruit-warrior",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-warrior/classic/fullbody-v1.webp",
+    "reference": null,
+    "prompt": "Use case: identity-preserve / precise-object-edit. Make a new supporting character variant from this established game art, preserving its EXACT painterly Chinese RPG art direction, hand-painted soft edges, calm lighting, natural 7.5-head body proportions, full-body 3/4 standing composition and rendering detail. Do not switch to photorealistic photography or western fantasy. Change only the person's identity, costume and held objects as follows: A different adult Chinese male retainer aged 32 with a square face, short moustache, tied black hair. Muted blue-gray Han lamellar armor with bronze edges and dark sash, plain practical officer clothing, no famous hero's unique emblems. A sheathed straight sword hangs naturally at the waist. Hands relaxed, no giant weapon. Male warrior. Entire head, hair and feet visible. Figure fills the same canvas height. Genuinely transparent background and empty alpha outside character, no scenery, halo, floor, text or logo. No extra person. Hands anatomically correct, grip handles not blades.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-mage",
+    "name": "recruit-mage",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-mage/classic/fullbody-v1.webp",
+    "reference": null,
+    "prompt": "Use case: identity-preserve / precise-object-edit. Make a new supporting character variant from this established game art, preserving its EXACT painterly Chinese RPG art direction, hand-painted soft edges, calm lighting, natural 7.5-head body proportions, full-body 3/4 standing composition and rendering detail. Do not switch to photorealistic photography or western fantasy. Change only the person's identity, costume and held objects as follows: A different adult Chinese male wandering ritual scholar aged 36, narrow thoughtful face, small neat beard, high tied black hair and simple dark scholar crown. Pale indigo and slate-blue Han scholar robes with subtle silver cloud pattern, holds a closed bamboo scripture and a small wooden ritual staff lowered at the side. Human Chinese mage, not western wizard, no glowing magic effects. Entire head, hair and feet visible. Figure fills the same canvas height. Genuinely transparent background and empty alpha outside character, no scenery, halo, floor, text or logo. No extra person. Hands anatomically correct, grip handles not blades.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-healer",
+    "name": "recruit-healer",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-healer/classic/fullbody-v1.webp",
+    "reference": null,
+    "prompt": "Use case: identity-preserve / precise-object-edit. Make a new supporting character variant from this established game art, preserving its EXACT painterly Chinese RPG art direction, hand-painted soft edges, calm lighting, natural 7.5-head body proportions, full-body 3/4 standing composition and rendering detail. Do not switch to photorealistic photography or western fantasy. Change only the person's identity, costume and held objects as follows: A different beautiful adult Chinese woman physician aged 25, kind expressive face, black hair in a modest bun with one jade hairpin. Ivory and pale green embroidered Han robes, modest elegant classical costume, holds a compact carved wooden medicine case and a small herb bundle, a soft pale mint sash. Female healer, no giant weapon. Entire head, hair and feet visible. Figure fills the same canvas height. Genuinely transparent background and empty alpha outside character, no scenery, halo, floor, text or logo. No extra person. Hands anatomically correct, grip handles not blades.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-assassin",
+    "name": "recruit-assassin",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-assassin/classic/fullbody-v1.webp",
+    "reference": null,
+    "prompt": "Use case: identity-preserve / precise-object-edit. Make a new supporting character variant from this established game art, preserving its EXACT painterly Chinese RPG art direction, hand-painted soft edges, calm lighting, natural 7.5-head body proportions, full-body 3/4 standing composition and rendering detail. Do not switch to photorealistic photography or western fantasy. Change only the person's identity, costume and held objects as follows: A different beautiful adult Chinese woman scout aged 27, alert angular face, black high ponytail, charcoal and dark plum light Chinese leather armor over fitted layered Han traveling clothes, burgundy sash. Holds a short dagger naturally by the HANDLE at her side, blade pointing away, the other hand at her belt. Female assassin, no hood obscuring face, no western armor. Entire head, hair and feet visible. Figure fills the same canvas height. Genuinely transparent background and empty alpha outside character, no scenery, halo, floor, text or logo. No extra person. Hands anatomically correct, grip handles not blades.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-ranger",
+    "name": "recruit-ranger",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-ranger/classic/fullbody-v1.webp",
+    "reference": null,
+    "prompt": "Use case: identity-preserve / precise-object-edit. Make a new supporting character variant from this established game art, preserving its EXACT painterly Chinese RPG art direction, hand-painted soft edges, calm lighting, natural 7.5-head body proportions, full-body 3/4 standing composition and rendering detail. Do not switch to photorealistic photography or western fantasy. Change only the person's identity, costume and held objects as follows: A different adult Chinese male hunter aged 30, warm weathered face, short tied hair and no beard. Olive green and tan Chinese traveling tunic, practical bracers, leather shoulder guard, boots, a quiver on his back. Left hand naturally grips the CENTER HANDLE of a Chinese recurved bow held vertically outward. Male archer, no long sword, no guns. Entire head, hair and feet visible. Figure fills the same canvas height. Genuinely transparent background and empty alpha outside character, no scenery, halo, floor, text or logo. No extra person. Hands anatomically correct, grip handles not blades.",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-berserker",
+    "name": "recruit-berserker",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/recruit-berserker/classic/fullbody-v1.webp",
+    "reference": null,
+    "prompt": "Use case: identity-preserve / precise-object-edit. Make a new supporting character variant from this established game art, preserving its EXACT painterly Chinese RPG art direction, hand-painted soft edges, calm lighting, natural 7.5-head body proportions, full-body 3/4 standing composition and rendering detail. Do not switch to photorealistic photography or western fantasy. Change only the person's identity, costume and held objects as follows: A different adult Chinese male strongman aged 38, stocky broad chest and powerful arms, short beard, untidy tied hair without a yellow headband. Dark brown leather and bronze Han-era armor, earth red cloth sash, practical trousers and boots. One hand correctly grips a short heavy Chinese iron axe by the wood handle at the side, other hand relaxed. No yellow turban faction insignia. Male strongman. Entire head, hair and feet visible. Figure fills the same canvas height. Genuinely transparent background and empty alpha outside character, no scenery, halo, floor, text or logo. No extra person. Hands anatomically correct, grip handles not blades.",
+    "reviewed": true
+  },
+  {
+    "id": "yuanshao",
+    "name": "yuanshao",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/yuanshao/classic/fullbody-v1.webp",
+    "reference": null,
+    "prompt": "Use case: identity-preserve / precise-object-edit. Derive a new NPC from this illustration while MATCHING its exact existing Chinese painted RPG art direction, hand-painted realistic fabrics, natural face, soft controlled contrast, clean light, full-body 3/4 standing framing and natural body/head proportions. Change identity and equipment as described: 袁绍: a DIFFERENT dignified middle-aged Chinese noble commander aged 48, handsome mature oval face, long neat black beard, black hair under an ornate gold Han crown. Elegant gold and ivory lamellar armor over burgundy Han robes, dark wine red cape, holds a straight Chinese sword correctly by its hilt lowered diagonally outward. Refined aristocratic posture, full body. Preserve transparent alpha outside silhouette. No background, halo, floor, text, logo or Western armor. Do not use photorealistic photography or over-detailed dark metal. This must stand next to the original protagonists without looking like a different game.",
+    "reviewed": true
+  },
+  {
+    "id": "yanliang",
+    "name": "yanliang",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/yanliang/classic/fullbody-v1.webp",
+    "reference": null,
+    "prompt": "Use case: identity-preserve / precise-object-edit. Derive a new NPC from this illustration while MATCHING its exact existing Chinese painted RPG art direction, hand-painted realistic fabrics, natural face, soft controlled contrast, clean light, full-body 3/4 standing framing and natural body/head proportions. Change identity and equipment as described: 颜良: a DIFFERENT powerful adult Chinese general aged 38, stern broad face with thick brows, short full beard, both eyes clearly visible and healthy. Dark green and iron-gray Han armor with bronze edgework, dark green cape, iron helmet with red tassel. Both hands naturally hold a long Chinese single-edged guandao by the WOOD SHAFT, blade up to the side. Imposing grounded stance, full body. Preserve transparent alpha outside silhouette. No background, halo, floor, text, logo or Western armor. Do not use photorealistic photography or over-detailed dark metal. This must stand next to the original protagonists without looking like a different game.",
+    "reviewed": true
+  },
+  {
+    "id": "wenchou",
+    "name": "wenchou",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/wenchou/classic/fullbody-v1.webp",
+    "reference": null,
+    "prompt": "Use case: identity-preserve / precise-object-edit. Derive a new NPC from this illustration while MATCHING its exact existing Chinese painted RPG art direction, hand-painted realistic fabrics, natural face, soft controlled contrast, clean light, full-body 3/4 standing framing and natural body/head proportions. Change identity and equipment as described: 文丑: a DIFFERENT burly rugged Chinese cavalry general aged 40, weathered square face, thick beard and intense eyes, black tied hair under a dark iron helmet with muted blue plume. Broad shoulders, charcoal and blue Han lamellar armor, tan belt and black boots, blue-gray cape. Holds a long iron-tipped spear VERTICALLY by its SHAFT at his side, other hand relaxed. Entire spear tip and both feet visible. Not a young handsome silver-armored hero. Preserve transparent alpha outside silhouette. No background, halo, floor, text, logo or Western armor. Do not use photorealistic photography or over-detailed dark metal. This must stand next to the original protagonists without looking like a different game.",
+    "reviewed": true
+  },
+  {
+    "id": "xuhuang",
+    "name": "xuhuang",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/xuhuang/classic/fullbody-v2.webp",
+    "reference": null,
+    "prompt": "Use case: precise-object-edit. Create a supporting full-body character variant preserving this game's exact established Chinese painted RPG style, calm soft lighting, realistic fabric with restrained details, natural 7.5-head proportions, front three-quarter grounded standing pose, entire feet and head visible. Change identity, clothing, and held objects: 徐晃, a distinct sturdy middle-aged Chinese male general, calm broad face, short neat black beard, both eyes healthy and visible. Blue-gray and bronze Han lamellar armor, small dark blue plume, muted slate cape. Correctly holds a long Chinese spear upright by its wood shaft, spear blade at the top, no axe, no western armor. Match the original protagonists' rendering, no photorealistic photo, no cartoon. Transparent alpha background, no floor, no colored glow, no scenery, text or logo. Keep full body large in portrait frame, hands grip handles not blades.",
+    "reviewed": true
+  },
+  {
+    "id": "yujin",
+    "name": "yujin",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/yujin/classic/fullbody-v2.webp",
+    "reference": null,
+    "prompt": "Use case: precise-object-edit. Create a supporting full-body character variant preserving this game's exact established Chinese painted RPG style, calm soft lighting, realistic fabric with restrained details, natural 7.5-head proportions, front three-quarter grounded standing pose, entire feet and head visible. Change identity, clothing, and held objects: 于禁, a distinct disciplined Chinese male general aged 42, narrow stern face, neatly trimmed moustache, black hair under a simple iron Han helmet. Dark blue and black practical Han lamellar armor with restrained bronze details, dark gray cape, long spear naturally held upright by the shaft, one hand at the waist. Not youthful silver armor or white hair. Match the original protagonists' rendering, no photorealistic photo, no cartoon. Transparent alpha background, no floor, no colored glow, no scenery, text or logo. Keep full body large in portrait frame, hands grip handles not blades.",
+    "reviewed": true
+  },
+  {
+    "id": "caoren",
+    "name": "caoren",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/caoren/classic/fullbody-v2.webp",
+    "reference": null,
+    "prompt": "Use case: precise-object-edit. Create a supporting full-body character variant preserving this game's exact established Chinese painted RPG style, calm soft lighting, realistic fabric with restrained details, natural 7.5-head proportions, front three-quarter grounded standing pose, entire feet and head visible. Change identity, clothing, and held objects: 曹仁, a distinct stocky Chinese male veteran general aged 43, broad steady face, black short full beard, iron helmet with dark blue cloth. Heavy bronze and dark navy Han lamellar armor, blue-black cape, large rectangular wood-and-iron Chinese shield naturally held by its back handle, short sheathed sword at his waist. No elderly white beard. Match the original protagonists' rendering, no photorealistic photo, no cartoon. Transparent alpha background, no floor, no colored glow, no scenery, text or logo. Keep full body large in portrait frame, hands grip handles not blades.",
+    "reviewed": true
+  },
+  {
+    "id": "zhangxiu",
+    "name": "张绣",
+    "tool": "imagegen (built-in)",
+    "asset": "./assets/characters/zhangxiu/classic/fullbody-v1.webp",
+    "reference": "./assets/characters/machao/classic/fullbody-v1.webp",
+    "prompt": "Edit the reference into a DIFFERENT full-body Chinese male officer, 张绣, age 39 with a short black beard and black hair. Match the exact original Chinese painted RPG style and natural proportions. Dark red and bronze Han armor, small iron helmet with red tassel, gray-blue cape. Hold a long spear upright naturally by the wood shaft. Remove the white hair/plume and silver armor. Entire head, weapon and feet inside frame, genuinely transparent alpha background, no scenery, halo, floor, text or watermark. The face must be a distinct mature man, not Ma Chao.",
+    "reviewed": true
+  }
+]

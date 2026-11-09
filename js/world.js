@@ -6,7 +6,7 @@
   const F=node?require('./proficiency.js'):root.WeaponProficiency,H=node?require('./hero-quests.js'):root.HeroQuests;
   const Optional=node?require('./optional-battles.js'):root.OptionalBattles;
   const Recruitment=node?require('./recruitment-content.js'):root.RecruitmentContent,Puzzle=node?require('./minigames.js'):root.SlidingPuzzle;
-  const Courts=node?require('./courts.js'):root.FactionCourts;
+  const Courts=node?require('./courts.js'):root.FactionCourts,Tavern=node?require('./tavern.js'):root.TavernRecruitment;
   const Story=node?require('./story-rules.js'):root.StoryRules;
   const Chapter=node?require('./chapter-one.js'):root.ChapterOne;if(node){require('./early-dungeons.js');require('./dialogue-voices.js');}
   const Progression=node?require('./quest-progression.js'):root.QuestProgression;
@@ -37,7 +37,7 @@
     if([1,2].includes(s.version)&&Number.isFinite(Number(state.troops.hero))){const previousConstitution=(character.legacyMaxHealth||E.maxHealth(character.attributes.constitution))/10,oldMax=s.version===1?Math.max(1,Math.round(200*previousConstitution/255)):previousConstitution*10;state.troops.hero=Math.floor(E.maxHealth(character.attributes.constitution)*Math.min(1,Number(state.troops.hero)/oldMax));}
     state.inside=Object.hasOwn(D.placeMap,nodeId)&&!!s.inside&&!D.placeMap[state.nodeId].requiresWater;
     for(const u of companions)if(u.weaponPlanMigrated){if(state.tactics[u.id])delete state.tactics[u.id].priorities;delete u.weaponPlanMigrated;}
-    state.story={items:copy(safeObject(s.story?.items)),flags:copy(safeObject(s.story?.flags))};state.courtDreams=copy(safeObject(s.courtDreams));state.chapterOne=Chapter.normalize(s.chapterOne);
+    state.story={items:copy(safeObject(s.story?.items)),flags:copy(safeObject(s.story?.flags))};state.courtDreams=copy(safeObject(s.courtDreams));state.chapterOne=Chapter.normalize(s.chapterOne);state.tavern=Tavern.normalize(s.tavern,state.seed);
     state.trainingWins=Object.fromEntries(D.trainingOptions.map(t=>[t.id,Math.max(0,Math.floor(Number(s.trainingWins?.[t.id])||0))]));
     state.recruitReports=Object.fromEntries(countries.map(country=>[country,[...new Set((Array.isArray(s.recruitReports?.[country])?s.recruitReports[country]:[]).filter(id=>state.recruits[country].includes(id)))]]));
     const stages=['available','entry','supplies','rescue','escort','return','decision','complete'],oldQuest=safeObject(s.quests?.changshan);state.quests={changshan:{stage:stages.includes(oldQuest.stage)?oldQuest.stage:'available',arrivalIndex:Math.max(0,Math.min(N.storyConversations.changshanEntry.length-1,Math.floor(Number(oldQuest.arrivalIndex)||0))),arrivalSeen:!!oldQuest.arrivalSeen,zhaoInvitation:!!oldQuest.zhaoInvitation,healerDecision:!!oldQuest.healerDecision,healerStayDecided:!!oldQuest.healerStayDecided,escortIntroSeen:!!oldQuest.escortIntroSeen,escortIntroIndex:Math.max(0,Math.min(N.storyConversations.escortArrival.length-1,Math.floor(Number(oldQuest.escortIntroIndex)||0))),healerJoined:!!oldQuest.healerJoined||companions.some(u=>u.id==='zhenji')||recruits.wei.includes('zhenji'),grainWins:Math.max(0,Math.min(2,Number.isInteger(oldQuest.grainWins)?oldQuest.grainWins:(['rescue','escort','return','decision','complete'].includes(oldQuest.stage)?2:0)))},side:copy(safeObject(s.quests?.side))};
@@ -133,6 +133,13 @@
       const money=items.reduce((sum,item)=>sum+I.sellPrice(item),0);this.state.inventory=this.state.inventory.filter(i=>!selected.has(i.uid));this.state.money+=money;return {count:items.length,money};
     }
 
+    tavernAvailable(){return this.state.inside&&Tavern.capitals.includes(this.state.nodeId)&&!this.pending&&!this.journey;}
+    refreshTavern(){if(!this.tavernAvailable()||this.state.money<Tavern.REFRESH_COST)return false;this.state.money-=Tavern.REFRESH_COST;this.state.tavern.generation++;this.state.tavern.candidates=Tavern.generate(this.state.seed,this.state.tavern.generation);return true;}
+    hireRetainer(id,type){
+      if(!this.tavernAvailable()||this.state.money<Tavern.HIRE_COST||!this.canRecruit())return false;const candidate=this.state.tavern.candidates.find(c=>c.id===id),u=Tavern.create(candidate,type,this.character.level,this.state.nodeId);if(!u||this.state.companions.some(v=>v.id===id)||this.state.residents[id])return false;
+      this.state.money-=Tavern.HIRE_COST;this.state.companions.push(u);this.state.troops[id]=I.apply(u).maxSoldiers;if(this.state.activeIds.length<this.activeLimit())this.state.activeIds.push(id);this.state.tavern.candidates=this.state.tavern.candidates.filter(c=>c.id!==id);return u;
+    }
+    renameRetainer(id,name){const u=this.state.companions.find(u=>u.id===id)||this.state.residents[id];if(!u||u.origin!=='tavern'||typeof name!=='string')return false;const next=R.sanitizeName(name).trim();if(!next||R.nameLength(next)>4)return false;u.name=next;this.npcListCache=null;return true;}
     rosterLimit(){return 7;}
     activeLimit(){return this.state.activeLimit||4;}
     unlockActiveLimit(limit){if(!Number.isInteger(limit)||limit<=this.activeLimit()||limit>this.rosterLimit())return false;this.state.activeLimit=limit;return true;}
@@ -162,6 +169,7 @@
       if(this.npcListCache?.key===key)return this.npcListCache.npcs;
       const npcs=id==='camp'?D.townNpcs.camp.filter(n=>!this.state.companions.some(u=>u.id===n.id)).map(copy):N.npcs.filter(n=>n.place===id&&(!n.unlockQuest||this.state.heroQuests[n.unlockQuest]?.stage!=='locked')).map(copy),court=Courts.at(id);
       if(court){if(this.state.companions.some(u=>u.id===court.id))npcs.unshift({...court,courtId:court.id,id:court.id+'-clerk',name:D.factions[court.country].name+'国主簿',art:'town-doctor',delegate:true});else npcs.unshift(court);}
+      const tavernNpc=Tavern.npc(id);if(tavernNpc)npcs.push(tavernNpc);
       if(id==='changshan'&&stage!=='complete'&&!this.state.companions.some(u=>u.id==='zhaoyun'))npcs.unshift(D.questNpcs.zhaoyun);
       if(id==='zhongshan-county'&&(this.state.quests.changshan.healerJoined||['return','decision','complete'].includes(stage))&&!this.state.companions.some(u=>u.id==='zhenji')&&!this.state.residents.zhenji)npcs.unshift(D.questNpcs.zhenji);
       for(const u of Object.values(this.state.residents))if(u.homeNode===id&&!npcs.some(n=>n.id===u.id))npcs.push({id:u.id,name:u.name,art:u.characterId||u.id,side:'left',role:'companion',roleLabel:'同行'});

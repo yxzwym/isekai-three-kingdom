@@ -64,8 +64,8 @@
     advanceIntroduction(){this.model.state.introStep=1;this.panel={type:'mapGuide'};this.save();this.invalidate();}
     finishIntroduction(){this.model.state.introStep=2;this.panel=null;this.save();this.invalidate();if(this.model.state.routeTarget)this.startNextLeg();}
     suggestedDestination(){return this.model.questDestination();}
-    closeWorldPanel(){if(this.panel?.type==='party')PartyInput.cancel(this);if(this.panel?.type==='reward'){this.finishReward();return;}if(this.panel?.type==='tacticsEditor'){this.panel.editor.closePanel();return;}const previous=this.panel?.previous||null;if(previous?.type==='npcDialogue'){this.dialogue=previous.dialogue;this.panel=null;}else this.panel=previous;}
-    interact(npc){const court=Object.values(root.FactionCourts.definitions).find(d=>d.id===(npc.courtId||npc.id));if(court&&!this.model.state.courtDreams[court.id]&&!npc.delegate){this.showCourtDream(npc,court);return;}this.dialogue=null;this.npcInteraction={id:npc.id,offered:false};this.speak(npc);}
+    closeWorldPanel(){if(this.renameInput)this.renameInput.hidden=true;if(this.panel?.type==='party')PartyInput.cancel(this);if(this.panel?.type==='reward'){this.finishReward();return;}if(this.panel?.type==='tacticsEditor'){this.panel.editor.closePanel();return;}const previous=this.panel?.previous||null;if(previous?.type==='npcDialogue'){this.dialogue=previous.dialogue;this.panel=null;}else this.panel=previous;}
+    interact(npc){if(npc.role==='tavern'){this.dialogue=null;this.panel={type:'tavern'};this.save();this.invalidate();return;}const court=Object.values(root.FactionCourts.definitions).find(d=>d.id===(npc.courtId||npc.id));if(court&&!this.model.state.courtDreams[court.id]&&!npc.delegate){this.showCourtDream(npc,court);return;}this.dialogue=null;this.npcInteraction={id:npc.id,offered:false};this.speak(npc);}
     observeNpc(npc){const unit=this.model.npcUnit(npc.id);if(!unit)return;const previous=this.dialogue?{type:'npcDialogue',dialogue:this.dialogue}:null,preview=this.memberPreview(unit);this.dialogue=null;this.panel={type:'character',unitId:unit.id,unit:preview.unit(unit.id),readonly:true,previous};}
     progress(state=this.model.snapshot()){return {storyVersion:2,stage:'world',index:0,dreamChoice:root.PengpaiPrologue.checkpoint(this.options.progress).dreamChoice,preparation:{},world:copy(state)};}
     save(state){this.character=this.model.character;try{this.options.store.save(this.options.slot,this.character,this.progress(state));this.saveError=false;}catch{this.saveError=true;}}
@@ -208,7 +208,7 @@
       return ['quest','story'].includes(npc.role)?'civilian':npc.role;
     }
     roleIcon(role,x,y,size=25,status=null){if(status){Panels.questIcon(this,status,x,y,size);return;}
-      const ids={healer:'heal',heal:'heal',advice:'任务',training:'shortBlade',merchant:'背包',companion:'人物',story:'任务'};
+      const ids={healer:'heal',heal:'heal',advice:'任务',training:'shortBlade',merchant:'背包',companion:'人物',tavern:'人物',story:'任务'};
       this.box(x,y,size,size,'#10232bee',null,3);
       if(ids[role])root.RpgIcons.draw(this.ctx,ids[role],x+1,y+1,size-2,{image:src=>this.image(src)});
       else{const c=this.ctx;c.save();c.beginPath();c.roundRect(x+3,y+4,size-6,size-11,3);c.moveTo(x+8,y+size-7);c.lineTo(x+5,y+size-2);c.lineTo(x+14,y+size-7);c.fillStyle='#c1d6cf';c.fill();c.fillStyle='#355461';for(let i=0;i<3;i++){c.beginPath();c.arc(x+8+i*4,y+10,1,0,7);c.fill();}c.restore();}
@@ -381,7 +381,7 @@
     frame(title,height,{closable=true,titleAlign='left',maxWidth=460,inset=14,verticalInset=16}={}){const c=this.ctx,w=Math.min(maxWidth,this.w-inset*2),h=Math.min(height,this.h-verticalInset*2),x=(this.w-w)/2,y=(this.h-h)/2;c.fillStyle='#020b11bd';c.fillRect(0,0,this.w,this.h);this.box(x,y,w,h,'#0c222b','#7a8f8e',6);this.hits=[];this.text(title,titleAlign==='center'?x+w/2:x+18,y+25,20,'#ead8b6',titleAlign);if(closable)this.button('×',x+w-44,y+9,30,30,()=>{if(this.panel?.type==='event')this.finishEvent(this.panel.decision.defaultId);else if(this.panel?.type==='mapGuide')this.finishIntroduction();else this.closeWorldPanel();});return{x,y,w,h};}
     dismissOutside(frame,action){const {x,y,w,h}=frame;this.hits.unshift(...[{x:0,y:0,w:this.w,h:y},{x:0,y:y+h,w:this.w,h:this.h-y-h},{x:0,y,w:x,h},{x:x+w,y,w:this.w-x-w,h}].filter(r=>r.w>0&&r.h>0).map(r=>({...r,label:'点击空白离开',action})));}
     drawPanel(){
-      const panel=this.panel;if(panel.type==='slidingPuzzle')return root.SlidingPuzzle.draw(this);if(Panels.draw(this))return;if(panel.type==='tacticsEditor'){const editor=panel.editor;editor.w=this.w;editor.h=this.h;editor.drawPanel();this.hits=editor.hits;return;}
+      const panel=this.panel;if(root.TavernUI?.draw(this))return;if(panel.type==='slidingPuzzle')return root.SlidingPuzzle.draw(this);if(Panels.draw(this))return;if(panel.type==='tacticsEditor'){const editor=panel.editor;editor.w=this.w;editor.h=this.h;editor.drawPanel();this.hits=editor.hits;return;}
       if(panel.type==='npcMenu'){
         const npc=panel.npc,canObserve=!!this.model.npcUnit(npc.id),f=this.frame(npc.name,canObserve?256:208),choices=[{label:'对话',action:()=>this.speak(npc)},...(canObserve?[{label:'观察',action:()=>this.observeNpc(npc)}]:[]),{label:'离开',action:()=>{this.panel=null;}}];choices.forEach((choice,i)=>this.button(choice.label,f.x+22,f.y+62+i*52,f.w-44,40,choice.action));this.dismissOutside(f,()=>{this.panel=null;});return;
       }
@@ -462,7 +462,7 @@
       }
       if(!victory)this.panel={type:'notice',title:'战败',text:'已读取战前存档，准备好后可以再次挑战。'};else if(this.journey||this.model.journey||this.model.state.routeTarget)this.resumeJourney();
     }
-    destroy(){this.disposed=true;PartyInput.cancel(this);clearTimeout(this.timer);clearTimeout(this.eventTimer);clearTimeout(this.rewardTimer);clearTimeout(this.noticeTimer);cancelAnimationFrame(this.raf);this.battle?.destroy();this.observer.disconnect();for(const [event,fn]of [['pointerdown',this.down],['pointermove',this.move],['pointerup',this.up],['pointercancel',this.cancel],['keydown',this.key],['wheel',this.wheel]])this.canvas.removeEventListener(event,fn);}
+    destroy(){this.renameInput?.remove();this.disposed=true;PartyInput.cancel(this);clearTimeout(this.timer);clearTimeout(this.eventTimer);clearTimeout(this.rewardTimer);clearTimeout(this.noticeTimer);cancelAnimationFrame(this.raf);this.battle?.destroy();this.observer.disconnect();for(const [event,fn]of [['pointerdown',this.down],['pointermove',this.move],['pointerup',this.up],['pointercancel',this.cancel],['keydown',this.key],['wheel',this.wheel]])this.canvas.removeEventListener(event,fn);}
   }
   root.WorldMap={CanvasWorld,mount:(canvas,options)=>new CanvasWorld(canvas,options)};if(typeof module!=='undefined'&&module.exports)module.exports={CanvasWorld};
 })(globalThis);

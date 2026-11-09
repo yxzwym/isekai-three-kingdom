@@ -93,7 +93,7 @@ test('单敌和后排双条在模型上方，前排姓名双条贴在脚下',()=
   const hp=boxes.find(box=>box.fill==='#10171d'),progress=boxes.find(box=>box.fill==='#07141c');
   assert.ok(texts.find(t=>t.text==='曹操').y<hp.y);assert.ok(hp.y+hp.h<=progress.y);
   if(count===1||r.hudAbove)assert.ok(progress.y+progress.h<=r.figure.y+.001);
-  else {assert.ok(texts.find(t=>t.text==='曹操').y>=r.figure.y+r.figure.h);assert.equal(hp.y-r.figure.y-r.figure.h,20);}
+  else {assert.ok(texts.find(t=>t.text==='曹操').y>=r.figure.y+r.figure.h);assert.ok(Math.abs(hp.y-r.figure.y-r.figure.h-20)<1e-9);}
   assert.equal(view.hits.length,2);assert.ok(view.hits.every(hit=>hit.unitId==='caocao'&&hit.kind==='unit'));
   }
 });
