@@ -92,7 +92,12 @@
   }
   if(p.drag){const d=p.drag,column=p.partyColumns.find(c=>c.group===d.overGroup);if(column){const yy=clamp(top+d.slot*p.rowHeight-p.scrolls[column.group],top,bottom-2);this.box(column.x,yy,column.w-4,3,'#e6cb83',null);}const u=[...groups.active,...groups.reserve].find(u=>u.id===d.id);if(u){c.save();c.globalAlpha=.9;c.shadowColor='#0009';c.shadowBlur=15;partyCard(this,u,d.x-d.offsetX,d.y-d.offsetY,d.w,true);c.restore();}}
  }
- function memberActions(){const p=this.panel,u=this.model.members().find(u=>u.id===p.unitId),active=this.model.state.activeIds.includes(u.id),canLeave=u.id!=='hero'&&!u.guest&&u.homeNode,f=this.frame(u.name+' · 队伍',u.origin==='tavern'?290:canLeave?240:180);this.button(active?'转为候补':'加入出战',f.x+20,f.y+65,f.w-40,40,()=>{const ids=active?this.model.state.activeIds.filter(id=>id!==u.id):[...this.model.state.activeIds,u.id];if(this.model.setActive(ids)){this.save();this.panel=p.previous;}else this.notify(active?'至少保留一人出战。':'最多'+this.model.activeLimit()+'人出战。');});if(canLeave)this.button('离队 · 返回'+root.WorldData.placeMap[u.homeNode].name,f.x+20,f.y+121,f.w-40,40,()=>{if(this.model.dismiss(u.id)){this.save();this.panel={type:'party',scroll:0};}});if(u.origin==='tavern')this.button('更改姓名',f.x+20,f.y+177,f.w-40,40,()=>{this.panel={type:'retainerRename',unitId:u.id,previous:p};});}
+ function memberActions(){
+  const p=this.panel,u=this.model.members().find(u=>u.id===p.unitId);if(!u){this.closeWorldPanel();return;}const active=this.model.state.activeIds.includes(u.id),retainer=u.origin==='tavern',canLeave=u.id!=='hero'&&!u.guest&&u.homeNode,f=this.frame(u.name+' · 队伍',retainer?346:canLeave?240:180);
+  this.button(active?'转为候补':'加入出战',f.x+20,f.y+65,f.w-40,40,()=>{const ids=active?this.model.state.activeIds.filter(id=>id!==u.id):[...this.model.state.activeIds,u.id];if(this.model.setActive(ids)){this.save();this.panel=p.previous;}else this.notify(active?'至少保留一人出战。':'最多'+this.model.activeLimit()+'人出战。');});
+  if(canLeave)this.button(retainer?'离队 · 返回酒馆':'离队 · 返回'+root.WorldData.placeMap[u.homeNode].name,f.x+20,f.y+121,f.w-40,40,()=>{if(this.model.dismiss(u.id)){this.save();this.panel={type:'party',scroll:0};}});
+  if(retainer){this.button('更改姓名',f.x+20,f.y+177,f.w-40,40,()=>{this.panel={type:'retainerRename',unitId:u.id,previous:p};});this.button('永久离队',f.x+20,f.y+233,f.w-40,40,()=>{this.panel={type:'retainerRelease',unitId:u.id,previous:p,returnPanel:{type:'party',scroll:0}};});}
+ }
 
  function formation(){
   const p=this.panel,members=this.model.members(),f=this.frame('上阵 ('+this.model.state.activeIds.length+'/'+this.model.activeLimit()+')',80+members.length*50),top=f.y+58,bottom=f.y+f.h-16,c=this.ctx;
