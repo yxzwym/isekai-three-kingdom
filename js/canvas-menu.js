@@ -47,13 +47,11 @@
       return {tight,gap,cardH,footerY,passiveTop,passiveTitleY,attributeTop,attributeRowH};
     }
     drawAttributeSummary(character,top=114,rowH=31){
-      const c=this.ctx,x=16,w=this.w-32,columns=[.34,.28,.38],edges=[x,x+w*columns[0],x+w*(columns[0]+columns[1]),x+w],height=rowH*(R.ATTRIBUTES.length+1);
+      const c=this.ctx,x=16,w=this.w-32,columns=[.22,.22,.22,.34],edges=[x];for(const fraction of columns)edges.push(edges.at(-1)+w*fraction);const height=rowH*(R.ATTRIBUTES.length+1);
       this.box(x,top,w,height,'#10252ddf','#536b70',4);c.fillStyle='#29414aaa';c.fillRect(x+1,top+1,w-2,rowH-1);c.strokeStyle='#4b656b99';c.lineWidth=1;c.beginPath();
       for(const xx of edges.slice(1,-1)){c.moveTo(xx,top);c.lineTo(xx,top+height);}for(let row=1;row<=R.ATTRIBUTES.length;row++){const yy=top+row*rowH;c.moveTo(x,yy);c.lineTo(x+w,yy);}c.stroke();
-      ['属性','当前','潜力'].forEach((label,i)=>this.text(label,(edges[i]+edges[i+1])/2,top+rowH/2,14,MUTED));
-      R.ATTRIBUTES.forEach(([key,label],i)=>{const cy=top+rowH*(i+1.5),potential=character.potentials[key],valueY=cy-(rowH>=30?3:0);this.text(label,(edges[0]+edges[1])/2,cy,14,WHITE);this.text(character.attributes[key],(edges[1]+edges[2])/2,cy,16,WHITE);this.text(potential+'(+'+Number((potential*.04).toFixed(2))+')',(edges[2]+edges[3])/2,valueY,14,GOLD);
-        if(rowH>=30){const bx=edges[2]+14,bw=edges[3]-edges[2]-28,by=cy+rowH/2-7;c.fillStyle='#293d44';c.fillRect(bx,by,bw,3);c.fillStyle='#c7a76d';c.fillRect(bx,by,bw*clamp(potential/100,0,1),3);}
-      });
+      ['属性','当前','潜力','每级加成'].forEach((label,i)=>this.text(label,(edges[i]+edges[i+1])/2,top+rowH/2,14,MUTED));
+      R.ATTRIBUTES.forEach(([key,label],i)=>{const cy=top+rowH*(i+1.5),potential=character.potentials[key];this.text(label,(edges[0]+edges[1])/2,cy,14,WHITE);this.text(character.attributes[key],(edges[1]+edges[2])/2,cy,16,WHITE);this.text(potential,(edges[2]+edges[3])/2,cy,14,GOLD);this.text('+'+Number(root.CharacterGrowth.growthPerLevel(potential).toFixed(2)),(edges[3]+edges[4])/2,cy,14,GOLD);});
     }
     drawCreationPassives(character,layout){
       R.sortPassives(character.passives).forEach((id,i)=>{const p=R.PASSIVE_MAP[id],q=R.QUALITIES[p.quality],x=16,y=layout.passiveTop+i*(layout.cardH+layout.gap),cardW=this.w-32,contentW=cardW-32,lineH=20;

@@ -7,6 +7,6 @@ test('赵云两红两金、张梁蓝绿白三被动，旧存档迁移保留其�
 });
 test('金绿白被动参与通用物理增伤、减伤，计策与反击真实伤害不受物理减伤影响',()=>{
  const unit=(id,passives)=>({id,war:10,intelligence:10,constitution:10,speed:10,technique:10,maxSoldiers:100,skills:[],passives}),b=new E.Battle({allies:[unit('zhao',['zhaoyun-ever-victorious','zhaoyun-loyal-guard']),unit('liang',['zhangliang-might','zhangliang-hardy'])],enemies:[unit('enemy',[])]}),flat={kind:'physical',flat:100,scaling:{},weaponCoefficient:0},enemy=b.effective(b.unit('enemy'));
- assert.equal(E.calculate({attacker:b.effective(b.unit('zhao')),target:enemy,skill:flat}).amount,110);assert.equal(E.calculate({attacker:b.effective(b.unit('liang')),target:enemy,skill:flat}).amount,105);
- for(const [id,expected]of [['zhao',92],['liang',98]]){const target=b.effective(b.unit(id));assert.equal(E.calculate({attacker:enemy,target,skill:flat}).amount,expected);assert.equal(E.calculate({attacker:enemy,target,skill:{...flat,kind:'tactic'}}).amount,100);assert.equal(E.calculate({attacker:enemy,target,skill:flat,damageType:'true'}).amount,100);}
+ assert.equal(E.calculate({attacker:b.effective(b.unit('zhao')),target:enemy,skill:flat}).amount,120);assert.equal(E.calculate({attacker:b.effective(b.unit('liang')),target:enemy,skill:flat}).amount,110);
+ for(const [id,expected]of [['zhao',80],['liang',95]]){const target=b.effective(b.unit(id));assert.equal(E.calculate({attacker:enemy,target,skill:flat}).amount,expected);assert.equal(E.calculate({attacker:enemy,target,skill:{...flat,kind:'tactic'}}).amount,100);assert.equal(E.calculate({attacker:enemy,target,skill:flat,damageType:'true'}).amount,100);}
 });

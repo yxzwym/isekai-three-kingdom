@@ -47,7 +47,7 @@
     function ensure(file,{retry=false,priority=0}={}){
       file=record(file);if(cache.has(file.src))return Promise.resolve(cache.get(file.src));if(pending.has(file.src)){promote(file.src,priority);return pending.get(file.src);}if(failures.has(file.src)&&!retry)return Promise.reject(failures.get(file.src));failures.delete(file.src);if(retry){const t=transport(file);if(transfers.get(t.url)?.error)transfers.delete(t.url);}
       const entry=slot(async job=>{const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs),t=transport(file);
-        try{let image;if(t.local){image=await loadLocal(t.url,controller.signal);transfers.set(t.url,{loaded:t.bytes,total:t.bytes});}
+        try{let image;if(t.local||root.BattleEmbeddedAssets?.[file.src]){image=await loadLocal(t.url,controller.signal);transfers.set(t.url,{loaded:t.bytes,total:t.bytes,done:true});}
           else{let blob=await fetchBlob(file,t,controller.signal,job.priority);if(t.pack){const {offset,length}=t.pack;if(!Number.isSafeInteger(offset)||!Number.isSafeInteger(length)||offset<0||length<=0||offset+length>blob.size)throw new Error('资源包索引无效');blob=blob.slice(offset,offset+length,'image/webp');}image=await decode(blob,file.src);}
           cache.set(file.src,image);emit({type:'ready',src:file.src});return image;
         }catch(error){failures.set(file.src,error);emit({type:'error',src:file.src,error});throw error;}finally{clearTimeout(timer);}
@@ -61,13 +61,13 @@
     }
     const subscribe=listener=>{listeners.add(listener);return()=>listeners.delete(listener);};
     function get(src,owner){if(!src)return;const view=owner||currentView;view?.assetSources?.add(src);const image=cache.get(src);if(!image&&!failures.has(src)){if(pending.has(src))promote(src,0);else ensure(src).catch(()=>{});}return image;}
-    function downloaded(src){const file=record(src),t=transport(file);return cache.has(src)||!!root.BattleEmbeddedAssets?.[src]||!!transfers.get(t.url)?.done;}
+    function downloaded(src){const file=record(src),t=transport(file);return t.local||cache.has(src)||!!root.BattleEmbeddedAssets?.[src]||!!transfers.get(t.url)?.done;}
     async function prefetch(files,{priority=3}={}){
       const resources=new Map();for(let file of files){file=record(file);const t=transport(file);if(!t.local&&!root.BattleEmbeddedAssets?.[file.src]&&!downloaded(file.src))resources.set(t.url,{file,t});}
       const tasks=[...resources.values()].map(({file,t})=>{if(prefetches.has(t.url))return prefetches.get(t.url);const entry=slot(async job=>{const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);try{return await fetchBlob(file,t,controller.signal,job.priority);}finally{clearTimeout(timer);}},priority),promise=entry.promise.finally(()=>prefetches.delete(t.url));prefetches.set(t.url,promise);return promise;});
       const results=await Promise.allSettled(tasks);return{count:resources.size,failed:results.filter(r=>r.status==='rejected').length};
     }
-    return {preload,get,ensure,prefetch,downloaded,progress,subscribe,peek:src=>cache.get(src),error:src=>failures.get(src),pending:src=>pending.has(src)};
+    return {preload,get,ensure,prefetch,downloaded,progress,subscribe,stats:()=>({decoded:cache.size,pending:pending.size,queued:queue.length}),peek:src=>cache.get(src),error:src=>failures.get(src),pending:src=>pending.has(src)};
   }
   let currentView=null;
   const loader=createLoader();
@@ -87,7 +87,7 @@
     const unsubscribe=loader.subscribe(event=>{if(view.assetSources.has(event.src)){if(event.type==='ready')onReady(event.src);redraw();}}),draw=view.draw,destroy=view.destroy;
     view.draw=function(...args){const waiting=[...view.assetSources].some(src=>!loader.peek(src));if(!view.assetsLoading||!waiting){const previous=currentView;currentView=view;try{draw.apply(this,args);}finally{currentView=previous;}}
       const missing=[...view.assetSources].filter(src=>!loader.peek(src));view.assetsLoading=missing.length>0;
-      if(view.assetsLoading){wave=[...new Set([...wave,...missing])];const now=performance.now(),error=missing.some(src=>loader.error(src));if(waitingSince===null){waitingSince=now;delayTimer=setTimeout(redraw,150);}view.assetFailure=error;view.assetLoadingVisible=!!(error||view.assetLoadingVisible||missing.some(src=>!loader.downloaded(src))&&now-waitingSince>=150);
+      if(view.assetsLoading){wave=[...new Set([...wave,...missing])];const now=performance.now(),error=missing.some(src=>loader.error(src));if(waitingSince===null){view.cancel?.();waitingSince=now;delayTimer=setTimeout(redraw,150);}view.assetFailure=error;view.assetLoadingVisible=!!(error||view.assetLoadingVisible||missing.some(src=>!loader.downloaded(src))&&now-waitingSince>=150);
         if(view.assetLoadingVisible)view.assetRetry=loadingScreen(view.canvas,view.ctx,view.w,view.h,loader.progress(wave),error);
         else if(hold){const c=view.ctx;c.save();c.setTransform(1,0,0,1,0,0);c.drawImage(hold,0,0,view.canvas.width,view.canvas.height);c.restore();view.canvas.setAttribute('aria-label','正在准备资源');}
         view.hits=[];if(view.input)view.input.hidden=true;}
@@ -98,12 +98,12 @@
     view.destroy=function(...args){unsubscribe();cancelAnimationFrame(scheduled);clearTimeout(delayTimer);if(hold)hold.width=hold.height=0;return destroy.apply(this,args);};
   }
   function mount(canvas,files,onReady){
-    const ctx=canvas.getContext('2d');let disposed=false,error=false,state={percent:0,loadedBytes:0,totalBytes:0,completed:0,total:files.length},width,height,retry,scheduled=0;
-    function draw(){if(!disposed)retry=loadingScreen(canvas,ctx,width,height,state,error);}
+    const ctx=canvas.getContext('2d');let disposed=false,error=false,state={percent:0,loadedBytes:0,totalBytes:0,completed:0,total:files.length},width,height,retry,scheduled=0,started=performance.now(),delayTimer;
+    function draw(){if(disposed)return;if(!error&&performance.now()-started<150){ctx.fillStyle='#071923';ctx.fillRect(0,0,canvas.width,canvas.height);canvas.setAttribute('aria-label','正在启动');return;}retry=loadingScreen(canvas,ctx,width,height,state,error);}
     function repaint(){if(scheduled||disposed)return;scheduled=requestAnimationFrame(()=>{scheduled=0;draw();});}
     function resize(){const view=Viewport.resize(canvas,ctx);width=view.w;height=view.h;draw();}
-    function destroy(){disposed=true;cancelAnimationFrame(scheduled);observer.disconnect();canvas.removeEventListener('pointerup',click);canvas.removeEventListener('keydown',key);}
-    async function run(){error=false;draw();try{await loader.preload(files,{onProgress:value=>{state=value;repaint();}});}catch(cause){if(!disposed){error=true;draw();console.error(cause);}return;}if(disposed)return;destroy();onReady();}
+    function destroy(){disposed=true;cancelAnimationFrame(scheduled);clearTimeout(delayTimer);observer.disconnect();canvas.removeEventListener('pointerup',click);canvas.removeEventListener('keydown',key);}
+    async function run(){error=false;started=performance.now();clearTimeout(delayTimer);delayTimer=setTimeout(repaint,150);draw();try{await loader.preload(files,{onProgress:value=>{state=value;repaint();}});}catch(cause){if(!disposed){error=true;draw();console.error(cause);}return;}if(disposed)return;destroy();onReady();}
     function click(event){if(!error)return;const {x,y}=Viewport.point(canvas.getBoundingClientRect(),event);if(x>=retry.x&&x<=retry.x+retry.w&&y>=retry.y&&y<=retry.y+retry.h)run();}
     function key(event){if(error&&event.key==='Enter'){event.preventDefault();run();}}
     const observer=new ResizeObserver(resize);observer.observe(canvas);canvas.addEventListener('pointerup',click);canvas.addEventListener('keydown',key);resize();run();return{destroy};
@@ -113,7 +113,7 @@
   let background;
   function startBackground(){
     if(!background)background=(async()=>{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-      const nearby=warmGroups(['creation','road','interface','camp','dream','map','townspeople'],{priority:2}).catch(()=>{}),remaining=loader.prefetch(root.GameAssetManifest||[]);await Promise.all([nearby,remaining]);
+      const nearby=warmGroups(['creation','road','interface','camp','dream','map','townspeople'],{priority:2}).catch(()=>{}),remaining=root.location?.protocol==='file:'?loader.preload(root.GameAssetManifest||[],{priority:3,concurrency:1}).catch(()=>{}):loader.prefetch(root.GameAssetManifest||[]);await Promise.all([nearby,remaining]);
     })();return background;
   }
   const api={...loader,createLoader,startupFiles,track,mount,warmMap,warmGroups,startBackground};root.GameAssetLoader=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;

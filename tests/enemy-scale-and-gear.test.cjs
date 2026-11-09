@@ -3,9 +3,9 @@ const {E,G,I,W,H,RC,World,R,general,fight,Chapter}=require('./helpers/balance.cj
 const Audit=require('./helpers/enemy-audit.cjs'),Field=require('../js/field-equipment.js'),N=require('../js/nearby-content.js'),S=require('../js/battle-simulator.js');
 const character=()=>({name:'行客',appearance:'scholar',difficulty:'normal',...R.rollHero('normal',()=>.5)});
 
-test('全部敌军使用当前章节的攻击量级，地狱只增加约20%，不混入上千攻击属性',()=>{
+test('剧情敌军使用当前章节的攻击量级，地狱只增加约20%，100级模拟大战单独验证',()=>{
  const groups=Audit.groups();assert.ok(groups.length>=190);
- for(const group of groups)for(const difficulty of ['normal','hell'])for(const unit of Audit.inspect(group,difficulty)){
+ for(const group of groups.filter(group=>!group.key.startsWith('war:')))for(const difficulty of ['normal','hell'])for(const unit of Audit.inspect(group,difficulty)){
   for(const key of ['war','intelligence','speed','technique'])assert.ok(unit.attributes[key]<=150,unit.group+':'+unit.name+':'+key);
   for(const skill of unit.skills.filter(s=>['physical','tactic'].includes(s.kind))){assert.ok(skill.normal<=(difficulty==='hell'?840:700),unit.group+':'+skill.name);assert.ok(skill.critical<=(difficulty==='hell'?1200:1000),unit.group+':'+skill.name);for(const effect of skill.periodic)assert.ok(effect.amount<=25,unit.group+':'+effect.id);}
  }

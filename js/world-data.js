@@ -133,6 +133,7 @@
   ]};
   const gateGuard={id:'gate-guard',name:'官兵',art:'imperial-soldier',side:'left',role:'guard'};
   const trainingOptions=[
+    {id:'straw-dummy',label:'稻草人',count:1,dummy:true},
     {id:'militia-one',label:'一名黄巾军',count:1},
     {id:'militia-two',label:'两名黄巾军',count:2},
     {id:'militia-five',label:'五名黄巾军',count:5},

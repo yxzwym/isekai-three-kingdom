@@ -33,28 +33,48 @@
       if(this.panel)this.drawPanel();if(this.notice?.until>performance.now()){this.box(18,this.h/2-28,this.w-36,56,'#102b36fa','#b7a279');this.text(this.notice.text,this.w/2,this.h/2,14,'#efdfb9','center');}if(this.saveError)this.text('模拟配置未能保存',this.w/2,this.h-5,14,'#e6a47e','center');this.drawnRevision=this.revision;
       this.canvas.setAttribute('aria-label','战斗模拟 '+boss.title+' 队伍等级'+this.session.level+' 出战'+this.session.activeIds().length+'/'+boss.limit+(this.panel?' '+this.panel.type:''));
     }
-    drawEnemies(){
+    enemyPreviews(){
       const b=this.preview(),enemies=b.living('enemy'),top=172,bottom=this.partyTop()-88,h=bottom-top;
-      const rects=root.BattleSystem.layout(this.w,this.h,Math.max(1,this.session.activeIds().length),enemies.length,root.BattleScenes.arrange(root.BattleScenes.get(this.session.boss().sceneId),enemies).enemyFormation).filter(r=>r.side==='enemy');
+      if(!enemies.length)return [];
+      const rects=root.BattleSystem.layout(this.w,this.h,Math.max(1,this.session.activeIds().length),enemies.length,root.BattleScenes.arrange(root.BattleScenes.get(this.session.boss().sceneId),enemies).enemyFormation,this.session.boss().limit).filter(r=>r.side==='enemy');
       const first=Math.min(...rects.map(r=>r.y)),last=Math.max(...rects.map(r=>r.y+r.h)),scale=h/Math.max(1,last-first);
-      for(const rect of rects){const u=enemies[rect.index],art=u.fullbody||u.portrait,img=this.image(art?.src),rowTop=top+(rect.y-first)*scale,above=rect.boss||rect.hudAbove,headroom=above?(rect.boss?22:36):0,box={x:rect.x,y:rowTop+headroom,w:rect.w,h:Math.max(12,rect.h*scale-headroom-(above?0:30))},dst=img?root.BattleSystem.fitImage(img.naturalWidth,img.naturalHeight,box):box,c=this.ctx;
-        c.save();c.fillStyle='#02080c88';c.beginPath();c.ellipse(dst.x+dst.w/2,dst.y+dst.h-2,Math.min(dst.w*.36,58),Math.min(10,dst.w*.1),0,0,Math.PI*2);c.fill();if(img)c.drawImage(img,dst.x,dst.y,dst.w,dst.h);c.restore();
-        const width=enemies.length===1?Math.min(180,this.w*.6):Math.min(rect.w-4,150),x=rect.x+(rect.w-width)/2,y=above?rowTop+(rect.boss?0:16):dst.y+dst.h+2;Panels.bar(this,x,y,width,15,1,'#b72731');this.text(u.maxSoldiers,x+width/2,y+7.5,14,'#fff3e4','center');if(!rect.boss)this.text(u.name,x+width/2,above?rowTop+5:y+27,14,'#e4e5da','center');this.hits.push({x:rect.x,y:rowTop,w:rect.w,h:rect.h*scale+14,label:'查看敌人 '+u.name,action:()=>{this.panel={type:'character',unit:u,unitId:u.id,readonly:true};}});
+      return rects.map(rect=>{
+        const u=enemies[rect.index],art=u.fullbody||u.portrait,img=this.image(art?.src),source=art?.crop||{x:0,y:0,width:img?.naturalWidth||art?.width||1,height:img?.naturalHeight||art?.height||1},rowTop=top+(rect.y-first)*scale,above=rect.boss||rect.hudAbove,headroom=above?48:0,box={x:rect.x,y:rowTop+headroom,w:rect.w,h:Math.max(12,rect.h*scale-headroom-(above?0:46))},dst=root.BattleSystem.fitImage(source.width,source.height,box),width=enemies.length===1?Math.min(180,this.w*.6):Math.min(rect.w-4,150),hud={x:rect.x+(rect.w-width)/2,y:above?dst.y-36:dst.y+dst.h+20,w:width};
+        return {u,img,source,dst,hud,above};
+      });
+    }
+    drawEnemies(){
+      for(const {u,img,source,dst,hud:{x,y,w},above} of this.enemyPreviews()){const c=this.ctx;
+        c.save();c.fillStyle='#02080c88';c.beginPath();c.ellipse(dst.x+dst.w/2,dst.y+dst.h-2,Math.min(dst.w*.36,58),Math.min(10,dst.w*.1),0,0,Math.PI*2);c.fill();if(img)c.drawImage(img,source.x,source.y,source.width,source.height,dst.x,dst.y,dst.w,dst.h);c.restore();
+        this.text(u.name,x+w/2,y-11,14,'#e4e5da','center');Panels.bar(this,x,y,w,18,1,'#b72731');this.text(u.maxSoldiers,x+w/2,y+9,14,'#fff3e4','center');Panels.bar(this,x,y+21,w,4,u.progress,'#23c8d0');
+        const left=Math.min(dst.x,x),right=Math.max(dst.x+dst.w,x+w),top=above?y-20:dst.y,bottom=above?dst.y+dst.h:y+25;this.hits.push({x:left,y:top,w:right-left,h:bottom-top,label:'查看敌人 '+u.name,action:()=>{this.panel={type:'character',unit:u,unitId:u.id,readonly:true};}});
       }
     }
     drawPanel(){
-      const p=this.panel;if(p.type==='simRoster')return this.drawRoster();if(p.type==='simBoss')return this.drawBosses();if(p.type==='simLevel')return this.drawLevel();if(p.type==='simResult')return this.drawResult();
+      const p=this.panel;if(p.type==='simRetainer')return this.drawRetainer();if(p.type==='simRoster')return this.drawRoster();if(p.type==='simBoss')return this.drawBosses();if(p.type==='simLevel')return this.drawLevel();if(p.type==='simResult')return this.drawResult();
       if(p.type==='simSettings'){const f=this.frame('设置',root.GameSettingsPanel.HEIGHT);root.GameSettingsPanel.draw(this,f,this.options.store.settings(),patch=>{this.options.store.setSettings(patch);this.invalidate();});return;}
       super.drawPanel();
     }
     drawRoster(){
-      const p=this.panel,f=this.frame(p.slot==null?'选择武将 '+this.session.activeIds().length+'/'+this.session.boss().limit:'更换武将',600),left=f.x+16,w=f.w-32,tabs=[['all','全部'],['wei','魏'],['shu','蜀'],['wu','吴'],['other','群雄']];
-      tabs.forEach(([id,name],i)=>this.button(name,left+i*w/5,f.y+55,w/5-4,30,()=>{p.filter=id;p.scroll=0;},{active:p.filter===id}));
-      const heroes=S.heroes.filter(u=>p.filter==='all'||(p.filter==='other'?['other','yellow','dong'].includes(u.country):u.country===p.filter)),cols=4,gap=8,cw=(w-gap*3)/cols,rowH=105,top=f.y+97,bottom=f.y+f.h-16,c=this.ctx;
+      const p=this.panel,f=this.frame(p.slot==null?'选择武将 '+this.session.activeIds().length+'/'+this.session.boss().limit:'更换武将',600),left=f.x+16,w=f.w-32,tabs=[['all','全部'],['wei','魏'],['shu','蜀'],['wu','吴'],['other','群雄'],['retainer','酒馆']];
+      tabs.forEach(([id,name],i)=>this.button(name,left+i*w/tabs.length,f.y+55,w/tabs.length-4,30,()=>{p.filter=id;p.scroll=0;},{active:p.filter===id}));
+      this.button('添加酒馆角色',left,f.y+94,w,30,()=>{this.panel={type:'simRetainer',grade:'white',group:'warrior',weaponType:'sword',previous:p,slot:p.slot};});
+      const heroes=this.session.heroChoices().filter(u=>p.filter==='all'||(p.filter==='other'?['other','yellow','dong'].includes(u.country):u.country===p.filter)),cols=4,gap=8,cw=(w-gap*3)/cols,rowH=105,top=f.y+139,bottom=f.y+f.h-16,c=this.ctx;
       p.maxScroll=Math.max(0,Math.ceil(heroes.length/cols)*rowH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);const before=this.hits.length;c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
-      heroes.forEach((u,i)=>{const x=left+i%cols*(cw+gap),y=top+Math.floor(i/cols)*rowH-p.scroll,index=this.session.activeIds().indexOf(u.id);if(y+97<top||y>bottom)return;this.box(x,y,cw,97,index>=0?'#344332':'#112d37',index>=0?'#e4c77d':'#536f77',4);const art=u.id==='hero'?root.PengpaiAssets.protagonists.scholar:root.CharacterAssets.resolve(u.id).portrait;const avatar=Math.min(70,cw-10),px=x+(cw-avatar)/2;if(u.id==='hero')this.portrait({src:art.src,crop:art.portrait},px,y+5,avatar,{frame:false});else this.portrait(art,px,y+5,avatar,{frame:false});this.text(u.name,x+cw/2,y+83,14,'#eddfc2','center');if(index>=0){this.box(x+cw-20,y+3,17,19,'#70572d',null);this.text(index+1,x+cw-11.5,y+12.5,14,'#fff0c6','center');}
+      heroes.forEach((u,i)=>{const x=left+i%cols*(cw+gap),y=top+Math.floor(i/cols)*rowH-p.scroll,index=this.session.activeIds().indexOf(u.id);if(y+97<top||y>bottom)return;this.box(x,y,cw,97,index>=0?'#344332':'#112d37',index>=0?'#e4c77d':'#536f77',4);const art=u.id==='hero'?root.PengpaiAssets.protagonists.scholar:root.CharacterAssets.resolve(u.characterId||u.id).portrait;const avatar=Math.min(70,cw-10),px=x+(cw-avatar)/2;if(u.id==='hero')this.portrait({src:art.src,crop:art.portrait},px,y+5,avatar,{frame:false});else this.portrait(art,px,y+5,avatar,{frame:false});this.text(u.name,x+cw/2,y+83,14,'#eddfc2','center');if(index>=0){this.box(x+cw-20,y+3,17,19,'#70572d',null);this.text(index+1,x+cw-11.5,y+12.5,14,'#fff0c6','center');}
         this.hits.push({x,y,w:cw,h:97,label:'选择武将 '+u.name,action:()=>{const okay=p.slot==null?this.session.toggle(u.id):this.session.replace(p.slot,u.id);if(!okay){this.notify('最多出战'+this.session.boss().limit+'人');return;}this.save();if(p.slot!=null)this.panel=null;}});
       });c.restore();this.clipHits(before,top,bottom);this.scrollTrack(f,top,bottom);
+    }
+    drawRetainer(){
+      const p=this.panel,T=root.TavernRecruitment,C=root.WeaponCatalog,f=this.frame('添加酒馆角色',580),left=f.x+16,w=f.w-32;
+      T.grades.forEach((g,i)=>{const cw=w/5;this.button(g.name,left+i*cw,f.y+56,cw-4,30,()=>{p.grade=g.id;p.modelId=null;},{active:p.grade===g.id});this.text(g.value,left+(i+.5)*cw,f.y+103,14,g.color,'center');});
+      C.groups.forEach((g,i)=>this.button(g.name,left+i%3*(w+6)/3,f.y+124+Math.floor(i/3)*37,(w-12)/3,31,()=>{p.group=g.id;p.weaponType=C.types.find(t=>t.group===g.id).id;p.modelId=null;},{active:p.group===g.id}));
+      const types=C.types.filter(t=>t.group===p.group);types.forEach((t,i)=>this.button(t.name,left+i%3*(w+6)/3,f.y+207+Math.floor(i/3)*35,(w-12)/3,29,()=>{p.weaponType=t.id;},{active:p.weaponType===t.id}));
+      const pool=p.grade==='red'?T.mythic[p.group]:T.appearances[p.group];p.modelId||=pool[0].id;
+      const candidate=this.session.previewRetainer({type:p.weaponType,grade:p.grade,modelId:p.modelId});pool.forEach((a,i)=>{const cw=w/pool.length,x=left+i*cw,y=f.y+294;this.box(x+2,y,cw-4,90,'#112d37',p.modelId===a.id?'#e3c17c':'#4a6870');this.portrait(root.CharacterAssets.resolve(a.id).portrait,x+(cw-60)/2,y+5,60,{frame:false});this.text(T.modelNames[p.group][p.grade==='red'?(i?1:0):i],x+cw/2,y+76,14,'#ddceab','center');this.hits.push({x,y,w:cw,h:90,label:'选择模型 '+a.id,action:()=>{p.modelId=a.id;}});});
+      root.PengpaiRules.ATTRIBUTES.forEach(([key,label],i)=>{const x=left+i%3*(w+6)/3,y=f.y+402+Math.floor(i/3)*38;this.box(x,y,(w-12)/3,32,'#102b35','#45636a');this.text(label,x+7,y+16,14,'#abc3c8');this.text(candidate.potentials[key],x+(w-12)/3-7,y+16,14,T.gradeOf(candidate).color,'right');});
+      this.text('可重复添加；入场后可调整配装与施法设置',f.x+f.w/2,f.y+f.h-91,12,'#b5c7c9','center');
+      this.button('添加到阵容',left,f.y+f.h-62,w,38,()=>{const id=this.session.addRetainer({type:p.weaponType,grade:p.grade,modelId:p.modelId},p.slot);if(!id){this.notify('阵容已满，请先移除一名角色');return;}this.save();if(p.slot!=null)this.panel=p.previous?.previous||null;else this.notify('已添加 '+this.session.record(id).unit.name);},{active:true});
     }
     drawBosses(){
       const p=this.panel,f=this.frame('选择战斗',590),left=f.x+16,w=f.w-32,tabs=[['all','全部'],['war','大战'],['boss','首领'],['duel','单挑'],['luoyang','洛阳']];tabs.forEach(([id,name],i)=>this.button(name,left+i*w/tabs.length,f.y+55,w/tabs.length-5,30,()=>{p.filter=id;p.scroll=0;},{active:p.filter===id}));
@@ -65,7 +85,7 @@
     scrollTrack(f,top,bottom){const p=this.panel;if(!p.maxScroll)return;const height=bottom-top,thumb=Math.max(20,height*height/(height+p.maxScroll));this.box(f.x+f.w-8,top,2,height,'#18343e',null);this.box(f.x+f.w-8,top+(height-thumb)*(p.scroll||0)/p.maxScroll,2,thumb,'#8ba9ad',null);}
     clipHits(before,top,bottom){this.hits=this.hits.filter((h,i)=>{if(i<before)return true;const end=Math.min(bottom,h.y+h.h);h.y=Math.max(top,h.y);h.h=end-h.y;return h.h>0;});}
     drawLevel(){
-      const p=this.panel,id=p.unitId,teamLevels=[...new Set(this.model.members().map(u=>u.level))],current=id?this.session.record(id).unit.level:teamLevels.length===1?teamLevels[0]:this.session.level,f=this.frame(id?S.heroMap[id].name+' · 等级':'队伍等级',220),left=f.x+24,w=f.w-48,y=f.y+132;
+      const p=this.panel,id=p.unitId,teamLevels=[...new Set(this.model.members().map(u=>u.level))],current=id?this.session.record(id).unit.level:teamLevels.length===1?teamLevels[0]:this.session.level,f=this.frame(id?this.session.record(id).unit.name+' · 等级':'队伍等级',220),left=f.x+24,w=f.w-48,y=f.y+132;
       this.button('−',left,f.y+64,48,36,()=>{this.session.setLevel(current-1,id);this.save();},{disabled:current===1});this.text(current,f.x+f.w/2,f.y+82,24,'#e9d5a8','center');this.button('+',left+w-48,f.y+64,48,36,()=>{this.session.setLevel(current+1,id);this.save();},{disabled:current===S.MAX_LEVEL});
       this.box(left,y,w,5,'#122f39','#5f7f88',2);this.box(left,y,w*(current-1)/(S.MAX_LEVEL-1),5,'#55bec8',null,2);this.ctx.fillStyle='#caedf0';this.ctx.beginPath();this.ctx.arc(left+w*(current-1)/(S.MAX_LEVEL-1),y+2.5,7,0,Math.PI*2);this.ctx.fill();this.text(1,left,y+28,14,'#b1c4c9');this.text(S.MAX_LEVEL,left+w,y+28,14,'#b1c4c9','right');
       this.hits.push({x:left-5,y:y-13,w:w+10,h:32,label:'调整等级',kind:'slider',change:x=>{this.session.setLevel(Math.round(1+clamp((x-left)/w,0,1)*(S.MAX_LEVEL-1)),id);this.save();}});

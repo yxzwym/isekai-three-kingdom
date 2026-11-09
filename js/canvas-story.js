@@ -54,7 +54,7 @@
     }
     text(value,x,y,size=16,color='#f1ece2',align='left'){size=UI.textSize(size);const c=this.ctx;c.font=`${size}px ${FONT}`;c.fillStyle=color;c.textBaseline='middle';c.textAlign=align;c.fillText(value,x,y);}
     box(x,y,w,h,fill='#0c1d26ed',stroke='#b6a17a'){const c=this.ctx;c.fillStyle=fill;c.beginPath();c.roundRect(x,y,w,h,5);c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
-    button(label,x,y,w,h,action){this.box(x,y,w,h);this.text(label,x+w/2,y+h/2,15,'#e7d4b0','center');this.hits.push({x,y,w,h,action:()=>{root.GameAudio?.play('ui');action();}});}
+    button(label,x,y,w,h,action){this.box(x,y,w,h);this.text(label,x+w/2,y+h/2,15,'#e7d4b0','center');this.hits.push({x,y,w,h,label,action:()=>{root.GameAudio?.play('ui');action();}});}
     bust(id,side,top,active){
       if(!id)return;const early=this.progress&&typeof this.progress==='object'&&!['departure','world','complete'].includes(this.progress.stage)&&(this.progress.stage!=='dawn'||this.progress.index<3),art=P.assets(id,this.character.appearance,early).fullbody,img=this.image(art?.src);if(!img)return;
       if(!this.busts.has(art.src)){const crop=art.dialogueCrop||root.CharacterAssets.bustCrop(img.naturalWidth,img.naturalHeight),cache=document.createElement('canvas');cache.width=Math.round(crop.width);cache.height=Math.round(crop.height);const c=cache.getContext('2d');c.drawImage(img,crop.x,crop.y,crop.width,crop.height,0,0,cache.width,cache.height);const fade=c.createLinearGradient(0,0,0,cache.height);fade.addColorStop(0,'#000');fade.addColorStop(.65,'#000');fade.addColorStop(1,'#0000');c.globalCompositeOperation='destination-in';c.fillStyle=fade;c.fillRect(0,0,cache.width,cache.height);this.busts.set(art.src,cache);}
@@ -104,7 +104,7 @@
       ids.forEach((id,i)=>{const skill=W.skills[id],x=left+i*(cardW+cardGap),role=proto.skillRole.call(this,skill),prefix=/^(单体|群体|自身)/.exec(role),scope=prefix?prefix[0]:skill.side==='self'?'自身':skill.scope==='all'?'群体':'单体',effect=prefix?role.slice(prefix[0].length):role,color=skill.kind==='heal'?'#91ddb1':skill.kind==='buff'?'#d9c084':skill.kind==='tactic'?'#c7a6e7':'#dbb39c',icon=compact?38:44;
         this.box(x,skillTop,cardW,cardH,'#102832ee','#54757c');this.box(x+(cardW-icon)/2,skillTop+10,icon,icon,'#0b222d','#719199');proto.drawSkillIcon.call(this,skill,x+(cardW-icon)/2,skillTop+10,icon);this.text(skill.name,x+cardW/2,skillTop+icon+28,14,'#e5e9e5','center');this.text(scope,x+cardW/2,skillTop+icon+51,14,'#b4c9cc','center');this.text(effect,x+cardW/2,skillTop+icon+71,14,color,'center');this.hits.push({x,y:skillTop,w:cardW,h:cardH,label:'查看'+skill.name+'详情',action:()=>this.openWeaponSkill(id)});
       });
-      const fy=h-64;this.text('后续可随意切换武器',w/2,fy-22,14,'#b6cbd0','center');this.button('启程',16,fy,inner,44,()=>this.depart());this.canvas.setAttribute('aria-label','选择初始兵器。'+R.ATTRIBUTES.map(([key,label])=>label+'潜力'+actor.potentials?.[key]).join('，')+'。'+group.name+'：'+group.description+'。已选'+selected.name+'，'+selected.style+'。'+ids.map(id=>W.skills[id].name).join('、')+'。技能可点击查看详情。后续可随意切换武器。启程。');
+      const fy=h-64;this.text('后续可随意切换武器',w/2,fy-22,14,'#b6cbd0','center');this.button(this.departureConfirmLabel||'启程',16,fy,inner,44,()=>this.depart());this.canvas.setAttribute('aria-label','选择初始兵器。'+R.ATTRIBUTES.map(([key,label])=>label+'潜力'+actor.potentials?.[key]).join('，')+'。'+group.name+'：'+group.description+'。已选'+selected.name+'，'+selected.style+'。'+ids.map(id=>W.skills[id].name).join('、')+'。技能可点击查看详情。后续可随意切换武器。启程。');
     }
     openWeaponSkill(id){
       const unit=this.departureWorld?.members()[0];if(!unit?.skills.includes(id))return false;
@@ -115,7 +115,7 @@
     wrapInfo(...args){return root.BattleSystem.CanvasBattle.prototype.wrapInfo.apply(this,args);}
     closePanel(){this.panel=null;this.detailPress=null;this.draw();}
     scrollSkill(delta){if(!this.panel)return;this.panel.scroll=Math.max(0,Math.min(this.panel.maxScroll||0,(this.panel.scroll||0)+delta));this.draw();}
-    depart(){if(!this.weaponChoice)return;this.departureWorld.chooseWeapon(this.weaponChoice);this.progress.world=this.departureWorld.snapshot();this.enter('world');}
+    depart(){if(!this.weaponChoice)return;this.departureWorld.chooseWeapon(this.weaponChoice);this.departureWorld.state.departurePractice='offer';this.departureWorld.state.inside=true;this.progress.world=this.departureWorld.snapshot();this.enter('world');}
     skip(){if(this.transition)return;const chapter=P.chapters[this.progress.stage];if(this.progress.stage==='dream'&&!this.progress.dreamChoice){this.progress.index=chapter.lines.length-1;this.save();this.draw();return;}if(chapter)this.enter(chapter.next);}
     chooseDream(id){const next=P.chooseDream(this.progress,id);if(!next)return;this.progress=next;this.save();this.draw();}
     next(){if(this.transition)return;if(this.failure){this.enter(this.progress.stage);return;}const chapter=P.chapters[this.progress.stage],lines=P.linesFor(this.progress.stage,this.progress);if(!chapter||lines[this.progress.index]?.choices)return;if(this.progress.index+1<lines.length){this.progress.index++;this.save();this.draw();}else this.enter(chapter.next);}

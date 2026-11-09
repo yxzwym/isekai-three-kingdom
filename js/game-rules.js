@@ -209,14 +209,14 @@
   }
 ];
   const IDENTITY_PASSIVE_WEIGHTS={
-    worthless:{white:100},civilian:{white:70,green:25,blue:5},
-    teacher:{white:15,green:50,blue:30,gold:5},bully:{white:15,green:50,blue:30,gold:5},
-    strategist:{blue:45,gold:45,red:10},warrior:{blue:45,gold:45,red:10},overlord:{gold:40,red:60}
+    worthless:{white:80,green:16,blue:3.5,gold:.45,red:.05},civilian:{white:68,green:25,blue:6,gold:.9,red:.1},
+    teacher:{white:22,green:43,blue:29,gold:5.5,red:.5},bully:{white:22,green:43,blue:29,gold:5.5,red:.5},
+    strategist:{white:5,green:15,blue:45,gold:30,red:5},warrior:{white:5,green:15,blue:45,gold:30,red:5},overlord:{gold:40,red:60}
   };
   // Legacy identities remain numeric templates and save aliases, not professions.
   IDENTITIES[0]={...IDENTITIES[1],id:'worthless',name:'无用之人',difficulty:5};
   const DIFFICULTIES=[
-    {id:'hell',name:'地狱难度',stars:5,profiles:['civilian'],enemyModifiers:{healthMultiplier:1.2,damageMultiplier:1.2}},
+    {id:'hell',name:'地狱难度',stars:5,profiles:['worthless'],enemyModifiers:{healthMultiplier:1.2,damageMultiplier:1.2}},
     {id:'survival',name:'乱世求生',stars:4,profiles:['civilian']},
     {id:'normal',name:'初出茅庐',stars:3,profiles:['teacher','bully']},
     {id:'heroic',name:'天纵之才',stars:2,profiles:['strategist','warrior']},
@@ -237,65 +237,65 @@
     passive('healthy','身强体健','white','最大生命提高5%。',{troopsMultiplier:1.05},'生命'),
     passive('steady','稳扎稳打','white','物理技能伤害提高5%。',{physicalMultiplier:1.05},'武技'),
     passive('careful','心思缜密','white','计策伤害提高5%。',{tacticMultiplier:1.05},'计策'),
-    passive('lightfoot','步履轻健','white','行动读条时间缩短3%。',{intervalMultiplier:.97},'速度'),
+    passive('lightfoot','步履轻健','white','行动读条时间缩短5%。',{intervalMultiplier:0.95},'速度'),
     passive('bandage','包扎手法','white','治疗量提高5%。',{healingMultiplier:1.05},'治疗'),
-    passive('patient','坚守本心','white','受到的伤害降低3%。',{takenMultiplier:.97},'防护'),
+    passive('patient','坚守本心','white','受到的伤害降低5%。',{takenMultiplier:0.95},'防护'),
     passive('brave','破阵之勇','green','物理技能伤害提高10%。',{physicalMultiplier:1.1},'武技'),
     passive('planning','运筹帷幄','green','计策伤害提高10%。',{tacticMultiplier:1.1},'计策'),
-    passive('strongarmy','兵强马壮','green','最大生命提高12%。',{troopsMultiplier:1.12},'生命'),
-    passive('swift','疾行如风','green','行动读条时间缩短6%。',{intervalMultiplier:.94},'速度'),
-    passive('herbalist','灵丹妙手','green','治疗量提高12%。',{healingMultiplier:1.12},'治疗'),
-    passive('veteran','百战余生','green','受到的伤害降低6%。',{takenMultiplier:.94},'防护'),
-    passive('initiative','先声夺人','blue','开战时获得25%行动进度。',{initialProgress:.25},'先手'),
-    passive('clever','奇谋迭出','blue','计策伤害提高20%。',{tacticMultiplier:1.2},'计策'),
-    passive('unstoppable','势如破竹','blue','物理技能伤害提高20%。',{physicalMultiplier:1.2},'武技'),
-    passive('fortress','坚壁清野','blue','护甲与抗性提高25%。',{armorMultiplier:1.25,resistanceMultiplier:1.25},'防护'),
-    passive('rapid','兵贵神速','blue','行动读条时间缩短12%。',{intervalMultiplier:.88},'速度'),
-    passive('doctor','妙手回春','blue','治疗量提高25%。',{healingMultiplier:1.25},'治疗'),
-    passive('critical','会心一击','blue','暴击率增加15个百分点。',{criticalBonus:.15},'暴击'),
-    passive('edge','锋芒毕露','gold','暴击率增加30个百分点。',{criticalBonus:.3},'暴击'),
-    passive('surprise','攻其不备','gold','物理技能无视目标50%护甲。',{armorPierce:.5},'破甲'),
-    passive('foresight','料敌先机','gold','受到物理技能时有25%概率闪避。',{physicalDodge:.25},'闪避'),
-    passive('loyal','赤胆忠心','gold','最大生命提高35%。',{troopsMultiplier:1.35},'生命'),
-    passive('mastermind','神机妙算','gold','计策伤害提高40%。',{tacticMultiplier:1.4},'计策'),
-    passive('miracle','回天之术','gold','治疗量提高45%。',{healingMultiplier:1.45},'治疗'),
-    passive('shadow','神行无踪','gold','行动读条时间缩短22%。',{intervalMultiplier:.78},'速度'),
-    passive('guishen','鬼神无双','red','物理技能必定暴击。',{guaranteedCritical:true},'暴击'),
-    passive('bagua','八卦阵','red','受到物理技能时有50%概率闪避。',{physicalDodge:.5},'闪避'),
-    passive('pojun','破军绝阵','red','物理技能无视目标全部护甲。',{ignoreArmor:true},'破甲'),
-    passive('heavenly','经天纬地','red','计策伤害提高100%。',{tacticMultiplier:2},'计策'),
-    passive('invincible','万夫莫当','red','受到的伤害降低50%。',{takenMultiplier:.5},'防护'),
-    passive('renewal','枯木逢春','red','治疗量提高100%。',{healingMultiplier:2},'治疗'),
-    passive('destiny','天命所归','red','最大生命提高75%，读条时间缩短15%。',{troopsMultiplier:1.75,intervalMultiplier:.85},'统合'),
-    passive('keen','眼疾手快','white','暴击率增加3个百分点。',{criticalBonus:.03},'暴击'),
-    passive('toughskin','皮糙肉厚','white','护甲提高8%。',{armorMultiplier:1.08},'护甲'),
-    passive('calm','沉着应战','white','抗性提高8%。',{resistanceMultiplier:1.08},'抗性'),
-    passive('bluntforce','蓄力重击','white','物理伤害提高8%，读条时间增加3%。',{physicalMultiplier:1.08,intervalMultiplier:1.03},'武技'),
-    passive('mindshield','明心守志','white','受到的计策伤害降低5%。',{tacticTakenMultiplier:.95},'抗性'),
-    passive('renew','吐故纳新','white','每次行动恢复1%最大生命。',{actionRegen:.01},'恢复'),
-    passive('ironbody','铜筋铁骨','green','护甲提高18%。',{armorMultiplier:1.18},'护甲'),
-    passive('clearhead','固守心神','green','抗性提高18%。',{resistanceMultiplier:1.18},'抗性'),
-    passive('sharpsense','洞察破绽','green','物理技能无视目标12%护甲。',{armorPierce:.12},'破甲'),
-    passive('brightmind','攻心为上','green','计策无视目标12%抗性。',{resistancePierce:.12},'破谋'),
-    passive('smallcure','生生不息','green','每次行动恢复2.5%最大生命。',{actionRegen:.025},'恢复'),
-    passive('assault','乘胜追击','green','攻击生命低于30%的敌人时伤害提高15%。',{executeThreshold:.3,executeMultiplier:1.15},'追击'),
-    passive('sustain','浴血奋战','blue','物理技能恢复造成伤害8%的生命。',{physicalLifesteal:.08},'吸血'),
-    passive('spellpierce','奇策破阵','blue','计策无视目标25%抗性。',{resistancePierce:.25},'破谋'),
-    passive('counter','以逸待劳','blue','受物理技能时15%概率反击，造成50%物理伤害。',{counterChance:.15,counterMultiplier:.5},'反击'),
-    passive('vanguard','先登夺旗','blue','开战获得相当于15%最大生命的护盾。',{openingShield:.15},'护盾'),
-    passive('resolve','坚忍不拔','blue','自身生命低于30%时，受到伤害降低20%。',{lowTroopsThreshold:.3,lowTroopsTakenMultiplier:.8},'绝境'),
-    passive('lightning','疾风迅雷','blue','开战获得15%进度，读条时间缩短10%。',{initialProgress:.15,intervalMultiplier:.9},'先手'),
-    passive('disrupt','出奇制胜','gold','计策无视目标50%抗性。',{resistancePierce:.5},'破谋'),
-    passive('resolvebreak','背水一战','gold','自身生命低于30%时，伤害提高60%。',{lowTroopsThreshold:.3,lowTroopsDamageMultiplier:1.6},'绝境'),
-    passive('guardall','固若金汤','gold','护甲与抗性提高50%。',{armorMultiplier:1.5,resistanceMultiplier:1.5},'防护'),
-    passive('bloodblade','血战到底','gold','物理技能恢复造成伤害18%的生命。',{physicalLifesteal:.18},'吸血'),
-    passive('shrine','悬壶济世','gold','治疗提高35%，溢出治疗的40%转为护盾。',{healingMultiplier:1.35,overhealShield:.4},'治疗'),
-    passive('decisive','一击制敌','gold','暴击率增加10个百分点，暴击伤害增加50%。',{criticalBonus:.1,criticalDamageBonus:.5},'暴击'),
-    passive('dominance','王者之威','red','所有伤害提高50%，护甲与抗性提高30%。',{damageMultiplier:1.5,armorMultiplier:1.3,resistanceMultiplier:1.3},'统合'),
-    passive('stratagem','算无遗策','red','计策暴击率增加50个百分点，暴击伤害增加50%。',{tacticCriticalBonus:.5,tacticCriticalDamageBonus:.5},'计策'),
-    passive('rampage','修罗血煞','red','物理技能恢复造成伤害35%的生命。',{physicalLifesteal:.35},'吸血'),
-    passive('thunderlord','雷霆万钧','red','计策无视目标全部抗性。',{ignoreResistance:true},'破谋'),
-    passive('neverfall','不屈战魂','red','自身生命低于30%时，受到伤害降低65%。',{lowTroopsThreshold:.3,lowTroopsTakenMultiplier:.35},'绝境'),
+    passive('strongarmy','兵强马壮','green','最大生命提高10%。',{troopsMultiplier:1.1},'生命'),
+    passive('swift','疾行如风','green','行动读条时间缩短10%。',{intervalMultiplier:0.9},'速度'),
+    passive('herbalist','灵丹妙手','green','治疗量提高10%。',{healingMultiplier:1.1},'治疗'),
+    passive('veteran','百战余生','green','受到的伤害降低10%。',{takenMultiplier:0.9},'防护'),
+    passive('initiative','先声夺人','blue','开战时获得15%行动进度。',{initialProgress:0.15},'先手'),
+    passive('clever','奇谋迭出','blue','计策伤害提高15%。',{tacticMultiplier:1.15},'计策'),
+    passive('unstoppable','势如破竹','blue','物理技能伤害提高15%。',{physicalMultiplier:1.15},'武技'),
+    passive('fortress','坚壁清野','blue','护甲与抗性提高15%。',{armorMultiplier:1.15,resistanceMultiplier:1.15},'防护'),
+    passive('rapid','兵贵神速','blue','行动读条时间缩短15%。',{intervalMultiplier:0.85},'速度'),
+    passive('doctor','妙手回春','blue','治疗量提高15%。',{healingMultiplier:1.15},'治疗'),
+    passive('critical','会心一击','blue','暴击率增加15个百分点。',{criticalBonus:0.15},'暴击'),
+    passive('edge','锋芒毕露','gold','暴击率增加20个百分点。',{criticalBonus:0.2},'暴击'),
+    passive('surprise','攻其不备','gold','物理技能无视目标20%护甲。',{armorPierce:0.2},'破甲'),
+    passive('foresight','料敌先机','gold','受到物理技能时有20%概率闪避。',{physicalDodge:0.2},'闪避'),
+    passive('loyal','赤胆忠心','gold','最大生命提高20%。',{troopsMultiplier:1.2},'生命'),
+    passive('mastermind','神机妙算','gold','计策伤害提高20%。',{tacticMultiplier:1.2},'计策'),
+    passive('miracle','回天之术','gold','治疗量提高20%。',{healingMultiplier:1.2},'治疗'),
+    passive('shadow','神行无踪','gold','行动读条时间缩短20%。',{intervalMultiplier:0.8},'速度'),
+    passive('guishen','鬼神无双','red','物理技能暴击率增加25个百分点。',{criticalBonus:0.25},'暴击'),
+    passive('bagua','八卦阵','red','受到物理技能时有25%概率闪避。',{physicalDodge:0.25},'闪避'),
+    passive('pojun','破军绝阵','red','物理技能无视目标25%护甲。',{armorPierce:0.25},'破甲'),
+    passive('heavenly','经天纬地','red','计策伤害提高25%。',{tacticMultiplier:1.25},'计策'),
+    passive('invincible','万夫莫当','red','受到的伤害降低25%。',{takenMultiplier:0.75},'防护'),
+    passive('renewal','枯木逢春','red','治疗量提高25%。',{healingMultiplier:1.25},'治疗'),
+    passive('destiny','天命所归','red','最大生命提高25%，读条时间缩短25%。',{troopsMultiplier:1.25,intervalMultiplier:0.75},'统合'),
+    passive('keen','眼疾手快','white','暴击率增加5个百分点。',{criticalBonus:0.05},'暴击'),
+    passive('toughskin','皮糙肉厚','white','护甲提高5%。',{armorMultiplier:1.05},'护甲'),
+    passive('calm','沉着应战','white','抗性提高5%。',{resistanceMultiplier:1.05},'抗性'),
+    passive('bluntforce','蓄力重击','white','物理伤害提高5%，读条时间增加5%。',{physicalMultiplier:1.05,intervalMultiplier:1.05},'武技'),
+    passive('mindshield','明心守志','white','受到的计策伤害降低5%。',{tacticTakenMultiplier:0.95},'抗性'),
+    passive('renew','吐故纳新','white','每次行动恢复5%最大生命。',{actionRegen:0.05},'恢复'),
+    passive('ironbody','铜筋铁骨','green','护甲提高10%。',{armorMultiplier:1.1},'护甲'),
+    passive('clearhead','固守心神','green','抗性提高10%。',{resistanceMultiplier:1.1},'抗性'),
+    passive('sharpsense','洞察破绽','green','物理技能无视目标10%护甲。',{armorPierce:0.1},'破甲'),
+    passive('brightmind','攻心为上','green','计策无视目标10%抗性。',{resistancePierce:0.1},'破谋'),
+    passive('smallcure','生生不息','green','每次行动恢复10%最大生命。',{actionRegen:0.1},'恢复'),
+    passive('assault','乘胜追击','green','攻击生命低于30%的敌人时伤害提高10%。',{executeThreshold:0.3,executeMultiplier:1.1},'追击'),
+    passive('sustain','浴血奋战','blue','物理技能恢复造成伤害15%的生命。',{physicalLifesteal:0.15},'吸血'),
+    passive('spellpierce','奇策破阵','blue','计策无视目标15%抗性。',{resistancePierce:0.15},'破谋'),
+    passive('counter','以逸待劳','blue','受物理技能时15%概率反击，造成15%物理伤害。',{counterChance:0.15,counterMultiplier:0.15},'反击'),
+    passive('vanguard','先登夺旗','blue','开战获得相当于15%最大生命的护盾。',{openingShield:0.15},'护盾'),
+    passive('resolve','坚忍不拔','blue','自身生命低于30%时，受到伤害降低15%。',{lowTroopsThreshold:0.3,lowTroopsTakenMultiplier:0.85},'绝境'),
+    passive('lightning','疾风迅雷','blue','开战获得15%进度，读条时间缩短15%。',{initialProgress:0.15,intervalMultiplier:0.85},'先手'),
+    passive('disrupt','出奇制胜','gold','计策无视目标20%抗性。',{resistancePierce:0.2},'破谋'),
+    passive('resolvebreak','背水一战','gold','自身生命低于30%时，伤害提高20%。',{lowTroopsThreshold:0.3,lowTroopsDamageMultiplier:1.2},'绝境'),
+    passive('guardall','固若金汤','gold','护甲与抗性提高20%。',{armorMultiplier:1.2,resistanceMultiplier:1.2},'防护'),
+    passive('bloodblade','血战到底','gold','物理技能恢复造成伤害20%的生命。',{physicalLifesteal:0.2},'吸血'),
+    passive('shrine','悬壶济世','gold','治疗提高20%，溢出治疗的20%转为护盾。',{healingMultiplier:1.2,overhealShield:0.2},'治疗'),
+    passive('decisive','一击制敌','gold','暴击率增加20个百分点，暴击伤害增加20%。',{criticalBonus:0.2,criticalDamageBonus:0.2},'暴击'),
+    passive('dominance','王者之威','red','所有伤害提高25%，护甲与抗性提高25%。',{damageMultiplier:1.25,armorMultiplier:1.25,resistanceMultiplier:1.25},'统合'),
+    passive('stratagem','算无遗策','red','计策暴击率增加25个百分点，暴击伤害增加25%。',{tacticCriticalBonus:0.25,tacticCriticalDamageBonus:0.25},'计策'),
+    passive('rampage','修罗血煞','red','物理技能恢复造成伤害25%的生命。',{physicalLifesteal:0.25},'吸血'),
+    passive('thunderlord','雷霆万钧','red','计策无视目标25%抗性。',{resistancePierce:0.25},'破谋'),
+    passive('neverfall','不屈战魂','red','自身生命低于30%时，受到伤害降低25%。',{lowTroopsThreshold:0.3,lowTroopsTakenMultiplier:0.75},'绝境'),
     passive('unity','万象归一','rainbow','融合品质预留，开局不会出现。'),
     passive('reversal','逆转乾坤','rainbow','融合品质预留，开局不会出现。')
   ];
@@ -323,11 +323,25 @@
     }
     return selected;
   }
+  function rollPotentials(average,rng){
+    if(average===100)return Object.fromEntries(ATTRIBUTES.map(([key])=>[key,100]));
+    const values=[];let remaining=average*ATTRIBUTES.length;
+    for(let i=0;i<ATTRIBUTES.length-1;i++){
+      const slots=ATTRIBUTES.length-i-1,min=Math.max(1,remaining-slots*100),max=Math.min(100,remaining-slots),center=remaining/(slots+1),weights=[];
+      // 总潜力不变，单项可以到100；偏离均值越远越少见，其他项会让出相应潜力。
+      for(let value=min;value<=max;value++)weights.push(1/(1+Math.pow((value-center)/18,4)));
+      let pick=unitRandom(rng)*weights.reduce((sum,weight)=>sum+weight,0),chosen=max;
+      for(let j=0;j<weights.length;j++){pick-=weights[j];if(pick<0){chosen=min+j;break;}}
+      values.push(chosen);remaining-=chosen;
+    }
+    values.push(remaining);
+    // 分配顺序随机，任何一项属性都有同样的机会成为强项。
+    for(let i=values.length-1;i>0;i--){const other=randomInt(0,i,rng);[values[i],values[other]]=[values[other],values[i]];}
+    return Object.fromEntries(ATTRIBUTES.map(([key],i)=>[key,values[i]]));
+  }
   function rollHero(difficultyId,rng=Math.random){
     const difficulty=getDifficulty(difficultyId);if(!difficulty)throw new TypeError('请先选择难度');
-    const profileId=difficultyId==='worthless'?'civilian':IDENTITIES.some(i=>i.id===difficultyId)?difficultyId:difficulty.profiles.length===1?difficulty.profiles[0]:difficulty.profiles[randomInt(0,difficulty.profiles.length-1,rng)];
-    const identity=IDENTITIES.find(i=>i.id===profileId);
-    const average={hell:40,survival:40,normal:60,heroic:80,protagonist:100}[difficulty.id],values=ATTRIBUTES.map(()=>average===100?100:randomInt(average-15,average+15,rng));let delta=average*values.length-values.reduce((a,b)=>a+b,0);for(let i=0;delta&&i<1000;i++){const k=i%values.length,step=Math.sign(delta);if(values[k]+step>=1&&values[k]+step<=100){values[k]+=step;delta-=step;}}const growth=G.characterAt({potentials:Object.fromEntries(ATTRIBUTES.map(([key],i)=>[key,values[i]]))},1);
+    const average={hell:40,survival:40,normal:60,heroic:80,protagonist:100}[difficulty.id],growth=G.characterAt({potentials:rollPotentials(average,rng)},1);
     return {...growth,weaponCatalogVersion:1,weaponProficiencies:Object.fromEntries(WEAPON_TYPES.map(type=>[type.id,0])),passives:rollPassives(rng,3,difficulty.passiveWeights)};
   }
   const segments=text=>typeof Intl.Segmenter==='function'?Array.from(new Intl.Segmenter('zh',{granularity:'grapheme'}).segment(text),s=>s.segment):Array.from(text);

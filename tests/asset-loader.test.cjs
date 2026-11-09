@@ -21,7 +21,7 @@ test('重复路径只下载一次，控制并发数，跨页面使用同一张�
   await loader.preload([...files,files[0]],{concurrency:3});const cached=loader.get('0.webp');assert.equal(calls,8);assert.equal(peak,3);await loader.preload(files);assert.equal(calls,8);assert.equal(loader.get('0.webp'),cached);
 });
 test('网页图片使用内容版本号缓存，离线版直接读取内嵌资源',async()=>{
-  const calls=[],loader=createLoader({fetch:async src=>{calls.push(src);return response();},decode:image});
+  const calls=[],loader=createLoader({fetch:async src=>{calls.push(src);return response();},loadLocal:async src=>{calls.push(src);return{complete:true};},decode:image});
   await loader.preload([{src:'a.webp',bytes:100,revision:'abc123'}]);assert.deepEqual(calls,['a.webp?v=abc123']);
   const previous=globalThis.BattleEmbeddedAssets;try{globalThis.BattleEmbeddedAssets={'b.webp':'data:image/webp;base64,test'};await loader.preload([{src:'b.webp',bytes:100,revision:'def456'}]);assert.equal(calls.at(-1),'data:image/webp;base64,test');}finally{globalThis.BattleEmbeddedAssets=previous;}
 });
@@ -39,7 +39,7 @@ test('直接打开本地源码页面时使用图片加载，不对file地址发�
 });
 test('本地源码图片加载失败后可重试，离线单文件仍直接读取内嵌数据',async()=>{
   let calls=0;const loader=createLoader({protocol:()=> 'file:',fetch:async()=>response(),decode:image,loadLocal:async()=>{if(++calls===1)throw new Error('missing');return {complete:true};}}),files=[{src:'local.webp',bytes:100}];await assert.rejects(loader.preload(files));await loader.preload(files);assert.equal(calls,2);
-  const previous=globalThis.BattleEmbeddedAssets;try{globalThis.BattleEmbeddedAssets={'embedded.webp':'data:image/webp;base64,test'};await loader.preload([{src:'embedded.webp',bytes:100}]);assert.equal(calls,2);assert.ok(loader.get('embedded.webp').complete);}finally{globalThis.BattleEmbeddedAssets=previous;}
+  const previous=globalThis.BattleEmbeddedAssets;try{globalThis.BattleEmbeddedAssets={'embedded.webp':'data:image/webp;base64,test'};await loader.preload([{src:'embedded.webp',bytes:100}]);assert.equal(calls,3);assert.ok(loader.get('embedded.webp').complete);}finally{globalThis.BattleEmbeddedAssets=previous;}
 });
 
 test('同一资源包只下载一次，按索引取回原始图片，只解码被请求的图片',async()=>{
@@ -57,7 +57,7 @@ test('按需get会去重并共享全局并发限制，失败后等待明确重�
 });
 test('离线源文件绕过传输包，读取原始文件；内嵌资源优先于包',async()=>{
  const file={src:'a.webp',bytes:100,revision:'image-v1',pack:{src:'scene.bin',bytes:200,offset:0,length:100,revision:'pack-v1'}},urls=[],loader=createLoader({protocol:()=> 'file:',loadLocal:async src=>{urls.push(src);return{complete:true};},fetch:async()=>{throw Error('No file fetch');}});await loader.preload([file]);assert.deepEqual(urls,['a.webp?v=image-v1']);
- const previous=globalThis.BattleEmbeddedAssets;try{globalThis.BattleEmbeddedAssets={'a.webp':'data:image/webp;base64,embedded'};const embedded=createLoader({fetch:async src=>{urls.push(src);return response();},decode:image});await embedded.preload([file]);assert.equal(urls.at(-1),'data:image/webp;base64,embedded');}finally{globalThis.BattleEmbeddedAssets=previous;}
+ const previous=globalThis.BattleEmbeddedAssets;try{globalThis.BattleEmbeddedAssets={'a.webp':'data:image/webp;base64,embedded'};const embedded=createLoader({fetch:async()=>{throw Error('内嵌图不应再fetch');},loadLocal:async src=>{urls.push(src);return{complete:true};},decode:image});await embedded.preload([file]);assert.equal(urls.at(-1),'data:image/webp;base64,embedded');}finally{globalThis.BattleEmbeddedAssets=previous;}
 });
 test('网页入口只含一个有内容版本的脚本；小包逐项保持与原图字节一致',()=>{
  const root=path.resolve(__dirname,'..'),html=fs.readFileSync(path.join(root,'index.html'),'utf8'),scripts=[...html.matchAll(/<script[^>]+src="([^"]+)"/g)];assert.equal(scripts.length,1);const runtime=fs.readFileSync(path.join(root,'assets/runtime/game.js'));assert.equal(scripts[0][1],'./assets/runtime/game.js?v='+crypto.createHash('sha256').update(runtime).digest('hex').slice(0,12));assert.ok(!html.includes('BattleEmbeddedAssets'));
@@ -87,3 +87,5 @@ test('本地文件和单文件内嵌图片不重复进行后台字节下载',asy
 test('同包多张背景图片下载失败时整包只请求一次，不逐张反复重试',async()=>{
  let calls=0;const files=Array.from({length:8},(_,i)=>({src:i+'.webp',bytes:10,pack:{src:'scene.bin',bytes:80,offset:i*10,length:10}})),loader=createLoader({fetch:async()=>{calls++;throw Error('offline');},decode:image});await assert.rejects(loader.preload(files,{priority:2}));assert.equal(calls,1);const result=await loader.prefetch(files);assert.equal(result.failed,1);assert.equal(calls,1);
 });
+
+test('加载开始取消尚未抬起的旧触点，准备完成后点击正常恢复',()=>{const ctx={save(){},restore(){},setTransform(){},drawImage(){}},canvas={width:390,height:720,setAttribute(){},getBoundingClientRect:()=>({width:390,height:720})},context={document:{createElement:()=>({getContext:()=>ctx})},performance:{now:()=>0},setTimeout:()=>1,clearTimeout(){},requestAnimationFrame:()=>1,cancelAnimationFrame(){}};vm.createContext(context);vm.runInContext(fs.readFileSync(path.join(__dirname,'../js/asset-loader.js'),'utf8'),context);let missing=false,actions=0;const v={canvas,ctx,w:390,h:720,hits:[],draw(){if(missing)this.assetSources.add('missing.webp');},down(){this.press={};},up(){if(this.press)actions++;this.press=null;},cancel(){this.press=null;},destroy(){}};context.GameAssetLoader.track(v);v.draw();v.down({});missing=true;v.draw();assert.equal(v.press,null);v.up({});assert.equal(actions,0);missing=false;v.assetSources.clear();v.draw();v.down({});v.up({});assert.equal(actions,1);v.destroy();});

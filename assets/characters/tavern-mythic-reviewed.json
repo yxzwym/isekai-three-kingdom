@@ -1,0 +1,122 @@
+[
+  {
+    "id": "recruit-warrior-mythic-1",
+    "group": "warrior",
+    "gender": "male",
+    "prompt": "Use case: stylized-concept. Create ONE distinctly new rare elite recruit for the same Three Kingdoms Chinese RPG as the supplied reference. Match reference EXACTLY in hand-painted semi-realistic rendering, painted edges, calm soft light, natural 7.5-head proportions, full-body standing framing with large readable face. This is an elite, visually richer design, not a famous historical hero and not a recolor or same face as reference. An imposing handsome Chinese male heavy guard, dark blue and silver ornate Han lamellar armor, broad cloak, holds a tall practical Chinese shield at his side, sword sheathed. Strong broad build, dignified mature face. Full hair and both feet visible, fills 95% of vertical 2:3 canvas, centered. Chinese late-Han fantasy only, no Western armor, no modern items, no giant weapons or magic particles. Correct hands on handles, never blades. Genuinely transparent background, empty alpha outside figure, no scenery, floor, halo, text, logo, or separate portraits.",
+    "reference": "./assets/characters/recruit-warrior/classic/fullbody-v1.webp",
+    "asset": "./assets/characters/recruit-warrior-mythic-1/classic/fullbody-v1.webp",
+    "tool": "imagegen (built-in)",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-warrior-mythic-2",
+    "group": "warrior",
+    "gender": "female",
+    "prompt": "Use case: stylized-concept. Create ONE distinctly new rare elite recruit for the same Three Kingdoms Chinese RPG as the supplied reference. Match reference EXACTLY in hand-painted semi-realistic rendering, painted edges, calm soft light, natural 7.5-head proportions, full-body standing framing with large readable face. This is an elite, visually richer design, not a famous historical hero and not a recolor or same face as reference. Beautiful adult Chinese female swordmaster, ivory and crimson ornate Han light armor with bronze phoenix motifs, high ponytail, holds a straight sword correctly by its handle lowered at her side. Athletic elegant build. Full hair and both feet visible, fills 95% of vertical 2:3 canvas, centered. Chinese late-Han fantasy only, no Western armor, no modern items, no giant weapons or magic particles. Correct hands on handles, never blades. Genuinely transparent background, empty alpha outside figure, no scenery, floor, halo, text, logo, or separate portraits.",
+    "reference": "./assets/characters/recruit-warrior/classic/fullbody-v1.webp",
+    "asset": "./assets/characters/recruit-warrior-mythic-2/classic/fullbody-v1.webp",
+    "tool": "imagegen (built-in)",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-mage-mythic-1",
+    "group": "mage",
+    "gender": "male",
+    "prompt": "Use case: stylized-concept. Create ONE distinctly new rare elite recruit for the same Three Kingdoms Chinese RPG as the supplied reference. Match reference EXACTLY in hand-painted semi-realistic rendering, painted edges, calm soft light, natural 7.5-head proportions, full-body standing framing with large readable face. This is an elite, visually richer design, not a famous historical hero and not a recolor or same face as reference. Handsome young adult Chinese male thunder ritual master, dark indigo and silver cloud-pattern layered Han ritual robes, long black hair, holds an elegant wooden thunder staff with small bronze finial, no large effects. Full hair and both feet visible, fills 95% of vertical 2:3 canvas, centered. Chinese late-Han fantasy only, no Western armor, no modern items, no giant weapons or magic particles. Correct hands on handles, never blades. Genuinely transparent background, empty alpha outside figure, no scenery, floor, halo, text, logo, or separate portraits.",
+    "reference": "./assets/characters/recruit-mage/classic/fullbody-v1.webp",
+    "asset": "./assets/characters/recruit-mage-mythic-1/classic/fullbody-v1.webp",
+    "tool": "imagegen (built-in)",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-mage-mythic-2",
+    "group": "mage",
+    "gender": "female",
+    "prompt": "Use case: stylized-concept. Create ONE distinctly new rare elite recruit for the same Three Kingdoms Chinese RPG as the supplied reference. Match reference EXACTLY in hand-painted semi-realistic rendering, painted edges, calm soft light, natural 7.5-head proportions, full-body standing framing with large readable face. This is an elite, visually richer design, not a famous historical hero and not a recolor or same face as reference. Beautiful adult Chinese female ritual sorceress, deep jade and gold fine embroidered Han robes, elaborate dark hair bun, holds an opened red and ivory feather fan at chest level, calm mysterious expression. Full hair and both feet visible, fills 95% of vertical 2:3 canvas, centered. Chinese late-Han fantasy only, no Western armor, no modern items, no giant weapons or magic particles. Correct hands on handles, never blades. Genuinely transparent background, empty alpha outside figure, no scenery, floor, halo, text, logo, or separate portraits.",
+    "reference": "./assets/characters/recruit-mage/classic/fullbody-v1.webp",
+    "asset": "./assets/characters/recruit-mage-mythic-2/classic/fullbody-v1.webp",
+    "tool": "imagegen (built-in)",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-healer-mythic-1",
+    "group": "healer",
+    "gender": "male",
+    "prompt": "Use case: stylized-concept. Create ONE distinctly new rare elite recruit for the same Three Kingdoms Chinese RPG as the supplied reference. Match reference EXACTLY in hand-painted semi-realistic rendering, painted edges, calm soft light, natural 7.5-head proportions, full-body standing framing with large readable face. This is an elite, visually richer design, not a famous historical hero and not a recolor or same face as reference. Handsome adult Chinese male physician, immaculate white and pale teal Han robes with fine silver botanical embroidery, dark tied hair, slim build, holds a lacquered medicine box and small needle pouch. Full hair and both feet visible, fills 95% of vertical 2:3 canvas, centered. Chinese late-Han fantasy only, no Western armor, no modern items, no giant weapons or magic particles. Correct hands on handles, never blades. Genuinely transparent background, empty alpha outside figure, no scenery, floor, halo, text, logo, or separate portraits.",
+    "reference": "./assets/characters/recruit-healer/classic/fullbody-v1.webp",
+    "asset": "./assets/characters/recruit-healer-mythic-1/classic/fullbody-v1.webp",
+    "tool": "imagegen (built-in)",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-healer-mythic-2",
+    "group": "healer",
+    "gender": "female",
+    "prompt": "Use case: stylized-concept. Create ONE distinctly new rare elite recruit for the same Three Kingdoms Chinese RPG as the supplied reference. Match reference EXACTLY in hand-painted semi-realistic rendering, painted edges, calm soft light, natural 7.5-head proportions, full-body standing framing with large readable face. This is an elite, visually richer design, not a famous historical hero and not a recolor or same face as reference. Beautiful adult Chinese female healer, ivory and pale gold Han ceremonial robes with fine lotus embroidery, flowing dark hair and ornate restrained hairpins, holds a bound medical scripture in both hands, graceful and serene. Full hair and both feet visible, fills 95% of vertical 2:3 canvas, centered. Chinese late-Han fantasy only, no Western armor, no modern items, no giant weapons or magic particles. Correct hands on handles, never blades. Genuinely transparent background, empty alpha outside figure, no scenery, floor, halo, text, logo, or separate portraits.",
+    "reference": "./assets/characters/recruit-healer/classic/fullbody-v1.webp",
+    "asset": "./assets/characters/recruit-healer-mythic-2/classic/fullbody-v1.webp",
+    "tool": "imagegen (built-in)",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-assassin-mythic-1",
+    "group": "assassin",
+    "gender": "male",
+    "prompt": "Use case: stylized-concept. Create ONE distinctly new rare elite recruit for the same Three Kingdoms Chinese RPG as the supplied reference. Match reference EXACTLY in hand-painted semi-realistic rendering, painted edges, calm soft light, natural 7.5-head proportions, full-body standing framing with large readable face. This is an elite, visually richer design, not a famous historical hero and not a recolor or same face as reference. Handsome adult Chinese male stealth master, black and midnight blue fitted Han layered traveling clothes, silver detailed light leather bracers, lean agile body, high tied hair, two short daggers safely sheathed at belt, hands relaxed. Full hair and both feet visible, fills 95% of vertical 2:3 canvas, centered. Chinese late-Han fantasy only, no Western armor, no modern items, no giant weapons or magic particles. Correct hands on handles, never blades. Genuinely transparent background, empty alpha outside figure, no scenery, floor, halo, text, logo, or separate portraits.",
+    "reference": "./assets/characters/recruit-assassin/classic/fullbody-v1.webp",
+    "asset": "./assets/characters/recruit-assassin-mythic-1/classic/fullbody-v1.webp",
+    "tool": "imagegen (built-in)",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-assassin-mythic-2",
+    "group": "assassin",
+    "gender": "female",
+    "prompt": "Use case: stylized-concept. Create ONE distinctly new rare elite recruit for the same Three Kingdoms Chinese RPG as the supplied reference. Match reference EXACTLY in hand-painted semi-realistic rendering, painted edges, calm soft light, natural 7.5-head proportions, full-body standing framing with large readable face. This is an elite, visually richer design, not a famous historical hero and not a recolor or same face as reference. Beautiful adult Chinese female shadow scout, dark plum and jade green fitted Han light leather armor, braided high ponytail, lean agile frame, holds a short Chinese dagger BY THE HANDLE beside leg, compact medicine/poison pouches on belt. Full hair and both feet visible, fills 95% of vertical 2:3 canvas, centered. Chinese late-Han fantasy only, no Western armor, no modern items, no giant weapons or magic particles. Correct hands on handles, never blades. Genuinely transparent background, empty alpha outside figure, no scenery, floor, halo, text, logo, or separate portraits.",
+    "reference": "./assets/characters/recruit-assassin/classic/fullbody-v1.webp",
+    "asset": "./assets/characters/recruit-assassin-mythic-2/classic/fullbody-v1.webp",
+    "tool": "imagegen (built-in)",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-ranger-mythic-1",
+    "group": "ranger",
+    "gender": "male",
+    "prompt": "Use case: stylized-concept. Create ONE distinctly new rare elite recruit for the same Three Kingdoms Chinese RPG as the supplied reference. Match reference EXACTLY in hand-painted semi-realistic rendering, painted edges, calm soft light, natural 7.5-head proportions, full-body standing framing with large readable face. This is an elite, visually richer design, not a famous historical hero and not a recolor or same face as reference. Handsome adult Chinese male elite archer, dark green and gold detailed Han traveling armor, high tied hair, narrow alert eyes, correctly holds a traditional Chinese recurved bow by central grip, quiver on back. Full hair and both feet visible, fills 95% of vertical 2:3 canvas, centered. Chinese late-Han fantasy only, no Western armor, no modern items, no giant weapons or magic particles. Correct hands on handles, never blades. Genuinely transparent background, empty alpha outside figure, no scenery, floor, halo, text, logo, or separate portraits.",
+    "reference": "./assets/characters/recruit-ranger/classic/fullbody-v1.webp",
+    "asset": "./assets/characters/recruit-ranger-mythic-1/classic/fullbody-v1.webp",
+    "tool": "imagegen (built-in)",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-ranger-mythic-2",
+    "group": "ranger",
+    "gender": "female",
+    "prompt": "Use case: stylized-concept. Create ONE distinctly new rare elite recruit for the same Three Kingdoms Chinese RPG as the supplied reference. Match reference EXACTLY in hand-painted semi-realistic rendering, painted edges, calm soft light, natural 7.5-head proportions, full-body standing framing with large readable face. This is an elite, visually richer design, not a famous historical hero and not a recolor or same face as reference. Beautiful adult Chinese female marksman, dark navy and ivory Han scout armor with gold fittings, braided ponytail, holds a compact wooden crossbow lowered across her body, one hand on wooden stock other on foregrip, natural correct anatomy. Full hair and both feet visible, fills 95% of vertical 2:3 canvas, centered. Chinese late-Han fantasy only, no Western armor, no modern items, no giant weapons or magic particles. Correct hands on handles, never blades. Genuinely transparent background, empty alpha outside figure, no scenery, floor, halo, text, logo, or separate portraits.",
+    "reference": "./assets/characters/recruit-ranger/classic/fullbody-v1.webp",
+    "asset": "./assets/characters/recruit-ranger-mythic-2/classic/fullbody-v1.webp",
+    "tool": "imagegen (built-in)",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-berserker-mythic-1",
+    "group": "berserker",
+    "gender": "male",
+    "prompt": "Use case: stylized-concept. Create ONE distinctly new rare elite recruit for the same Three Kingdoms Chinese RPG as the supplied reference. Match reference EXACTLY in hand-painted semi-realistic rendering, painted edges, calm soft light, natural 7.5-head proportions, full-body standing framing with large readable face. This is an elite, visually richer design, not a famous historical hero and not a recolor or same face as reference. Imposing adult Chinese male champion strongman, dark crimson and bronze ornate sleeveless Han armor, powerful arms and broad build, tied hair short beard, holds a compact heavy Chinese iron battle axe by the wooden handle beside leg. Full hair and both feet visible, fills 95% of vertical 2:3 canvas, centered. Chinese late-Han fantasy only, no Western armor, no modern items, no giant weapons or magic particles. Correct hands on handles, never blades. Genuinely transparent background, empty alpha outside figure, no scenery, floor, halo, text, logo, or separate portraits.",
+    "reference": "./assets/characters/recruit-berserker/classic/fullbody-v1.webp",
+    "asset": "./assets/characters/recruit-berserker-mythic-1/classic/fullbody-v1.webp",
+    "tool": "imagegen (built-in)",
+    "reviewed": true
+  },
+  {
+    "id": "recruit-berserker-mythic-2",
+    "group": "berserker",
+    "gender": "female",
+    "prompt": "Use case: stylized-concept. Create ONE distinctly new rare elite recruit for the same Three Kingdoms Chinese RPG as the supplied reference. Match reference EXACTLY in hand-painted semi-realistic rendering, painted edges, calm soft light, natural 7.5-head proportions, full-body standing framing with large readable face. This is an elite, visually richer design, not a famous historical hero and not a recolor or same face as reference. Beautiful powerful adult Chinese female champion, dark jade and silver ornate Han sleeveless heavy armor, strong athletic physique, thick braided hair tied up, holds a compact Chinese iron hammer correctly by wooden handle at side. Full hair and both feet visible, fills 95% of vertical 2:3 canvas, centered. Chinese late-Han fantasy only, no Western armor, no modern items, no giant weapons or magic particles. Correct hands on handles, never blades. Genuinely transparent background, empty alpha outside figure, no scenery, floor, halo, text, logo, or separate portraits.",
+    "reference": "./assets/characters/recruit-berserker/classic/fullbody-v1.webp",
+    "asset": "./assets/characters/recruit-berserker-mythic-2/classic/fullbody-v1.webp",
+    "tool": "imagegen (built-in)",
+    "reviewed": true
+  }
+]

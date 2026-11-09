@@ -14,7 +14,7 @@ test('同档智将与猛将互换武智范围，平均潜力随难度降低而�
 test('四十潜力档仍有单项差异，重复重掷保持平均四十',()=>{const rng=random(88);let varied=0;for(let n=0;n<1000;n++){const values=Object.values(R.rollHero('civilian',rng).potentials);assert.equal(values.reduce((a,b)=>a+b),200);if(new Set(values).size>1)varied++;}assert.ok(varied>900);});
 test('新建只提供五档难度，原身份模板不再作为职业选项',()=>{
   assert.deepEqual(R.DIFFICULTIES.map(d=>d.stars),[5,4,3,2,1]);assert.equal(new Set(R.DIFFICULTIES.map(d=>d.id)).size,5);
-  for(const difficulty of R.DIFFICULTIES){const rng=random(43);for(let n=0;n<100;n++){const c={name:'无名氏',difficulty:difficulty.id,appearance:'wanderer',...R.rollHero(difficulty.id,rng)};assert.equal(R.validCharacter(c),true);for(const value of Object.values(c.potentials)){assert.ok(value>=1&&value<=100);if(difficulty.id==='hell')assert.ok(value>=16&&value<=76);if(difficulty.id==='protagonist')assert.equal(value,100);}const allowed=R.IDENTITY_PASSIVE_WEIGHTS[difficulty.profiles[0]];for(const id of c.passives)assert.ok(allowed[R.PASSIVE_MAP[id].quality]>0);}}
+  for(const difficulty of R.DIFFICULTIES){const rng=random(43);for(let n=0;n<100;n++){const c={name:'无名氏',difficulty:difficulty.id,appearance:'wanderer',...R.rollHero(difficulty.id,rng)};assert.equal(R.validCharacter(c),true);for(const value of Object.values(c.potentials)){assert.ok(value>=1&&value<=100);if(difficulty.id==='protagonist')assert.equal(value,100);}const allowed=R.IDENTITY_PASSIVE_WEIGHTS[difficulty.profiles[0]];for(const id of c.passives)assert.ok(allowed[R.PASSIVE_MAP[id].quality]>0);}}
 });
 test('旧身份存档映射五档难度，新存档兼容独立装备和武器熟练度字段',()=>{
   const storage=memory(),store=new R.SaveStore(storage);
@@ -48,11 +48,27 @@ test('重掷不重复被动，彩虹融合品质不会从任何身份开局出�
   assert.deepEqual([...seen].sort(),['blue','gold','green','red','white']);
   assert.ok(R.rollPassives(()=>.999999,3).every(id=>R.PASSIVE_MAP[id].quality==='red'));
 });
-test('身份限制开局被动品质，两个极端始终只出白色或金红色，同档使用相同概率',()=>{
-  const allowed={worthless:['white','green','blue'],civilian:['white','green','blue'],teacher:['white','green','blue','gold'],bully:['white','green','blue','gold'],strategist:['blue','gold','red'],warrior:['blue','gold','red'],overlord:['gold','red']};
-  for(const identity of R.IDENTITIES){const rng=random(20261103),seen=new Set();for(let n=0;n<600;n++){const result=R.rollHero(identity.id,n<2?()=>n?1:0:rng);assert.equal(result.passives.length,3);assert.equal(new Set(result.passives).size,3);for(const id of result.passives){const quality=R.PASSIVE_MAP[id].quality;assert.ok(allowed[identity.id].includes(quality),`${identity.id}抽到了${quality}`);seen.add(quality);}}assert.deepEqual([...seen].sort(),allowed[identity.id].sort());}
+test('随机难度均可抽到金红被动，主角剧本仍为金红，融合不会出现在开局',()=>{
+  const all=['white','green','blue','gold','red'];
+  for(const difficulty of R.DIFFICULTIES){const allowed=difficulty.id==='protagonist'?['gold','red']:all,rng=random(20261103);for(const quality of allowed)assert.ok(difficulty.passiveWeights[quality]>0);for(let n=0;n<600;n++){const result=R.rollHero(difficulty.id,rng);assert.equal(result.passives.length,3);assert.equal(new Set(result.passives).size,3);for(const id of result.passives)assert.ok(allowed.includes(R.PASSIVE_MAP[id].quality));}assert.ok(R.rollHero(difficulty.id,()=>1).passives.every(id=>R.PASSIVE_MAP[id].quality==='red'));}
   assert.deepEqual(R.IDENTITY_PASSIVE_WEIGHTS.teacher,R.IDENTITY_PASSIVE_WEIGHTS.bully);assert.deepEqual(R.IDENTITY_PASSIVE_WEIGHTS.strategist,R.IDENTITY_PASSIVE_WEIGHTS.warrior);
   assert.throws(()=>R.rollPassives(random(1),99,{white:1}),/数量/);
+});
+test('随机潜力可突破原档位范围并达到100，以其他属性让出潜力保持总量',()=>{
+  for(const [id,average] of [['hell',40],['survival',40],['normal',60],['heroic',80]]){
+    const rng=random(20261109),peaks=new Set(),means=Array(5).fill(0);let belowFormerFloor=false,aboveFormerCeiling=false;
+    for(let n=0;n<36000;n++){
+      const values=Object.values(R.rollHero(id,rng).potentials);assert.equal(values.reduce((sum,value)=>sum+value,0),average*5);
+      values.forEach((value,i)=>{assert.ok(value>=1&&value<=100);means[i]+=value;if(value===100)peaks.add(i);if(value<average-15)belowFormerFloor=true;if(value>average+15)aboveFormerCeiling=true;});
+      if(values.includes(100))assert.ok(values.filter(value=>value!==100).some(value=>value<average));
+    }
+    assert.equal(peaks.size,5,`${id}每项都有机会达到100`);assert.ok(belowFormerFloor&&aboveFormerCeiling);for(const mean of means)assert.ok(Math.abs(mean/36000-average)<1.5,'属性分配不偏向固定一列');
+  }
+});
+test('高品质被动概率随难度降低而提高，困难档仍保留稀有机会',()=>{
+  const rates=[];
+  for(const difficulty of R.DIFFICULTIES){const rng=random(20261109);let rare=0,red=0;for(let n=0;n<6000;n++)for(const id of R.rollHero(difficulty.id,rng).passives){const quality=R.PASSIVE_MAP[id].quality;if(['gold','red'].includes(quality))rare++;if(quality==='red')red++;}assert.ok(red>0);rates.push(rare/18000);}
+  for(let i=1;i<rates.length;i++)assert.ok(rates[i]>rates[i-1],`高品质概率应递增：${rates}`);
 });
 test('被动名称为三到四字、品质颜色齐全，NPC不受主角三个被动的限制',()=>{
   assert.equal(new Set(R.PASSIVES.map(p=>p.name)).size,R.PASSIVES.length);
@@ -60,7 +76,7 @@ test('被动名称为三到四字、品质颜色齐全，NPC不受主角三个�
   assert.deepEqual(R.rollPassives(random(1),0),[]);assert.equal(new Set(R.rollPassives(random(9),8)).size,8);
   for(const count of[0,1,6]){const c=hero();c.passives=R.rollPassives(random(12),count);assert.equal(R.validCharacter(c),true);}
   assert.throws(()=>R.rollPassives(random(1),999),/数量/);
-  assert.equal(R.PASSIVE_MAP.guishen.effects.guaranteedCritical,true);assert.equal(R.PASSIVE_MAP.bagua.effects.physicalDodge,.5);
+  assert.equal(R.PASSIVE_MAP.guishen.effects.criticalBonus,.25);assert.equal(R.PASSIVE_MAP.bagua.effects.physicalDodge,.25);
 });
 test('姓名最多四个字，中文输入结果、空白、Emoji和空名字均正确处理',()=>{
   assert.equal(R.sanitizeName('司马长风第五'),'司马长风');assert.equal(R.sanitizeName(' 张 三\n'),'张三');assert.equal(R.sanitizeName(''),'');

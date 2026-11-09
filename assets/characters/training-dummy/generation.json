@@ -1,0 +1,6 @@
+{
+  "tool": "imagegen (built-in)",
+  "asset": "./assets/characters/training-dummy/classic/fullbody-v1.webp",
+  "reviewed": true,
+  "prompt": "Use case: stylized-concept. Create one full-body practice straw dummy for a Chinese late-Han Three Kingdoms RPG. A human-sized bundle-of-straw training target fixed to a simple wooden upright and crossbar, rough woven straw round head with no eyes or human face, tattered muted brown and tan short Han tunic, rope ties at shoulders and waist, straw arms loosely extending downward, sturdy wooden base with two short supports so it visibly stands on the ground. No living person, no weapons, no magic. Hand-painted semi-realistic Chinese RPG item/character art, soft painted edges, realistic straw fibres and aged timber, neutral light, restrained colors. Vertical 2:3 full object composition, top and entire base visible, target occupies 92% of image height. Genuinely transparent empty alpha background, no floor, scenery, halo, text or logo."
+}

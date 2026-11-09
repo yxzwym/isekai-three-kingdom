@@ -74,7 +74,6 @@
  H.definitions.taishici.battles['jianye-duel'].failureLines=['先停，你肩上已经见血了。你那几下出手够重，可一急就顾不上准头，反倒给我留了空。回去把招式用稳些，改天我们再比。'];H.definitions.lvbu.battles.trial.friendly=true;
  // 通常冲突以三人以下的小队为主，劫狱外院等明确配置保留四人。
  for(const d of Object.values(H.definitions))for(const f of Object.values(d.battles))if(d.id!=='ganning'&&f.count===4&&!f.boss&&!f.duel&&!f.roster&&!f.named)f.count=3;
- N.storyBattles.escort.count=3;
  for(const d of Object.values(H.definitions)){const at=d.stages.freed?.place||d.place;if(at===d.home)for(const choice of d.stages.freed?.npc?.choices||[])if(choice.recruit===false)choice.label='留在'+root.WorldData.placeMap[d.home].name;}
  const api={version:1};root.RecruitmentChallenges=api;if(node)module.exports=api;
 })(globalThis);

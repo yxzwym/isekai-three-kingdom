@@ -7,7 +7,7 @@ test('被动按钮固定四分之一宽并居中，普通品质分别着色，�
 });
 test('敌人属性只显示被动按钮，点击才打开详情，关闭恢复原面板和滚动位置',()=>{
  const battle=new Battle({allies:[{...G.create('hero',1),id:'hero'}],enemies:[{...G.create('yellowMilitia',3),id:'foe',skills:['punch'],passives:['zhangliang-might','zhangliang-hardy']}]}),texts=[],v=Object.assign(Object.create(CanvasBattle.prototype),{battle,w:390,h:844,hits:[],panel:{type:'inspect',id:'foe',scroll:0},ctx:{measureText:value=>({width:String(value).length*14}),save(){},restore(){},beginPath(){},rect(){},clip(){}},panelFrame(){return{x:20,y:30,w:350,h:620};},box(){},text(value){texts.push(String(value));},drawSkillIcon(){}});
- v.drawInspect();const previous=v.panel;assert.ok(!texts.includes(P.definitions['zhangliang-might'].description));v.hits.find(h=>h.label==='勇健有力').action();assert.equal(v.panel.type,'passiveInfo');v.drawPassiveInfo();assert.ok(texts.some(t=>t.includes('物理伤害提高5%')));v.closePanel();assert.equal(v.panel,previous);assert.equal(v.panel.scroll,0);
+ v.drawInspect();const previous=v.panel;assert.ok(!texts.includes(P.definitions['zhangliang-might'].description));v.hits.find(h=>h.label==='勇健有力').action();assert.equal(v.panel.type,'passiveInfo');v.drawPassiveInfo();assert.ok(texts.some(t=>t.includes('物理伤害提高10%')));v.closePanel();assert.equal(v.panel,previous);assert.equal(v.panel.scroll,0);
 });
 test('五名黄巾训练采用前一后四，后排头顶双条，四人默认横排',()=>{
  const hero={name:'行客',...R.rollHero('normal',()=>.5)},world=new World(hero,{nodeId:'camp',inside:true,weaponType:'sword',introStep:2});assert.ok(world.beginTraining('militia-five').ok);const scenario=world.battleScenario();

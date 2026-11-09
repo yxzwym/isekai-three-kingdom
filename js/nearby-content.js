@@ -50,7 +50,7 @@
   {speaker:'hero',text:'他们果然没肯罢休，还追到村口来了。里面有孩子和伤者，不能让他们冲进去，我们得在这里把人拦住。'},
   {speaker:'zhaoyun',text:'我守住村口这条路，你帮着照看粮车旁边。乡亲们快进去，等把门关好再出来帮忙，别让他们抓到人。'}
  ];
- const storyBattles={entry:{sceneId:'farmland',title:'常山村口',place:'changshan',scaling:'early',count:2},grain:{followup:{phase:'grain',speaker:'zhaoyun',lines:['前院的人已经退开，粮袋还在。后院还有几个正在搬东西，我们现在过去，别让他们把仓门堵上，再从后墙逃走。']},sceneId:'market-street',title:'夺回乡粮',place:'zhongshan',scaling:'early',count:3},rescue:{sceneId:'market-street',title:'祠堂救人',place:'zhongshan-county',scaling:'early',count:2},escort:{sceneId:'rural-road',title:'粮车归途',place:'changshan',scaling:'early',count:4}};
+ const storyBattles={entry:{sceneId:'farmland',title:'常山村口',place:'changshan',scaling:'early',count:2},grain:{followup:{phase:'grain',speaker:'zhaoyun',lines:['前院的人已经退开，粮袋还在。后院还有几个正在搬东西，我们现在过去，别让他们把仓门堵上，再从后墙逃走。']},sceneId:'market-street',title:'夺回乡粮',place:'zhongshan',scaling:'early',count:3},rescue:{sceneId:'market-street',title:'祠堂救人',place:'zhongshan-county',scaling:'early',count:2},escort:{sceneId:'rural-road',title:'粮车归途',place:'changshan',scaling:'early',pattern:'earlyLeader',count:3}};
  // 普通施法者使用独立的杂兵成长档案，数值随等级成长，不借用名将潜力。
  const casterProfiles={outlawCaster:[[3,9,7,10,8],[15,45,35,50,40]],fieldMedic:[[3,9,8,8,8],[15,45,40,40,45]],fieldPriest:[[3,9,8,7,8],[15,45,40,35,45]],outlawWitch:[[3,8,8,8,8],[15,45,40,40,45]]};
  for(const [id,[base,potential]]of Object.entries(casterProfiles))G.PROFILES[id]={baseAttributes:Object.fromEntries(G.KEYS.map((key,i)=>[key,base[i]])),potentials:Object.fromEntries(G.KEYS.map((key,i)=>[key,potential[i]]))};
