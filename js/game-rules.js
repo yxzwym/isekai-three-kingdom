@@ -214,7 +214,7 @@
   // Legacy identities remain numeric templates and save aliases, not professions.
   IDENTITIES[0]={...IDENTITIES[1],id:'worthless',name:'无用之人',difficulty:5};
   const DIFFICULTIES=[
-    {id:'hell',name:'地狱难度',stars:5,profiles:['worthless'],enemyModifiers:{healthMultiplier:1.2,damageMultiplier:1.2}},
+    {id:'hell',name:'地狱难度',stars:5,profiles:['worthless'],enemyModifiers:{constitutionMultiplier:1.2,damageMultiplier:1.2}},
     {id:'survival',name:'乱世求生',stars:4,profiles:['civilian']},
     {id:'normal',name:'初出茅庐',stars:3,profiles:['teacher','bully']},
     {id:'heroic',name:'天纵之才',stars:2,profiles:['strategist','warrior']},
@@ -231,7 +231,7 @@
   };
   const passive=(id,name,quality,description,effects={},category='特殊')=>({id,name,quality,description,effects,category,fusionOnly:quality==='rainbow'});
   const PASSIVES=[
-    passive('healthy','身强体健','white','最大生命提高5%。',{troopsMultiplier:1.05},'生命'),
+    passive('healthy','身强体健','white','体质提高5%。',{constitutionMultiplier:1.05},'体质'),
     passive('steady','稳扎稳打','white','物理技能伤害提高5%。',{physicalMultiplier:1.05},'武技'),
     passive('careful','心思缜密','white','计策伤害提高5%。',{tacticMultiplier:1.05},'计策'),
     passive('lightfoot','步履轻健','white','行动读条时间缩短5%。',{intervalMultiplier:0.95},'速度'),
@@ -239,7 +239,7 @@
     passive('patient','坚守本心','white','受到的伤害降低5%。',{takenMultiplier:0.95},'防护'),
     passive('brave','破阵之勇','green','物理技能伤害提高10%。',{physicalMultiplier:1.1},'武技'),
     passive('planning','运筹帷幄','green','计策伤害提高10%。',{tacticMultiplier:1.1},'计策'),
-    passive('strongarmy','兵强马壮','green','最大生命提高10%。',{troopsMultiplier:1.1},'生命'),
+    passive('strongarmy','兵强马壮','green','体质提高10%。',{constitutionMultiplier:1.1},'体质'),
     passive('swift','疾行如风','green','行动读条时间缩短10%。',{intervalMultiplier:0.9},'速度'),
     passive('herbalist','灵丹妙手','green','治疗量提高10%。',{healingMultiplier:1.1},'治疗'),
     passive('veteran','百战余生','green','受到的伤害降低10%。',{takenMultiplier:0.9},'防护'),
@@ -253,7 +253,7 @@
     passive('edge','锋芒毕露','gold','暴击率增加20个百分点。',{criticalBonus:0.2},'暴击'),
     passive('surprise','攻其不备','gold','物理技能无视目标20%护甲。',{armorPierce:0.2},'破甲'),
     passive('foresight','料敌先机','gold','受到物理技能时有20%概率闪避。',{physicalDodge:0.2},'闪避'),
-    passive('loyal','赤胆忠心','gold','最大生命提高20%。',{troopsMultiplier:1.2},'生命'),
+    passive('loyal','赤胆忠心','gold','体质提高20%。',{constitutionMultiplier:1.2},'体质'),
     passive('mastermind','神机妙算','gold','计策伤害提高20%。',{tacticMultiplier:1.2},'计策'),
     passive('miracle','回天之术','gold','治疗量提高20%。',{healingMultiplier:1.2},'治疗'),
     passive('shadow','神行无踪','gold','行动读条时间缩短20%。',{intervalMultiplier:0.8},'速度'),
@@ -263,7 +263,7 @@
     passive('heavenly','经天纬地','red','计策伤害提高25%。',{tacticMultiplier:1.25},'计策'),
     passive('invincible','万夫莫当','red','受到的伤害降低25%。',{takenMultiplier:0.75},'防护'),
     passive('renewal','枯木逢春','red','治疗量提高25%。',{healingMultiplier:1.25},'治疗'),
-    passive('destiny','天命所归','red','最大生命提高25%，读条时间缩短25%。',{troopsMultiplier:1.25,intervalMultiplier:0.75},'统合'),
+    passive('destiny','天命所归','red','体质提高25%，读条时间缩短25%。',{constitutionMultiplier:1.25,intervalMultiplier:0.75},'统合'),
     passive('keen','眼疾手快','white','暴击率增加5个百分点。',{criticalBonus:0.05},'暴击'),
     passive('toughskin','皮糙肉厚','white','护甲提高5%。',{armorMultiplier:1.05},'护甲'),
     passive('calm','沉着应战','white','抗性提高5%。',{resistanceMultiplier:1.05},'抗性'),

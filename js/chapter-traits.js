@@ -10,11 +10,11 @@
  ];
  rows.push(
   ['xuhuang-steady','治军严整','gold','技能命中率增加8个百分点。',{hitBonus:.08}],['xuhuang-martial','沉勇善战','blue','物理伤害提高15%。',{physicalBonus:0.15},false],
-  ['yujin-discipline','持军有度','gold','受到的物理伤害减少10%。',{physicalReduction:.1}],['yujin-guard','久历军阵','blue','最大生命提高15%。',{healthMultiplier:1.15},false],
-  ['caoren-fortress','不动坚城','gold','受到的物理和计策伤害减少10%。',{physicalReduction:.1,tacticReduction:.1}],['caoren-tenacious','固守不退','gold','最大生命提高20%。',{healthMultiplier:1.2},false],
+  ['yujin-discipline','持军有度','gold','受到的物理伤害减少10%。',{physicalReduction:.1}],['yujin-guard','久历军阵','blue','体质提高15%。',{constitutionMultiplier:1.15},false],
+  ['caoren-fortress','不动坚城','gold','受到的物理和计策伤害减少10%。',{physicalReduction:.1,tacticReduction:.1}],['caoren-tenacious','固守不退','gold','体质提高20%。',{constitutionMultiplier:1.2},false],
   ['yuanshao-noble','四世三公','gold','受到的物理和计策伤害减少8%。',{physicalReduction:.08,tacticReduction:.08}],
   ['yuanshao-command','从容督战','blue','技能命中率增加15个百分点。',{hitBonus:0.15},false],
-  ['yuanshao-reserve','河北雄兵','gold','最大生命提高20%。',{healthMultiplier:1.2},false],
+  ['yuanshao-reserve','河北雄兵','gold','体质提高20%。',{constitutionMultiplier:1.2},false],
   ['yanliang-might','河北骁将','gold','物理伤害提高15%。',{physicalBonus:.15}],
   ['yanliang-iron','披坚执锐','blue','受到的物理伤害减少15%。',{physicalReduction:0.15},false],
   ['yanliang-strike','奋力破敌','gold','技能暴击率增加20个百分点。',{criticalBonus:0.2},false],
@@ -33,6 +33,6 @@
  );
  // 本表是武将招牌特质；强度品质与“角色专属”的身份分别记录。
  for(const [id,name,quality,description,stats,exclusive=true]of rows)P.definitions[id]={id,name,quality,description,stats,triggers:[],...(exclusive?{exclusive:true}:{})};
- P.definitions['luoyang-possession']={id:'luoyang-possession',name:'诡影附身',quality:'white',temporary:true,enemyOnly:true,description:'最大生命提高200%，免疫眩晕，仍可被破甲、麻痹和持续伤害影响。',stats:{healthMultiplier:3},triggers:[]};
+ P.definitions['luoyang-possession']={id:'luoyang-possession',name:'诡影附身',quality:'white',temporary:true,enemyOnly:true,description:'体质提高200%，免疫眩晕，仍可被破甲、麻痹和持续伤害影响。',stats:{constitutionMultiplier:3},triggers:[]};
  const api={ids:rows.map(r=>r[0])};root.ChapterTraits=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

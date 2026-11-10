@@ -32,7 +32,7 @@ test('英雄专属与敌方临时规则保留独立数值和机制',()=>{
   assert.equal(P.definitions['thunder-lord'].triggers[0].on,'dodge');
   assert.equal(P.definitions['enemy-healing-suppression'].stats.opponentHealingMultiplier,.25);
   assert.equal(P.definitions['enemy-stun-resistance'].stats.immuneStun,true);
-  assert.equal(P.definitions['luoyang-possession'].stats.healthMultiplier,3);
+  assert.equal(P.definitions['luoyang-possession'].stats.constitutionMultiplier,3);
 });
 
 

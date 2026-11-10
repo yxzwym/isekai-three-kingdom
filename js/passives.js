@@ -27,8 +27,8 @@
   for(const [id,name,description,stats]of [
     ['enemy-negative-immunity','百邪不侵','本场战斗免疫一切负面状态，包括眩晕、麻痹、持续伤害和属性衰减。增益与治疗不受影响。',{immuneNegative:true}],
     ['enemy-healing-suppression','压制回复','存活期间，敌方的治疗、回春和吸血回复效果降低75%。本场战斗结束后失效。',{opponentHealingMultiplier:.25}],
-    ['enemy-trial-armor','校场护具','本场切磋穿戴护具，最大生命提高100%。',{healthMultiplier:2}],
-    ['enemy-hell-strength','乱世凶兵','地狱难度：最大生命与造成的伤害提高20%。',{healthMultiplier:1.2,damageMultiplier:1.2}],
+    ['enemy-trial-armor','校场护具','本场切磋穿戴护具，体质提高100%。',{constitutionMultiplier:2}],
+    ['enemy-hell-strength','乱世凶兵','地狱难度：体质与造成的伤害提高20%。',{constitutionMultiplier:1.2,damageMultiplier:1.2}],
     ['enemy-hunt-wounded','追击伤者','优先攻击当前生命值最低的目标。',{ }],
     ['enemy-ignore-taunt','无视嘲讽','本场战斗的攻击不受嘲讽影响，可以越过嘲讽者选择其他目标。',{ignoreTaunt:true}]
   ])definitions[id]={id,name,description,stats,quality:'white',enemyOnly:true,temporary:true,triggers:[]};
@@ -123,7 +123,7 @@
   let randomInstalled=false;
   function allDefinitions(){
     const rules=typeof module!=='undefined'&&module.exports?require('./game-rules.js'):root.PengpaiRules;
-    if(!randomInstalled&&rules){for(const p of rules.PASSIVES){const stats={...p.effects};if(stats.troopsMultiplier!=null){stats.healthMultiplier=stats.troopsMultiplier;delete stats.troopsMultiplier;}if(stats.physicalDodge!=null){stats.physicalDodgeBonus=stats.physicalDodge;delete stats.physicalDodge;}definitions[p.id]={id:p.id,name:p.name,quality:p.quality,description:p.description,stats,triggers:[]};}randomInstalled=true;}
+    if(!randomInstalled&&rules){for(const p of rules.PASSIVES){const stats={...p.effects};if(stats.physicalDodge!=null){stats.physicalDodgeBonus=stats.physicalDodge;delete stats.physicalDodge;}definitions[p.id]={id:p.id,name:p.name,quality:p.quality,description:p.description,stats,triggers:[]};}randomInstalled=true;}
     return definitions;
   }
   function statsFor(unit,table=allDefinitions()){
@@ -137,7 +137,8 @@
     // 缓存仅为运行时数据，不能写入存档或参战阵容。
     Object.defineProperty(unit,'_passiveStats',{value:{key,table,value},configurable:true,writable:true,enumerable:false});return value;
   }
-  const healthMultiplier=unit=>statsFor(unit).healthMultiplier||1;
-  const api={skills,get definitions(){return allDefinitions();},heroDefaults,forUnit,complete,statsFor,healthMultiplier};root.BattlePassives=api;
+  const effectiveConstitution=(unit,table)=>{const stats=statsFor(unit,table);return Math.max(1,((Number(unit.constitution)||1)+(stats.constitutionBonus||0))*(stats.constitutionMultiplier||1));};
+  function maxHealth(unit,table){const G=typeof module!=='undefined'&&module.exports?require('./character-growth.js'):root.CharacterGrowth,stats=statsFor(unit,table);if(unit.healthOverride!=null)return Math.max(1,Math.floor(Number(unit.healthOverride)||1));return stats.constitutionMultiplier!=null||stats.constitutionBonus!=null?G.healthFromConstitution(effectiveConstitution(unit,table)):(unit.baseMaxHealth??G.healthFromConstitution(unit.constitution));}
+  const api={skills,get definitions(){return allDefinitions();},heroDefaults,forUnit,complete,statsFor,effectiveConstitution,maxHealth};root.BattlePassives=api;
   if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

@@ -1,5 +1,5 @@
 {
-  "background": "./assets/game/main-menu.webp",
+  "background": "./assets/game/main-menu-v2.webp",
   "protagonists": {
     "wanderer": {
       "name": "行旅少年",
@@ -114,12 +114,19 @@
       "height": 1536,
       "portrait": {
         "x": 335.0,
-        "y": 45.0,
+        "y": 110,
         "width": 354.0,
         "height": 410.0
       },
       "defaultWeapon": "halberd",
-      "artDirection": "origins"
+      "artDirection": "origins",
+      "crop": {
+        "x": 60,
+        "y": 80,
+        "width": 950,
+        "height": 1456
+      }
     }
-  }
+  },
+  "logo": "./assets/game/title-logo-v1.webp"
 }

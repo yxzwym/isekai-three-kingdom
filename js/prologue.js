@@ -143,7 +143,7 @@
   function assets(id,appearance,modern=false){
     if(typeof module!=='undefined'&&module.exports&&!root.CharacterAssets)require('./character-assets.js');
     if(id==='hero'&&modern&&root.CharacterAssets?.manifest.characters['modern-male'])return root.CharacterAssets.resolve(['swordswoman','healer','armored'].includes(appearance)?'modern-female':'modern-male');
-    if(id==='hero'){const a=root.PengpaiAssets?.protagonists[appearance];return a?{fullbody:{src:a.src},portrait:{src:a.src,crop:a.portrait}}:{};}
+    if(id==='hero'){const a=root.PengpaiAssets?.protagonists[appearance];return a?{fullbody:{src:a.src,...(a.crop?{crop:a.crop}:{})},portrait:{src:a.src,crop:a.portrait}}:{};}
     return root.CharacterAssets?.manifest.characters[id]?root.CharacterAssets.resolve(id):{};
   }
   const W=typeof module!=='undefined'&&module.exports?require('./weapon-skills.js'):root.WeaponSkills;

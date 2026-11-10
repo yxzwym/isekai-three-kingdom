@@ -14,8 +14,8 @@ test('杂兵独立数值、单体攻击和法系混编，护卫更耐打，普�
 test('追袭无视嘲讽时仍按最低当前生命选目标，通用随机目标不受影响',()=>{
  const a=general('zhaoyun',10),weak=general('zhenji',10),b=new E.Battle({allies:[a,weak],enemies:[Catalog.unit('raider',10)]});b.start();const enemy=b.living('enemy')[0];b.addStatus(b.unit(a.id),b.unit(a.id),{id:'taunt',taunt:true,duration:20});for(let i=0;i<10;i++)assert.equal(b.autoCommand(enemy).target,weak.id);
 });
-test('地狱沿用求生开局，并由通用临时特质提高敌方生命与伤害20%，旧极端档可继续培养',()=>{
- assert.deepEqual(R.rollHero('hell',()=>.4),R.rollHero('survival',()=>.4));const scenario={allies:[general('zhaoyun',5)],enemies:[Catalog.unit('infantry',5)]},plain=new E.Battle(scenario),hard=new E.Battle({...scenario,rules:{difficulty:'hell'}}),p=plain.living('enemy')[0],h=hard.living('enemy')[0];assert.equal(h.maxSoldiers,Math.floor(p.maxSoldiers*1.2));assert.ok(h.passives.includes('enemy-hell-strength'));assert.equal(hard.effective(h).damageMultiplier,1.2);assert.ok(!hard.living('ally')[0].passives.includes('enemy-hell-strength'));
+test('地狱沿用求生开局，并由通用临时特质提高敌方体质与伤害20%，旧极端档可继续培养',()=>{
+ assert.deepEqual(R.rollHero('hell',()=>.4),R.rollHero('survival',()=>.4));const scenario={allies:[general('zhaoyun',5)],enemies:[Catalog.unit('infantry',5)]},plain=new E.Battle(scenario),hard=new E.Battle({...scenario,rules:{difficulty:'hell'}}),p=plain.living('enemy')[0],h=hard.living('enemy')[0];assert.equal(h.maxSoldiers,Math.floor(plain.effective(p).constitution*1.2)*10);assert.ok(h.passives.includes('enemy-hell-strength'));assert.equal(hard.effective(h).damageMultiplier,1.2);assert.ok(!hard.living('ally')[0].passives.includes('enemy-hell-strength'));
  const c={name:'旧档',appearance:'scholar',difficulty:'hell',...R.rollHero('normal',()=>.4),potentials:Object.fromEntries(G.KEYS.map(k=>[k,1]))},m=new World(c);assert.ok(Object.values(m.character.potentials).every(n=>n===40));assert.deepEqual(new World(m.character,m.snapshot()).character.potentials,m.character.potentials);
 });
 test('董卓保留生命与追击，攻击降至当前属性量级，不再附加生命流失',()=>{

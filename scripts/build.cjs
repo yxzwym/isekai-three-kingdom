@@ -3,7 +3,7 @@ const root=path.resolve(__dirname,'..'),manifest=require('./sync-assets.cjs'),fi
 const read=file=>fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n'),hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex').slice(0,12);
 const gameAssets=JSON.parse(read('assets/game/manifest.json'));
 fs.writeFileSync(path.join(root,'assets/game/manifest.js'),`// Generated from manifest.json.\nglobalThis.PengpaiAssets=${JSON.stringify(gameAssets)};\n`);
-const refs=new Set([gameAssets.background]);
+const refs=new Set([gameAssets.background,gameAssets.logo].filter(Boolean));
 for(const art of Object.values(gameAssets.protagonists)){if(art.src)refs.add(art.src);if(art.portrait?.src)refs.add(art.portrait.src);}
 for(const character of Object.values(manifest.characters))for(const art of Object.values(character.variants))for(const role of ['portrait','fullbody'])if(art[role]?.src)refs.add(art[role].src);
 for(const file of files.filter(f=>f.startsWith('js/')))for(const match of read(file).matchAll(/['"](\.\/assets\/[^'"]+\.(?:png|jpe?g|webp))['"]/g))refs.add(match[1]);

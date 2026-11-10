@@ -78,7 +78,7 @@
         if(u.side==='enemy'&&!u.passives.includes('enemy-negative-immunity'))for(const immunity of u.statusImmunities||[]){const id=immunity==='stun'?'enemy-stun-resistance':'enemy-status-immunity:'+immunity;if(!this.passives[id]){const name=STATES.definitions[immunity]?.name||immunity;this.passives[id]={id,name:name+'免疫',quality:'white',temporary:true,enemyOnly:true,description:'本场战斗免疫'+name+'。',stats:{},triggers:[]};}u.passives=[...new Set([...u.passives,id])];}
         u.priorities = Array.isArray(u.priorities) ? u.priorities.map(r=>normalizeRule(r,this.skills[r.skill])) : [];
         u.targetRule=u.targetRule||(u.side==='enemy'?'random':'lowestCurrent');u.lastSingleSkill=null;u.lastManualSkill=null;
-        u.maxSoldiers=u.healthOverride!=null?attr(u.healthOverride):Math.max(1,Math.floor(u.baseMaxHealth*(PASSIVES.statsFor(u,this.passives).healthMultiplier||1)));
+        u.maxSoldiers=PASSIVES.maxHealth(u,this.passives);
         u.soldiers = clamp(Math.floor(Number(u.startSoldiers ?? u.maxSoldiers)), 0, u.maxSoldiers);
         u.woundsEnabled=u.side==='ally'&&(u.woundsEnabled??this.config.wounds!==false);u.dead=!!u.dead||u.condition==='dead'||u.soldiers===0&&!u.woundsEnabled;u.wounded=!u.dead&&u.soldiers===0&&u.woundsEnabled;
         u.sp = Math.max(0, Number(u.enemySp) || 0); u.initialSp = u.sp;

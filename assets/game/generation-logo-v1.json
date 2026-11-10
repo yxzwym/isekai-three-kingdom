@@ -1,0 +1,9 @@
+{
+  "provider": "built-in imagegen",
+  "created": "2026-11-10",
+  "src": "./assets/game/title-logo-v1.webp",
+  "width": 2172,
+  "height": 724,
+  "transparent": true,
+  "prompt": "Use case: logo-brand. Asset type: finished transparent-background Chinese historical RPG title wordmark, to overlay on a dark cinematic landscape. Create ONE horizontal logo containing exactly these four Chinese characters, in this exact left-to-right order: 异梦三国. Text (verbatim): \"异梦三国\". The second character is 梦, not 界. Expressive masterful Chinese brush calligraphy, mature late-Han historical epic mood, clear legibility, strong disciplined rhythm, elegant contrasting thick and fine brush strokes. Antique pale ivory-gold ink with very subtle naturally worn pigment, readable against a charcoal-blue background. Original premium RPG title design, understated and solemn; flat painted ink texture, not glossy metal, not 3D embossed, not plastic, no fiery or neon glow. Modest irregular brush edges, not excessive splatter. Arrange all four characters as one balanced horizontal title; broad landscape logo composition about 3:1 with transparent padding. Genuine alpha transparency; absolutely no paper, sky, black rectangle, scenery, vignette, frame, additional letters, subtitle, English, tiny illegible text, watermark, icons or decorative objects. Entire brush strokes within image bounds. This is a game logo asset only, not a menu screenshot. Make the exact four-character text unmistakably correct."
+}

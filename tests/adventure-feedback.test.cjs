@@ -67,7 +67,7 @@ test('主菜单保留所有入口，继续旅程读取最新存档，手机按�
  const {CanvasMenu}=require('../js/canvas-menu.js'),old=global.MenuScene;global.MenuScene={draw(){}};
  try{for(const width of [320,405,540])for(const saved of [false,true]){
   const loaded=[],slots=saved?[{savedAt:'2026-11-01T00:00:00Z'},{savedAt:'2026-11-09T00:00:00Z'},null]:[null,null,null];
-  const v=Object.assign(Object.create(CanvasMenu.prototype),{w:width,h:720,hits:[],ctx:{save(){},restore(){},fillRect(){},strokeRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){}},store:{slots:()=>slots},settings:{menuScale:1},options:{onLoad:(s,i)=>loaded.push(i)},text(){},startNew(){},go(){},focus:-1});
+  const v=Object.assign(Object.create(CanvasMenu.prototype),{w:width,h:720,hits:[],ctx:new Proxy({createLinearGradient:()=>({addColorStop(){}})},{get:(o,k)=>k in o?o[k]:()=>{}}),store:{slots:()=>slots},settings:{menuScale:1},options:{onLoad:(s,i)=>loaded.push(i)},text(){},startNew(){},go(){},focus:-1});
   v.drawMain(0);for(const hit of v.hits){assert.ok(hit.x>=0&&hit.x+hit.w<=width);assert.ok(hit.y>=0&&hit.y+hit.h<=720);}for(const label of ['新游戏','载入游戏','战斗模拟','设置','关于'])assert.ok(v.hits.some(h=>h.label===label));
   if(saved){v.hits.find(h=>h.label==='继续旅程').action();assert.deepEqual(loaded,[1]);}
  }}finally{global.MenuScene=old;}

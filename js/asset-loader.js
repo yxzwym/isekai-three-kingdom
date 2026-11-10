@@ -71,10 +71,10 @@
   }
   let currentView=null;
   const loader=createLoader();
-  const startupFiles=()=>{const files=root.GameAssetManifest||[],src=root.PengpaiAssets?.background;return files.filter(file=>file.src===src);};
+  const startupFiles=()=>{const files=root.GameAssetManifest||[],sources=[root.PengpaiAssets?.background,root.PengpaiAssets?.logo].filter(Boolean);return files.filter(file=>sources.includes(file.src));};
   function loadingScreen(canvas,ctx,width,height,state,error=false){
     const font=root.PengpaiUI.font,size=bytes=>(bytes/1000000).toFixed(2)+' MB';ctx.save();ctx.setTransform(canvas.width/width,0,0,canvas.height/height,0,0);ctx.fillStyle='#071923';ctx.fillRect(0,0,width,height);ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle='#dfc18b';ctx.font=`20px ${font}`;ctx.fillText('异界三国',width/2,height*.43);ctx.fillStyle='#dce6e5';ctx.font=`14px ${font}`;ctx.fillText(error?'资源加载失败':`正在加载 ${state.percent}%`,width/2,height*.43+44);
+    ctx.fillStyle='#dfc18b';ctx.font=`20px ${font}`;ctx.fillText('异梦三国',width/2,height*.43);ctx.fillStyle='#dce6e5';ctx.font=`14px ${font}`;ctx.fillText(error?'资源加载失败':`正在加载 ${state.percent}%`,width/2,height*.43+44);
     const barWidth=Math.min(300,width-64),x=(width-barWidth)/2,y=height*.43+72;ctx.fillStyle='#173842';ctx.fillRect(x,y,barWidth,6);ctx.fillStyle='#52bccb';ctx.fillRect(x,y,barWidth*state.percent/100,6);ctx.fillStyle='#9eb4b8';ctx.fillText(`${size(state.loadedBytes)} / ${size(state.totalBytes)}`,width/2,y+29);
     const retry={x:width/2-65,y:y+55,w:130,h:40};if(error){ctx.strokeStyle='#79999c';ctx.strokeRect(retry.x,retry.y,retry.w,retry.h);ctx.fillStyle='#e4e8e4';ctx.fillText('重试',width/2,retry.y+20);}ctx.restore();canvas.setAttribute('aria-label',error?'资源加载失败，点击重试':`资源加载 ${state.percent}%，${state.completed}/${state.total} 项`);return retry;
   }
