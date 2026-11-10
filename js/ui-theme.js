@@ -12,6 +12,12 @@
   }
   // 1080×1920设计像素：正文28、按钮32、标题40；绘图单位为设计像素的一半。
   const textSize=value=>value>25?value:value>=18?20:value>=15?16:14;
+  function dragGrip(view,x,y,w=28,h=36,color='#a5a58d'){const c=view.ctx;c.save();c.fillStyle=color;for(let row=0;row<3;row++)for(let col=0;col<2;col++)c.fillRect(x+w/2-4+col*6,y+h/2-7+row*6,2,2);c.restore();}
+  function centeredText(view,value,x,y,w,h,size=14,color='#ead8ad'){
+    const c=view.ctx,label=String(value);if(!c?.measureText||!c.fillText){view.text(label,x+w/2,y+h/2,size,color,'center');return;}
+    c.save();c.font=textSize(size)+'px '+font;c.textAlign='center';c.textBaseline='alphabetic';c.fillStyle=color;const metrics=c.measureText(label),ascent=metrics.actualBoundingBoxAscent,descent=metrics.actualBoundingBoxDescent;
+    if(Number.isFinite(ascent)&&Number.isFinite(descent))c.fillText(label,x+w/2,y+(h+ascent-descent)/2);else{c.textBaseline='middle';c.fillText(label,x+w/2,y+h/2);}c.restore();
+  }
   const controls={compact:32,normal:40,primary:48,font:16};
   function buttonTrim(view,x,y,w,h,{active=false,disabled=false,pressed=false}={}){
     const c=view.ctx;if(!c?.save||!c.beginPath||!c.moveTo||!c.lineTo||!c.stroke)return;
@@ -51,5 +57,5 @@
       view.hits.push({x:xx,y:yy,w:cw,h,label:passive.name,action:()=>onSelect(passive)});
     });return rows.reduce((n,row)=>n+row.h,0);
   }
-  const api={font,serif,surface,controls,button,buttonTrim,chevron,pin,textSize,wrapLines,singleChoiceHit,EXCLUSIVE_COLOR,passiveColor,passiveLabel,passiveButtons,passiveHeight};root.PengpaiUI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const api={font,serif,surface,controls,dragGrip,centeredText,button,buttonTrim,chevron,pin,textSize,wrapLines,singleChoiceHit,EXCLUSIVE_COLOR,passiveColor,passiveLabel,passiveButtons,passiveHeight};root.PengpaiUI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

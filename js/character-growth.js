@@ -54,6 +54,7 @@
   }
   const clone=x=>JSON.parse(JSON.stringify(x)),positive=value=>Math.max(1,Math.floor(Number(value)||1)),level=value=>positive(value);
   const growthPerLevel=potential=>positive(potential)*.04;
+  const healthFromConstitution=constitution=>positive(constitution)*10;
   function attributesAt(baseAttributes,potentials,currentLevel){
     const upgrades=level(currentLevel)-1;
     // 按累计成长取整，保留跨级的小数进度；逐级升与直接设等级结果相同。
@@ -77,5 +78,5 @@
   }
   const GENERAL_IDS=['xuchu','dianwei','huangzhong','maliang','taishici','hero','zhangjiao','zhangbao','zhangliang','zhaoyun','zhenji','zhouyu','huanggai','ganning','lusu','zhugeliang','caocao','zhangliao','xuhuang','yujin','caoren','sunquan','lvbu'];
   const isGeneral=unit=>unit.unitType==='general'||GENERAL_IDS.includes(unit.characterId||unit.id);
-  const api={GENERAL_IDS,isGeneral,ATTRIBUTES,KEYS,PROFILES,GENERAL_POTENTIALS,AGILITY_PROFILES,derivedPotential,normalizeKnownPotentials,growthPerLevel,attributesAt,create,characterAt,normalizeCharacter,validGrowth};root.CharacterGrowth=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const api={GENERAL_IDS,isGeneral,ATTRIBUTES,KEYS,PROFILES,GENERAL_POTENTIALS,AGILITY_PROFILES,derivedPotential,normalizeKnownPotentials,growthPerLevel,healthFromConstitution,attributesAt,create,characterAt,normalizeCharacter,validGrowth};root.CharacterGrowth=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

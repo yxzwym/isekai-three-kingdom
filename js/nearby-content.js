@@ -1,7 +1,7 @@
 (function(root){
  'use strict';
  const node=typeof module!=='undefined'&&module.exports,G=node?require('./character-growth.js'):root.CharacterGrowth,I=node?require('./items.js'):root.ItemCatalog,W=node?require('./weapon-skills.js'):root.WeaponSkills;
- const np=(id,name,art,role,place,lines)=>({id,name,art,role,place,side:role==='healer'?'right':'left',roleLabel:{civilian:'交谈',quest:'委托',merchant:'商贩',healer:'疗伤'}[role]||'交谈',lines});
+ const np=(id,name,art,role,place,lines)=>({id,name,art,role,place,side:role==='healer'?'right':'left',roleLabel:{civilian:'交谈',quest:'任务',merchant:'商贩',healer:'疗伤'}[role]||'交谈',lines});
  const npcs=[
   np('changshan-elder','里正','villager','quest','changshan',['你是想打听人，还是找个住的地方？西边有间空屋，我让人腾张铺位出来。走了一路，先在这里歇歇吧。','逃难来的乡亲暂时都住在村里，赵将军一直帮着照顾。住的地方还能再挤一挤，可粮食剩得不多了，大家都在发愁。']),
   np('changshan-woodcutter','樵夫','laborer','quest','changshan',['你准备进山吗？山口那条近路先别走，我前两天在那里遇见了贼，柴和斧头都没保住，跑回来时还摔了一跤。','以前我天不亮就进山，如今得等邻居们一起出门。也不是人多就打得过，只是遇到事情，总能有人跑回来报信。']),

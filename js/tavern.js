@@ -6,7 +6,7 @@
  const surnames=['陈','刘','张','赵','孙','周','吴','郑','王','冯','卫','许','沈','杨','韩','曹','方','陆','秦','袁','杜','严','程','丁','石','宋'],given={male:['平','安','岳','成','远','义','衡','毅','康','志诚','守义','明远','仲平','子安','文昭','承志'],female:['宁','兰','青','芳','芸','玉','月','秀','静宜','清禾','兰心','知秋','若云','素贞','玉蓉']};
  const pick=(a,rng)=>a[Math.min(a.length-1,Math.floor(rng()*a.length))],copy=v=>JSON.parse(JSON.stringify(v));
  function name(gender,rng){return pick(surnames,rng)+pick(given[gender],rng);}
- const grades=[{id:'white',name:'普通',value:40,color:'#dddcd3',weight:45},{id:'green',name:'精良',value:60,color:'#79cc8f',weight:32},{id:'blue',name:'稀有',value:80,color:'#6cb9ed',weight:17},{id:'gold',name:'传说',value:90,color:'#edc363',weight:5},{id:'red',name:'神话',value:95,color:'#ef7679',weight:1}];
+ const grades=[{id:'white',name:'常才',value:40,color:'#dddcd3',weight:45},{id:'green',name:'良才',value:60,color:'#79cc8f',weight:32},{id:'blue',name:'英才',value:80,color:'#6cb9ed',weight:17},{id:'gold',name:'奇才',value:90,color:'#edc363',weight:5},{id:'red',name:'旷世之才',value:95,color:'#ef7679',weight:1}];
  const models={
   warrior:[[.9,.2,1,.55,.65],[1,.2,.8,.8,.7],[.9,.2,.7,.85,1],[.75,.2,1,.65,.7]],
   mage:[[.15,1,.65,.85,.85],[.15,1,.7,.9,.7],[.12,.9,.65,.9,1],[.15,1,.8,.7,.9]],

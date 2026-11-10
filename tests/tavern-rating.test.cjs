@@ -7,3 +7,8 @@ test('五档评级基准准确，36种模型有不同侧重，刺客高速度低
 test('模拟器可重复添加同评级同兵器的独立角色，等级、装备与阵容在刷新后保持',()=>{
  const data=new Map(),storage={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)},s=new S.Session(storage);for(const id of [...s.selected])s.toggle(id);const spec={grade:'red',type:'needle',modelId:'recruit-healer-mythic-1'},a=s.addRetainer(spec),b=s.addRetainer(spec);assert.ok(a&&b&&a!==b);assert.equal(s.world.members().length,2);assert.ok(s.world.members().every(u=>u.lockedWeaponType==='needle'&&u.recruitGrade==='red'));s.setLevel(13,a);const item=s.world.state.inventory.find(i=>i.templateId==='swift-pendant');assert.ok(s.world.changeEquipment(a,'accessory1',item.uid));const loaded=new S.Session(storage);assert.deepEqual(loaded.activeIds(),[a,b]);assert.equal(loaded.record(a).unit.level,13);assert.equal(loaded.record(b).unit.level,20);assert.equal(loaded.record(a).unit.equipment.accessory1.templateId,'swift-pendant');assert.equal(loaded.record(b).unit.equipment.accessory1,null);const battle=new E.Battle(loaded.scenario());assert.equal(battle.living('ally').length,2);assert.equal(loaded.addRetainer(spec,-1),false);for(const type of C.types){const unit=T.create(T.candidate({id:'t',group:type.group,grade:'gold'}),type.id,10,'xuchang');assert.ok(I.canEquip(unit,I.create('weapon-'+type.id)));}
 });
+
+test('酒馆五档统一使用人才资质称谓，已招募角色与旧存档沿用相同评级',()=>{
+ assert.deepEqual(T.grades.map(g=>g.name),['常才','良才','英才','奇才','旷世之才']);
+ for(const grade of T.grades){const candidate=T.candidate({id:'rated',group:'warrior',grade:grade.id,rng:E.seededRandom('rated')});const unit=T.create(candidate,'sword',7,'xuchang');assert.equal(T.gradeOf(candidate).name,grade.name);assert.equal(T.gradeOf(unit).name,grade.name);assert.equal(T.gradeOf(JSON.parse(JSON.stringify(unit))).name,grade.name);}
+});

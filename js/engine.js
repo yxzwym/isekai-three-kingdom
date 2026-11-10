@@ -20,7 +20,7 @@
     let state = seedNumber(seed);
     return () => { state += 0x6D2B79F5; let n = state; n = Math.imul(n ^ n >>> 15, n | 1); n ^= n + Math.imul(n ^ n >>> 7, n | 61); return ((n ^ n >>> 14) >>> 0) / 4294967296; };
   }
-  const maxHealth=constitution=>Math.max(1,Math.floor(attr(constitution)*10));
+  const maxHealth=G.healthFromConstitution;
   // Compatibility alias for existing scenario/save fields; life no longer depends on level.
   const maxSoldiers=(level,constitution)=>maxHealth(constitution);
   function ratio(war,speed,unload=0){return Math.floor(Math.min(3,Math.max(1,(Number(war)||0)-(Number(unload)||0))/(Math.max(0,Number(speed)||0)+1))*10)/10;}
