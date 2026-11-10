@@ -3,8 +3,6 @@
   const C=typeof module!=='undefined'&&module.exports?require('./weapon-catalog.js'):root.WeaponCatalog;
   const G=typeof module!=='undefined'&&module.exports?require('./character-growth.js'):root.CharacterGrowth;
   const ATTRIBUTES=G.ATTRIBUTES;
-  const PROFICIENCY_BASE=100;
-  const proficiencyFromLegacy=value=>value===0?0:Math.max(1,Math.round(value*PROFICIENCY_BASE/255));
   const IDENTITIES=[
   {
     "id": "worthless",
@@ -225,7 +223,6 @@
   const getDifficulty=id=>DIFFICULTIES.find(d=>d.id===id)||DIFFICULTIES.find(d=>d.id===({worthless:'hell',civilian:'survival',teacher:'normal',bully:'normal',strategist:'heroic',warrior:'heroic',overlord:'protagonist'}[id]));
   const WEAPON_GROUPS=C.groups;
   const WEAPON_TYPES=C.types.map(({id,name,role,group,ordinaryName,style})=>({id,name,role,group,ordinaryName,style,skillPlanId:id}));
-  const getWeaponProficiency=(character,id)=>{const values=character?.weaponProficiencies,value=values?.[id]??(id==='talisman'?values?.['medicine-bag']:id==='qin'?values?.jade:undefined);return Number.isSafeInteger(value)&&value>=0?value:0;};
   const WEAPON_SKILL_PLANS=Object.fromEntries(C.types.map(t=>[t.id,{status:'ready',skills:t.skills}]));
   const QUALITIES={
     white:{name:'普通',color:'#e5e7e7',weight:42},green:{name:'精良',color:'#87cf92',weight:31},
@@ -342,7 +339,7 @@
   function rollHero(difficultyId,rng=Math.random){
     const difficulty=getDifficulty(difficultyId);if(!difficulty)throw new TypeError('请先选择难度');
     const average={hell:40,survival:40,normal:60,heroic:80,protagonist:100}[difficulty.id],growth=G.characterAt({potentials:rollPotentials(average,rng)},1);
-    return {...growth,weaponCatalogVersion:1,weaponProficiencies:Object.fromEntries(WEAPON_TYPES.map(type=>[type.id,0])),passives:rollPassives(rng,3,difficulty.passiveWeights)};
+    return {...growth,weaponCatalogVersion:1,passives:rollPassives(rng,3,difficulty.passiveWeights)};
   }
   const segments=text=>typeof Intl.Segmenter==='function'?Array.from(new Intl.Segmenter('zh',{granularity:'grapheme'}).segment(text),s=>s.segment):Array.from(text);
   const sanitizeName=value=>segments(String(value||'').replace(/[\u0000-\u001f\u007f\s]/g,'')).slice(0,4).join('');
@@ -350,16 +347,13 @@
   function validCharacter(c){
     return !!c&&typeof c.name==='string'&&c.name.length>0&&sanitizeName(c.name)===c.name&&!!getDifficulty(c.difficulty||c.identity)&&APPEARANCES.some(a=>a.id===c.appearance)
       &&G.validGrowth(c)&&ATTRIBUTES.every(([key])=>Number.isSafeInteger(c.attributes?.[key])&&c.attributes[key]>=1)
-      &&(c.weaponProficiencies===undefined||!!c.weaponProficiencies&&typeof c.weaponProficiencies==='object'&&!Array.isArray(c.weaponProficiencies)&&Object.values(c.weaponProficiencies).every(value=>Number.isSafeInteger(value)&&value>=0))
       &&Array.isArray(c.passives)&&new Set(c.passives).size===c.passives.length&&c.passives.every(id=>!!PASSIVE_MAP[id]);
   }
-  const clone=value=>JSON.parse(JSON.stringify(value));
+  const clone=value=>JSON.parse(JSON.stringify(value,(key,data)=>['weaponProficiencies','weaponExperience','proficiencies'].includes(key)?undefined:data));
   function normalizeCharacter(character){
     if(!character||typeof character!=='object')return character;
     const next=G.normalizeCharacter(character);const difficulty=getDifficulty(next.difficulty||next.identity);if(difficulty)next.difficulty=difficulty.id;delete next.identity;
     if(next.difficulty==='hell'&&!next.hellBalanceVersion){if(ATTRIBUTES.every(([key])=>next.potentials[key]===1)){next.potentials=Object.fromEntries(ATTRIBUTES.map(([key])=>[key,40]));Object.assign(next,G.characterAt(next,next.level));}next.hellBalanceVersion=1;}
-    if(next.weaponProficiencies&&typeof next.weaponProficiencies==='object'&&!Array.isArray(next.weaponProficiencies)&&Object.hasOwn(next.weaponProficiencies,'medicine-bag')){if(!Object.hasOwn(next.weaponProficiencies,'talisman'))next.weaponProficiencies.talisman=next.weaponProficiencies['medicine-bag'];delete next.weaponProficiencies['medicine-bag'];}
-    if(next.weaponProficiencies&&Object.hasOwn(next.weaponProficiencies,'jade')){next.weaponProficiencies.qin??=next.weaponProficiencies.jade;delete next.weaponProficiencies.jade;}
     if(Array.isArray(next.passives))next.passives=next.passives.filter(id=>id!=='revive');return next;
   }
   const Settings=typeof module!=='undefined'&&module.exports?require('./settings.js'):root.GameSettings;
@@ -368,7 +362,6 @@
     slots(){
       let data;try{data=JSON.parse(this.storage.getItem(this.key)||'[]');}catch{return [null,null,null];}
       return Array.from({length:3},(_,i)=>{const slot=Array.isArray(data)?data[i]:null,character=normalizeCharacter(slot?.character);if(![1,2,3,4].includes(slot?.version)||!validCharacter(character)||typeof slot.savedAt!=='string'||!Number.isFinite(Date.parse(slot.savedAt)))return null;
-        if(slot.version<3&&character.weaponProficiencies)character.weaponProficiencies=Object.fromEntries(Object.entries(character.weaponProficiencies).map(([id,value])=>[id,proficiencyFromLegacy(value)]));
         return clone({...slot,version:4,character});});
     }
     save(index,character,progress){
@@ -380,6 +373,6 @@
     setSettings(settings){const next=Settings.validate({...this.settings(),...settings});this.storage.setItem(this.settingsKey,JSON.stringify(next));Settings.changed(next);return next;}
   }
   const sortPassives=(ids,map=PASSIVE_MAP)=>ids.map((id,index)=>({id,index})).sort((a,b)=>(Object.keys(QUALITIES).indexOf(map[b.id]?.quality)-Object.keys(QUALITIES).indexOf(map[a.id]?.quality))||a.index-b.index).map(v=>v.id);
-  const api={sortPassives,PARTY_LIMIT:4,ATTRIBUTES,PROFICIENCY_BASE,DIFFICULTIES,getDifficulty,WEAPON_GROUPS,WEAPON_TYPES,WEAPON_SKILL_PLANS,getWeaponProficiency,IDENTITIES,IDENTITY_PASSIVE_WEIGHTS,QUALITIES,PASSIVES,PASSIVE_MAP,APPEARANCES,randomInt,rollPassives,rollHero,sanitizeName,heroName,nameLength:value=>segments(value).length,validCharacter,SaveStore};
+  const api={sortPassives,PARTY_LIMIT:4,ATTRIBUTES,DIFFICULTIES,getDifficulty,WEAPON_GROUPS,WEAPON_TYPES,WEAPON_SKILL_PLANS,IDENTITIES,IDENTITY_PASSIVE_WEIGHTS,QUALITIES,PASSIVES,PASSIVE_MAP,APPEARANCES,randomInt,rollPassives,rollHero,sanitizeName,heroName,nameLength:value=>segments(value).length,validCharacter,SaveStore};
   root.PengpaiRules=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

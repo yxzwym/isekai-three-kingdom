@@ -7,7 +7,6 @@
   const EQUIPMENT=typeof module!=='undefined'&&module.exports?require('./equipment.js'):root.EquipmentSlots;
   const ITEMS=typeof module!=='undefined'&&module.exports?require('./items.js'):root.ItemCatalog;
   const G=typeof module!=='undefined'&&module.exports?require('./character-growth.js'):root.CharacterGrowth;
-  const PROFICIENCY=typeof module!=='undefined'&&module.exports?require('./proficiency.js'):root.WeaponProficiency;
   const { SKILLS, DEFAULTS } = DATA;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const attr = value => Math.max(1, Math.floor(Number(value) || 1));
@@ -63,7 +62,7 @@
       const ids = new Set();
       for (const u of roster) { if (!u.id || ids.has(u.id)) throw new TypeError('参战单位必须有唯一 id'); ids.add(u.id); }
       this.units = roster.map((base, order) => {
-        const u = { ...base, ...(this.config.rosterOverrides?.[base.id] || {}) };u.equipment=EQUIPMENT.normalize(u.equipment);
+        const u = { ...base, ...(this.config.rosterOverrides?.[base.id] || {}) };delete u.weaponProficiencies;delete u.weaponExperience;u.equipment=EQUIPMENT.normalize(u.equipment);
         if(u.weapon){if(WEAPONS.special(u.weapon)||!Array.isArray(u.skills))u.skills=WEAPONS.forWeapon(u.weapon);for(const definition of WEAPONS.definitionsForWeapon(u.weapon))this.skills[definition.id]??=definition;u.weapon=WEAPONS.resolveWeapon(u.weapon);}
         u.constitution??=u.leadership;delete u.leadership;u.species||='humanoid';
         u.level=attr(u.level??(u.side==='enemy'?this.config.enemyLevel||this.config.level:this.config.level));
@@ -138,7 +137,7 @@
       for(const [kind,mult]of [['physical','physicalMultiplier'],['tactic','tacticMultiplier'],['healing','healingMultiplier']])if(p[mult]!==undefined)out[kind+'Bonus']=(1+out[kind+'Bonus'])*p[mult]-1;
       out.damageMultiplier=Number(u.damageMultiplier??1)*(p.damageMultiplier||1);out.guaranteedCritical=!!(u.guaranteedCritical||p.guaranteedCritical);out.ignoreArmor=!!(u.ignoreArmor||p.ignoreArmor);out.ignoreResistance=!!(u.ignoreResistance||p.ignoreResistance);
       let taken=p.takenMultiplier||1;for(const id of u.passives){const stats=this.passives[id]?.stats||{},maximum=Number(stats.missingHealthDamageBonus)||0;if(maximum>0)out.damageMultiplier*=1+maximum*clamp(1-u.soldiers/u.maxSoldiers,0,1);if(stats.lowTroopsThreshold&&u.soldiers/u.maxSoldiers<=stats.lowTroopsThreshold){out.damageMultiplier*=stats.lowTroopsDamageMultiplier||1;taken*=stats.lowTroopsTakenMultiplier||1;}}
-      if(taken!==1)out.physicalReduction=1-(1-out.physicalReduction)*taken;if(taken!==1||p.tacticTakenMultiplier!==undefined)out.tacticReduction=1-(1-out.tacticReduction)*taken*(p.tacticTakenMultiplier||1);out.weaponPower=PROFICIENCY.power(out.attack,u);return out;
+      if(taken!==1)out.physicalReduction=1-(1-out.physicalReduction)*taken;if(taken!==1||p.tacticTakenMultiplier!==undefined)out.tacticReduction=1-(1-out.tacticReduction)*taken*(p.tacticTakenMultiplier||1);out.weaponPower=out.attack;return out;
     }
     gainShield(source,target,amount){
       if(amount<=0||target.dead)return;let status=target.statuses.find(s=>s.id==='passiveShield');if(status)status.amount+=amount;else{status={id:'passiveShield',name:'护盾',shield:true,amount,source:source.id,permanent:true,expiresAt:Infinity};target.statuses.push(status);}this.emit('status',{actor:source.id,target:target.id,status:copy(status)});

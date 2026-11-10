@@ -70,7 +70,7 @@
   }
   const validGrowth=c=>Number.isSafeInteger(c.level)&&c.level>=1&&KEYS.every(key=>Number.isSafeInteger(c.baseAttributes?.[key])&&c.baseAttributes[key]>=1&&Number.isSafeInteger(c.potentials?.[key])&&c.potentials[key]>=1);
   function normalizeCharacter(character){
-    const next=clone(character);if(next.attributes){next.attributes.constitution??=next.attributes.leadership;delete next.attributes.leadership;}
+    const next=clone(character);delete next.weaponProficiencies;delete next.weaponExperience;if(next.attributes){next.attributes.constitution??=next.attributes.leadership;delete next.attributes.leadership;}
     if(next.growthVersion===1){if(!validGrowth(next)||!KEYS.every(k=>Number.isSafeInteger(next.attributes?.[k])&&next.attributes[k]>=1))return next;return characterAt(next);}
     const old=next.attributes||{},potentials=Object.fromEntries(KEYS.map(key=>[key,Math.max(1,Math.round((Number(old[key])||1)*100/255))]));
     return characterAt({...next,potentials,legacyMaxHealth:positive(old.constitution)*10},next.level||1);

@@ -41,7 +41,6 @@
     const out=JSON.parse(JSON.stringify(unit));out.equipment=equipment.normalize(out.equipment);
     if(out.weaponPlanVersion!==3&&!special(out.weapon)){
       const oldType=out.weapon?.type,nextType=C.legacyAliases[oldType]||oldType;if(out.weapon)out.weapon.type=nextType;
-      if(out.weaponProficiencies){const migrated={};for(const [id,value]of Object.entries(out.weaponProficiencies)){const key=C.legacyAliases[id]||id;migrated[key]=Math.max(migrated[key]||0,value);}out.weaponProficiencies=migrated;}
       if(out.weapon&&C.types.some(t=>t.id===nextType)&&(!out.skills?.length||out.skills.some(id=>!['punch','spear-cut','spear-sweep','sword-cut','sword-sweep'].includes(id)))){const next=forWeapon(out.weapon);if(JSON.stringify(out.skills)!==JSON.stringify(next)){out.skills=next;out.priorities=prioritiesFor(out.skills);out.weaponPlanMigrated=true;}}
     }
     if(special(out.weapon)){out.skills=forWeapon(out.weapon);out.priorities=out.priorities?.every(r=>out.skills.includes(r.skill))?out.priorities:prioritiesFor(out.skills);}

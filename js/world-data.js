@@ -104,7 +104,7 @@
     {id:'quiet',weight:88,kind:'quiet'}
   ];
   const G=typeof module!=='undefined'&&module.exports?require('./character-growth.js'):root.CharacterGrowth;
-  const patrol={...G.create('imperialSoldier',4),name:'巡兵',characterId:'imperial-soldier',attack:10,armor:8,resistance:8,weapon:{type:'spear',name:'长枪'},weaponProficiencies:{spear:60},skills:['spear-cut'],priorities:[{skill:'spear-cut',when:'always'}]};
+  const patrol={...G.create('imperialSoldier',4),name:'巡兵',characterId:'imperial-soldier',attack:10,armor:8,resistance:8,weapon:{type:'spear',name:'长枪'},skills:['spear-cut'],priorities:[{skill:'spear-cut',when:'always'}]};
   const encounters={patrol:{id:'patrol',title:'路遇巡兵',scene:{background:'./assets/story/village-road-v3.webp'},roster:[patrol,{...patrol,...G.create('imperialPikeman',4)}],rules:{level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true}}};
   const nearby=typeof module!=='undefined'&&module.exports?require('./nearby-content.js'):root.NearbyContent;
   const outlaw=(profile,level,name,art,type,skills)=>nearby.enemy(profile,level,name,art,type,skills);

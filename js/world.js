@@ -3,7 +3,7 @@
   const node=typeof module!=='undefined'&&module.exports,D=node?require('./world-data.js'):root.WorldData,E=node?require('./engine.js'):root.BattleEngine,R=node?require('./game-rules.js'):root.PengpaiRules,W=node?require('./weapon-skills.js'):root.WeaponSkills;
   const I=node?require('./items.js'):root.ItemCatalog,N=node?require('./nearby-content.js'):root.NearbyContent;
   const G=node?require('./character-growth.js'):root.CharacterGrowth,Scenes=node?require('./battle-scenes.js'):root.BattleScenes;
-  const F=node?require('./proficiency.js'):root.WeaponProficiency,H=node?require('./hero-quests.js'):root.HeroQuests;
+  const H=node?require('./hero-quests.js'):root.HeroQuests;
   const Optional=node?require('./optional-battles.js'):root.OptionalBattles;
   const Recruitment=node?require('./recruitment-content.js'):root.RecruitmentContent,Puzzle=node?require('./minigames.js'):root.SlidingPuzzle;
   const Courts=node?require('./courts.js'):root.FactionCourts,Tavern=node?require('./tavern.js'):root.TavernRecruitment;
@@ -14,7 +14,7 @@
   const Chapter=node?require('./chapter-one.js'):root.ChapterOne;if(node){require('./early-dungeons.js');require('./dialogue-voices.js');}
   const Progression=node?require('./quest-progression.js'):root.QuestProgression;
   const X=node?require('./experience.js'):root.CharacterExperience,Q=node?require('./timed-choice.js'):root.TimedChoice;
-  const copy=x=>JSON.parse(JSON.stringify(x)),countries=['wei','shu','wu'],recruitCountries=[...countries,'other','yellow'],placeId=id=>Object.hasOwn(D.placeAliases,id)?D.placeAliases[id]:id,neighbors=id=>D.roads.flatMap(([a,b])=>a===id?[b]:b===id?[a]:[]),safeObject=value=>value&&typeof value==='object'&&!Array.isArray(value)?value:{};
+  const copy=x=>JSON.parse(JSON.stringify(x,(key,data)=>['weaponProficiencies','weaponExperience','proficiencies'].includes(key)?undefined:data)),countries=['wei','shu','wu'],recruitCountries=[...countries,'other','yellow'],placeId=id=>Object.hasOwn(D.placeAliases,id)?D.placeAliases[id]:id,neighbors=id=>D.roads.flatMap(([a,b])=>a===id?[b]:b===id?[a]:[]),safeObject=value=>value&&typeof value==='object'&&!Array.isArray(value)?value:{};
   function shortestRoute(from,to){
     if(!D.placeMap[from]||!D.placeMap[to]||D.placeMap[from].requiresWater||D.placeMap[to].requiresWater)return null;
     const distance=new Map([[from,0]]),previous=new Map(),open=new Set([from]);
@@ -25,7 +25,7 @@
   }
   function heroUnit(character,state){
     character=G.characterAt(character);const stats=Object.fromEntries(R.ATTRIBUTES.map(([key])=>[key,E.attr(character.attributes?.[key])])),weapon=state.weapon?W.resolveWeapon(state.weapon):state.weaponType?{type:state.weaponType,name:D.weaponNames[state.weaponType],attack:10}:null;
-    const unit={...character,id:'hero',name:character.name,...stats,level:character.level,weapon,weaponProficiencies:copy(character.weaponProficiencies||{}),equipment:copy(state.heroEquipment||{armor:{name:'布衣'}}),attack:weapon?10:0,armor:0,resistance:0,maxSoldiers:E.maxHealth(stats.constitution),skills:W.forWeapon(weapon),passives:[...(character.passives||[])],...safeObject(state.tactics?.hero)};
+    const unit={...character,id:'hero',name:character.name,...stats,level:character.level,weapon,equipment:copy(state.heroEquipment||{armor:{name:'布衣'}}),attack:weapon?10:0,armor:0,resistance:0,maxSoldiers:E.maxHealth(stats.constitution),skills:W.forWeapon(weapon),passives:[...(character.passives||[])],...safeObject(state.tactics?.hero)};
     unit.trophies=T.equipped(state,'hero');Object.assign(unit,I.apply(unit));unit.condition=state.conditions?.hero;unit.dead=unit.condition==='dead';unit.startSoldiers=Math.max(0,Math.min(unit.maxSoldiers,Number(state.troops?.hero??unit.maxSoldiers)));unit.priorities=unit.priorities?.length&&unit.priorities.every(r=>unit.skills.includes(r.skill))?unit.priorities:W.prioritiesFor(unit.skills);
     if(root.PengpaiAssets?.protagonists[character.appearance]){const art=root.PengpaiAssets.protagonists[character.appearance];unit.fullbody={src:art.src};unit.portrait={src:art.src,crop:art.portrait};}
     return unit;
@@ -59,11 +59,12 @@
     state.mapZoom=Number.isFinite(Number(s.mapZoom))&&Number(s.mapZoom)>0?Math.max(.05,Math.min(3.6,Number(s.mapZoom))):D.mapRules.defaultZoom;state.questTab=['main','story','side'].includes(s.questTab)?s.questTab:'main';if(s.questUiVersion!==1&&state.questTab==='story'&&state.quests.changshan.stage!=='complete')state.questTab='main';state.questUiVersion=1;state.questNotice={signature:typeof s.questNotice?.signature==='number'?s.questNotice.signature:null,unread:!!s.questNotice?.unread};state.questProgressVersion=2;state.enemyLevelCap=N.combatProgression.initialCap;
     state.residents=Object.fromEntries(Object.entries(safeObject(s.residents)).filter(([id,u])=>u&&u.id===id&&id!=='hero'&&D.placeMap[u.homeNode]&&!ids.has(id)).map(([id,u])=>[id,normalizeRecruitHome(W.migrateWeaponPlan(X.normalizeRecord(G.normalizeKnownPotentials(u))))]));
     for(const u of Object.values(state.residents))if(!I.canEquip(u,u.weapon)){if(u.weapon)state.inventory.push({...copy(u.weapon),slot:'weapon',uid:'item-'+(++state.itemSerial)});u.weapon=H.definitions[u.characterId||u.id]?copy(Recruitment.companion(u.characterId||u.id,u.level).weapon):I.create('weapon-'+I.profession(u).weaponType,'green');u.skills=W.forWeapon(u.weapon);u.priorities=W.prioritiesFor(u.skills);if(state.tactics[u.id])delete state.tactics[u.id].priorities;}
+    state.heroEquipment.armor=I.armorRecord(state.heroEquipment.armor,'initial-cloth');state.inventory=state.inventory.map(item=>item.slot==='armor'?I.armorRecord(item,item.uid):item);for(const u of [...companions,...Object.values(state.residents)])if(u.equipment?.armor)u.equipment.armor=I.armorRecord(u.equipment.armor,u.id+'-initial-armor');
     for(const u of Object.values(state.residents))if(u.weaponPlanMigrated){if(state.tactics[u.id])delete state.tactics[u.id].priorities;delete u.weaponPlanMigrated;}
     for(const u of [...companions,...Object.values(state.residents)]){const old=(Array.isArray(s.companions)?s.companions:[]).find(record=>record?.id===u.id)||s.residents?.[u.id];if(old&&(!(old.potentialRevision>=2)||old.constitutionRevision!==1)&&G.GENERAL_POTENTIALS[u.characterId||u.id]&&old.potentials){const oldMax=I.apply(old).maxSoldiers,newMax=I.apply(u).maxSoldiers;if(oldMax>0&&newMax>0){if(Object.hasOwn(state.troops,u.id))state.troops[u.id]=Math.floor(Math.max(0,Math.min(1,state.troops[u.id]/oldMax))*newMax);if(u.startSoldiers!=null)u.startSoldiers=Math.floor(Math.max(0,Math.min(1,u.startSoldiers/oldMax))*newMax);}}}
-    // 仅迁移旧版默认长枪；玩家自行更换的兵器及已练出的熟练经验保留。
+    // 仅迁移旧版默认长枪；玩家自行更换的兵器保留。
     for(const u of [...companions,...Object.values(state.residents)])if((u.characterId||u.id)==='taishici'&&u.defaultLoadoutVersion!==2){
-      if(u.weapon?.type==='spear'&&u.weapon.uid==='taishici-weapon'){u.weapon=I.create('weapon-blade',u.weapon.quality||'green',u.weapon.uid);u.skills=W.forWeapon(u.weapon);u.priorities=W.prioritiesFor(u.skills);u.weaponProficiencies={...u.weaponProficiencies,blade:Math.max(60,u.weaponProficiencies?.blade||0)};delete state.tactics[u.id];}u.defaultLoadoutVersion=2;
+      if(u.weapon?.type==='spear'&&u.weapon.uid==='taishici-weapon'){u.weapon=I.create('weapon-blade',u.weapon.quality||'green',u.weapon.uid);u.skills=W.forWeapon(u.weapon);u.priorities=W.prioritiesFor(u.skills);delete state.tactics[u.id];}u.defaultLoadoutVersion=2;
     }
     for(const u of [...companions,...Object.values(state.residents)])if(u.id==='zhangliang'&&u.campLevelVersion!==2){if(!u.recruitLevelVersion&&(u.level<10||u.level===15&&!u.experience)){const old=I.apply(u),attributes=G.attributesAt(u.baseAttributes,u.potentials,10);Object.assign(u,{level:10,attributes},attributes);delete u.maxSoldiers;const max=I.apply(u).maxSoldiers;if(Object.hasOwn(state.troops,u.id))state.troops[u.id]=Math.floor(state.troops[u.id]/old.maxSoldiers*max);if(u.startSoldiers!=null)u.startSoldiers=Math.floor(u.startSoldiers/old.maxSoldiers*max);}u.campLevelVersion=2;}
 
@@ -72,7 +73,7 @@
     const hero=heroUnit(character,state),max=hero.maxSoldiers;let health=Number(state.troops.hero);if(s.passiveEffectsVersion!==1&&Number.isFinite(health)&&max!==hero.baseMaxHealth)health=Math.floor(Math.max(0,Math.min(1,health/hero.baseMaxHealth))*max);state.passiveEffectsVersion=1;state.troops.hero=Math.max(0,Math.min(max,Number.isFinite(health)?health:max));return state;
   }
   class World{
-    constructor(character,saved){this.character=X.normalizeRecord(G.normalizeCharacter({...character,...(character.difficulty==='hell'&&!character.hellBalanceVersion&&Object.values(character.potentials||{}).every(n=>n===1)?{potentials:Object.fromEntries(G.KEYS.map(key=>[key,40])),hellBalanceVersion:1}: {})}));if(this.character.weaponCatalogVersion!==1){const C=node?require('./weapon-catalog.js'):root.WeaponCatalog,values={};for(const [id,value]of Object.entries(this.character.weaponProficiencies||{})){const key=C.legacyAliases[id]||id;values[key]=Math.max(values[key]||0,value);}this.character.weaponProficiencies=values;this.character.weaponCatalogVersion=1;}this.state=normalize(this.character,saved);this.syncCompanionLevels();if(this.state.weaponType&&!this.state.weapon)this.state.weapon=I.create('weapon-'+this.state.weaponType,'white','initial-weapon');this.pending=null;this.journey=this.state.resolvedLeg?{...this.state.resolvedLeg,checkpoint:this.snapshot(),event:{kind:'quiet'},checked:true}:null;this.lastReward=null;this.restoreEquipmentRewards();this.restoreTrophyRewards();}
+    constructor(character,saved){this.character=X.normalizeRecord(G.normalizeCharacter({...character,...(character.difficulty==='hell'&&!character.hellBalanceVersion&&Object.values(character.potentials||{}).every(n=>n===1)?{potentials:Object.fromEntries(G.KEYS.map(key=>[key,40])),hellBalanceVersion:1}: {})}));this.character.weaponCatalogVersion=1;this.state=normalize(this.character,saved);this.syncCompanionLevels();if(this.state.weaponType&&!this.state.weapon)this.state.weapon=I.create('weapon-'+this.state.weaponType,'white','initial-weapon');this.pending=null;this.journey=this.state.resolvedLeg?{...this.state.resolvedLeg,checkpoint:this.snapshot(),event:{kind:'quiet'},checked:true}:null;this.lastReward=null;this.restoreEquipmentRewards();this.restoreTrophyRewards();}
     questStateKey(){return JSON.stringify([this.state.quests,this.state.heroQuests,this.state.recruits,this.state.recruitReports,this.state.story,this.state.chapterOne,this.state.questCompletions,this.state.serviceRumors]);}
     refreshQuestNotice(){const raw=this.questStateKey();if(raw===this.questNoticeKey)return this.state.questNotice.unread;this.questNoticeKey=raw;const q=this.state.quests.changshan,signature=E.seedNumber(JSON.stringify([this.quests().map(q=>[q.id,q.title,q.category,q.taskStatus,q.complete,q.target]),[q.stage,q.zhaoInvitation,q.healerDecision,q.healerStayDecided,q.healerRescued,q.healerJoined,q.grainWins],this.state.quests.side,this.state.heroQuests,this.counts()]));if(signature!==this.state.questNotice.signature){this.state.questNotice={signature,unread:true};}return this.state.questNotice.unread;}
     readQuests(){this.refreshQuestNotice();this.state.questNotice.unread=false;}
@@ -91,14 +92,14 @@
     pendingReports(country){return countries.includes(country)?this.state.recruits[country].filter(id=>!this.state.recruitReports[country].includes(id)):[];}
     claimRecruitReward(country){
       const court=Courts.definitions[country],ids=this.pendingReports(country);if(!court||!ids.length||!this.state.inside||this.state.nodeId!==court.place||this.pending||this.journey||this.state.pendingReward)return null;
-      this.state.recruitReports[country].push(...ids);const names=ids.map(id=>this.state.companions.find(u=>u.id===id)?.name||this.state.residents[id]?.name||H.definitions[id]?.name||({zhaoyun:'赵云',zhenji:'甄姬',ganning:'甘宁'})[id]||id),reward={title:'招贤赏钱',reportedNames:names,money:ids.length*Courts.rewardPerHero,gains:[],proficiencies:[],items:[]};
+      this.state.recruitReports[country].push(...ids);const names=ids.map(id=>this.state.companions.find(u=>u.id===id)?.name||this.state.residents[id]?.name||H.definitions[id]?.name||({zhaoyun:'赵云',zhenji:'甄姬',ganning:'甘宁'})[id]||id),reward={title:'招贤赏钱',reportedNames:names,money:ids.length*Courts.rewardPerHero,gains:[],items:[]};
       this.state.money+=reward.money;this.state.pendingReward=copy(reward);this.state.afterBattle=null;this.lastReward=reward;return copy(reward);
     }
     coalitionReady(){return countries.every(id=>this.state.recruits[id].length>=3);}
     chooseWeapon(type){if(!R.WEAPON_TYPES.some(t=>t.id===type))return false;this.state.weaponType=type;this.state.weapon=I.create('weapon-'+type,'white','initial-weapon');this.state.outfitted=true;delete this.state.tactics.hero;return true;}
     equipWeapon(weapon){if(!weapon||!weapon.type)return false;const resolved=W.resolveWeapon(weapon);W.forWeapon(resolved);this.state.weapon=copy(resolved);this.state.weaponType=resolved.type;this.state.outfitted=true;delete this.state.tactics.hero;return true;}
     prepareRecruit(raw){
-      const u=copy(raw),id=u.characterId||u.id;
+      const u=copy(raw),id=u.characterId||u.id;if(u.equipment?.armor)u.equipment.armor=I.armorRecord(u.equipment.armor,u.id+'-initial-armor');
       if(u.passives?.includes('enemy-stun-resistance')){u.passives=u.passives.filter(id=>id!=='enemy-stun-resistance');u.statusImmunities=u.statusImmunities?.filter(id=>id!=='stun');}
       const passiveDefinitions=(node?require('./passives.js'):root.BattlePassives).definitions;u.passives=(u.passives||[]).filter(id=>typeof id==='string'&&!passiveDefinitions[id]?.enemyOnly&&!id.startsWith('enemy-status-immunity:'));if(u.observationEnemy||u.side==='enemy'){u.statusImmunities=[];delete u.boss;delete u.side;}delete u.observationEnemy;
       if(id==='zhaoyun'||!u.baseAttributes||!u.potentials)return u;
@@ -113,7 +114,7 @@
     members(){return [heroUnit(this.character,this.state),...this.state.companions.map(raw=>{const u=I.apply({...copy(raw),trophies:T.equipped(this.state,raw.id)}),max=u.maxSoldiers??E.maxHealth(u.constitution);return {...u,...(root.CharacterAssets?.manifest.characters[u.characterId||u.id]?root.CharacterAssets.resolve(u.characterId||u.id):{}),maxSoldiers:max,condition:this.state.conditions[u.id],dead:this.state.conditions[u.id]==='dead',startSoldiers:clampTroops(this.state.troops[u.id]??max,max),...safeObject(this.state.tactics[u.id]),...(!u.weapon?{attack:0,skills:W.forWeapon(null),priorities:W.prioritiesFor(W.forWeapon(null))}:{})};})];}
     addTrophy(templateId){const t=T.create(templateId,'trophy-'+(++this.state.trophySerial),this.state.roadSeed+':trophy:'+this.state.trophySerial);this.state.trophies.push(t);return copy(t);}
     claimTrophy(key,templateId){if(this.state.trophyClaims[key])return [];this.state.trophyClaims[key]=true;return [this.addTrophy(templateId)];}
-    restoreTrophyRewards(){const items=[...(['return','decision','complete'].includes(this.state.quests.changshan.stage)?this.claimTrophy('changshan','peace-jade'):[]),...(this.state.quests.side['reed-shrine']?.paid?this.claimTrophy('shrine','sacred-censer'):[])];if(!items.length)return;const reward=this.state.pendingReward||{title:'获得遗物',gains:[],proficiencies:[],money:0,items:[]};reward.items.push(...items);this.state.pendingReward=reward;}
+    restoreTrophyRewards(){const items=[...(['return','decision','complete'].includes(this.state.quests.changshan.stage)?this.claimTrophy('changshan','peace-jade'):[]),...(this.state.quests.side['reed-shrine']?.paid?this.claimTrophy('shrine','sacred-censer'):[])];if(!items.length)return;const reward=this.state.pendingReward||{title:'获得遗物',gains:[],money:0,items:[]};reward.items.push(...items);this.state.pendingReward=reward;}
     trophyOwner(uid){return T.owner(this.state,uid);}
     equipTrophy(id,slot,uid){if(this.pending||this.journey||![0,1].includes(slot)||!this.members().some(u=>u.id===id)||uid&&!this.state.trophies.some(t=>t.uid===uid))return false;const before=this.members();if(uid){const owner=T.owner(this.state,uid);if(owner)this.state.trophyEquipment[owner.id][owner.slot]=null;}this.state.trophyEquipment[id]||=[null,null];this.state.trophyEquipment[id][slot]=uid||null;for(const old of before){const member=this.members().find(u=>u.id===old.id);this.state.troops[old.id]=Math.min(old.startSoldiers,member.maxSoldiers);}return true;}
     upgradeTrophy(uid){const index=this.state.trophies.findIndex(t=>t.uid===uid),item=this.state.trophies[index],cost=T.costs[(item?.level||0)-1];if(this.pending||this.journey||!item||cost==null||this.state.money<cost)return false;const upgraded=T.upgrade(item);if(!upgraded)return false;const before=this.members();this.state.money-=cost;this.state.trophies[index]=upgraded;for(const old of before)this.state.troops[old.id]=Math.min(old.startSoldiers,this.members().find(u=>u.id===old.id).maxSoldiers);return {item:copy(upgraded),roll:copy(upgraded.rolls.at(-1)),cost};}
@@ -124,7 +125,7 @@
     }
     restoreEquipmentRewards(){
       const keys=[...(['return','decision','complete'].includes(this.state.quests.changshan.stage)?['story:escort']:[]),...N.sideQuests.filter(q=>this.state.quests.side[q.id].paid).map(q=>'side:'+q.id),...Object.keys(this.state.heroQuests).filter(id=>this.state.heroQuests[id].stage==='complete').map(id=>'hero:'+id)],items=keys.flatMap(key=>this.claimEquipmentReward(key));
-      if(!items.length)return;const reward=this.state.pendingReward||{title:'获得谢礼',gains:[],proficiencies:[],money:0,items:[]};reward.items=[...(reward.items||[]),...items];this.state.pendingReward=reward;
+      if(!items.length)return;const reward=this.state.pendingReward||{title:'获得谢礼',gains:[],money:0,items:[]};reward.items=[...(reward.items||[]),...items];this.state.pendingReward=reward;
     }
     addItem(template,quality='white'){const uid='item-'+(++this.state.itemSerial),item=typeof template==='object'?{...copy(template),uid}:I.roll(template,quality,E.seededRandom(this.state.roadSeed+':item:'+uid),uid,this.character.level);this.state.inventory.push(item);return copy(item);}
     equipped(id,slot){if(id==='hero')return slot==='weapon'?this.state.weapon:this.state.heroEquipment[slot];const u=this.state.companions.find(u=>u.id===id);return slot==='weapon'?u?.weapon:u?.equipment?.[slot];}
@@ -273,18 +274,25 @@
       this.pending={kind:'story',phase,to:this.state.nodeId,checkpoint,memberIds:this.members().map(u=>u.id),seed:this.state.seed+':story:'+phase+':'+q.grainWins};return true;
     }
     zhaoYunUnit(){
-      const weapon={type:'spear',name:'白蜡枪',power:10},skills=W.forWeapon(weapon),u={...G.create('zhaoyun',3),id:'zhaoyun',name:'赵云',characterId:'zhaoyun',homeNode:'chengdu',guest:true,experience:0,experienceVersion:2,weaponPlanVersion:3,passives:['zhaoyun-courage','zhaoyun-seven-crossings','zhaoyun-ever-victorious','zhaoyun-loyal-guard'],equipment:{armor:{name:'轻甲'},accessory1:null,accessory2:null},weapon,attack:10,armor:6,resistance:3,weaponProficiencies:{spear:75},skills,priorities:W.prioritiesFor(skills)};
+      const weapon={type:'spear',name:'白蜡枪',power:10},skills=W.forWeapon(weapon),u={...G.create('zhaoyun',3),id:'zhaoyun',name:'赵云',characterId:'zhaoyun',homeNode:'chengdu',guest:true,experience:0,experienceVersion:2,weaponPlanVersion:3,passives:['zhaoyun-courage','zhaoyun-seven-crossings','zhaoyun-ever-victorious','zhaoyun-loyal-guard'],equipment:{armor:I.armorRecord({name:'轻甲'},'zhaoyun-initial-armor'),accessory1:null,accessory2:null},weapon,attack:10,armor:6,resistance:3,skills,priorities:W.prioritiesFor(skills)};
       return u;
     }
     zhenJiUnit(){
       const weapon={type:'needle',name:'金针',power:10},skills=W.forWeapon(weapon),priorities=W.prioritiesFor(skills);for(const rule of priorities){const skill=W.skills[rule.skill];if(skill.kind==='heal'){rule.selfThreshold=.8;rule.allyThreshold=.8;}if(skill.kind==='buff')rule.disabled=true;}
-      return {...G.create('zhenji',this.character.level),id:'zhenji',unitType:'general',name:'甄姬',characterId:'zhenji',homeNode:'zhongshan-county',guest:true,experience:0,experienceVersion:2,weaponPlanVersion:3,passives:['benevolent-healer','zhenji-clear-water','zhenji-serenity'],weapon,attack:10,armor:3,resistance:5,equipment:{armor:{name:'绣纹轻衣'},accessory1:null,accessory2:null},weaponProficiencies:{needle:65},skills,priorities};
+      return {...G.create('zhenji',this.character.level),id:'zhenji',unitType:'general',name:'甄姬',characterId:'zhenji',homeNode:'zhongshan-county',guest:true,experience:0,experienceVersion:2,weaponPlanVersion:3,passives:['benevolent-healer','zhenji-clear-water','zhenji-serenity'],weapon,attack:10,armor:3,resistance:5,equipment:{armor:I.armorRecord({name:'绣纹轻衣'},'zhenji-initial-armor'),accessory1:null,accessory2:null},skills,priorities};
     }
     recruitZhenJi(){
       const q=this.state.quests.changshan;if(q.healerJoined||this.pending||this.journey||!['zhongshan','zhongshan-county'].includes(this.state.nodeId)||!this.canRecruit())return false;
       const unit=this.prepareRecruit(this.zhenJiUnit());if(['escort','return','decision','complete'].includes(q.stage)){delete unit.guest;q.healerStayDecided=true;}this.state.companions.push(unit);this.state.troops[unit.id]=E.maxHealth(unit.constitution);if(!this.state.recruits.wei.includes(unit.id))this.state.recruits.wei.push(unit.id);
       if(this.state.activeIds.length>=this.activeLimit()){const replaced=[...this.state.activeIds].reverse().find(id=>!['hero','zhaoyun'].includes(id));if(replaced)this.state.activeIds=this.state.activeIds.filter(id=>id!==replaced);}
       if(this.state.activeIds.length<this.activeLimit())this.state.activeIds.push(unit.id);q.healerRescued=true;q.healerJoined=true;q.healerDecision=false;return true;
+    }
+    recruitPreview(id){
+      const member=this.members().find(u=>u.id===id);if(member)return copy(member);
+      let raw=this.state.residents[id];
+      if(!raw){if(id==='zhaoyun')raw=this.zhaoYunUnit();else if(id==='zhenji')raw=this.zhenJiUnit();else if(id==='zhangliang'){const P=node?require('./prologue.js'):root.PengpaiPrologue;raw=P.general(id,this.character.level);}else if(H.definitions[id])raw=Recruitment.companion(id,this.character.level);else return null;raw=this.prepareRecruit(raw);}
+      const u=I.apply(copy(raw)),max=u.maxSoldiers,art=root.CharacterAssets?.manifest.characters[u.characterId||u.id]?root.CharacterAssets.resolve(u.characterId||u.id):{};
+      return {...u,...art,maxSoldiers:max,startSoldiers:clampTroops(u.startSoldiers??max,max)};
     }
     npcUnit(id){
       this.syncCompanionLevels();const member=this.members().find(u=>u.id===id)||this.state.residents[id];if(member)return copy(member);
@@ -328,7 +336,7 @@
       const level=({'militia-one':1,'militia-two':3,'militia-five':5})[training.id]||Math.min(5,training.count||1);
       if(training.rivals){const P=node?require('./prologue.js'):root.PengpaiPrologue;return training.rivals.map(id=>({...P.general(id,10),id:'training-'+id,characterId:id,formationRow:id==='zhangliang'?'front':'back'}));}
       if(training.dummy)return [{...G.create('yellowMilitia',1),id:'training-dummy',name:'稻草人',characterId:'training-dummy',unitType:'soldier',species:'object',weapon:null,attack:0,armor:2,resistance:0,skills:[],priorities:[],targetRule:'random',experienceWeight:.5}];
-      const profiles=['yellowMilitia','yellowSkirmisher','yellowGuard'];return Array.from({length:training.count},(_,i)=>({...G.create(profiles[i%profiles.length],level),id:'training-militia-'+i,name:'黄巾军',characterId:'yellow-militia',weapon:{type:'spear',name:'木杆枪'},weaponProficiencies:{spear:30},attack:6,armor:2,resistance:0,skills:['spear-cut'],priorities:[{skill:'spear-cut',when:'always'}]}));
+      const profiles=['yellowMilitia','yellowSkirmisher','yellowGuard'];return Array.from({length:training.count},(_,i)=>({...G.create(profiles[i%profiles.length],level),id:'training-militia-'+i,name:'黄巾军',characterId:'yellow-militia',weapon:{type:'spear',name:'木杆枪'},attack:6,armor:2,resistance:0,skills:['spear-cut'],priorities:[{skill:'spear-cut',when:'always'}]}));
     }
     trainingAllies(training){return this.partyGroups().active.filter(u=>!training.rivals?.includes(u.id));}
     beginTraining(id){
@@ -394,19 +402,11 @@
       const passives=heroPassives();
       return {id:'road-encounter',title:encounter.title,scene:Scenes.arrange(copy(encounter.scene),enemies),allies:[...allies,...extraAllies],enemies,passives,rules:{...copy(encounter.rules),difficulty:this.character.difficulty,partySlots:this.activeLimit(),seed:this.pending.seed}};
     }
-    awardProficiency(result){
-      const gains=[];for(const use of F.rewards(result)){
-        const record=use.id==='hero'?this.character:this.state.companions.find(u=>u.id===use.id);if(!record)continue;
-        const gain=F.grant(record,use.type,use.amount);if(use.id==='hero')this.character=gain.record;else this.state.companions=this.state.companions.map(u=>u.id===use.id?gain.record:u);
-        gains.push({...gain,id:use.id,name:record.name,uses:use.uses});
-      }return gains;
-    }
     resolveBattle(result){
       if(!this.pending)return false;const pending=this.pending,scenario=this.battleScenario();this.pending=null;this.lastReward=null;
       const practice=pending.kind==='heroQuest'&&H.definitions[pending.questId].battles[pending.phase].acceptDefeat;if(result.result!=='victory'&&!practice){const mapZoom=this.state.mapZoom;this.state=normalize(this.character,pending.checkpoint);this.state.mapZoom=mapZoom;this.journey=null;this.cancelRoute();if(pending.kind==='training')this.rest();return false;}
       for(const u of result.units||[])if(u.side==='ally'&&this.members().some(m=>m.id===u.id)){this.state.troops[u.id]=u.soldiers;this.state.conditions[u.id]=u.dead?'dead':u.wounded?'wounded':'healthy';}
-      const proficiencyGains=this.awardProficiency(result);
-      const defeated=(result.units||[]).filter(u=>u.side==='enemy'),foes=defeated.length?defeated:scenario.enemies,firstVictory=pending.kind==='story'&&pending.phase==='entry'&&this.character.level===1;this.lastReward=this.awardExperience(member=>practice?0:X.reward(foes,member)+(firstVictory&&member===this.character?20:0),pending.memberIds||this.members().map(u=>u.id));this.lastReward.proficiencies=proficiencyGains;if(firstVictory)this.lastReward.milestone={label:'初战历练',experience:20};
+      const defeated=(result.units||[]).filter(u=>u.side==='enemy'),foes=defeated.length?defeated:scenario.enemies,firstVictory=pending.kind==='story'&&pending.phase==='entry'&&this.character.level===1;this.lastReward=this.awardExperience(member=>practice?0:X.reward(foes,member)+(firstVictory&&member===this.character?20:0),this.members().map(u=>u.id));if(firstVictory)this.lastReward.milestone={label:'初战历练',experience:20};
       const rng=E.seededRandom(pending.seed+':loot:'+this.state.battleSerial++),drops=pending.kind==='training'||practice?{money:0,items:[]}:I.loot(foes,rng);this.state.money+=drops.money;this.lastReward.money=drops.money;this.lastReward.items=drops.items.map(i=>this.addItem(i));
       if(pending.kind==='story'){const q=this.state.quests.changshan;if(pending.phase==='entry'){q.stage='supplies';q.zhaoInvitation=!this.state.companions.some(u=>u.id==='zhaoyun');}else if(pending.phase==='grain'){q.grainWins++;q.stage=q.grainWins>=2?'escort':'supplies';if(q.grainWins>=2&&!q.healerStayDecided&&this.state.companions.some(u=>u.id==='zhenji'))q.healerDecision=true;this.lastReward.progress={label:'夺回粮车',value:q.grainWins/2};}else if(pending.phase==='rescue'){q.healerRescued=true;this.recruitZhenJi();q.stage=q.grainWins>=2?'escort':'supplies';}else if(pending.phase==='escort')q.stage='return';this.state.inside=true;}
       if(pending.kind==='side'){const data=N.sideQuests.find(q=>q.id===pending.questId),q=this.state.quests.side[data.id];q.wins++;this.lastReward.progress={label:data.title,value:q.wins/data.rounds};this.state.inside=true;if(data.dungeon&&q.wins>=data.rounds){q.paid=true;this.lastReward.items.push(this.addItem(I.roll(data.item,'green',rng,undefined,data.fixedCombatLevel)));this.state.money+=data.money;this.lastReward.money+=data.money;this.markQuestComplete(data.id);}}

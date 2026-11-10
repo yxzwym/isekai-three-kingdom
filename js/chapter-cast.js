@@ -37,7 +37,7 @@
   const d=definitions[id];if(!d)throw new TypeError('未登记剧情人物：'+id);
   level??=d.level;
   const weapon={...I.create('weapon-'+d.type,boss?'blue':'green',id+'-weapon'),...clone(d.weapon||{})},skills=W.forWeapon(weapon),growth=G.create(id,level),armor=I.create(boss?'iron-armor':'leather-armor',boss?'blue':'green',id+'-armor');
-  const u={...growth,id,name:d.name,characterId:id,unitType:'general',homeNode:d.home,experience:0,experienceVersion:2,weaponPlanVersion:3,weapon,skills,priorities:W.prioritiesFor(skills),equipment:{armor,accessory1:boss?I.create('copper-ring','blue',id+'-ring'):null,accessory2:boss?I.create('wood-beads','blue',id+'-beads'):null},armor:boss?15:3,resistance:boss?15:3,weaponProficiencies:{[weapon.proficiencyType||d.type]:boss?90:65},passives:clone(d.passives||[])};
+  const u={...growth,id,name:d.name,characterId:id,unitType:'general',homeNode:d.home,experience:0,experienceVersion:2,weaponPlanVersion:3,weapon,skills,priorities:W.prioritiesFor(skills),equipment:{armor,accessory1:boss?I.create('copper-ring','blue',id+'-ring'):null,accessory2:boss?I.create('wood-beads','blue',id+'-beads'):null},armor:boss?15:3,resistance:boss?15:3,passives:clone(d.passives||[])};
   if(d.guaranteedCritical)u.guaranteedCritical=true;if(d.ignoreArmor)u.ignoreArmor=true;return u;
  }
  for(const d of Object.values(definitions))if(d.country!=='dong')C.registerCompanion(d.id,level=>unit(d.id,level??d.level));

@@ -155,11 +155,11 @@
       zhangbao:{name:'张宝',attack:8,armor:8,resistance:10,weapon:{type:'scripture',name:'太平经'},skills:W.forWeapon({type:'scripture'}),priorities:[{skill:'scripture-2',when:'healThresholds',selfThreshold:.85,allyThreshold:.85},{skill:'scripture-3',when:'enemyCount',threshold:2,disabled:true}]},
       zhangliang:{name:'张梁',passives:['zhangliang-might','zhangliang-hardy'],attack:8,armor:12,resistance:6,weapon:{type:'spear',name:'铁枪'},skills:W.forWeapon({type:'spear'}),priorities:W.prioritiesFor(W.forWeapon({type:'spear'}))}
     };
-    const u={id,unitType:'general',campLevelVersion:2,weaponPlanVersion:3,...G.create(id,level),...clone(data[id]),...assets(id)};u.weaponProficiencies={[u.weapon.type]:100};u.equipment={armor:{name:id==='zhangliang'?'铁甲':'道袍'},accessory1:null,accessory2:null};return (typeof module!=='undefined'&&module.exports?require('./passives.js'):root.BattlePassives).complete(u);
+    const u={id,unitType:'general',campLevelVersion:2,weaponPlanVersion:3,...G.create(id,level),...clone(data[id]),...assets(id)};u.equipment={armor:(typeof module!=='undefined'&&module.exports?require('./items.js'):root.ItemCatalog).armorRecord({name:id==='zhangliang'?'铁甲':'道袍'},id+'-initial-armor'),accessory1:null,accessory2:null};return (typeof module!=='undefined'&&module.exports?require('./passives.js'):root.BattlePassives).complete(u);
   }
   function soldier(i,level=8){
     const profiles=['imperialSoldier','imperialPikeman','imperialGuard','imperialSkirmisher'],growth=G.create(profiles[Math.max(0,i-1)%profiles.length],level),groups=[2,4,3,4];
-    return {id:'soldier-'+i,name:'官兵',...assets('imperial-soldier'),...growth,weapon:{type:'spear',name:'长枪'},equipment:{armor:{name:'旧铁甲'}},weaponProficiencies:{spear:90},attack:6,armor:5,resistance:5,skills:['spear-cut'],priorities:[{skill:'spear-cut',when:'always'}]};
+    return {id:'soldier-'+i,name:'官兵',...assets('imperial-soldier'),...growth,weapon:{type:'spear',name:'长枪'},equipment:{armor:{name:'旧铁甲'}},attack:6,armor:5,resistance:5,skills:['spear-cut'],priorities:[{skill:'spear-cut',when:'always'}]};
   }
   function createBattle(stage,character,preparation={}){
     const basic={id:stage,title:'村道交锋',control:{retreatDisabled:true},scene:{background:'./assets/story/village-road-v3.webp'},skills:clone(skills),rules:{difficulty:character.difficulty,level:1,enemyLevel:1,allySp:0,random:false,critical:false,hit:false,seed:'prologue-'+stage}};
@@ -167,7 +167,7 @@
     if(stage==='manual-fight'){const j=general('zhangjiao');j.passives=['thunder-lord-tutorial'];return {...basic,title:'一杖退敌',hint:'点击技能，再选择敌人',control:{...basic.control,manualOnly:true,lockTactics:true},allies:[j],enemies:[soldier(1)]};}
     if(!['prepare','squad-fight'].includes(stage))throw new TypeError('未知序章战斗');
     const allies=['zhangjiao','zhangbao','zhangliang'].map(id=>{const u=general(id),saved=preparation[id];if(id==='zhangjiao')u.passives=['thunder-lord-tutorial'];if(saved){if(['manual','auto'].includes(saved.mode))u.initialMode=saved.mode;if(Array.isArray(saved.rules))u.priorities=saved.rules.filter(r=>u.skills.includes(r.skill));u.targetRule=saved.targetRule;}return u;});
-    const captain={...soldier(1),...G.create('imperialCaptain',8),id:'captain',name:'官兵队长',armor:10,resistance:5,...assets('imperial-captain'),weapon:{type:'spear',name:'铁枪'},equipment:{armor:{name:'加固铁甲'},accessory1:null,accessory2:null},weaponProficiencies:{spear:90},skills:['shield-taunt','spear-cut'],priorities:[{skill:'shield-taunt',when:'always'},{skill:'spear-cut',when:'always'}],weaponPlanVersion:3};
+    const captain={...soldier(1),...G.create('imperialCaptain',8),id:'captain',name:'官兵队长',armor:10,resistance:5,...assets('imperial-captain'),weapon:{type:'spear',name:'铁枪'},equipment:{armor:{name:'加固铁甲'},accessory1:null,accessory2:null},skills:['shield-taunt','spear-cut'],priorities:[{skill:'shield-taunt',when:'always'},{skill:'spear-cut',when:'always'}],weaponPlanVersion:3};
     return {...basic,title:'黄巾并肩',preparationHint:'点击人物头像，可配置技能释放设置',scene:{...basic.scene,enemyFormation:{back:[1,2,3,4],front:[0]}},allies,enemies:[captain,...Array.from({length:4},(_,i)=>soldier(i+1))]};
   }
   function preparationOf(battle){return Object.fromEntries(battle.units.filter(u=>u.side==='ally').map(u=>[u.id,{mode:u.mode,rules:clone(u.priorities),targetRule:u.targetRule}]));}
