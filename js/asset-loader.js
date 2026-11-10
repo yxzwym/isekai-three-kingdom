@@ -74,9 +74,9 @@
   const startupFiles=()=>{const files=root.GameAssetManifest||[],sources=[root.PengpaiAssets?.background,root.PengpaiAssets?.logo].filter(Boolean);return files.filter(file=>sources.includes(file.src));};
   function loadingScreen(canvas,ctx,width,height,state,error=false){
     const font=root.PengpaiUI.font,size=bytes=>(bytes/1000000).toFixed(2)+' MB';ctx.save();ctx.setTransform(canvas.width/width,0,0,canvas.height/height,0,0);ctx.fillStyle='#071923';ctx.fillRect(0,0,width,height);ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle='#dfc18b';ctx.font=`20px ${font}`;ctx.fillText('异梦三国',width/2,height*.43);ctx.fillStyle='#dce6e5';ctx.font=`14px ${font}`;ctx.fillText(error?'资源加载失败':`正在加载 ${state.percent}%`,width/2,height*.43+44);
+    ctx.fillStyle='#dfc18b';ctx.font=`20px ${font}`;ctx.fillText('异梦三国',width/2,height*.43);ctx.fillStyle='#dce6e5';ctx.font=`14px ${font}`;ctx.fillText(error?'资源加载失败':state.preparing?'正在准备画面':`正在加载 ${state.percent}%`,width/2,height*.43+44);
     const barWidth=Math.min(300,width-64),x=(width-barWidth)/2,y=height*.43+72;ctx.fillStyle='#173842';ctx.fillRect(x,y,barWidth,6);ctx.fillStyle='#52bccb';ctx.fillRect(x,y,barWidth*state.percent/100,6);ctx.fillStyle='#9eb4b8';ctx.fillText(`${size(state.loadedBytes)} / ${size(state.totalBytes)}`,width/2,y+29);
-    const retry={x:width/2-65,y:y+55,w:130,h:40};if(error){ctx.strokeStyle='#79999c';ctx.strokeRect(retry.x,retry.y,retry.w,retry.h);ctx.fillStyle='#e4e8e4';ctx.fillText('重试',width/2,retry.y+20);}ctx.restore();canvas.setAttribute('aria-label',error?'资源加载失败，点击重试':`资源加载 ${state.percent}%，${state.completed}/${state.total} 项`);return retry;
+    const retry={x:width/2-65,y:y+55,w:130,h:40};if(error){ctx.strokeStyle='#79999c';ctx.strokeRect(retry.x,retry.y,retry.w,retry.h);ctx.fillStyle='#e4e8e4';ctx.fillText('重试',width/2,retry.y+20);}ctx.restore();canvas.setAttribute('aria-label',error?'资源加载失败，点击重试':`${state.preparing?'正在准备画面，':'资源加载 '}${state.percent}%，${state.completed}/${state.total} 项`);return retry;
   }
   // Each canvas view requests only the images it actually uses. Loading blocks input,
   // and the battle clock waits until the current scene is ready.
@@ -87,8 +87,8 @@
     const unsubscribe=loader.subscribe(event=>{if(view.assetSources.has(event.src)){if(event.type==='ready')onReady(event.src);redraw();}}),draw=view.draw,destroy=view.destroy;
     view.draw=function(...args){const waiting=[...view.assetSources].some(src=>!loader.peek(src));if(!view.assetsLoading||!waiting){const previous=currentView;currentView=view;try{draw.apply(this,args);}finally{currentView=previous;}}
       const missing=[...view.assetSources].filter(src=>!loader.peek(src));view.assetsLoading=missing.length>0;
-      if(view.assetsLoading){wave=[...new Set([...wave,...missing])];const now=performance.now(),error=missing.some(src=>loader.error(src));if(waitingSince===null){view.cancel?.();waitingSince=now;delayTimer=setTimeout(redraw,150);}view.assetFailure=error;view.assetLoadingVisible=!!(error||view.assetLoadingVisible||missing.some(src=>!loader.downloaded(src))&&now-waitingSince>=150);
-        if(view.assetLoadingVisible)view.assetRetry=loadingScreen(view.canvas,view.ctx,view.w,view.h,loader.progress(wave),error);
+      if(view.assetsLoading){wave=[...new Set([...wave,...missing])];const now=performance.now(),error=missing.some(src=>loader.error(src));if(waitingSince===null){view.cancel?.();waitingSince=now;delayTimer=setTimeout(redraw,150);}view.assetFailure=error;view.assetLoadingVisible=!!(error||view.assetLoadingVisible||now-waitingSince>=150);
+        if(view.assetLoadingVisible)view.assetRetry=loadingScreen(view.canvas,view.ctx,view.w,view.h,{...loader.progress(wave),preparing:missing.every(src=>loader.downloaded(src))},error);
         else if(hold){const c=view.ctx;c.save();c.setTransform(1,0,0,1,0,0);c.drawImage(hold,0,0,view.canvas.width,view.canvas.height);c.restore();view.canvas.setAttribute('aria-label','正在准备资源');}
         view.hits=[];if(view.input)view.input.hidden=true;}
       else{wave=[];waitingSince=null;clearTimeout(delayTimer);view.assetFailure=false;view.assetLoadingVisible=false;}

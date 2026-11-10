@@ -300,7 +300,7 @@
 
     offerZhenStay(){this.speak(D.questNpcs.zhenji,{lines:['药箱和粮食都找回来了，这一趟我也总算帮上了忙。看着那些伤者都坐上车，我才觉得能安心离开这里。','之前救出来的人已经有人照顾，我想继续跟你们同行，不知道你们方不方便？暂时人手够了，我就先回毋极，有需要再来找我。'],choices:[{label:'留下同行（推荐）',action:()=>{if(this.model.finishZhenStay(true)){this.save();this.speak(D.questNpcs.zhenji,{lines:['那我就跟大家一起走。药箱我会带着，路上谁觉得不舒服，早点告诉我，也好在严重之前处理。']});}}},{label:'先回毋极',action:()=>{if(this.model.finishZhenStay(false)){this.save();this.speak(D.questNpcs.zhenji,{lines:['好，我先回毋极照顾那边的伤者。你们以后要找我，问问甄家的侍女就知道我在哪里，她会带你们过来。']});}}}]});}
 
-    finishZhaoQuest(stay){if(!this.model.finishChangshan(stay))return;this.save();this.speak(D.questNpcs.zhaoyun,{lines:[stay?'我愿意继续跟你走。村里的事情已经安顿好，我们先把你手里的事办完，以后有机会再一起去成都。':'我先去成都看看那边的情况。你以后经过成都，记得来找我，需要一起出门帮忙的话，也不用再客气。','你说想找些愿意出来做事的人，我倒听过一点消息。前些天有北海来的乡亲，说那里有人替百姓解了围。是谁我也没问清，你若往东走，不妨去那边问问。','不过北海离这儿可不近，沿路什么情形，我也没摸清。常山的樵夫正为山道上的贼发愁，巨鹿那边也有人在找失了消息的粮车。不妨先去帮帮他们，添些盘缠，把兵器使顺手了，再走这趟远路。']});}
+    finishZhaoQuest(stay){if(!this.model.finishChangshan(stay))return;this.save();this.speak(D.questNpcs.zhaoyun,{lines:[stay?'我愿意继续跟你走。村里的事情已经安顿好，我们先把你手里的事办完，以后有机会再一起去成都。':'我先去成都看看那边的情况。你以后经过成都，记得来找我，需要一起出门帮忙的话，也不用再客气。','你说想找些愿意出来做事的人，我倒听过一点消息。前些天有北海来的乡亲，说太史慈正在那里照顾生病的母亲，城里的药铺又被人抢了，一直在想办法找药。你若往东走，不妨到北海找他问问，有没有能帮忙的地方。','不过北海离这儿可不近，沿路什么情形，我也没摸清。常山的樵夫正为山道上的贼发愁，巨鹿那边也有人在找失了消息的粮车。不妨先去帮帮他们，添些盘缠，把兵器使顺手了，再走这趟远路。'],onComplete:()=>{if(this.model.state.pendingReward)this.showReward(this.model.state.pendingReward);}});}
     scrollPanel(){return ['tacticsEditor','practiceWeapons'].includes(this.panel?.type)?this.panel.editor.panel:this.panel;}
     resumeDeparturePractice(){
       if(this.model.state.departurePractice==='training'){this.showDepartureTrainer();return;}
@@ -363,9 +363,11 @@
       }[data.id];this.playConversation(rows.map(([npc,lines])=>({npc,lines})),()=>{this.model.state.courtDreams[data.id]=true;this.save();this.interact(npc);});
     }
     courtDialogue(npc){
+      this.model.acceptRecruitAssignment(npc.country);
       const data=root.FactionCourts.definitions[npc.country],ruler=root.FactionCourts.rulerStatus(this.model,npc.country),pending=this.model.pendingReports(npc.country),visits=this.model.state.npcTalks[npc.id]||0,lines=npc.delegate?['先生已经跟我交代过了，你们介绍来的人，由我负责登记。赏钱和需要的文书也都准备好了，有什么事情直接来找我就行。']:pending.length?[data.thanks]:ruler.complete?[ruler.restored]:visits?[data.idle]:data.welcome,choices=[],topics=this.serviceQuestChoices(npc);
       this.model.state.npcTalks[npc.id]=visits+1;
-      if(pending.length)choices.push({label:'领取赏钱 · '+pending.length*root.FactionCourts.rewardPerHero+'文',action:()=>{const reward=this.model.claimRecruitReward(npc.country);if(reward){this.dialogue=null;this.save();this.showReward(reward);}else this.notify('这份赏钱已经领过了。');}});
+      if(this.model.state.pendingReward?.items?.some(item=>item.templateId==='three-courts-seal'))choices.push({label:'查看拜访谢礼',action:()=>{this.dialogue=null;this.save();this.showReward(this.model.state.pendingReward);}});
+      if(pending.length&&!this.model.state.pendingReward)choices.push({label:'领取赏钱 · '+pending.length*root.FactionCourts.rewardPerHero+'文',action:()=>{const reward=this.model.claimRecruitReward(npc.country);if(reward){this.dialogue=null;this.save();this.showReward(reward);}else this.notify('这份赏钱已经领过了。');}});
       choices.push({label:'询问'+ruler.name+'下落',action:()=>{
         if(ruler.complete){this.speak(npc,{lines:[this.model.state.companions.some(u=>u.id===ruler.id)?ruler.name+'正与你们同行。府里的交接已经办好，你们放心出门，有急事我会托人送信。':ruler.restored],choices:[{label:'还有别的事',action:()=>this.courtDialogue(npc)}]});return;}
         if(!ruler.ready){this.speak(npc,{lines:ruler.before,choices:[{label:'我再去打听人选',action:()=>this.courtDialogue(npc)}]});return;}
@@ -374,7 +376,7 @@
       if(topics.length)choices.unshift(...topics);
       if(this.model.state.residents[npc.id])choices.push({label:'请你同行',action:()=>{if(this.model.inviteResident(npc.id)){this.save();this.closeDialogue();}else this.notify(this.model.lastRecruitError);}});
       choices.push({label:'打听消息',action:()=>{const rumor=this.model.townRumor();if(rumor)this.model.hearRumor(rumor.id,rumor.place);this.save();this.speak(npc,{lines:rumor?[rumor.text]:['最近还没有收到新的消息。你们要是准备出门，可以去附近的村子多问问，过路的人常在那里歇脚，说不定有人知道。']});}},{label:'告辞',dismiss:true,action:()=>this.closeDialogue()});
-      this.save();this.speak(npc,{lines,choices});
+      this.save();this.speak(npc,{lines,choices,onComplete:()=>{if(this.model.state.pendingReward)this.showReward(this.model.state.pendingReward);}});
     }
     playConversation(turns,onComplete){const next=index=>{if(index>=turns.length){onComplete?.();return;}const turn=turns[index];this.speak(turn.npc,{lines:turn.lines,onComplete:()=>next(index+1)});};next(0);}
     advanceWithKeyboard(e){

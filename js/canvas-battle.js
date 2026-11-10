@@ -278,14 +278,14 @@
     }
     openPassiveInfo(u,id){if(u?.passives.includes(id)&&this.battle.passives[id])this.panel={type:'passiveInfo',id:u.id,passive:id,previous:this.panel,scroll:0};}
     drawInspect(){
-      const p=this.panel,u=this.battle.unit(p.id);if(!u){this.panel=null;return;}
+      const p=this.panel,u=this.battle.unit(p.id);if(!u){this.panel=null;return;}const current=this.battle.effective(u);
       const potential=root.CharacterGrowth.isGeneral(u)&&u.potentials,{x,y,w,h}=this.panelFrame(u.name+' · 属性',u.side==='enemy'&&!potential?440:620),left=x+22,right=x+w-22,start=y+54,bottom=y+h-14,c=this.ctx,headerHits=this.hits.length;let row=start+12-(p.scroll||0);
       c.save();c.beginPath();c.rect(x,start,w,bottom-start);c.clip();
-      const pairs=[['生命',number(u.soldiers)+' / '+number(u.maxSoldiers)],['等级',number(u.level)],...(!potential?root.PengpaiRules.ATTRIBUTES.map(([key,label])=>[label,number(u[key])]):[]),['护甲',number(this.battle.effective(u).armor)],['抗性',number(this.battle.effective(u).resistance)]];
+      const pairs=[['生命',number(u.soldiers)+' / '+number(u.maxSoldiers)],['等级',number(u.level)],...(!potential?root.PengpaiRules.ATTRIBUTES.map(([key,label])=>[label,number(current[key])]):[]),['护甲',number(this.battle.effective(u).armor)],['抗性',number(this.battle.effective(u).resistance)]];
       if(u.statusImmunities?.includes('stun')&&!u.passives.includes('enemy-stun-resistance'))pairs.push(['状态','抵抗眩晕']);
       for(let i=0;i<pairs.length;i++){const xx=left+(i%2)*(w-44)/2,yy=row+Math.floor(i/2)*26;this.text(pairs[i][0],xx,yy,14,'#acbec2','left');this.text(pairs[i][1],xx+(w-44)/2-10,yy,14,'#eddfbd','right');}
       row+=Math.ceil(pairs.length/2)*26+13;
-      if(potential){this.text('属性',left,row,14,'#acbec2','left');this.text('当前',left+(w-44)*.55,row,14,'#acbec2','right');this.text('潜力',right,row,14,'#d8bc8b','right');row+=27;for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.text(label,left,row,14,'#c5d3d5','left');this.text(number(u[key]),left+(w-44)*.55,row,14,'#e4e2d4','right');this.text(u.potentials[key],right,row,14,'#ddc393','right');row+=27;}row+=14;}
+      if(potential){this.text('属性',left,row,14,'#acbec2','left');this.text('当前',left+(w-44)*.55,row,14,'#acbec2','right');this.text('潜力',right,row,14,'#d8bc8b','right');row+=27;for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.text(label,left,row,14,'#c5d3d5','left');this.text(number(current[key]),left+(w-44)*.55,row,14,'#e4e2d4','right');this.text(u.potentials[key],right,row,14,'#ddc393','right');row+=27;}row+=14;}
       if(u.side!=='enemy'){this.text('装备',left,row,14,'#ebd4a6','left');row+=25;this.text(u.weapon?.name||(u.weapon===null?'徒手':'未登记武器'),left,row,14,'#d6e2e3','left');this.text(`攻击 ${number(u.attack)}`,right,row,14,'#c5d3d5','right');row+=25;
       for(const [slot,label]of [['armor','防具'],['accessory1','饰品'],['accessory2','饰品']]){this.text(label,left,row,14,'#acbec2','left');this.text(u.equipment?.[slot]?.name||'未装备',right,row,14,'#c5d3d5','right');row+=25;}
       }
@@ -381,6 +381,7 @@
       const p=this.panel,u=this.battle.unit(p.id);if(!u||!['ready','running'].includes(this.battle.status)){this.panel=null;return;}
       const contentHeight=p.rules.reduce((height,r)=>height+(this.battle.skills[r.skill].kind==='heal'?166:114),70);
       const c=this.ctx,{x,y:top,w,h}=this.panelFrame(`${u.name} · 施法设置`,contentHeight+65),pad=17,left=x+pad,bottom=top+h-18;
+      this.box(x+w-104,top+9,48,32,'#252c27','#766e57',2);this.text('属性',x+w-80,top+25,14,'#dcd8c5');this.hits.push({x:x+w-104,y:top+9,w:48,h:32,label:'属性',action:()=>{this.panel={type:'inspect',id:u.id,scroll:0,previous:p};}});
       const start=top+49,viewHeight=bottom-start;let y=start-p.scroll;
       p.maxScroll=Math.max(0,contentHeight-viewHeight);p.scroll=clamp(p.scroll,0,p.maxScroll);y=start-p.scroll;
       c.save();c.beginPath();c.rect(x,start,w,viewHeight);c.clip();const before=this.hits.length;
@@ -406,7 +407,7 @@
       for(const r of p.rules)if(this.battle.skills[r.skill].kind==='buff'){if(this.battle.skills[r.skill].buff?.taunt){const t=r.displayThreshold??1.01;r.when=t>=1.01?'always':'selfBelow';r.threshold=t;}else{r.when='always';r.threshold=0;}delete r.displayThreshold;}
       this.battle.setTactics(u.id,{rules:p.rules,targetRule:p.targetRule});this.panel=null;this.options?.onTacticsSave?.(u,this);
     }
-    closePanel(){if(this.panel?.type==='tactics')this.commitTactics();else if(['skillInfo','passiveInfo'].includes(this.panel?.type))this.panel=this.panel.previous;else this.panel=null;}
+    closePanel(){if(this.panel?.type==='tactics')this.commitTactics();else if(['skillInfo','passiveInfo','inspect'].includes(this.panel?.type))this.panel=this.panel.previous||null;else this.panel=null;}
     notify(text){this.notice={text,until:performance.now()+2000};}
     notifyStatus(u,status){this.notice={unitId:u.id,statusId:status.id,statusName:status.name,until:performance.now()+2000};}
     drawNotice(now){

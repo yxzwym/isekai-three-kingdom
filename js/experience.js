@@ -32,7 +32,7 @@
     const level=Math.max(1,integer(member.level)),difference=Math.max(-5,Math.min(5,Math.max(1,integer(enemy.level))-level));
     if(difference<=-5||level>=maxLevel)return 0;
     const multiplier=[0,.1,.25,.45,.7,1,1.04,1.08,1.12,1.16,1.2][difference+5];
-    return points(required(level)*multiplier/10*Math.max(0,Math.min(5,Number(enemy.experienceWeight??1)||0)));
+    return points(required(Math.max(1,Math.min(maxLevel-1,integer(enemy.level))))*multiplier/10*Math.max(0,Math.min(5,Number(enemy.experienceWeight??1)||0)));
   }
   const reward=(enemies,member)=>points((enemies||[]).reduce((sum,enemy)=>sum+rewardForEnemy(enemy,member),0));
   function grant(record,amount){

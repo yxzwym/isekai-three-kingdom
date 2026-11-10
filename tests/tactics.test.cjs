@@ -53,6 +53,11 @@ test('长按设置使用草稿，保存前不改施法规则和手动状态，�
   b.setTactics(u.id,{rules:view.panel.rules,targetRule:'highestCurrent'});assert.equal(b.autoCommand(u),null);assert.equal(u.targetRule,'highestCurrent');assert.equal(b.status,'running');
 });
 
+test('施法设置的属性入口在关闭左侧，观察返回保留草稿，关闭设置才保存',()=>{
+ const b=make(),u=b.unit('zhouyu'),texts=[],v=Object.assign(Object.create(CanvasBattle.prototype),{battle:b,w:540,h:960,hits:[],ctx:{save(){},restore(){},beginPath(){},rect(){},clip(){},fillRect(){}},button(label,x,y,w,h,action){this.hits.push({label,x,y,w,h,action});},text(t){texts.push(String(t));},box(){},slider(){},drawSkillIcon(){},skillRole(){return '';}});global.BattleVFX=require('../js/canvas-effects.js');
+ v.openTactics(u);const draft=v.panel;draft.rules[0].disabled=true;draft.scroll=17;const before=JSON.stringify(u.priorities);v.drawTactics();const scroll=draft.scroll,button=v.hits.find(h=>h.label==='属性'),close=v.hits.find(h=>h.label==='×');assert.ok(button);assert.ok(button.x+button.w<close.x);assert.equal(button.y,close.y+1);button.action();assert.equal(v.panel.type,'inspect');assert.equal(v.panel.previous,draft);v.closePanel();assert.equal(v.panel,draft);assert.equal(v.panel.scroll,scroll);assert.equal(JSON.stringify(u.priorities),before);v.closePanel();assert.equal(v.panel,null);assert.equal(u.priorities[0].disabled,true);
+});
+
 test('敌方单体物理和计策默认随机选存活目标，不集火最低兵力；己方默认不变',()=>{
   const b=make(),u=b.unit('zhangliao'),allies=b.living('ally');assert.ok(b.living('enemy').every(e=>e.targetRule==='random'));assert.ok(allies.every(a=>a.targetRule==='lowestCurrent'));
   allies.forEach((a,i)=>a.soldiers=100+i*100);

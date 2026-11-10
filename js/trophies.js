@@ -13,6 +13,7 @@
   eye:{name:'摄魂石眼',icon:5,last:['tacticSingleLifesteal','tacticGroupLifesteal'],pool:['intelligence','technique','hitBonus','tacticBonus','healingBonus','criticalBonus'],fixed:{1:'hitBonus',3:'intelligence',5:'intelligence'},source:'术士与首领敌手',description:'石眼被雕得栩栩如生，幽光藏在瞳孔深处，像在注视来人。'},
   'tiger-seal':{name:'破阵虎符',icon:6,unique:true,profile:[['war',.5],['war',.5],['war',1],['physicalBonus',1],['physicalBonus',1],['physicalBonus',1],['physicalBonus',1],['physicalBonus',4]],source:'首次击败首领',description:'破阵夺魁的信物，铜纹间还留着难以拭净的旧痕。'},
   'peace-jade':{name:'常山平安佩',icon:7,unique:true,profile:Array.from({length:8},(_,i)=>['constitution',i===7?2.4:.8]),source:'常山护粮归还任务',description:'乡亲赠予的白玉佩，红绳打得结实。愿远行之人，岁岁平安。'},
+  'three-courts-seal':{name:'三府信符',icon:6,unique:true,profile:Array.from({length:8},(_,i)=>['hitBonus',i===7?2.4:.8]),source:'拜访三府',description:'三府往来的铜符，正反两面都刻着验过的印记。乱世相逢，凭此一信。'},
   'sacred-censer':{name:'清心铜炉',icon:8,unique:true,profile:[['constitution',1],['technique',1],['constitution',1],['technique',1],['constitution',1],['technique',1],['constitution',2],['technique',5]],source:'首次完成古祠探索',description:'铜色早已暗了，炉中却还留着一缕淡淡药香。'}
  };
  const round=n=>Math.round(n*100)/100,percent=n=>Number(Number(n).toFixed(2))+'%',format=roll=>(attributes[roll.key]?.name||roll.key)+' +'+percent(roll.value);
