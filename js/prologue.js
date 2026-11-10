@@ -1,6 +1,7 @@
 (function(root){
   'use strict';
   const clone=x=>JSON.parse(JSON.stringify(x));
+  const Journal=typeof module!=='undefined'&&module.exports?require('./conversation-journal.js'):root.ConversationJournal;
   const speakerSides={hero:'right',nanhua:'right',zuoci:'left',yuji:'left',zhangjiao:'left',zhangbao:'right',zhangliang:'left'};
   const line=(speaker,text,partner,figure)=>({speaker,text,partner,figure,side:speakerSides[speaker]||'left'});
   const chapters={
@@ -137,7 +138,7 @@
     ]
   };
   function linesFor(stage,progress={}){const lines=chapters[stage]?.lines;return stage==='dream'&&dreamBranches[progress.dreamChoice]?[...lines,...dreamBranches[progress.dreamChoice]]:lines;}
-  function checkpoint(value={}){value=value&&typeof value==='object'?value:{};let stage=stages.includes(value.stage)?value.stage:'arrival',index=Math.floor(Number(value.index)||0);if(stage==='complete'||(stage==='camp'&&value.storyVersion!==2)){stage='camp';index=0;}const dreamChoice=Object.hasOwn(dreamBranches,value.dreamChoice)?value.dreamChoice:null,lines=linesFor(stage,{dreamChoice});return {storyVersion:2,stage,index:lines?Math.max(0,Math.min(lines.length-1,index)):0,dreamChoice,preparation:clone(value.preparation&&typeof value.preparation==='object'?value.preparation:{}),...(value.world&&typeof value.world==='object'?{world:clone(value.world)}:{})};}
+  function checkpoint(value={}){value=value&&typeof value==='object'?value:{};let stage=stages.includes(value.stage)?value.stage:'arrival',index=Math.floor(Number(value.index)||0);if(stage==='complete'||(stage==='camp'&&value.storyVersion!==2)){stage='camp';index=0;}const dreamChoice=Object.hasOwn(dreamBranches,value.dreamChoice)?value.dreamChoice:null,lines=linesFor(stage,{dreamChoice});return {storyVersion:2,history:Journal.normalize(value.history),stage,index:lines?Math.max(0,Math.min(lines.length-1,index)):0,dreamChoice,preparation:clone(value.preparation&&typeof value.preparation==='object'?value.preparation:{}),...(value.world&&typeof value.world==='object'?{world:clone(value.world)}:{})};}
   function chooseDream(progress,id){if(progress.stage!=='dream'||progress.index!==chapters.dream.lines.length-1||!Object.hasOwn(dreamBranches,id)||progress.dreamChoice)return null;return checkpoint({...progress,dreamChoice:id,index:progress.index+1});}
   function assets(id,appearance,modern=false){
     if(typeof module!=='undefined'&&module.exports&&!root.CharacterAssets)require('./character-assets.js');

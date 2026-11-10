@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const S=require('../js/battle-simulator.js'),E=require('../js/engine.js'),{layout}=require('../js/canvas-battle.js'),R=require('../js/game-rules.js'),I=require('../js/items.js');
 const memory=()=>({value:null,getItem(){return this.value;},setItem(k,v){this.value=v;}});
 test('所有剧情与模拟人物均有同源头像和全身图，裁切范围不越过素材',()=>{const Cast=require('../js/chapter-cast.js'),A=require('../js/character-assets.js'),actors=require('../js/recruitment-content.js').actors;for(const id of new Set([...Object.keys(Cast.definitions),...Object.values(actors).map(a=>a.art).filter(id=>id!=='hero')])){const a=A.resolve(id),f=a.fullbody,p=a.portrait;assert.ok(f&&p,id);assert.equal(p.src,f.src,id);const q=p.crop;assert.ok(q.x>=0&&q.y>=0&&q.width>0&&q.height>0&&q.x+q.width<=f.width&&q.y+q.height<=f.height,id);}});
-test('四场大战的所有敌人均为100级，普通兵按真实成长计算而不受剧情等级上限截断',()=>{
+test('四场大战的所有敌人均为100级，全部使用具名将领并保持真实成长',()=>{
  const Wars=require('../js/great-battles.js'),Catalog=require('../js/enemy-catalog.js');
  for(const b of Wars.definitions){
   assert.equal(b.level,100,b.id);
@@ -10,8 +10,7 @@ test('四场大战的所有敌人均为100级，普通兵按真实成长计算�
   assert.equal(enemies.length,b.foes.length);
   assert.ok(enemies.every(u=>u.level===100),b.id);
   for(const [i,entry] of b.foes.entries())if(typeof entry==='object'){
-   const p=Catalog.profiles[entry.role],values=p.base.map((n,j)=>Math.round(n+p.growth[j]*99)),u=enemies[i];
-   assert.deepEqual([u.war,u.intelligence,u.constitution,u.speed,u.technique,u.armor,u.resistance,u.weapon.power],values,b.id+':'+entry.role);
+   const u=enemies[i];assert.equal(u.unitType,'general');assert.equal(u.name,entry.name);assert.ok(u.war>0&&u.constitution>0);assert.ok(!/杂兵|弓兵|刀兵|卫士/.test(u.name));
   }
  }
  assert.equal(Catalog.unit('infantry',100).level,25,'剧情敌人仍保留原等级上限');

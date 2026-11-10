@@ -5,7 +5,7 @@
   class CanvasStory{
     constructor(canvas,options){
       this.canvas=canvas;this.ctx=canvas.getContext('2d');this.options=options;this.character=options.character;this.store=options.store;this.slot=options.slot;this.progress=P.checkpoint(options.progress);this.images=new Map();this.busts=new Map();this.hits=[];this.disposed=false;
-      this.resize=this.resize.bind(this);this.up=e=>{if(this.view||this.transition)return;if(this.detailPress){const press=this.detailPress;if(press.id!==e.pointerId)return;this.detailPress=null;if(press.moved)return;}const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*this.w/r.width,y=(e.clientY-r.top)*this.h/r.height;[...this.hits].reverse().find(a=>x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h)?.action();};
+      this.resize=this.resize.bind(this);this.up=e=>{if(this.view||this.transition)return;if(this.detailPress){const press=this.detailPress;if(press.id!==e.pointerId)return;this.detailPress=null;if(press.moved)return;}const r=canvas.getBoundingClientRect(),x=Viewport.point(r,e).x,y=Viewport.point(r,e).y;[...this.hits].reverse().find(a=>x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h)?.action();};
       this.key=e=>{if(this.view||this.transition||e.repeat)return;if(this.panel){if(e.key==='Escape')this.closePanel();else if(['ArrowDown','ArrowUp','PageDown','PageUp'].includes(e.key)){e.preventDefault();this.scrollSkill((e.key==='ArrowDown'?1:e.key==='ArrowUp'?-1:e.key==='PageDown'?8:-8)*24);}return;}if(this.progress.stage==='departure'&&e.key==='Enter'){e.preventDefault();this.depart();return;}if([' ','Enter'].includes(e.key)){e.preventDefault();this.next();}if(e.key==='Escape')this.leave();};
       this.down=e=>{if(this.transition||!this.panel||e.button!==0)return;this.detailPress={id:e.pointerId,y:Viewport.point(canvas.getBoundingClientRect(),e).y,scroll:this.panel.scroll||0,panel:this.panel,moved:false};};this.move=e=>{const p=this.detailPress;if(!p||p.id!==e.pointerId||p.panel!==this.panel)return;const dy=Viewport.point(canvas.getBoundingClientRect(),e).y-p.y;if(Math.abs(dy)>7)p.moved=true;if(p.moved){this.panel.scroll=Math.max(0,Math.min(this.panel.maxScroll||0,p.scroll-dy));this.draw();}};this.cancel=()=>{this.detailPress=null;};this.wheel=e=>{if(this.panel){e.preventDefault();this.scrollSkill(e.deltaY);}};
       root.GameAssetLoader?.track?.(this);
@@ -13,7 +13,13 @@
     }
     image(src){if(!src)return null;if(root.GameAssetLoader)return root.GameAssetLoader.get(src,this)||null;if(!this.images.has(src)){const i=new Image();i.onload=()=>{if(!this.disposed&&!this.view)this.draw();};i.src=root.BattleEmbeddedAssets?.[src]||src;this.images.set(src,i);}const i=this.images.get(src);return i.complete&&i.naturalWidth?i:null;}
     resize(){if(this.disposed||this.view)return;Object.assign(this,Viewport.resize(this.canvas,this.ctx));this.draw();}
-    save(){try{this.store.save(this.slot,this.character,this.progress);this.saveError=false;}catch{this.saveError=true;}}
+    rememberLine(){
+      const row=P.linesFor(this.progress.stage,this.progress)?.[this.progress.index];if(!row)return;
+      const names={hero:this.character.name,narrator:'旁白',zhangjiao:'张角',zhangbao:'张宝',zhangliang:'张梁',nanhua:'南华',yuji:'于吉',zuoci:'左慈','imperial-soldier':'官兵',villager:'老人'};
+      this.progress.history=root.ConversationJournal.append(this.progress.history,{name:names[row.speaker]||row.speaker,text:row.text.replaceAll('{name}',this.character.name),chapter:P.chapters[this.progress.stage]?.title});
+    }
+    openHistory(){this.panel={type:'history',scroll:null};this.draw();}
+    save(){this.rememberLine();try{this.store.save(this.slot,this.character,this.progress);this.saveError=false;}catch{this.saveError=true;}}
     sceneOf(stage){return P.chapters[stage]?.scene||(['first-fight','manual-fight','prepare','squad-fight'].includes(stage)?'village':stage==='departure'?'camp':null);}
     enter(stage,index=0){
       if(this.disposed||this.transition)return;
@@ -33,7 +39,7 @@
     draw(now=performance.now()){
       if(this.disposed||!this.w)return;const t=this.transition,c=this.ctx;
       if(t?.phase==='out'){c.clearRect(0,0,this.w,this.h);c.drawImage(t.snapshot,0,0,this.w,this.h);}
-      else {this.drawScene();this.hasDrawn=true;}
+      else {this.drawScene();if(this.panel?.type==='history')root.ConversationJournal.draw(this,this.progress.history,this.panel,()=>this.closePanel());this.hasDrawn=true;}
       if(t){const progress=Math.max(0,Math.min(1,(now-t.start)/t.duration)),smooth=progress*progress*(3-2*progress);c.save();c.globalAlpha=t.phase==='out'?smooth:1-smooth;c.fillStyle='#000';c.fillRect(0,0,this.w,this.h);c.restore();}
     }
     mountStage(stage,index=0){
@@ -53,8 +59,8 @@
       this.resize();
     }
     text(value,x,y,size=16,color='#f1ece2',align='left'){size=UI.textSize(size);const c=this.ctx;c.font=`${size}px ${FONT}`;c.fillStyle=color;c.textBaseline='middle';c.textAlign=align;c.fillText(value,x,y);}
-    box(x,y,w,h,fill='#0c1d26ed',stroke='#b6a17a'){const c=this.ctx;c.fillStyle=fill;c.beginPath();c.roundRect(x,y,w,h,5);c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
-    button(label,x,y,w,h,action){this.box(x,y,w,h);this.text(label,x+w/2,y+h/2,15,'#e7d4b0','center');this.hits.push({x,y,w,h,label,action:()=>{root.GameAudio?.play('ui');action();}});}
+    box(x,y,w,h,fill='#18201fed',stroke='#877958'){UI.surface(this.ctx,x,y,w,h,fill,stroke,3);}
+    button(label,x,y,w,h,action){UI.button(this,label,x,y,w,h,action);}
     bust(id,side,top,active){
       if(!id)return;const early=this.progress&&typeof this.progress==='object'&&!['departure','world','complete'].includes(this.progress.stage)&&(this.progress.stage!=='dawn'||this.progress.index<3),art=P.assets(id,this.character.appearance,early).fullbody,img=this.image(art?.src);if(!img)return;
       if(!this.busts.has(art.src)){const crop=art.dialogueCrop||root.CharacterAssets.bustCrop(img.naturalWidth,img.naturalHeight),cache=document.createElement('canvas');cache.width=Math.round(crop.width);cache.height=Math.round(crop.height);const c=cache.getContext('2d');c.drawImage(img,crop.x,crop.y,crop.width,crop.height,0,0,cache.width,cache.height);const fade=c.createLinearGradient(0,0,0,cache.height);fade.addColorStop(0,'#000');fade.addColorStop(.65,'#000');fade.addColorStop(1,'#0000');c.globalCompositeOperation='destination-in';c.fillStyle=fade;c.fillRect(0,0,cache.width,cache.height);this.busts.set(art.src,cache);}
@@ -115,7 +121,7 @@
     wrapInfo(...args){return root.BattleSystem.CanvasBattle.prototype.wrapInfo.apply(this,args);}
     closePanel(){this.panel=null;this.detailPress=null;this.draw();}
     scrollSkill(delta){if(!this.panel)return;this.panel.scroll=Math.max(0,Math.min(this.panel.maxScroll||0,(this.panel.scroll||0)+delta));this.draw();}
-    depart(){if(!this.weaponChoice)return;this.departureWorld.chooseWeapon(this.weaponChoice);this.departureWorld.state.departurePractice='offer';this.departureWorld.state.inside=true;this.progress.world=this.departureWorld.snapshot();this.enter('world');}
+    depart(){if(!this.weaponChoice)return;this.departureWorld.chooseWeapon(this.weaponChoice);this.departureWorld.state.journal=root.ConversationJournal.normalize(this.progress.history);this.departureWorld.state.departurePractice='offer';this.departureWorld.state.inside=true;this.progress.world=this.departureWorld.snapshot();this.enter('world');}
     skip(){if(this.transition)return;const chapter=P.chapters[this.progress.stage];if(this.progress.stage==='dream'&&!this.progress.dreamChoice){this.progress.index=chapter.lines.length-1;this.save();this.draw();return;}if(chapter)this.enter(chapter.next);}
     chooseDream(id){const next=P.chooseDream(this.progress,id);if(!next)return;this.progress=next;this.save();this.draw();}
     next(){if(this.transition)return;if(this.failure){this.enter(this.progress.stage);return;}const chapter=P.chapters[this.progress.stage],lines=P.linesFor(this.progress.stage,this.progress);if(!chapter||lines[this.progress.index]?.choices)return;if(this.progress.index+1<lines.length){this.progress.index++;this.save();this.draw();}else this.enter(chapter.next);}

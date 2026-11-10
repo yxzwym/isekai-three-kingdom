@@ -1,8 +1,9 @@
 const assert=require('node:assert/strict');
 const {general,rescueTeam,fight,Chapter,I}=require('../tests/helpers/balance.cjs');
 const Audit=require('../tests/helpers/enemy-audit.cjs');
-const groups=Audit.groups(),units=groups.flatMap(group=>Audit.inspect(group)),attacks=units.flatMap(unit=>unit.skills.filter(s=>['physical','tactic'].includes(s.kind)));
-const report={audit:{groups:groups.length,units:units.length,skills:attacks.length,maxOffensiveAttribute:Math.max(...units.flatMap(u=>['war','intelligence','speed','technique'].map(k=>u.attributes[k]))),maxNormalDamage:Math.max(...attacks.map(s=>s.normal)),maxCriticalDamage:Math.max(...attacks.map(s=>s.critical)),maxPeriodicTick:Math.max(...attacks.flatMap(s=>s.periodic.map(e=>e.amount)))},ordinary:{attempts:0,victories:0},rescue:{attempts:40,victories:0,longestSeconds:0},questEquipment:{attempts:12,victories:0}};
+const allGroups=Audit.groups(),warGroups=allGroups.filter(g=>g.key.startsWith('war:')),groups=allGroups.filter(g=>!g.key.startsWith('war:')),units=groups.flatMap(group=>Audit.inspect(group)),attacks=units.flatMap(unit=>unit.skills.filter(s=>['physical','tactic'].includes(s.kind)));
+for(const group of warGroups)assert.ok(group.roster.every(u=>u.level===100&&u.unitType==='general'),'百级大战将领独立于剧情数值上限：'+group.key);
+const report={wars:{groups:warGroups.length,units:warGroups.reduce((n,g)=>n+g.roster.length,0)},audit:{groups:groups.length,units:units.length,skills:attacks.length,maxOffensiveAttribute:Math.max(...units.flatMap(u=>['war','intelligence','speed','technique'].map(k=>u.attributes[k]))),maxNormalDamage:Math.max(...attacks.map(s=>s.normal)),maxCriticalDamage:Math.max(...attacks.map(s=>s.critical)),maxPeriodicTick:Math.max(...attacks.flatMap(s=>s.periodic.map(e=>e.amount)))},ordinary:{attempts:0,victories:0},rescue:{attempts:40,victories:0,longestSeconds:0},questEquipment:{attempts:12,victories:0}};
 assert.ok(report.audit.maxOffensiveAttribute<=150);assert.ok(report.audit.maxNormalDamage<=700);assert.ok(report.audit.maxCriticalDamage<=1000);assert.ok(report.audit.maxPeriodicTick<=25);
 for(let seed=0;seed<40;seed++){
  const b=fight(rescueTeam(),Chapter.enemies('dongzhuo'),'boss-seed-'+seed);

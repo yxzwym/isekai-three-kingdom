@@ -12,5 +12,5 @@ test('未来有离开选项的多句对话，在选择出现前仍保持全屏�
 });
 
 test('多选对话只有选项按钮有效，空白不会离开；单个选项仍覆盖全屏',()=>{
- const npc={name:'来客',art:'villager'},v=draw({npc,lines:['你准备怎么办？'],index:0,choices:[{label:'迎战',action(){}},{label:'离开',action(){}}]});assert.equal(v.hits.length,2);assert.ok(!v.hits.some(h=>h.x===0&&h.y===0));const single=draw({npc,lines:['继续往前走。'],index:0,choices:[{label:'继续',action(){}}]});assert.ok(single.hits.some(h=>h.x===0&&h.y===0&&h.w===390&&h.h===844));
+ const npc={name:'来客',art:'villager'},v=draw({npc,lines:['你准备怎么办？'],index:0,choices:[{label:'迎战',action(){}},{label:'离开',action(){}}]});assert.equal(v.hits.filter(h=>h.label!=='回顾').length,2);assert.ok(!v.hits.some(h=>h.x===0&&h.y===0));const single=draw({npc,lines:['继续往前走。'],index:0,choices:[{label:'继续',action(){}}]});assert.ok(single.hits.some(h=>h.x===0&&h.y===0&&h.w===390&&h.h===844));
 });

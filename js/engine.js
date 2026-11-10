@@ -70,7 +70,7 @@
         if(u.potentials&&u.baseAttributes)Object.assign(u,{growthVersion:1,attributes:G.attributesAt(u.baseAttributes,u.potentials,u.level)},G.attributesAt(u.baseAttributes,u.potentials,u.level));
         for (const key of ['war', 'intelligence', 'constitution', 'speed', 'technique']) u[key] = attr(u[key]);
         Object.assign(u,ITEMS.apply(u));
-        u.attack = Math.max(0, Math.floor(Number(u.weapon?.power??u.weapon?.attack??u.attack) || 0)); u.armor = Math.max(0,Math.floor(Number(u.armor)||0));u.resistance=Math.max(0,Math.floor(Number(u.resistance)||0));
+        u.attack = Math.max(0, Number(u.attack) || 0); u.armor = Math.max(0,Math.floor(Number(u.armor)||0));u.resistance=Math.max(0,Math.floor(Number(u.resistance)||0));
         if(u.side==='enemy'&&(this.config.bossBattle||u.boss||u.passives?.includes('enemy-stun-resistance')))u.statusImmunities=[...new Set([...(u.statusImmunities||[]),'stun'])];
         u.level = attr(u.level ?? (u.side === 'enemy' ? this.config.enemyLevel || this.config.level : this.config.level));
         u.skills = Array.isArray(u.skills) ? u.skills.filter(id=>this.skills[id]&&!this.skills[id].reactionOnly) : [];
@@ -348,7 +348,7 @@
         const healing = skill.kind === 'heal';
         const result=miss?{before,after:before,actual:0}:healing?this.healUnit(u,target,calc.amount):this.damageUnit(u,target,calc.amount,{ignoreWounds:!!skill.ignoreWounds});
         const {restored,...detail}=result;if(restored)restores.push(restored);if(result.miss)miss=result.miss;healthChanges.push({unit:target,before,after:target.soldiers});
-        if(!healing&&!miss){drain+=Math.floor(calc.amount*((Number(skill.lifesteal)||0)+(skill.kind==='physical'?(actor.physicalLifesteal||0):0)));const reflect=target.soldiers>0?target.statuses.reduce((n,s)=>n+(Number(s.reflect)||0),0):0;if(skill.kind==='physical'&&target.soldiers>0){const p=PASSIVES.statsFor(target,this.passives);if(p.counterChance&&this.rng()<p.counterChance)counters.push({source:target,multiplier:p.counterMultiplier||.5});}if(reflect>0)reflections.push({source:target,amount:Math.floor(result.actual*reflect*this.effective(target).damageMultiplier)});}
+        if(!healing&&!miss){drain+=Math.floor(calc.amount*((Number(skill.lifesteal)||0)+(skill.kind==='physical'?(actor.physicalLifesteal||0)+(actor[skill.scope==='all'?'physicalGroupLifesteal':'physicalSingleLifesteal']||0):(actor[skill.scope==='all'?'tacticGroupLifesteal':'tacticSingleLifesteal']||0))));const reflect=target.soldiers>0?target.statuses.reduce((n,s)=>n+(Number(s.reflect)||0),0):0;if(skill.kind==='physical'&&target.soldiers>0){const p=PASSIVES.statsFor(target,this.passives);if(p.counterChance&&this.rng()<p.counterChance)counters.push({source:target,multiplier:p.counterMultiplier||.5});}if(reflect>0)reflections.push({source:target,amount:Math.floor(result.actual*reflect*this.effective(target).damageMultiplier)});}
         if(!miss&&!target.dead)for(const effect of skill.effects||[])if(effect.recipient!=='self')this.addStatus(u,target,effect,skill);
         event.results.push({target:target.id,targetName:target.name,...detail,healing,miss,critical:!miss&&critical,multiplier,random,...calc,...(healing?{amount:result.amount,raw:result.amount}:{})});
       }

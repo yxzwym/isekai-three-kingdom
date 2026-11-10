@@ -1,6 +1,7 @@
 (function(root){
  'use strict';
  const definitions={
+  'chibi-deck':{id:'chibi-deck',name:'赤壁连舰',background:'./assets/battles/chibi-deck-v2.webp',color:'#292c29'},
   'capital-wei':{id:'capital-wei',name:'许昌官署',background:'./assets/towns/capital-wei-v1.webp',color:'#887054'},
   'capital-shu':{id:'capital-shu',name:'成都府院',background:'./assets/towns/capital-shu-v1.webp',color:'#77895c'},
   'capital-wu':{id:'capital-wu',name:'建业水府',background:'./assets/towns/capital-wu-v1.webp',color:'#738b87'},

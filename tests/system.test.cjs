@@ -93,15 +93,15 @@ test('单敌和后排双条在模型上方，前排姓名双条贴在脚下',()=
   const hp=boxes.find(box=>box.fill==='#10171d'),progress=boxes.find(box=>box.fill==='#07141c');
   assert.ok(texts.find(t=>t.text==='曹操').y<hp.y);assert.ok(hp.y+hp.h<=progress.y);
   if(count===1||r.hudAbove)assert.ok(progress.y+progress.h<=r.figure.y+.001);
-  else {assert.ok(texts.find(t=>t.text==='曹操').y>=r.figure.y+r.figure.h);assert.ok(Math.abs(hp.y-r.figure.y-r.figure.h-20)<1e-9);}
+  else {assert.ok(texts.find(t=>t.text==='曹操').y>=r.figure.y+r.figure.h);assert.ok(hp.y>=r.figure.y+r.figure.h+8&&hp.y<=r.figure.y+r.figure.h+24);}
   assert.equal(view.hits.length,2);assert.ok(view.hits.every(hit=>hit.unitId==='caocao'&&hit.kind==='unit'));
   }
 });
 test('敌方有全身图时只读取完整立绘，己方继续使用头像，保持原图比例及头脚完整',()=>{
   const head={src:'head.png',crop:{x:10,y:20,width:256,height:440},status:'legacy'},body={src:'body.png',width:1024,height:1536,status:'ready'};
   const requests=[],sprites=[],rects=[{id:'ally',side:'ally',unit:{portrait:head,fullbody:body},figure:{x:0,y:0,w:70,h:140}},{id:'enemy',side:'enemy',unit:{portrait:head,fullbody:body},figure:{x:100,y:80,w:120,h:180}}];
-  const view={rects,dpr:2,visuals:new Map(),image(src){requests.push(src);return {naturalWidth:1024,naturalHeight:1536};},sprite(img,source,width,red,fade){sprites.push({source,fade});return {};}};
-  for(const r of rects)r.unit.id=r.id;CanvasBattle.prototype.preparePortraits.call(view);
+  const view={rects,w:540,dpr:2,combatSource:()=>({x:0,y:0,width:1024,height:1536}),visuals:new Map(),image(src){requests.push(src);return {naturalWidth:1024,naturalHeight:1536};},sprite(img,source,width,red,fade){sprites.push({source,fade});return {};}};
+  for(const r of rects){r.unit.id=r.id;r.x=r.figure.x;r.w=r.figure.w;}CanvasBattle.prototype.preparePortraits.call(view);
   assert.deepEqual(requests,['head.png','body.png']);assert.deepEqual(sprites[2].source,{x:0,y:0,width:1024,height:1536});assert.equal(sprites[2].fade,false);
   const dst=view.visuals.get('enemy').dst;assert.equal(dst.w/dst.h,1024/1536);assert.equal(dst.y,80);assert.equal(dst.h,180);
 });

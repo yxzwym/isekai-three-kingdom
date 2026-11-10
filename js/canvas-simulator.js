@@ -8,7 +8,7 @@
       const session=new S.Session(options.store.storage);
       super(canvas,{...options,standalone:true,model:session.world,character:session.world.character,allowDismiss:false,showExperience:false,
         memberAction:{label:'更换武将',action:(view,u,p)=>view.chooseRoster(view.session.activeIds().indexOf(u.id),p)},
-        drawCharacterControls:(view,{unit:u,left,inner,slotSize,y})=>view.button('等级',left+inner-slotSize,y+8,slotSize,30,()=>{view.panel={type:'simLevel',unitId:u.id,previous:view.panel};})});
+        drawCharacterControls:(view,{unit:u,left,inner,slotSize,y,modelH})=>view.button('等级',left+inner-slotSize,y+modelH-36,slotSize,30,()=>{view.panel={type:'simLevel',unitId:u.id,previous:view.panel};})});
       this.session=session;this.panel=null;this.canvas.dataset.storyStage='simulator';this.canvas.dataset.menuScreen='simulator';
       const previousWheel=this.wheel;this.canvas.removeEventListener('wheel',previousWheel);this.wheel=e=>{if(['simRoster','simBoss','simResult'].includes(this.panel?.type)){e.preventDefault();this.panel.scroll=clamp((this.panel.scroll||0)+e.deltaY,0,this.panel.maxScroll||0);this.invalidate();}else previousWheel(e);};this.canvas.addEventListener('wheel',this.wheel,{passive:false});this.save();this.invalidate();
     }
@@ -97,11 +97,7 @@
       const draw=view.draw;view.draw=function(now){draw.call(this,now);if(!this.disposed&&!this.assetsLoading&&!this.panel)this.button('返回配置',12,12,88,30,()=>host.stopSimulation());};const host=this;view.draw();
     }
     stopSimulation(){if(!this.battle)return;clearTimeout(this.resultTimer);for(const u of this.battle.battle.units.filter(u=>u.side==='ally'))this.model.saveTactics(u);this.save();this.battle.destroy();this.battle=null;this.session.rebuild();this.panel=null;this.resize();}
-    drawResult(){
-      const p=this.panel,r=p.result,units=r.units.filter(u=>u.side==='ally'),f=this.frame(({victory:'模拟胜利',defeat:'模拟失利',draw:'双方倒下',retreated:'已撤退'})[r.result]||'模拟结束',Math.min(650,205+units.length*41)),left=f.x+20,w=f.w-40;this.text(clock(r.time),f.x+f.w/2,f.y+61,16,'#d9c49b','center');this.text('武将',left,f.y+92,14,'#a9c1c9');this.text('伤害',left+w*.52,f.y+92,14,'#a9c1c9','right');this.text('治疗',left+w*.79,f.y+92,14,'#a9c1c9','right');this.text('行动',left+w,f.y+92,14,'#a9c1c9','right');
-      units.forEach((u,i)=>{const y=f.y+114+i*41;this.box(left,y,w,34,'#112c36',null);this.text(u.name,left+7,y+17,14,'#e4d9bd');this.text(Math.floor(u.stats.damage),left+w*.52,y+17,14,'#e0b2ab','right');this.text(Math.floor(u.stats.healing),left+w*.79,y+17,14,'#93d4a5','right');this.text(u.stats.actions,left+w-4,y+17,14,'#c4d6dc','right');});
-      this.button('调整配置',left,f.y+f.h-55,(w-10)/2,36,()=>{this.panel=null;});this.button('再次挑战',left+(w+10)/2,f.y+f.h-55,(w-10)/2,36,()=>this.startSimulation(),{active:true});
-    }
+    drawResult(){const p=this.panel,r=p.result,f=this.frame(({victory:'模拟胜利',defeat:'模拟失利',draw:'双方倒下',retreated:'已撤退'})[r.result]||'模拟结束',Math.min(650,180+r.units.filter(u=>u.side==='ally').length*49));this.text(clock(r.time),f.x+f.w/2,f.y+56,14,'#d9c49b','center');root.BattleSummary.draw(this,r,f,p);this.button('调整配置',f.x+18,f.y+f.h-52,(f.w-46)/2,36,()=>{this.panel=null;});this.button('再次挑战',f.x+28+(f.w-46)/2,f.y+f.h-52,(f.w-46)/2,36,()=>this.startSimulation(),{active:true});}
     destroy(){clearTimeout(this.resultTimer);this.save();super.destroy();}
   }
   root.BattleSimulationUI={CanvasSimulator,mount:(canvas,options)=>new CanvasSimulator(canvas,options)};

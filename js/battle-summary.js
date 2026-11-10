@@ -1,0 +1,6 @@
+(function(root){
+ 'use strict';
+ function rows(result){return(result.units||[]).filter(u=>u.side==='ally').map(u=>({id:u.id,name:u.name,damage:Number(u.stats?.damage)||0,healing:Number(u.stats?.healing)||0,actions:Number(u.stats?.actions)||0}));}
+ function draw(v,result,f,p){const all=rows(result),c=v.ctx,left=f.x+18,w=f.w-36,top=f.y+104,bottom=f.y+f.h-72,total=all.reduce((n,u)=>n+u.damage,0);for(const [label,x]of [['武将',left],['有效伤害',left+w*.57],['治疗',left+w*.82],['行动',left+w]])v.text(label,x,f.y+80,14,'#b6b9a4',label==='武将'?'left':'right');p.maxScroll=Math.max(0,all.length*49-(bottom-top));p.scroll=Math.max(0,Math.min(p.maxScroll,p.scroll||0));c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();all.forEach((u,i)=>{const y=top+i*49-p.scroll;v.box(left,y,w,42,'#202a26',null,2);v.text(u.name,left+8,y+17,14,'#dfd4b7','left');v.text(Math.floor(u.damage),left+w*.57,y+17,14,'#e1b5a0','right');v.text(Math.floor(u.healing),left+w*.82,y+17,14,'#adc6a0','right');v.text(u.actions,left+w-5,y+17,14,'#b8c6b5','right');c.fillStyle='#aa8e58';c.fillRect(left+8,y+35,(w-16)*(total?u.damage/total:0),2);});c.restore();}
+ const api={rows,draw};root.BattleSummary=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(globalThis);

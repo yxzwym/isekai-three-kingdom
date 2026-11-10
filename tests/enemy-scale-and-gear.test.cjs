@@ -40,7 +40,7 @@ test('独特防具饰品各有固定获取任务，品质和加成固定，不�
 
 test('旧档已完成的剧情和支线补领一次，重复读档、重复交付不会复制装备和金钱',()=>{
  const q=N.sideQuests.find(q=>q.id==='trade-road'),w=new World(character(),{introStep:2,questProgressVersion:2,quests:{changshan:{stage:'complete'},side:{[q.id]:{accepted:true,paid:true,wins:q.rounds,rounds:q.rounds}}},heroQuests:{taishici:{stage:'complete',accepted:true}},money:123});
- for(const id of ['travel-knot','cloud-pendant','feather-pendant'])assert.ok(w.state.inventory.some(i=>i.templateId===id));assert.equal(w.state.money,123);assert.equal(w.state.pendingReward.items.length,3);
+ for(const id of ['travel-knot','cloud-pendant','feather-pendant'])assert.ok(w.state.inventory.some(i=>i.templateId===id));assert.equal(w.state.money,123);assert.equal(w.state.pendingReward.items.filter(i=>i.slot!=='trophy').length,3);
  const first=w.snapshot(),loaded=new World(w.character,first);assert.deepEqual(loaded.snapshot(),first);loaded.state.pendingReward=null;const next=new World(loaded.character,loaded.snapshot());assert.equal(next.state.pendingReward,null);assert.equal(next.state.inventory.length,3);assert.deepEqual(next.claimEquipmentReward('hero:taishici'),[]);
 });
 

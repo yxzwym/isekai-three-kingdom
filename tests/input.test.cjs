@@ -39,3 +39,4 @@ test('滑出目标、拖动和非当前触点松手均不造成误操作',t=>{
 test('按下后弹出面板，旧的松手事件不能穿透面板攻击',()=>{
   const v=view(),p=armed(v);v.down(event(p));v.openInspect(v.battle.unit('e'));v.up(event(p));assert.equal(v.panel.type,'inspect');assert.equal(v.battle.actionCount,0);
 });
+test('满条手动区持续提示选招与选目标，显式取消不会耗条或重新锁定目标',()=>{const old=global.BattleVFX;global.BattleVFX={kindOf:()=> 'physical',COLORS:{}};try{const v=view(),labels=[];v.drawSkillIcon=()=>{};v.text=t=>labels.push(t);v.button=(label,x,y,w,h,action)=>v.hits.push({label,x,y,w,h,action});armed(v);const before=v.battle.actionCount;v.drawReadySkills(0);assert.ok(labels.includes('选择目标'));v.hits.find(h=>h.label==='取消').action();assert.equal(v.aim,null);labels.length=0;v.drawReadySkills(1);assert.ok(labels.includes('a · 选择招式'));assert.equal(v.aim,null);assert.equal(v.battle.unit('a').ready,true);assert.equal(v.battle.actionCount,before);}finally{global.BattleVFX=old;}});
