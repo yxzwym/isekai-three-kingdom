@@ -427,17 +427,46 @@ globalThis.CharacterAssetManifest={"schemaVersion":1,"characters":{"zhouyu":{"id
     zhenji:[['serenity','静水凝心','blue','受到的计策伤害减少15%。',{tacticReduction:0.15}]]
   };
   for(const [hero,rows]of Object.entries(additions))for(const [suffix,name,quality,description,stats]of rows){const id=hero+'-'+suffix;definitions[id]={id,name,quality,description,stats,triggers:[]};}
-  // 人物名号、事迹与门派绑定的特质显示专属紫；普通资质仍按品质着色。
-  for(const id of ['xuchu-tiger','dianwei-guard','huangzhong-veteran','taishici-bold','maliang-white-brow','lusu-generous','ganning-brocade',
-    'liubei-fortitude','caocao-ambition','xiahoudun-defiance','guanyu-overawe','guanyu-martial','zhangfei-ferocity','machao-swift',
-    'zhouyu-elegance','zhouyu-steady','lvmeng-discipline','lvmeng-ambush','lvbu-flying','zhuge-divine','menghuo-endure',
-    'zhangjiao-taiping','zhangjiao-clarity','zhangbao-salve','dianwei-fury','ganning-night-raid','xuchu-steadfast'])definitions[id].exclusive=true;
+  // 专属仅保留一项；其余使用全角色共用的通用技能。
+  const roles={
+    physical:['hero-martial','hero-accuracy'],caster:['mastermind','hero-accuracy'],healer:['miracle','shadow'],
+    elitePhysical:['surprise','hero-accuracy','edge'],eliteCaster:['heavenly','hero-accuracy','shadow']
+  };
+  definitions['hero-martial']={id:'hero-martial',name:'武艺精熟',quality:'gold',description:'物理伤害提高20%。',stats:{physicalBonus:.2},triggers:[]};
+  definitions['hero-accuracy']={id:'hero-accuracy',name:'凝神命中',quality:'blue',description:'技能命中率增加15个百分点。',stats:{hitBonus:.15},triggers:[]};
+  definitions['hero-precision']={id:'hero-precision',name:'洞察破绽',quality:'gold',description:'技能命中率增加20个百分点。',stats:{hitBonus:.2},triggers:[]};
+  definitions['lvbu-guishen']={id:'lvbu-guishen',name:'鬼神',quality:'red',exclusive:true,description:'物理技能必定暴击。',stats:{guaranteedCritical:true},triggers:[]};
+  definitions['lvbu-wushuang']={id:'lvbu-wushuang',name:'无双',quality:'red',exclusive:true,description:'物理技能造成真实伤害，无视目标护甲与物理减伤。',stats:{physicalTrueDamage:true},triggers:[]};
+  const signatures={
+    liubei:['liubei-kind','healer'],caocao:['caocao-ambition','elitePhysical'],simayi:['simayi-deep','caster'],
+    xiahoudun:['xiahoudun-defiance','physical'],zhangliao:['zhangliao-assault','physical'],xunyu:['xunyu-counsel','healer'],jiaxu:['jiaxu-poison','caster'],
+    guanyu:['guanyu-righteous','elitePhysical'],zhangfei:['zhangfei-roar','physical'],machao:['machao-valiant','physical'],
+    sunquan:['sunquan-judgment','elitePhysical'],zhouyu:['zhouyu-flames','eliteCaster'],huanggai:['huanggai-tenacity','physical'],
+    lvmeng:['lvmeng-study','physical'],luxun:['luxun-fire','caster'],sunshangxiang:['sunshangxiang-bow','physical'],
+    zhugeliang:['zhuge-eight-trigrams','eliteCaster'],diaochan:['diaochan-grace','healer'],menghuo:['menghuo-strength','physical'],
+    huatuo:['huatuo-healer','healer'],dongzhuo:['dongzhuo-soldier','physical'],zhangjiao:['thunder-lord','caster'],
+    xuchu:['xuchu-tiger','physical'],dianwei:['dianwei-fury','physical'],huangzhong:['huangzhong-veteran','physical'],
+    taishici:['taishici-bold','physical'],maliang:['maliang-white-brow','healer'],lusu:['lusu-generous','healer'],ganning:['ganning-brocade','physical'],
+    zhaoyun:['zhaoyun-seven-crossings','physical'],zhenji:['zhenji-clear-water','healer'],
+    xuhuang:['xuhuang-steady','physical'],yujin:['yujin-discipline','physical'],caoren:['caoren-fortress','physical'],
+    yuanshao:['yuanshao-noble','physical'],yanliang:['yanliang-might','physical'],wenchou:['wenchou-charge','physical'],
+    guanlu:['guanlu-star','caster'],zhurong:['zhurong-hunter','physical'],huangyueying:['huangyueying-craft','physical']
+  };
+  const retired=new Set([...Object.values(heroDefaults).flat(),...Object.keys(definitions).filter(id=>Object.keys(signatures).some(hero=>id.startsWith(hero+'-')))]);
+  for(const id of Object.keys(definitions)){delete definitions[id].exclusive;if(retired.has(id))definitions[id].legacy=true;}
+  for(const [hero,[signature,role]]of Object.entries(signatures)){if(definitions[signature]){definitions[signature].exclusive=true;delete definitions[signature].legacy;}heroDefaults[hero]=[signature,...roles[role]];}
+  // 小将没有专属；吕布的两项能力分别显示和生效。
+  heroDefaults.zhangbao=['doctor','rapid'];heroDefaults.zhangliang=['unstoppable','hero-accuracy'];
+  heroDefaults.lvbu=['lvbu-guishen','lvbu-wushuang','shadow','hero-precision'];
+  definitions['lvbu-guishen'].exclusive=definitions['lvbu-wushuang'].exclusive=true;
+  delete definitions['zhaoyun-courage'];delete definitions['lvbu-peerless'];
   function forUnit(unit){
     const existing=Array.isArray(unit.passives)?unit.passives.filter(id=>!definitions[id]?.enemyOnly||unit.side==='enemy'):[];
-    // 教学专用的不败版本不叠加正式英雄天赋，避免改变新手战的节奏。
-    if(existing.some(id=>definitions[id]?.tutorialOnly))return [...new Set(existing)];
-    return [...new Set([...existing,...(heroDefaults[unit.characterId||unit.id]||[])])];
+    if(existing.some(id=>definitions[id]?.tutorialOnly))return [...new Set(existing.filter(id=>!retired.has(id)||definitions[id]?.tutorialOnly))];
+    const defaults=unit.origin!=='tavern'&&heroDefaults[unit.characterId||unit.id];
+    return defaults?[...new Set([...defaults,...existing.filter(id=>!retired.has(id)&&!definitions[id])])]:[...new Set(existing)];
   }
+  definitions['thunder-lord-tutorial'].exclusive=true;
   function complete(unit){return {...unit,passives:forUnit(unit)};}
   // 随机天赋和武将天赋共用同一份战斗定义；浏览器在规则表加载后首次取用。
   let randomInstalled=false;
@@ -5679,17 +5708,16 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
   add('punch','拳击','physical','enemy','single',{weaponCoefficient:0});
   add('spear-cut','直刺','physical','enemy','single');add('spear-sweep','横扫枪','physical','enemy','all',{scaling:{war:.8}});
   add('sword-cut','劈斩','physical','enemy','single');add('sword-sweep','横扫','physical','enemy','all',{scaling:{war:.8}});
-  // 火神杖沿用杖方向的范围和倍率，专武将火焰换成雷电与麻痹。
+  // 旧技能 ID 留作存档与反应技兼容，不再配置专属兵器。
   skills['staff-shock']={...JSON.parse(JSON.stringify(skills['staff-fire'])),id:'staff-shock',name:'电击',element:'thunder',effects:[{id:'paralysis',chance:.25,duration:8,speedMultiplier:.5}]};
   skills['staff-storm']={...JSON.parse(JSON.stringify(skills['staff-flame'])),id:'staff-storm',name:'落雷阵',element:'thunder',effects:[]};
   const specials={
-    'fire-god-staff':{id:'fire-god-staff',type:'staff',name:'火神杖',skills:['staff-shock','staff-storm']},
-    'fangtian-halberd':{id:'fangtian-halberd',type:'halberd',proficiencyType:'spear',name:'方天画戟',skills:['sword-critical','spear-break']}
+    'fangtian-halberd':{id:'fangtian-halberd',type:'spear',name:'方天画戟',quality:'purple',unique:true,exclusive:true,skills:[{base:'sword-critical',scope:'all'}]}
   };
   const canonical=value=>Array.isArray(value)?value.map(canonical):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(k=>[k,canonical(value[k])])):value;
   const fingerprint=value=>{let n=2166136261;for(const c of JSON.stringify(canonical(value)))n=Math.imul(n^c.codePointAt(0),16777619);return (n>>>0).toString(36);};
-  const special=weapon=>!!weapon&&(Array.isArray(weapon.skills)||!!specials[weapon.id]||weapon.type==='staff'&&weapon.school==='thunder');
-  function resolveWeapon(weapon){if(!weapon)return null;const preset=specials[weapon.id]||(weapon.type==='staff'&&weapon.school==='thunder'?specials['fire-god-staff']:{});return {...copy(preset),...copy(weapon)};}
+  const special=weapon=>!!weapon&&(Array.isArray(weapon.skills)||!!specials[weapon.id]);
+  function resolveWeapon(weapon){if(!weapon)return null;if(weapon.id==='fire-god-staff'){const {skills:oldSkills,school,exclusive,unique,...ordinary}=copy(weapon);return {...ordinary,id:'weapon-staff',name:'木杖',type:'staff'};}const preset=specials[weapon.id]||{};return weapon.id==='fangtian-halberd'?{...copy(weapon),...copy(preset)}:{...copy(preset),...copy(weapon)};}
   function definitionsForWeapon(weapon){
     const resolved=resolveWeapon(weapon);if(!resolved)return [copy(skills.punch)];
     const type=C.types.find(t=>t.id===(C.aliases[resolved.type]||resolved.type));
@@ -5710,6 +5738,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
   const prioritiesFor=ids=>ids.map(id=>{const s=skills[id];if(!s)throw new TypeError('未知技能：'+id);return s.kind==='buff'?{skill:id,when:'always'}:s.kind==='heal'?{skill:id,when:'healThresholds',selfThreshold:.65,allyThreshold:.65}:s.scope==='all'?{skill:id,when:'enemyCount',threshold:2}:{skill:id,when:'always',frequency:'sometimes'};});
   function migrateWeaponPlan(unit){
     const out=JSON.parse(JSON.stringify(unit));out.equipment=equipment.normalize(out.equipment);
+    const hero=out.origin!=='tavern'&&(out.characterId||out.id);if(out.weapon&&hero&&out.heroLoadoutVersion!==1){const legacy=out.weapon.id==='fire-god-staff'||['green-dragon-glaive','serpent-spear','zhouyu-featherfan','luxun-featherfan'].includes(out.weapon.id)||['飞翼枪','白羽扇'].includes(out.weapon.name);if(legacy){const type=hero==='zhangjiao'?'staff':hero==='zhangfei'?'spear':hero==='guanyu'?'blade':hero==='machao'?'spear':'fan';const I=typeof module!=='undefined'&&module.exports?require('./items.js'):root.ItemCatalog;out.weapon=I.create('weapon-'+type,out.weapon.quality||'green',out.weapon.uid);out.skills=forWeapon(out.weapon);out.priorities=prioritiesFor(out.skills);out.weaponPlanMigrated=true;}out.heroLoadoutVersion=1;}
     if(out.weaponPlanVersion!==3&&!special(out.weapon)){
       const oldType=out.weapon?.type,nextType=C.legacyAliases[oldType]||oldType;if(out.weapon)out.weapon.type=nextType;
       if(out.weapon&&C.types.some(t=>t.id===nextType)&&(!out.skills?.length||out.skills.some(id=>!['punch','spear-cut','spear-sweep','sword-cut','sword-sweep'].includes(id)))){const next=forWeapon(out.weapon);if(JSON.stringify(out.skills)!==JSON.stringify(next)){out.skills=next;out.priorities=prioritiesFor(out.skills);out.weaponPlanMigrated=true;}}
@@ -5885,9 +5914,9 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
   np('changshan-maiden','阿禾','village-maiden','civilian','changshan',['西边那间屋子我已经扫干净了，晚上再铺些干草。今天投宿的人多，要是被子不够，我再去问邻居借几床。','东边那家的小孩今天总算肯出来玩了。刚来的时候，一听见马蹄声就躲到桌下，抱着他娘怎么也不肯松手，实在叫人心疼。']),
   np('grain-steward','仓守','villager','quest','zhongshan',['这些粮是附近几家凑给常山乡亲的。我们还没把车备好，贼就来了，把守仓的人赶走，连仓门都给换了锁。','你看这些粮袋，线的颜色都不一样，是各家自己缝好送来的。我都点过数，只怕那伙人搬来搬去，把好好的粮食也糟蹋了。']),
   np('road-merchant','行商','laborer','merchant','zhongshan',['要买兵器还是护具？我这里有些旧货，看着不新，刃口和甲扣都修过了，用起来没问题，你可以慢慢挑。','最近送货太难，一趟路常要绕好几个村子，走到天黑也未必能到。等道路安稳些，我再多进点东西，现在先卖手里这些。']),
-  np('grain-maiden','阿芹','village-maiden','civilian','zhongshan',['你在找甄姑娘？她本来在这里替人看伤，贼听说甄家有粮，就把她和几个伤者一起带走了，说要叫她家里拿东西来换人。','甄姑娘给我弟弟包过伤，他一直怕疼不肯让人碰，还是她哄了半天才肯伸手。不知道她现在有没有受伤，我这几天一直惦记着。']),
-  np('refugee-laborer','车夫','laborer','quest','zhongshan-county',['我跟着那伙人看见了，他们把甄姑娘带进旧祠堂的后院。门口一直有人守着，我想靠近听听，还差点被他们发现。','车轮已经修好，我就停在路边等。里面那几个伤者走不动，甄姑娘肯定不愿意丢下他们，所以还得有人把车赶过去接。']),
-  np('wujii-servant','甄家侍女','maid','civilian','zhongshan-county',['你们有没有见过我家姑娘？她出门给人看病，到现在都没回家。我一路问到这里，可守门的人连她的消息都不肯说。','她出门时带了整箱药，跟我说用完就回来。我昨天还在等她回家，早知道外头这么乱，真该一起出来，至少有人能送个信。']),
+  np('grain-maiden','阿芹','village-maiden','civilian','zhongshan',['你们是来帮着运粮的吗？那伙人占着仓门，连原来在院里歇脚的人都没出来。我们去问，他们只说再靠近就动手，实在叫人放心不下。','甄姑娘给我弟弟包过伤，他一直怕疼不肯让人碰，还是她哄了半天才肯伸手。不知道她现在有没有受伤，我这几天一直惦记着。']),
+  np('refugee-laborer','车夫','laborer','quest','zhongshan',['车轮我已经修好了，就等把粮装上。你们若进仓，留意后院那扇门，方才有人过去时，里头好像敲了几下。','贼来以后，谁也不敢靠近那边。我把车推到仓外等着，真有人受了伤，横放几块木板，也能把人稳稳接出来。']),
+  np('wujii-servant','甄家侍女','maid','civilian','xuchang',['你们有没有见过我家姑娘？她出门给人看病，到现在都没回家。只听说她去了中山，路上又闹起了盗匪。我留在许昌等信，真怕送信的人跟她走岔了。','她出门时带了整箱药，跟我说用完就回来。我昨天还在等她回家，早知道外头这么乱，真该一起出来，至少有人能送个信。']),
   np('julu-carrier','运粮老卒','villager','quest','julu',['粮车往广宗去了，本来说前天就回，可一直没消息。我想去找找，偏偏这条腿又犯了老伤，连上车都得有人扶。','你们从外面过来，有没有看见几辆运粮车？赶车的老冯脸上有道疤，年纪跟我差不多，要是见过，劳烦跟我说一声。']),
   np('guangzong-worker','补车匠','laborer','civilian','julu-county',['车轮松了就推到这边来，我帮你看看。别觉得还能转就凑合上路，真在半道掉下来，伤着人不说，货也全得耽误。','这两天等着修的车太多，木料都快用光了。有急事的我先修，能等的就在旁边歇一会儿，轮到谁我会叫。']),
   {...np('xinye-doctor','药铺郎中','villager','healer','xinye',['到这里坐吧，我先把伤口清理一下，再换上干净布条。包好以后别沾水，觉得又疼又热，就回来让我再看看。','衙门那边闹得很厉害，你们要是还准备过去办事，至少先把身上的伤处理好。带着伤硬撑，真碰到麻烦就更难脱身了。']),unlockQuest:'ganning'}
@@ -5896,9 +5925,9 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
   'changshan-elder':{afterReturn:['粮食已经分给各家了，剩下的也收进了仓里。今晚大家准备一起做顿饭，你们不急着赶路的话，就留下吃完再走吧。','早上有人想回去看看自家的田，我劝他们先等等。路上还有没有乱兵，得问清楚，不能刚吃上几顿饱饭，又出了事。']},
   'changshan-maiden':{afterReturn:['昨天饭刚煮好，几个孩子就围在灶边等。好不容易分到碗里，烫得直吹气也不肯放下，看来之前真是饿坏了。','你们住过的铺位还留着，回来提前跟我说一声就行。我把被子晒一晒，再换些干草，晚上住着也舒服点。']},
   'grain-steward':{afterReturn:['粮车平安送到，我这边也放心了。这两天我找人把仓门补好，再安排几个年轻人轮流守着，不能总让我一个老头留在这里。','那些破粮袋我都收着呢，洗干净再补一补还能用。你们路上要是缺袋子，来跟我拿，别又为了装点东西多跑一趟。']},
-  'grain-maiden':{afterRescue:['听说甄姑娘已经救出来了，太好了！我弟弟还问她什么时候再来，想把自己做的小竹篮送给她，说以后能用来装药。','我煮了些吃的，想送给祠堂里救出来的伤者。你们见到甄姑娘，帮我问问他们有没有什么不能吃的，我好重新准备。']},
+  'grain-maiden':{afterRescue:['听说甄姑娘已经救出来了，太好了！我弟弟还问她什么时候再来，想把自己做的小竹篮送给她，说以后能用来装药。','我煮了些吃的，想送给粮仓里救出来的伤者。你们见到甄姑娘，帮我问问他们有没有什么不能吃的，我好重新准备。']},
   'refugee-laborer':{afterRescue:['人接出来，车也没坏，我终于敢回家安心睡一觉了。你们以后还要运人运东西，提前来叫我，我把车收拾好再出发。','那几个伤者一路上都在跟我道谢，我让他们少说话，先留着力气养伤。盼着下次见面，他们都能自己站起来走路。']},
-  'wujii-servant':{afterRescue:['多亏你们把姑娘救回来！她刚进门就问药箱找到了没有，自己身上的灰都没拍。我又高兴又着急，只好先拉着她坐下来。','换洗的衣服我已经收好了。姑娘要是还跟你们出门，麻烦帮我提醒她按时吃饭，她一忙起来，常常只记得病人，忘了自己也饿着。']}
+  'wujii-servant':{afterRescue:['中山送来的信我收到了，多亏你们把姑娘救出来！她怕我们担心，报了平安，后面却写了满满一页伤者该怎么换药，还是那个总顾着别人的性子。','换洗的衣服我已经收好了。姑娘要是还跟你们出门，麻烦帮我提醒她按时吃饭，她一忙起来，常常只记得病人，忘了自己也饿着。']}
  };
  const sideQuests=[
   {id:'clear-mountain',sceneId:'bandit-camp',title:'山道清剿',giver:'changshan-woodcutter',giverPlace:'changshan',place:'zhongshan',enemyName:'山道盗匪',enemyArt:'mountain-bandit',recommendedLevel:4,rounds:5,money:180,item:'leather-armor',quality:'green',description:'前往中山山道清理盗匪，再回常山向樵夫复命。',accept:'你们愿意帮忙，那真是太好了。那些贼就在通往中山的山道上，分散住着几间旧棚。到了找一找，把还没离开的也清出去，不能只赶跑眼前的一伙。'},
@@ -5926,7 +5955,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
   {speaker:'hero',text:'他们果然没肯罢休，还追到村口来了。里面有孩子和伤者，不能让他们冲进去，我们得在这里把人拦住。'},
   {speaker:'zhaoyun',text:'我守住村口这条路，你帮着照看粮车旁边。乡亲们快进去，等把门关好再出来帮忙，别让他们抓到人。'}
  ];
- const storyBattles={entry:{sceneId:'farmland',title:'常山村口',place:'changshan',scaling:'early',count:2},grain:{followup:{phase:'grain',speaker:'zhaoyun',lines:['前院的人已经退开，粮袋还在。后院还有几个正在搬东西，我们现在过去，别让他们把仓门堵上，再从后墙逃走。']},sceneId:'market-street',title:'夺回乡粮',place:'zhongshan',scaling:'early',count:3},rescue:{sceneId:'market-street',title:'祠堂救人',place:'zhongshan-county',scaling:'early',count:2},escort:{sceneId:'rural-road',title:'粮车归途',place:'changshan',scaling:'early',pattern:'earlyLeader',count:3}};
+ const storyBattles={entry:{sceneId:'farmland',title:'常山村口',place:'changshan',scaling:'early',count:2},grain:{followup:{phase:'grain',speaker:'zhaoyun',lines:['前院的人已经退开，粮袋还在。后院还有几个正在搬东西，我们接着过去，别让他们堵了仓门。']},sceneId:'market-street',title:'夺回乡粮',place:'zhongshan',scaling:'early',count:3},rescue:{sceneId:'market-street',title:'粮仓救人',place:'zhongshan',scaling:'early',count:2},escort:{sceneId:'rural-road',title:'粮车归途',place:'changshan',scaling:'early',pattern:'earlyLeader',count:3}};
  // 普通施法者使用独立的杂兵成长档案，数值随等级成长，不借用名将潜力。
  const casterProfiles={outlawCaster:[[3,9,7,10,8],[15,45,35,50,40]],fieldMedic:[[3,9,8,8,8],[15,45,40,40,45]],fieldPriest:[[3,9,8,7,8],[15,45,40,35,45]],outlawWitch:[[3,8,8,8,8],[15,45,40,40,45]]};
  for(const [id,[base,potential]]of Object.entries(casterProfiles))G.PROFILES[id]={baseAttributes:Object.fromEntries(G.KEYS.map((key,i)=>[key,base[i]])),potentials:Object.fromEntries(G.KEYS.map((key,i)=>[key,potential[i]]))};
@@ -6070,19 +6099,20 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
   }
   function raceMultiplier(skill,target){const tags=new Set([target?.species||'humanoid',...(target?.tags||[])]);return 1+Object.entries(skill.raceBonuses||{}).reduce((n,[tag,value])=>n+(tags.has(tag)?value:0),0);}
   function calculate({attacker={},target={},skill={},critical=1,damageType=skill.damageType||skill.kind||'physical'}){
-    if(attacker.soldiers<=0)return {raw:0,amount:0,factors:[]};const healing=skill.kind==='heal',physical=damageType==='physical',protectionValue=healing||damageType==='true'||(physical&&attacker.ignoreArmor)||(!physical&&attacker.ignoreResistance)?0:Math.max(0,Number(target[physical?'armor':'resistance'])||0)*(1-clamp(Number(attacker[physical?'armorPierce':'resistancePierce'])||0,0,1))-Math.max(0,Number(attacker[physical?'armorPenetration':'resistancePenetration'])||0);
+    if(skill.kind==='physical'&&attacker.physicalTrueDamage)damageType='true';if(attacker.soldiers<=0)return {raw:0,amount:0,factors:[]};const healing=skill.kind==='heal',physical=skill.kind==='physical'||damageType==='physical',protectionValue=healing||damageType==='true'||(physical&&attacker.ignoreArmor)||(!physical&&attacker.ignoreResistance)?0:Math.max(0,Number(target[physical?'armor':'resistance'])||0)*(1-clamp(Number(attacker[physical?'armorPierce':'resistancePierce'])||0,0,1))-Math.max(0,Number(attacker[physical?'armorPenetration':'resistancePenetration'])||0);
     const base=skillValue(attacker,skill),bonus=healing?(1+(Number(attacker.healingBonus)||0)):(1+(Number(attacker[physical?'physicalBonus':'tacticBonus'])||0)),beforeMitigation=Math.max(0,base*bonus*(healing?1:Math.max(0,Number(attacker.damageMultiplier??1)))*(healing?1:critical)*raceMultiplier(skill,target)*(healing?1:(skill.kind==='physical'||skill.kind==='tactic')&&attacker.executeThreshold&&target.soldiers/target.maxSoldiers<=attacker.executeThreshold?(attacker.executeMultiplier||1):1)),protection=healing?1:mitigation(protectionValue)*(damageType==='true'?1:clamp(1-(Number(target[physical?'physicalReduction':'tacticReduction'])||0),0,1)),raw=beforeMitigation*protection;
     return {raw,amount:Math.max(1,Math.floor(raw)),damageType,armor:physical?Math.max(0,protectionValue):undefined,resistance:physical?undefined:Math.max(0,protectionValue),beforeMitigation,mitigation:protection,factors:[['技能面板',base],['效果加成',bonus],...(!healing&&attacker.damageMultiplier!==undefined&&attacker.damageMultiplier!==1?[['被动增伤',attacker.damageMultiplier]]:[]),['暴击倍率',healing?1:critical],['减伤后倍率',protection]],formula:healing?'技能治疗量':damageType==='true'?'真实伤害':'技能伤害 × 50÷(50＋减伤属性)'};
   }
   function physical(options){return calculate({...options,skill:options.skill||{kind:'physical',scaling:{war:1},weaponCoefficient:1},damageType:options.damageType||'physical'});}
   function tactic(options){return calculate({...options,attacker:options.attacker||{intelligence:attr(options.intelligence),attack:0},skill:options.skill,damageType:options.skill.damageType||options.skill.kind});}
-  function criticalChance(unit,config,skill={}){return unit.guaranteedCritical?1:clamp((Number(skill.criticalChance)||0)+(Number(skill.criticalBonus)||0)+(Number(unit.criticalBonus)||0)+(skill.kind==='tactic'?(Number(unit.tacticCriticalBonus)||0):0)+Math.max(0,Number(unit.technique)||0)/2000,0,1);}
+  function criticalChance(unit,config,skill={}){return unit.guaranteedCritical||skill.kind==='physical'&&unit.physicalGuaranteedCritical?1:clamp((Number(skill.criticalChance)||0)+(Number(skill.criticalBonus)||0)+(Number(unit.criticalBonus)||0)+(skill.kind==='tactic'?(Number(unit.tacticCriticalBonus)||0):0)+Math.max(0,Number(unit.technique)||0)/2000,0,1);}
   function hitChance(actor,target,skill,dodge=0){return skill.alwaysHit?1:clamp((skill.hitChance??.4)+(Number(actor.hitBonus)||0)+(Math.max(0,Number(actor.technique)||0)/Math.max(1,Number(target.speed)||0))*.3-dodge,0,1);}
   function normalizeRule(rule,skill){
     const r=copy(rule);if(!skill)return r;
     if(['physical','tactic'].includes(skill.kind)){
-      return {skill:rule.skill,disabled:!!rule.disabled,when:skill.scope==='all'?'enemyCount':'always',threshold:skill.scope==='all'?(rule.when==='enemyCount'?Math.max(2,Math.floor(Number(rule.threshold)||2)):2):0,...(rule.frequency==='sometimes'?{frequency:'sometimes'}:{})};
+      return {skill:rule.skill,disabled:!!rule.disabled,when:skill.scope==='all'&&rule.when!=='always'?'enemyCount':'always',threshold:skill.scope==='all'&&rule.when!=='always'?Math.max(2,Math.floor(Number(rule.threshold)||2)):0,...(rule.frequency==='sometimes'?{frequency:'sometimes'}:{})};
     }
+    if(skill.kind==='buff'&&skill.side!=='enemy')return {skill:rule.skill,disabled:!!rule.disabled,when:'always',threshold:0};
     return r;
   }
   class Battle {
@@ -6173,7 +6203,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
       for(const stat of ['healingBonus','physicalBonus','tacticBonus','physicalReduction','tacticReduction','hitBonus','criticalBonus','armorPenetration','resistancePenetration','armorPierce','resistancePierce','criticalDamageBonus','tacticCriticalBonus','tacticCriticalDamageBonus','physicalLifesteal','executeThreshold'])out[stat]=(Number(u[stat])||0)+(p[stat]||0);
       for(const stat of ['intervalMultiplier','executeMultiplier'])out[stat]=(Number(u[stat])||1)*(p[stat]||1);
       for(const [kind,mult]of [['physical','physicalMultiplier'],['tactic','tacticMultiplier'],['healing','healingMultiplier']])if(p[mult]!==undefined)out[kind+'Bonus']=(1+out[kind+'Bonus'])*p[mult]-1;
-      out.damageMultiplier=Number(u.damageMultiplier??1)*(p.damageMultiplier||1);out.guaranteedCritical=!!(u.guaranteedCritical||p.guaranteedCritical);out.ignoreArmor=!!(u.ignoreArmor||p.ignoreArmor);out.ignoreResistance=!!(u.ignoreResistance||p.ignoreResistance);
+      out.physicalTrueDamage=!!(u.physicalTrueDamage||p.physicalTrueDamage);out.damageMultiplier=Number(u.damageMultiplier??1)*(p.damageMultiplier||1);out.guaranteedCritical=!!u.guaranteedCritical;out.physicalGuaranteedCritical=!!p.guaranteedCritical;out.ignoreArmor=!!(u.ignoreArmor||p.ignoreArmor);out.ignoreResistance=!!(u.ignoreResistance||p.ignoreResistance);
       let taken=p.takenMultiplier||1;for(const id of u.passives){const stats=this.passives[id]?.stats||{},maximum=Number(stats.missingHealthDamageBonus)||0;if(maximum>0)out.damageMultiplier*=1+maximum*clamp(1-u.soldiers/u.maxSoldiers,0,1);if(stats.lowTroopsThreshold&&u.soldiers/u.maxSoldiers<=stats.lowTroopsThreshold){out.damageMultiplier*=stats.lowTroopsDamageMultiplier||1;taken*=stats.lowTroopsTakenMultiplier||1;}}
       if(taken!==1)out.physicalReduction=1-(1-out.physicalReduction)*taken;if(taken!==1||p.tacticTakenMultiplier!==undefined)out.tacticReduction=1-(1-out.tacticReduction)*taken*(p.tacticTakenMultiplier||1);out.weaponPower=out.attack;return out;
     }
@@ -6307,8 +6337,8 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
       const weakestFoe=[...foes].sort((a,b)=>a.soldiers-b.soldiers||a.order-b.order)[0],candidates=[];
       for(const r of u.priorities){
         if(r.disabled)continue;const skill=this.skills[r.skill];if(!skill||!u.skills.includes(r.skill)||this.availableSp(u)<skill.cost)continue;
-        const threshold=Number(r.threshold);let target=skill.side==='ally'?weakestFriend:skill.side==='self'?u:sortedFoes[0],enabled=false,always=r.when==='always'&&r.frequency!=='sometimes'&&(skill.kind==='heal'||skill.scope!=='all');
-        if(['physical','tactic'].includes(skill.kind))enabled=skill.scope==='all'?foes.length>=Math.max(1,Number(r.threshold)||1):true;
+        const threshold=Number(r.threshold);let target=skill.side==='ally'?weakestFriend:skill.side==='self'?u:sortedFoes[0],enabled=false,always=r.when==='always'&&r.frequency!=='sometimes';
+        if(['physical','tactic'].includes(skill.kind))enabled=skill.scope==='all'&&r.when!=='always'?foes.length>=Math.max(2,Number(r.threshold)||2):true;
         else if(r.when==='healThresholds'){
           const self=Number(r.selfThreshold)||0,ally=Number(r.allyThreshold)||0;
           if(self>0&&u.soldiers<u.maxSoldiers&&u.soldiers/u.maxSoldiers<=self){target=u;enabled=true;always=self>1;}
@@ -6380,7 +6410,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
         if(!healingSkill&&!target.wounded&&this.config.hit&&!skill.alwaysHit){const dodge=this.dodgeChance(target,skill.kind),hit=hitChance(actor,victim,skill,dodge),roll=this.rng();if(roll>=hit){miss=dodge>0&&roll<hitChance(actor,victim,skill,0)?'闪避':'未命中';if(miss==='闪避'){target.stats.dodges++;dodged.push(target);}}}
         // Explicit dodge passives still function in deterministic tutorial scenarios.
         else if(!healingSkill&&!target.wounded&&this.dodgeChance(target,skill.kind)>0&&this.rng()<this.dodgeChance(target,skill.kind)){miss='闪避';target.stats.dodges++;dodged.push(target);}
-        if(!miss&&!healingSkill){critical=!!actor.guaranteedCritical||(this.config.critical&&this.rng()<criticalChance(actor,this.config,skill));multiplier=critical?1.5+(actor.criticalDamageBonus||0)+(skill.kind==='tactic'?(actor.tacticCriticalDamageBonus||0):0):1;}
+        if(!miss&&!healingSkill){critical=!!actor.guaranteedCritical||skill.kind==='physical'&&!!actor.physicalGuaranteedCritical||(this.config.critical&&this.rng()<criticalChance(actor,this.config,skill));multiplier=critical?1.5+(actor.criticalDamageBonus||0)+(skill.kind==='tactic'?(actor.tacticCriticalDamageBonus||0):0):1;}
         calc=miss?{raw:0,amount:0,factors:[],formula:miss}:calculate({attacker:actor,target:victim,skill,critical:multiplier});
         const healing = skill.kind === 'heal';
         const result=miss?{before,after:before,actual:0}:healing?this.healUnit(u,target,calc.amount):this.damageUnit(u,target,calc.amount,{ignoreWounds:!!skill.ignoreWounds});
@@ -6479,7 +6509,9 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
       view.hits.push({x:xx,y:yy,w:cw,h,label:passive.name,action:()=>onSelect(passive)});
     });return rows.reduce((n,row)=>n+row.h,0);
   }
-  const api={font,serif,surface,controls,dragGrip,centeredText,button,buttonTrim,chevron,pin,textSize,wrapLines,singleChoiceHit,EXCLUSIVE_COLOR,passiveColor,passiveLabel,passiveButtons,passiveHeight};root.PengpaiUI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const courtesyNames={赵云:'子龙',刘备:'玄德',关羽:'云长',张飞:'翼德',诸葛亮:'孔明',马超:'孟起',黄忠:'汉升',马良:'季常',曹操:'孟德',司马懿:'仲达',夏侯惇:'元让',张辽:'文远',荀彧:'文若',贾诩:'文和',许褚:'仲康',徐晃:'公明',于禁:'文则',曹仁:'子孝',孙权:'仲谋',周瑜:'公瑾',鲁肃:'子敬',吕蒙:'子明',陆逊:'伯言',甘宁:'兴霸',黄盖:'公覆',太史慈:'子义',吕布:'奉先',董卓:'仲颖',袁绍:'本初',袁术:'公路',华佗:'元化',管辂:'公明',左慈:'元放'};
+  const dialogueName=name=>courtesyNames[name]?name+' '+courtesyNames[name]:name;
+  const api={dialogueName,font,serif,surface,controls,dragGrip,centeredText,button,buttonTrim,chevron,pin,textSize,wrapLines,singleChoiceHit,EXCLUSIVE_COLOR,passiveColor,passiveLabel,passiveButtons,passiveHeight};root.PengpaiUI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
 
 </script>
@@ -6690,8 +6722,8 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
     if(context.kind==='story'){
       const beats={
         entry:['守住最后两袋粮','村民推开了紧闭的门。赵云记住了与你并肩的这一战。','与赵云商议，结伴前往中山。'],
-        rescue:['祠堂的门打开了',q.healerJoined?'伤者登上了车。甄姬带着金针加入队伍，往后有人替你照看伤势。':'伤者登上了车。甄姬已获救，暂留毋极；队伍有空位时可邀请。','返回中山，夺回前后两院的粮车。'],
-        grain:q.grainWins<2?['前仓夺回','仓守把各家缝制的粮袋一一认了出来。还有最后一院。','粮仓后院 · 还差一战。']:['粮车装好了','两院粮袋全数清点。车夫套好缰绳，只等你一声出发。','护送粮车回常山，给这趟奔波一个交代。'],
+        rescue:['粮仓的门打开了','被扣押的伤者终于走出后仓，门后的医者向你道谢。','与获救的医者交谈，再护送粮车回常山。'],
+        grain:q.grainWins<2?['前仓夺回','仓守把各家缝制的粮袋一一认了出来。还有最后一院。','粮仓后院 · 还差一战。']:['乡粮夺回','两院粮袋全数清点，后院的锁门却传来呼救声。','查看后院，救出被扣押的人。'],
         escort:['常山，开门！','孩子们追着粮车跑进村。你一路护住的，终于成了灶上的热粥。','与里正交谈，再与赵云商议同行。']
       };
       const beat=beats[context.phase];return beat?{title:beat[0],text:beat[1],next:beat[2]}:null;
@@ -6715,7 +6747,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
   }
   function objective(world){
     const q=world.state.quests.changshan;
-    const steps={available:['第一程 · 常山','去常山看看赵云与乡亲们的难处'],entry:['第一程 · 守住村口','与赵云并肩，挡住抢粮的盗匪'],supplies:['为常山带回粮食',q.zhaoInvitation?'与赵云商议结伴':q.grainWins?'再夺后仓，粮车就能上路':q.healerRescued?'返回中山，找仓守夺粮':'前往中山，向仓守询问粮车'],rescue:['先把人救出来','前往毋极，找车夫接应甄姬'],escort:['最后一程 · 护粮归乡','护送粮车返回常山'],return:['常山的灶火','进村与里正交谈，看看乡亲们'],decision:['一杆愿意同行的枪','与赵云商议下一程']};
+    const steps={available:['第一程 · 常山','去常山看看赵云与乡亲们的难处'],entry:['第一程 · 守住村口','与赵云并肩，挡住抢粮的盗匪'],supplies:['为常山带回粮食',q.zhaoInvitation?'与赵云商议结伴':q.grainWins?'再夺后仓，粮车就能上路':q.healerRescued?'返回中山，找仓守夺粮':'前往中山，向仓守询问粮车'],rescue:['粮仓里的呼救','查看中山粮仓后院，救出被扣押的人'],escort:['最后一程 · 护粮归乡','护送粮车返回常山'],return:['常山的灶火','进村与里正交谈，看看乡亲们'],decision:['一杆愿意同行的枪','与赵云商议下一程']};
     return steps[q.stage]||null;
   }
   function questReward(world,quest){
@@ -6725,7 +6757,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
       const progress=world.state.quests.side[data.id];
       return '任务奖励 · '+data.money+'文'+(item?' · '+quality+item.name:'')+(progress?.accepted?'　进度 '+Math.min(data.rounds,progress.wins)+'/'+data.rounds:'');
     }
-    if(quest.id==='changshan')return '完成后可邀 · 赵云　途中可结识甄姬';
+    if(quest.id==='changshan')return '任务奖励 · 常山平安佩';
     if(quest.id==='coalition')return '达成目标 · 开启洛阳战线';
     const hero=root.HeroQuests?.definitions[quest.id];
     return hero?'完成后可邀 · '+hero.name:'';
@@ -6912,7 +6944,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
     if(buff)action='对'+target+'施放'+(skill.buff?.name||skill.name);
     else {
       const received=heal&&b.healingFactor?b.healingFactor(u):1,value=Math.floor(E.calculate({attacker:actor,target:{armor:0,resistance:0,species:'none'},skill}).amount*received);
-      const factor=heal?(1+(actor.healingBonus||0))*received:(1+(actor[skill.kind==='physical'?'physicalBonus':'tacticBonus']||0))*(actor.damageMultiplier??1),formula=skillFormula(skill).replace('武器威力',actor.weaponPower!==undefined&&actor.weaponPower!==actor.attack?'武器威力×'+n(actor.weaponPower/Math.max(1,actor.attack)):'武器威力'),displayed=calculated(value,factor===1?formula:'（'+formula+'）×'+n(factor));action=heal?'为'+target+'回复'+displayed+'点生命':'对'+target+'造成'+displayed+'点'+(skill.kind==='physical'?'物理':'计策')+'伤害';
+      const factor=heal?(1+(actor.healingBonus||0))*received:(1+(actor[skill.kind==='physical'?'physicalBonus':'tacticBonus']||0))*(actor.damageMultiplier??1),formula=skillFormula(skill).replace('武器威力',actor.weaponPower!==undefined&&actor.weaponPower!==actor.attack?'武器威力×'+n(actor.weaponPower/Math.max(1,actor.attack)):'武器威力'),displayed=calculated(value,factor===1?formula:'（'+formula+'）×'+n(factor));action=heal?'为'+target+'回复'+displayed+'点生命':'对'+target+'造成'+displayed+'点'+(skill.kind==='physical'?(actor.physicalTrueDamage?'真实':'物理'):'计策')+'伤害';
     }
     const attached=effects.filter(e=>e.id!==skill.buff?.id).map(e=>(e.chance===undefined?'附加':n(e.chance*100)+'%几率附加')+(S.definitions[e.id]?.name||e.name||e.id));
     lines.push(action+(attached.length?'，'+attached.join('，'):'')+'。');
@@ -6985,7 +7017,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
       if (!canvas?.getContext) throw new TypeError('需要传入 canvas 元素');
       this.canvas=canvas;this.ctx=canvas.getContext('2d');this.options=options;this.visuals=new Map();this.textTextures=new Map();this.spriteBuilds=0;this.dpr=1;this.background=null;this.ariaLabel='';this.metrics=options.profile?new Presentation.FrameStats():null;this.images=new Map();this.imageIds=new WeakMap();this.imageSerial=0;this.sprites=new Map();this.hits=[];this.floats=[];this.vfx=new root.BattleVFX.BattleEffects();this.aim=null;this.panel=null;this.focus=-1;this.disposed=false;
       this.click=this.click.bind(this);this.key=this.key.bind(this);this.resize=this.resize.bind(this);this.frame=this.frame.bind(this);
-      this.down=this.down.bind(this);this.up=this.up.bind(this);this.move=this.move.bind(this);this.cancel=this.cancel.bind(this);this.context=e=>e.preventDefault();this.wheel=e=>{if(['tactics','inspect','skillInfo','passiveInfo','result'].includes(this.panel?.type)){e.preventDefault();this.panel.scroll=clamp(this.panel.scroll+e.deltaY,0,this.panel.maxScroll||0);}};
+      this.down=this.down.bind(this);this.up=this.up.bind(this);this.move=this.move.bind(this);this.cancel=this.cancel.bind(this);this.context=e=>e.preventDefault();this.wheel=e=>{if(['tactics','inspect','skillInfo','passiveInfo','result','character','characterDetails','itemDetail','trophyDetail','npcSkill'].includes(this.panel?.type)){e.preventDefault();this.panel.scroll=clamp((this.panel.scroll||0)+e.deltaY,0,this.panel.maxScroll||0);}};
       root.GameAssetLoader?.track?.(this,{onReady:()=>{this.buildBackground();this.preparePortraits();}});
       canvas.addEventListener('pointerdown',this.down);canvas.addEventListener('pointerup',this.up);canvas.addEventListener('pointermove',this.move);canvas.addEventListener('pointercancel',this.cancel);canvas.addEventListener('contextmenu',this.context);canvas.addEventListener('wheel',this.wheel,{passive:false});canvas.addEventListener('keydown',this.key);
       this.observer=new ResizeObserver(this.resize);this.observer.observe(canvas);
@@ -7205,6 +7237,17 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
       this.button('开战',(this.w-w)/2,y+18,w,48,()=>{this.options.onPrepared?.(this);this.battle.start();},true);
     }
     openInspect(u){if(u&&!(u.side==='enemy'&&u.soldiers<=0))this.panel={type:'inspect',id:u.id,scroll:0};}
+    openCharacter(u,previous=null){if(u)this.panel={type:'character',unitId:u.id,readonly:true,previous,scroll:0};}
+    drawCharacterPanel(){
+      if(!this.characterView){
+        const node=typeof module!=='undefined'&&module.exports,WorldView=node?require('./canvas-world.js').CanvasWorld:root.WorldMap.CanvasWorld;if(node)require('./trophy-panels.js');
+        const v=this.characterView=Object.create(WorldView.prototype);Object.defineProperty(v,'panel',{get:()=>this.panel,set:panel=>{this.panel=panel;}});
+        v.canvas=this.canvas;v.ctx=this.ctx;v.options={allowDismiss:false};v.memberPreview=()=>this.battle;v.image=src=>this.image(src);v.closeWorldPanel=()=>this.closePanel();v.invalidate=()=>{};
+        v.model={members:()=>this.battle.units.filter(u=>u.side==='ally'),pending:true,state:{money:0,trophies:[]},trophyOwner:uid=>{for(const u of this.battle.units){const slot=(u.trophies||[]).findIndex(t=>t?.uid===uid);if(slot>=0)return{id:u.id,slot};}return null;}};
+      }
+      const v=this.characterView,p=this.panel;if(p.type==='character'){const u=this.battle.unit(p.unitId);if(!u){this.closePanel();return;}p.unit={...u,startSoldiers:u.soldiers,trophies:u.trophies?.length?u.trophies:[null,null]};}
+      Object.assign(v,{w:this.w,h:this.h,dpr:this.dpr||1,hits:[]});v.model.state.trophies=this.battle.units.flatMap(u=>(u.trophies||[]).filter(Boolean));v.drawPanel();this.hits=v.hits;
+    }
     openSkillInfo(u,id){
       if(!u?.skills.includes(id)||!this.battle.skills[id])return;
       this.panel={type:'skillInfo',id:u.id,skill:id,previous:this.panel,scroll:0};
@@ -7244,6 +7287,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
       for(const line of info.lines.slice(1)){for(const wrapped of this.wrapInfo(line,w-44)){this.text(wrapped,x+22,row,14,'#d2e0df','left');row+=23;}row+=8;}c.restore();p.maxScroll=Math.max(0,row+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);
     }
     drawPanel() {
+      if(['character','characterDetails','itemDetail','trophyDetail','npcSkill'].includes(this.panel.type)||this.panel.type==='passiveInfo'&&typeof this.panel.passive==='object')return this.drawCharacterPanel();
       if(this.panel.type==='tactics')return this.drawTactics();
       if(this.panel.type==='inspect')return this.drawInspect();
       if(this.panel.type==='skillInfo')return this.drawSkillInfo();
@@ -7279,7 +7323,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
       if(!this.press||(e.pointerId!==undefined&&e.pointerId!==this.press.pointer))return;const p=this.point(e),dx=p.x-this.press.x,dy=p.y-this.press.y;
       if(!this.press.axis&&Math.max(Math.abs(dx),Math.abs(dy))>7)this.press.axis=this.press.hit?.kind==='slider'&&Math.abs(dx)>Math.abs(dy)?'slider':'scroll';
       if(this.press.axis==='slider'){clearTimeout(this.pressTimer);this.press.moved=true;this.press.hit.change(p.x);}
-      else if(this.press.axis==='scroll'){clearTimeout(this.pressTimer);this.press.moved=true;if(['tactics','inspect','skillInfo','passiveInfo','result'].includes(this.panel?.type))this.panel.scroll=clamp(this.press.scroll-dy,0,this.panel.maxScroll||0);}
+      else if(this.press.axis==='scroll'){clearTimeout(this.pressTimer);this.press.moved=true;if(['tactics','inspect','skillInfo','passiveInfo','result','character','characterDetails','itemDetail','trophyDetail','npcSkill'].includes(this.panel?.type))this.panel.scroll=clamp(this.press.scroll-dy,0,this.panel.maxScroll||0);}
     }
     up(e){
       if(!this.press||e.pointerId!==this.press.pointer)return;const press=this.press,p=this.point(e);this.cancel();
@@ -7296,8 +7340,8 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
         if(skill.kind==='heal'){
           if(r.when!=='healThresholds'){const t=r.when==='always'?1.01:Number(r.threshold)||0;r.selfThreshold=r.when==='selfBelow'?t:r.when==='allyBelow'||r.when==='always'?t:0;r.allyThreshold=r.when==='selfBelow'?0:t;}
           if(r.disabled){r.selfThreshold=0;r.allyThreshold=0;}r.when='healThresholds';
-        }else if(['physical','tactic'].includes(skill.kind)){r.when=skill.scope==='all'?'enemyCount':'always';r.threshold=skill.scope==='all'?Math.max(1,Math.floor(r.threshold)||1):0;}
-        else if(skill.kind==='buff')r.displayThreshold=r.disabled?0:r.when==='always'?1.01:Number(r.threshold)||0;
+        }else if(['physical','tactic'].includes(skill.kind)){if(skill.scope==='all'){r.when=r.when==='always'?'always':'enemyCount';r.threshold=r.when==='always'?0:clamp(Math.floor(r.threshold)||2,2,5);}else{r.when='always';r.threshold=0;}}
+        else if(skill.kind==='buff'){r.when='always';r.threshold=0;delete r.displayThreshold;delete r.frequency;}
       }
       this.aim=null;this.panel={type:'tactics',id:u.id,rules,targetRule:u.targetRule,scroll:0,maxScroll:0};
     }
@@ -7314,7 +7358,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
       const p=this.panel,u=this.battle.unit(p.id);if(!u||!['ready','running'].includes(this.battle.status)){this.panel=null;return;}
       const contentHeight=p.rules.reduce((height,r)=>height+(this.battle.skills[r.skill].kind==='heal'?166:114),70);
       const c=this.ctx,{x,y:top,w,h}=this.panelFrame(`${u.name} · 施法设置`,contentHeight+65),pad=17,left=x+pad,bottom=top+h-18;
-      this.box(x+w-104,top+9,48,32,'#252c27','#766e57',2);this.text('属性',x+w-80,top+25,14,'#dcd8c5');this.hits.push({x:x+w-104,y:top+9,w:48,h:32,label:'属性',action:()=>{this.panel={type:'inspect',id:u.id,scroll:0,previous:p};}});
+      this.box(x+w-104,top+9,48,32,'#252c27','#766e57',2);this.text('属性',x+w-80,top+25,14,'#dcd8c5');this.hits.push({x:x+w-104,y:top+9,w:48,h:32,label:'属性',action:()=>this.openCharacter(u,p)});
       const start=top+49,viewHeight=bottom-start;let y=start-p.scroll;
       p.maxScroll=Math.max(0,contentHeight-viewHeight);p.scroll=clamp(p.scroll,0,p.maxScroll);y=start-p.scroll;
       c.save();c.beginPath();c.rect(x,start,w,viewHeight);c.clip();const before=this.hits.length;
@@ -7325,8 +7369,8 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
         this.box(left-5,y,w-pad*2+10,height-8,'#102a32','#2d4a54',4);this.box(left,y+5,36,36,'#0b222d','#7b9ba6');this.drawSkillIcon(skill,left,y+5,36,root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]);this.text(skill.name,left+44,y+23,14,'#d9e9e9','left');this.text(this.skillRole(skill),left+w-pad*2-8,y+23,12,skill.kind==='heal'?'#8fdfae':'#b5c6d4','right');
         this.hits.push({x:left-2,y:y+3,w:40,h:40,label:`查看${skill.name}详情`,action:()=>this.openSkillInfo(u,skill.id)});
         if(heal){percent(r,'selfThreshold','治疗自己',y+49);percent(r,'allyThreshold','治疗队友',y+103);}
-        else if(group){const count=Math.max(2,this.battle.config.tacticsEnemyCount||0,this.battle.units.filter(t=>t.side==='enemy').length,Math.floor(r.threshold)||2);this.slider('施放条件',left+9,y+49,w-(pad+9)*2,r.disabled?0:Math.max(1,Math.min(count,r.threshold)-1),count-1,v=>{r.disabled=v===0;r.when='enemyCount';r.threshold=v+1;},v=>v===0?'从不释放':`至少 ${v+1} 人`);}
-        else if(skill.buff?.taunt){const value=clamp(Math.round((r.displayThreshold||0)*100),0,101);this.slider('施放条件',left+9,y+49,w-(pad+9)*2,value,101,value=>{r.displayThreshold=value/100;r.disabled=value===0;},value=>value>0&&value<101?`自身生命低于 ${value}%`:thresholdLabel(value));}
+        else if(group)this.slider('施放条件',left+9,y+49,w-(pad+9)*2,r.disabled?0:r.when==='always'?5:clamp(r.threshold-1,1,4),5,v=>{r.disabled=v===0;r.when=v===5?'always':'enemyCount';r.threshold=v===5?0:v+1;},v=>v===0?'从不释放':v===5?'始终释放':`至少 ${v+1} 人`);
+        else if(skill.kind==='buff')this.slider('施放条件',left+9,y+49,w-(pad+9)*2,r.disabled?0:1,1,value=>{r.disabled=value===0;r.when='always';r.threshold=0;},value=>value?'始终保持':'从不释放');
         else this.slider('施放频率',left+9,y+49,w-(pad+9)*2,r.disabled?0:r.frequency==='sometimes'?1:2,2,v=>{r.disabled=v===0;r.frequency=v===1?'sometimes':'always';r.when='always';r.threshold=0;},v=>['从不释放','偶尔释放','始终释放'][v]);
         y+=height;
       });
@@ -7337,10 +7381,10 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
     }
     commitTactics(){
       const p=this.panel;if(p?.type!=='tactics')return;const u=this.battle.unit(p.id);if(!u){this.panel=null;return;}
-      for(const r of p.rules)if(this.battle.skills[r.skill].kind==='buff'){if(this.battle.skills[r.skill].buff?.taunt){const t=r.displayThreshold??1.01;r.when=t>=1.01?'always':'selfBelow';r.threshold=t;}else{r.when='always';r.threshold=0;}delete r.displayThreshold;}
+      for(const r of p.rules)if(this.battle.skills[r.skill].kind==='buff'){r.when='always';r.threshold=0;delete r.displayThreshold;delete r.frequency;}
       this.battle.setTactics(u.id,{rules:p.rules,targetRule:p.targetRule});this.panel=null;this.options?.onTacticsSave?.(u,this);
     }
-    closePanel(){if(this.panel?.type==='tactics')this.commitTactics();else if(['skillInfo','passiveInfo','inspect'].includes(this.panel?.type))this.panel=this.panel.previous||null;else this.panel=null;}
+    closePanel(){if(this.panel?.type==='tactics')this.commitTactics();else if(this.panel?.previous||['skillInfo','passiveInfo','inspect'].includes(this.panel?.type))this.panel=this.panel.previous||null;else this.panel=null;}
     notify(text){this.notice={text,until:performance.now()+2000};}
     notifyStatus(u,status){this.notice={unitId:u.id,statusId:status.id,statusName:status.name,until:performance.now()+2000};}
     drawNotice(now){
@@ -7895,7 +7939,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     ['mountain-bandits','山道拦路','mountainBandit','山贼','mountain-bandit','blade',['blade-cut'],3,2],
     ['brigands','行路遇匪','brigand','强盗','brigand','blade',['blade-cut'],4,2]
   ])encounters[id]={id,title,count,scene:{background:'./assets/story/village-road-v3.webp'},roster:[outlaw(profile,level,name,art,type,skills)],rules:{level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true}};
-  encounters['changshan-rescue']={id:'changshan-rescue',title:'毋极接应',count:2,scene:{background:'./assets/story/village-road-v3.webp'},roster:[outlaw('thief',1,'盗贼','thief','dagger',['dagger-fast'])],rules:{level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true}};
+  encounters['changshan-rescue']={id:'changshan-rescue',title:'粮仓接应',count:2,scene:{background:'./assets/story/village-road-v3.webp'},roster:[outlaw('thief',1,'盗贼','thief','dagger',['dagger-fast'])],rules:{level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true}};
   for(const [id,scene]of Object.entries({patrol:'rural-road',thieves:'forest-path','river-bandits':'river-dock','mountain-bandits':'bandit-camp',brigands:'bandit-camp','changshan-rescue':'market-street'}))encounters[id].scene=Scenes.get(scene);
   const questDefinitions=[
     {id:'coalition',title:'访贤合盟',category:'main',recommendedLevel:10,longTerm:true},
@@ -8217,8 +8261,8 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  for(const [id,rows]of Object.entries(conclusions))H.definitions[id].stages.freed.npc.turns=rows.map(([speaker,text])=>({speaker,text}));
  const factories=new Map();
  function companion(id,currentLevel){if(factories.has(id))return root.BattlePassives.complete(factories.get(id)(currentLevel));const d=H.definitions[id];if(id==='ganning')return root.BattlePassives.complete(H.companion(currentLevel??1));const weapon=I.create('weapon-'+d.type,'green',id+'-weapon'),skills=W.forWeapon(weapon);return {...G.create(id,currentLevel??d.level??10),id,name:d.name,characterId:id,unitType:'general',homeNode:d.home,experience:0,experienceVersion:2,weaponPlanVersion:3,defaultLoadoutVersion:2,weapon,skills,priorities:W.prioritiesFor(skills),equipment:{armor:I.create('leather-armor','white',id+'-armor'),accessory1:null,accessory2:null},armor:3,resistance:3,passives:root.BattlePassives.forUnit({id,passives:d.passives||[]})};}
- function buildEnemies(id,phase,currentLevel){const d=H.definitions[id],f=d.battles[phase];if(f.roster)return f.roster().map(u=>{const level=f.level||d.fixedCombatLevel||10;return u.baseAttributes&&u.potentials?{...u,level,...G.attributesAt(u.baseAttributes,u.potentials,level)}:{...u,level};});if(f.duel){let u=companion(f.duel,f.level||d.fixedCombatLevel||10);if(f.trainingWeapon){const weapon={...I.create('weapon-'+u.weapon.type,'white','duel-training'),id:'training-'+f.duel,name:f.trainingWeapon,skills:f.trainingSkills||[{base:'sword-cut',name:'试招'}]},skills=W.forWeapon(weapon);u={...u,weapon,skills,priorities:W.prioritiesFor(skills)};}return [{...u,id:'duel-'+f.duel,experienceWeight:1}];}const Catalog=node?require('./enemy-catalog.js'):root.EnemyCatalog;return Catalog.roster(f.level||d.fixedCombatLevel||10,f.count,f.pattern,{army:!f.enemyKind}).map((u,i)=>({...u,id:id+'-foe-'+i,...(i===0&&f.leaderName?{name:f.leaderName}:{}),...(i===0&&f.leaderArt?{characterId:f.leaderArt}:{})}));}
- function enemies(id,phase,currentLevel){const f=H.definitions[id].battles[phase],boss=f.boss||f.duel||f.named||f.roster;return N.mixRoster(buildEnemies(id,phase,currentLevel),f.enemyRoles,{army:!f.enemyKind}).map(u=>({...u,...(boss?{boss:true,statusImmunities:[...new Set([...(u.statusImmunities||[]),'stun'])]}:{}),passives:[...new Set([...(u.passives||[]),...(f.temporaryPassives||[])])]}));}
+ function buildEnemies(id,phase,currentLevel){const d=H.definitions[id],f=d.battles[phase];if(f.roster)return f.roster().map(u=>{const level=f.level||d.fixedCombatLevel||10;return u.baseAttributes&&u.potentials?{...u,level,...G.attributesAt(u.baseAttributes,u.potentials,level)}:{...u,level};});if(f.duel){let u=companion(f.duel,f.level||d.fixedCombatLevel||10);if(f.trainingWeapon){const weapon={...I.create('weapon-'+u.weapon.type,'white','duel-training'),id:'training-'+f.duel,name:f.trainingWeapon,skills:f.trainingSkills||[{base:'sword-cut',name:'试招'}]},skills=W.forWeapon(weapon);u={...u,weapon,skills,priorities:W.prioritiesFor(skills)};}return [{...u,id:'duel-'+f.duel,experienceWeight:1}];}const Catalog=node?require('./enemy-catalog.js'):root.EnemyCatalog;return Catalog.roster(f.level||d.fixedCombatLevel||10,f.count,f.pattern,{army:!f.enemyKind}).map((u,i)=>({...u,id:id+'-foe-'+i,...(f.enemyKind==='retainer'?{name:i===0?'家丁头目':'李府家丁',characterId:'brigand'}:{}),...(i===0&&f.leaderName?{name:f.leaderName}:{}),...(i===0&&f.leaderArt?{characterId:f.leaderArt}:{})}));}
+ function enemies(id,phase,currentLevel){const f=H.definitions[id].battles[phase],boss=f.boss||f.duel||f.named||f.roster;return N.mixRoster(buildEnemies(id,phase,currentLevel),f.enemyRoles,{army:!f.enemyKind}).map((u,i)=>({...u,...(i===0&&f.leaderName?{name:f.leaderName}:{}),...(i===0&&f.leaderArt?{characterId:f.leaderArt}:{}),...(boss?{boss:true,statusImmunities:[...new Set([...(u.statusImmunities||[]),'stun'])]}:{}),passives:[...new Set([...(u.passives||[]),...(f.temporaryPassives||[])])]}));}
  // 城镇日常人物长期保留；线索只指出当前需要前往的地点。
  const Scenes=node?require('./battle-scenes.js'):root.BattleScenes;
  const excluded=new Set(['camp']);
@@ -8284,15 +8328,15 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   function rulerStatus(world,country){const data=rulers[country];if(!data)return null;const q=world.state.heroQuests[data.id];return {...data,count:world.state.recruits[country].length,ready:world.state.recruits[country].length>=data.minimum,complete:q.stage==='complete',stage:q.stage,accepted:q.accepted};}
   const definitions={
     wei:{country:'wei',place:'xuchang',id:'simayi',name:'司马懿',art:'simayi',side:'left',
-      welcome:['曹公还没有回来，许昌的事情暂时由我照看。听说你们在外面帮过不少乡亲，这一路应该也累了，进来坐下喝点水，我们慢慢聊。','这里还需要能带兵、也肯管束手下的人。你们走的地方多，要是遇到愿意来魏国做事的将士，麻烦帮我们介绍一下，事后回来告诉我就好。'],
+      welcome:['你终于到许昌了。那夜梦中一别，我还疑心只是怪梦，今日见到你，才算信了。曹公尚未回来，府里的事由我照看，先进来坐。','这里还需要能带兵、也肯管束手下的人。你们走的地方多，要是遇到愿意来魏国做事的将士，麻烦帮我们介绍一下，事后回来告诉我就好。'],
       thanks:'他们已经来信，说了你们一路帮忙的事情。我让人备好了赏钱，你们收着吧，往后还要赶路，吃住和买药都用得上。',
       idle:'你上次介绍来的人，我已经记好了。以后再碰到合适的，也可以叫他来这里找我，到了报你的名字，我们会安排接待。'},
     shu:{country:'shu',place:'chengdu',id:'zhugeliang',name:'诸葛亮',art:'zhugeliang',side:'right',
-      welcome:['主公现在不在成都，府里的事情先由我处理。门口的人说你们从北边来，走了这么远，先坐下歇歇，想问什么都可以慢慢说。','成都最近收留了不少逃难的人，住处、粮车、沿路护送都缺人照看。你们如果遇到愿意来帮忙的将士，麻烦替我们问问，介绍成了，路上的花费也该由我们出一些。'],
+      welcome:['那夜梦中相约，今日总算见面了。从常山一路到成都，想必很不容易。主公尚未归来，我已叫人收拾了客房，你们先歇歇。','成都最近收留了不少逃难的人，住处、粮车、沿路护送都缺人照看。你们如果遇到愿意来帮忙的将士，麻烦替我们问问，介绍成了，路上的花费也该由我们出一些。'],
       thanks:'你们介绍来的几位，已经说过一路发生的事情了。这份赏钱请收下，不能总让你们自己出钱赶路，大家愿意来，少不了你们费心。',
       idle:'你带回的消息我都记下了。想休息就多住几天，府里有地方安排；准备继续走的话，也先把伤治好，不用刚到就急着出门。'},
     wu:{country:'wu',place:'jianye',id:'zhouyu',name:'周瑜',art:'zhouyu',side:'left',
-      welcome:['主公还没有回建业，有事可以先跟我说。你们刚从外头回来吧？这一路怎么样，沿江有没有遇到拦船的人？','来建业的乡亲越来越多，渡口要有人接应，城里也要安排吃住。你们在外头遇到愿意来江东做事的人，替我们带句话，办成以后回来，我会给大家备好路上的花费。'],
+      welcome:['我已吩咐门吏，见你便请进府来。那夜三位仙长说过的事，我还记得。主公尚在外面接应百姓，眼下由我留守建业。你们这一路可还顺利？','来建业的乡亲越来越多，渡口要有人接应，城里也要安排吃住。你们在外头遇到愿意来江东做事的人，替我们带句话，办成以后回来，我会给大家备好路上的花费。'],
       thanks:'这几位的事情我已经记好了，真是帮了江东的大忙。赏钱带上吧，接下来不管是找人还是救急，总有要花钱的地方。',
       idle:'上次那份赏钱已经结清了，账上也都有记录。你们可以放心去办自己的事，再找到愿意来江东的人，回来告诉我，我会接着安排。'}
   };
@@ -8356,7 +8400,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  ['simayi-deep','深谋远虑','gold','计策伤害提高15%。',{tacticBonus:.15}],['xiahoudun-stalwart','拔矢奋战','gold','物理伤害提高15%。',{physicalBonus:.15}],['zhangliao-assault','威震逍遥','gold','物理伤害提高15%。',{physicalBonus:.15}],['xunyu-counsel','王佐之才','gold','治疗效果提高20%。',{healingBonus:.2}],['jiaxu-poison','帷幄毒士','gold','计策伤害提高18%。',{tacticBonus:.18}],
  ['guanyu-righteous','义薄云天','gold','物理伤害提高15%。',{physicalBonus:.15}],['zhangfei-roar','燕人怒吼','gold','物理伤害提高18%。',{physicalBonus:.18}],['machao-valiant','西凉骁骑','gold','物理伤害提高15%。',{physicalBonus:.15}],
  ['sunquan-command','坐镇江东','gold','受到的物理和计策伤害减少8%。',{physicalReduction:.08,tacticReduction:.08}],['zhouyu-flames','赤焰周郎','gold','计策伤害提高18%。',{tacticBonus:.18}],['huanggai-veteran','铁骨老将','gold','受到的物理伤害减少15%。',{physicalReduction:.15}],['lvmeng-study','刮目相看','gold','物理和计策伤害提高10%。',{physicalBonus:.1,tacticBonus:.1}],['luxun-fire','连营烈火','gold','计策伤害提高18%。',{tacticBonus:.18}],['sunshangxiang-bow','弓腰姬','gold','物理伤害提高15%。',{physicalBonus:.15}],
- ['lvbu-peerless','天下无双','red','物理技能必定暴击，无视目标全部护甲。',{guaranteedCritical:true,ignoreArmor:true},true],['zhuge-eight-trigrams','八卦阵','red','受到物理技能时有50%概率闪避。',{physicalDodgeBonus:.5},true],['diaochan-grace','闭月流风','gold','受到物理技能时额外增加15%闪避率。',{physicalDodgeBonus:.15}],['menghuo-strength','南中雄威','gold','受到物理伤害减少12%，物理伤害提高10%。',{physicalReduction:.12,physicalBonus:.1}],['huatuo-healer','青囊济世','red','治疗效果提高35%。',{healingBonus:.35},true],['dongzhuo-soldier','西凉旧将','gold','物理伤害提高12%，受到物理伤害减少10%。',{physicalBonus:.12,physicalReduction:.1}]
+ ['zhuge-eight-trigrams','八卦阵','red','受到物理技能时有50%概率闪避。',{physicalDodgeBonus:.5},true],['diaochan-grace','闭月流风','gold','受到物理技能时额外增加15%闪避率。',{physicalDodgeBonus:.15}],['menghuo-strength','南中雄威','gold','受到物理伤害减少12%，物理伤害提高10%。',{physicalReduction:.12,physicalBonus:.1}],['huatuo-healer','青囊济世','red','治疗效果提高35%。',{healingBonus:.35},true],['dongzhuo-soldier','西凉旧将','gold','物理伤害提高12%，受到物理伤害减少10%。',{physicalBonus:.12,physicalReduction:.1}]
  ];
  rows.push(
   ['xuhuang-steady','治军严整','gold','技能命中率增加8个百分点。',{hitBonus:.08}],['xuhuang-martial','沉勇善战','blue','物理伤害提高15%。',{physicalBonus:0.15},false],
@@ -8382,7 +8426,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   ['huangyueying-mechanism','机括娴熟','gold','速度提高20%。',{speedMultiplier:1.2},false]
  );
  // 本表是武将招牌特质；强度品质与“角色专属”的身份分别记录。
- for(const [id,name,quality,description,stats,exclusive=true]of rows)P.definitions[id]={id,name,quality,description,stats,triggers:[],...(exclusive?{exclusive:true}:{})};
+ for(const [id,name,quality,description,stats,exclusive=true]of rows)P.definitions[id]={id,name,quality,description,stats,triggers:[],...(Object.values(P.heroDefaults).some(ids=>ids.includes(id))&&exclusive?{exclusive:true}:{legacy:true})};
  P.definitions['luoyang-possession']={id:'luoyang-possession',name:'诡影附身',quality:'white',temporary:true,enemyOnly:true,description:'体质提高200%，免疫眩晕，仍可被破甲、麻痹和持续伤害影响。',stats:{constitutionMultiplier:3},triggers:[]};
  const api={ids:rows.map(r=>r[0])};root.ChapterTraits=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
@@ -8404,14 +8448,8 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  ];
  const definitions=Object.fromEntries(entries.map(([id,name,country,type,home])=>[id,{id,name,country,type,home,level:10}]));
  const clone=value=>JSON.parse(JSON.stringify(value));
- Object.assign(definitions.guanyu,{weapon:{id:'green-dragon-glaive',name:'青龙偃月刀',skills:[{base:'sword-eagle',name:'青龙斩'},{base:'spear-break',name:'偃月横扫'}]},passives:['guanyu-righteous']});
- Object.assign(definitions.zhangfei,{weapon:{id:'serpent-spear',type:'spear',proficiencyType:'spear',name:'丈八蛇矛',skills:[{base:'axe-1',name:'燕人怒击'},{base:'spear-break',name:'蛇矛横扫'}]},passives:['zhangfei-roar']});
- Object.assign(definitions.machao,{weapon:{name:'飞翼枪'},passives:['machao-valiant']});
- Object.assign(definitions.lvbu,{weapon:{id:'fangtian-halberd',name:'方天画戟',type:'halberd',proficiencyType:'spear',skills:['sword-critical','spear-break']},passives:['lvbu-peerless'],guaranteedCritical:true,ignoreArmor:true});
- Object.assign(definitions.zhangjiao,{weapon:{id:'fire-god-staff',name:'火神杖'},passives:['thunder-lord']});
- Object.assign(definitions.zhugeliang,{type:'fan',weapon:{name:'白羽扇'},passives:['zhuge-eight-trigrams']});
- Object.assign(definitions.zhouyu,{type:'fan',weapon:{id:'zhouyu-featherfan',name:'朱羽扇',type:'fan',skills:[{base:'staff-fire',name:'焰火计'},{base:'staff-flame',name:'赤焰连营'}]},passives:['zhouyu-flames']});
- Object.assign(definitions.luxun,{type:'fan',weapon:{id:'luxun-featherfan',name:'青竹扇',type:'fan',skills:[{base:'staff-fire',name:'火伏计'},{base:'staff-flame',name:'连营焚野'}]},passives:['luxun-fire']});
+ Object.assign(definitions.lvbu,{weapon:{id:'fangtian-halberd',name:'方天画戟',type:'spear',unique:true,exclusive:true,quality:'purple'},passives:['lvbu-guishen','lvbu-wushuang']});
+ Object.assign(definitions.zhugeliang,{type:'fan'});Object.assign(definitions.zhouyu,{type:'fan'});Object.assign(definitions.luxun,{type:'fan'});
  Object.assign(definitions.huatuo,{passives:['huatuo-healer']});
  Object.assign(definitions.dongzhuo,{passives:['dongzhuo-soldier']});
  Object.assign(definitions.xuhuang,{passives:['xuhuang-steady','xuhuang-martial']});Object.assign(definitions.yujin,{passives:['yujin-discipline','yujin-guard']});Object.assign(definitions.caoren,{passives:['caoren-fortress','caoren-tenacious']});
@@ -8427,7 +8465,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  function unit(id,level,{boss=false}={}){
   const d=definitions[id];if(!d)throw new TypeError('未登记剧情人物：'+id);
   level??=d.level;
-  const weapon={...I.create('weapon-'+d.type,boss?'blue':'green',id+'-weapon'),...clone(d.weapon||{})},skills=W.forWeapon(weapon),growth=G.create(id,level),armor=I.create(boss?'iron-armor':'leather-armor',boss?'blue':'green',id+'-armor');
+  const type=(node?require('./hero-professions.js'):root.HeroProfessions).definitions[id]?.weaponType||d.type,weapon={...I.create('weapon-'+type,boss?'blue':'green',id+'-weapon'),...clone(d.weapon||{})},skills=W.forWeapon(weapon),growth=G.create(id,level),armor=I.create(boss?'iron-armor':'leather-armor',boss?'blue':'green',id+'-armor');
   const u={...growth,id,name:d.name,characterId:id,unitType:'general',homeNode:d.home,experience:0,experienceVersion:2,weaponPlanVersion:3,weapon,skills,priorities:W.prioritiesFor(skills),equipment:{armor,accessory1:boss?I.create('copper-ring','blue',id+'-ring'):null,accessory2:boss?I.create('wood-beads','blue',id+'-beads'):null},armor:boss?15:3,resistance:boss?15:3,passives:clone(d.passives||[])};
   if(d.guaranteedCritical)u.guaranteedCritical=true;if(d.ignoreArmor)u.ignoreArmor=true;return u;
  }
@@ -8765,7 +8803,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   return:S('camp','将巨鹿发生的事告诉张角','zhangjiao',[
    ['npc','他们打着黄巾军的名号抢粮，我不能说一句不知情就不管。粮食先退给乡亲，牵涉的人我也会逐个问，查清楚是谁在纵容他们。'],['hero','乡亲们最担心的，是今天退了粮，明天那些人又来。你最好留几个人在这里，让他们遇到事情能找到人说，不用再一路跑到营里。'],['npc','你提醒得对。我会安排人留守，也会亲自去附近几个村子看看。有些事情只听送来的消息，确实发现不了问题。']],[N('与张角商议同行','freed')]),
   freed:End('zhangjiao','camp',[['npc','营里已经有人照看，我想跟你们出去走走。那些不敢进营说话的乡亲，见到我在村里，也许愿意把遇到的事情告诉我。'],['hero','我们一起去吧。需要回营的时候再回来，路上的事情也不必都急着一天办完，先把大家的难处问清楚。']])
- },{abuse:{stage:['abuse'],next:'trace',title:'巨鹿还粮',sceneId:'farmland',count:3,enemyKind:'bandit'},trace:{stage:['trace'],next:'return',title:'广宗追查',sceneId:'rural-road',count:4,enemyKind:'bandit'}});
+ },{abuse:{stage:['abuse'],next:'trace',title:'巨鹿还粮',sceneId:'farmland',count:3,enemyKind:'bandit',leaderName:'强盗首领',leaderArt:'brigand'},trace:{stage:['trace'],next:'return',title:'广宗追查',sceneId:'rural-road',count:4,enemyKind:'bandit',leaderName:'强盗首领',leaderArt:'brigand'}});
  R('zhangbao','营中药箱',{
   rumor:S('camp','与张宝商议补充药材','zhangbao',[
    ['npc','我也想出去看看，只是营里的伤者还离不开人。原定送来的药迟迟没到，要是药不够，我实在没法放心离开。'],['hero','那我去广宗找找送药的人。先把药备齐，等营里有人接手照顾伤者，你也能放心跟我们出去。']],[N('前往广宗取药','supplies')]),
@@ -8824,7 +8862,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  lu.stages['trial-talk']=S('xinye','与吕布约定同行的条件','lvbu',[
   ['npc','住处和粮食都到了，我没想到你们真会一户户把人接齐。可你们接下来要去洛阳，那里的仗不是救几辆车这么简单。'],['hero','我知道你在担心什么。如果我们连眼前这支队伍都带不好，就算你来了，也不过是把所有危险推给你。'],['npc','那就在营外试一场。你带平常同行的人，我也带两个亲卫，用自己的兵器，不让你故意占便宜。打不过就先去练，什么时候准备好了都能再来，我不会因为你输一场就不认人。']],[N('准备好后接受考验','trial')]);
  battle('lvbu','trial','xinye','lvbu','通过吕布的实战考验',[
-  ['npc','伤药已经放在旁边。大家站好，别只盯着我的戟，要看队友还能不能撑住。准备好了就来！']],'freed',{roster:()=>{const chapter=node?require('./chapter-one.js'):root.ChapterOne;return chapter.enemies('gate').map((u,i)=>({...u,id:'lvbu-trial-'+i,name:i?'吕布亲卫':u.name,...(i?{weapon:{...u.weapon,name:'练武长枪',power:25},equipment:{...u.equipment,armor:{id:'training-guard-armor',name:'练武皮甲',slot:'armor',quality:'green',attributes:{constitution:20,armor:40,resistance:12}}}}:{})}));},scene:'farmland',level:15});
+  ['npc','这回只试配合，我会收着力，你们不必顾忌。伤药就在旁边，撑不住便喊停。别只盯着我的戟，还得看住同伴！']],'freed',{roster:()=>{const chapter=node?require('./chapter-one.js'):root.ChapterOne;return chapter.enemies('gate').map((u,i)=>({...u,id:'lvbu-trial-'+i,name:i?'吕布亲卫':u.name,...(!i?{damageMultiplier:.35}:{}),...(i?{weapon:{...u.weapon,name:'练武长枪',power:25},equipment:{...u.equipment,armor:{id:'training-guard-armor',name:'练武皮甲',slot:'armor',quality:'green',attributes:{constitution:20,armor:40,resistance:12}}}}:{})}));},scene:'farmland',level:15});
  lu.stages.freed.npc.turns=[{speaker:'npc',text:'行，我跟你们走。不是因为赤兔，是因为你们答应照顾的人，最后都没有落下。到了洛阳，我也要当面问清楚，那些命令到底是谁下的。'},{speaker:'hero',text:'那就一起去。弟兄们留在这里照顾家人，有事随时回来。我们要做的事还很多，路上慢慢商量。'}];
  di.visibility={any:[{flags:{diaochanLead:true}},{chapterComplete:true}]};di.title='天香阁来信';
  di.stages.rumor=S('luoyang','把管事的口信带给貂蝉','diaochan',[
@@ -9300,7 +9338,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
    f.pattern=f.fixedPattern||patternNames[(route+index++)%patternNames.length];
    if(!f.duel&&!f.roster&&!f.named){f.count=Math.max(f.count||3,3);if(!f.fixedPattern&&level>=10&&route%5===0){f.pattern='ambush';f.count=4;}f.enemyRoles=null;}
    if(duel){f.temporaryPassives=[...new Set([...(f.temporaryPassives||[]),'enemy-stun-resistance','enemy-healing-suppression'])];}
-   for(const stage of Object.values(d.stages||{}))if(stage.npc?.choices?.some(c=>c.battle===phase))stage.recommendedLevel=f.level;
+   for(const stage of Object.values(d.stages||{}))if(stage.npc?.choices?.some(c=>c.battle===phase)){stage.recommendedLevel=f.level;const npc=stage.npc;if(!f.roster&&!f.named&&!f.duel&&!H.definitions[npc.id]&&['brigand','thief','imperial-soldier','mountain-bandit','river-bandit','li-yong'].includes(npc.art)){f.leaderName=npc.name;f.leaderArt=npc.art;}}
   }if(d.id==='lvbu')d.battles.trial.temporaryPassives=[...(d.battles.trial.temporaryPassives||[]),'enemy-trial-armor'];if(d.id==='ganning'){d.battles.breach.count=5;d.battles.breach.pattern='shieldwall';d.battles.cell.count=5;d.battles.cell.pattern='siege';}if(d.id==='taishici')for(const key of ['jianye-meet','jianye-duel','freed'])d.stages[key].recommendedLevel=12;route++;
  }
  const early={'grain-escort':3,'cs-blackwood':3,'clear-mountain':3,'trade-road':4,'ye-quarry':5};
@@ -9316,6 +9354,191 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  const node=typeof module!=='undefined'&&module.exports;
  if(node){require('./chapter-traits.js');require('./chapter-quests-wei.js');require('./chapter-quests-shu.js');require('./chapter-quests-wu.js');require('./chapter-quests-other.js');require('./recruitment-stories.js');require('./recruitment-challenges.js');require('./chapter-quests-specialists.js');require('./encounter-balance.js');}
  const api={version:1};root.ChapterRecruitment=api;if(node)module.exports=api;
+})(globalThis);
+
+</script>
+<script>
+(function(root){
+ 'use strict';
+ const node=typeof module!=='undefined'&&module.exports,H=node?require('./hero-quests.js'):root.HeroQuests;
+ const endings={
+  "ganning":["新野这座牢，我是再不想回了。弟兄们都还跟着我，可离了江面，他们连吃饭的门路都不熟。","不如去建业见周瑜。他那里需要熟悉水路的人，弟兄们也能有个去处。我替你引荐，也想请你先与我们同行。","建业……好，俺也去看看。丑话先说在前头，若又像这回一样骗我们入牢，我可不会再忍。"],
+  "xuchu": [
+    "村里有人轮着守粮，我总算能歇口气了。只是以后……我没想过，我只会种地、使锤，别的也不懂。",
+    "去许昌见见曹操吧。他那里缺能带兵的人，你又能打，又肯护着乡亲，应该用得上。我替你引荐，也想请你先陪我们走一程。",
+    "那俺也去看看！先容俺回家说一声，把锤带上。村里往后有事，你们可得捎信给俺。"
+  ],
+  "dianwei": [
+    "借据交出去了，可刘大嫂和孩子再也回不来了……我若早些赶回东街，兴许……",
+    "你也拼了命去救他们。先把伤养好，往后跟我们一起走吧。你若想有个落脚处，我替你引荐曹公，许昌总好过在外躲来躲去。",
+    "……好。以后再遇到这种事，叫上我。李家欺负人的那些招数，我记住了。"
+  ],
+  "huangzhong": [
+    "老夫这张弓还没到挂起来的时候。可如今到处征兵，听着都说要保境安民，到了村里又只会催粮。",
+    "不如去成都见刘备。他收留了不少流民，正缺带兵的老将。您先与我们同行，到了成都，再亲眼看看他治下如何。",
+    "好，老夫就走这一趟。若真是个肯顾百姓的人，这把老骨头还能替他做些事。"
+  ],
+  "maliang": [
+    "舍弟这几日肯在医馆帮忙了，我总算放下些心。自己的去处倒还没想过，先把他送回家再说吧。",
+    "你会理账，也懂医药，成都正缺这样的人。我替你引荐刘备和诸葛亮。若不急着动身，先跟我们走走也好。",
+    "那就有劳了。等我把药材账交清，便来找你。舍弟也该学着自己担些事，不能总让我守着。"
+  ],
+  "taishici": [
+    "比试也比过了，母亲那边又有人照料。你们接下来往哪里走？我能抽身出来了。",
+    "先在建业落脚吧。我先前劝你来见周瑜，也是觉得你能在这里施展本事。眼下我还想请你同行，路上若有险事，多个人也好商量。",
+    "好！刀法我见识过了，这一路你怎样待人，我也看在眼里。以后有事，尽管叫我。"
+  ],
+  "lusu": [
+    "粮食送到了，伙计也留了两个帮忙。只是这么一趟趟地送，家里粮再多，恐怕也有用尽的一天。",
+    "不妨以建业为落脚处，和周瑜商量个长久的办法。我想请你先与我们走一程，沿途哪里缺粮、哪里有余粮，你比我们更会打听。",
+    "好，我回去把账交给管事。路上住宿吃饭的地方我也认识几家，总不能叫大家饿着肚子赶路。"
+  ],
+  "xunyu": [
+    "学舍的事有人接手了。这些年读了许多书，若只在这里教书抄书，又觉得有些不甘。",
+    "文若不妨去许昌见曹操。那里正忙着恢复田地、安置流民，需要你这样的人。我可以引荐，也想请你先与我们同行。",
+    "许昌……好，我去见见。书先留给学舍，路上带两卷便够了。你若还有要问的事，途中慢慢谈。"
+  ],
+  "jiaxu": [
+    "追兵暂时退了，可我也不能总在这里躲下去。如今谁家门前都不太平，投错了人，比不投还麻烦。",
+    "先去许昌看看吧，我替你引荐曹公。用不着一见面便答应留下。你若愿意，也请先跟我们走一程，帮我看看路上的凶险。",
+    "既不催着我认主，那就去看看。路上我若劝你别走哪条道，你至少先听完缘由。"
+  ],
+  "zhangliao": [
+    "想走的弟兄都收拾好了。可他们跟我离了这里，总得有地方吃住，我不能只带他们出了城就不管。",
+    "我替你去许昌引荐曹操，也替弟兄们问清安置。你若愿意，先与我们同行，到了那里再决定。",
+    "好。有你帮着说话，我也能少些顾虑。不许侵扰百姓的规矩，我得当面跟他讲明。"
+  ],
+  "xiahoudun": [
+    "眼伤还疼，倒不妨碍走路。弟兄们让我歇着，我一坐下来，又总想起那些没回来的兵。",
+    "先回许昌把实情告诉曹操吧。他得知道前线是什么样子。我也想请你同行，不过伤口得按时换药，不能再硬撑。",
+    "好，听你的。郎中交代的话我记着，少了一只眼，又不是连人都不会照顾自己了。"
+  ],
+  "simayi": [
+    "主簿总算能接手了。你带来的几桩消息，和公文上写的差得很远，究竟漏了多少事，倒叫我坐不住。",
+    "那就请仲达与我们出去看看。许昌有主簿照看，我们遇到难辨真假的消息，也正好请你参详。",
+    "也好。把地图留下来，我先看看你们打算走哪条路。许昌这边，我会交代清楚。"
+  ],
+  "caocao": [
+    "这趟若没有接应，怕是回不来了。许昌积了多少事，还没来得及问，洛阳又不消停。",
+    "先稳住许昌，再商议洛阳吧。我想请你与我们走一程，亲眼看看外面的粮路和村落。府里留人接应，就不至于两头都顾不上。",
+    "好，我也想听听，离开府衙以后，百姓到底怎么说。给我些工夫，先把城里的事交代下去。"
+  ],
+  "zhugeliang": [
+    "名册和粮账都交给主簿了。只是有几处村落，送来的信总对不上，我也正想查问。",
+    "请孔明与我们同行吧。到了村里直接问，总比等信来得明白。成都这边仍要有人接应，我们也好随时送消息回来。",
+    "好。我把要问的几件事记下来，免得到了地方又漏下。出城前，容我再去看看那几户新来的乡亲。"
+  ],
+  "guanyu": [
+    "二老在这里住下，关某也能安心了。只是往后替谁效力，还未想定。",
+    "去成都见刘备吧。他重信义，也肯接济流民，我想你们谈得来。我来引荐，也想先请云长同行。",
+    "那就有劳引荐。是否留下，关某见过他再定。你们若要动身，提前叫我一声便是。"
+  ],
+  "zhangfei": [
+    "这回误事，俺也认了。酒醒以后再想想，俺空有一身力气，怎么总把事情弄糟？",
+    "先少喝些酒吧。成都的刘备，你可以去见见，他肯听人说话，也需要能护着乡亲的人。我来引荐，路上先和我们一起走，如何？",
+    "行！酒坛子俺不带了，俺也去成都看看。真遇到俺又犯浑，你就像今天这样，当面骂醒俺。"
+  ],
+  "machao": [
+    "枪和旧物都找回来了。可武威已经不是从前的武威，往后带着这些人往哪里去，我还没想定。",
+    "去成都问问刘备吧。他肯接纳远来的人。弟兄和家眷怎么安顿，先问清楚，再决定留下。我也想请你与我们同行。",
+    "好，先去见他。家里的东西我留人看守，不能再丢一回。你们何时动身，来知会我。"
+  ],
+  "liubei": [
+    "成都的住处和粮食已安排下去了。可城外究竟还有多少人在逃难，我知道的，恐怕还不及你们多。",
+    "那就请你与我们出去看看吧。成都留人接应，沿途遇到无家可归的人，我们也知道该送去哪里。",
+    "好，我去跟主簿交代。收容的人多了，也不能让原先的住户吃亏，这件事还得嘱咐清楚。"
+  ],
+  "zhouyu": [
+    "城中的事暂时能交出去了。江上的消息一天一个样，我也想亲自去看，可总怕一走，渡口又出了事。",
+    "让主簿照看渡口，请公瑾与我们沿江走一趟吧。建业作接应，遇到哪段水路被堵了，也能及时送信回来。",
+    "好。我先去点几条快船，信使往来总得有船可用。等这些安排好了，我们便动身。"
+  ],
+  "huanggai": [
+    "山路已派人巡查，采药的也回去了。老夫还能走，可一想到那些后生跟着受伤，心里就不痛快。",
+    "请您与我们同行吧。您熟悉山路，也知道怎样带兵护粮。平日以建业为落脚处，和周瑜彼此接应。",
+    "也好。这份山路图先留给巡守的人，往后采药的乡亲再进山，不必像这回一样摸着走。"
+  ],
+  "lvmeng": [
+    "书是看了，可有些地方还是看不懂。以前总想着会打仗便够了，如今才知道，光会使剑不行。",
+    "去建业找周瑜请教吧。他那里既能练兵，也有人陪你读书。我来引荐，若愿意，先跟我们一起走一程。",
+    "好！书我也带着。路上再遇到不懂的，你可别嫌我问得多。"
+  ],
+  "luxun": [
+    "最后一辆车也进城了。先前在阵里，我算来算去，只算着自己怎样出来，差点把坡下的人忘了。",
+    "能回头把他们接出来，已经很不容易了。你去建业见见周瑜吧，他那里用得上你。我也想请你先与我们同行。",
+    "那就有劳引荐。我先把绕路的图交给守城的人，后面若再有车来，也好提醒他们。"
+  ],
+  "sunshangxiang": [
+    "家里问我下次还出不出门，我倒答不上来了。以前只觉得在府里闷，出来才知道，光会射箭还不够。",
+    "那就先跟我们护送乡亲吧。留在建业时，也能帮着渡口接应。总比为了出门，随便找条路便走强些。",
+    "好，这回我可知道出门是去做什么了。我去跟家里说，弓箭也得重新理一理。"
+  ],
+  "sunquan": [
+    "人都接回来了，可外头还有多少渡口不通，城里的地图上一点也看不出来。我想去看看，又不知先往哪处走。",
+    "先与我们走一趟粮路吧。建业留人接应，沿途船只为什么被扣、百姓为什么不敢回家，到了地方就能问。",
+    "好。我先让人备船，也把接应的事交代下去。这一回，不能又叫府里断了消息。"
+  ],
+  "lvbu": [
+    "赤兔回来了，家眷也睡得安稳。可离了董卓，以后做什么，我还没想过。总不能谁叫一声，我又替谁冲锋。",
+    "先在新野安顿下来吧。我想请你与我们同行，路上遇到什么人、什么事，你自己看。等想清楚了，再决定替谁效力。",
+    "好，我跟你们走。到了洛阳，我还要亲口问问董卓，那些命令究竟是怎么回事。"
+  ],
+  "diaochan": [
+    "在新野住了这几日，夜里总算不再惊醒了。往后去哪里，我还没想好，也不敢想得太远。",
+    "那就先安心住在新野。等你歇够了，不妨与我们同行，沿途看看别处的生活。想回来时，再回来就是。",
+    "好。让我把这几件衣裳收拾好，走的时候来叫我。头一回自己出远门，倒还有些紧张。"
+  ],
+  "huatuo": [
+    "药方留了，病人也交给弟子了。可我每离开一处，总怕前脚刚走，后脚便有人来求医。",
+    "以宜城医馆作落脚处吧，弟子能接着看诊。我想请先生与我们同行，遇到缺医少药的村落，也好教人些应急的办法。",
+    "也好，我再备些常用的药。你们不必替我背药箱，这么些年，我背着它走惯了。"
+  ],
+  "menghuo": [
+    "寨里的人好起来了，我才睡了个整觉。要不是你们，恐怕到现在我还在门口拦大夫。山外的事，我懂得太少。",
+    "那就跟我们出去看看吧。南蛮的事先托给寨老，各地怎样分水、怎样运药，学到合用的，再带回来。",
+    "好！我去跟寨老说。你们等等我，我把路上吃的也带上，总不能出了寨子还要你们管饭。"
+  ],
+  "zhangjiao": [
+    "雨是下了，抢粮的人也抓到了，可他们顶着我的名号出去，我竟一点消息也没有。营外还有多少这样的事？",
+    "不如与我们出去走走，直接问乡亲吧。黄巾营地留人照看伤者，遇到抢粮的、缺药的，也知道往哪里送消息。",
+    "好，我把营里的事交给弟弟。往后有人来告状，不许守门的再拦着，我得先把这句话吩咐下去。"
+  ],
+  "zhangbao": [
+    "药箱补齐了，换药的事也有人接手。我总算能出营几日了，你们还缺人手吗？",
+    "正想请你同行。沿途缺药的地方不少，你认得药材，也能帮着照看病人。黄巾营地留作接应，有急事再捎信回来。",
+    "好，我把常用的药装上。箱子有些重，上坡的时候，还得请你们搭把手。"
+  ],
+  "dongzhuo": [
+    "关人的名册还在，我会叫人逐户去查。可有几户已经举家逃走了，连往哪里去了都不知道……",
+    "先在洛阳开仓放人，把能查到的逐户补偿。我也想请你跟我们去受害的村里看看，有些话，得听他们当面说。",
+    "……好，我去。该骂的，我听着。府里的人也得留下查账，不能我一出城，他们又将事情拖过去。"
+  ],
+  "guanlu": [
+    "这几桩传言问下来，十句里倒有八句不真。我再替人算下去，若连听来的话都没问明白，岂不是误人？",
+    "那就与我们一起去问吧。平原作落脚处，沿途听到怪事，先找当事人。你看人看事仔细，正好帮我们辨一辨。",
+    "好。卦具带着，纸笔也带着。听过的、亲眼见过的，我会分开记，免得日后自己也弄混了。"
+  ],
+  "huangyueying": [
+    "木靶打得再准，车一上路，轮子照样会坏。我守着院子改来改去，总有想不到的地方。",
+    "请你跟我们走一程吧，修车、运粮，路上都有。襄阳的工坊留人照看，哪里不好用，记下来再送回去改。",
+    "这倒好！我去收拾工具，带的东西可能有些多，你们车上还放得下吧？"
+  ],
+  "zhurong": [
+    "寨里的事都安排好了，可真要出山，我连往哪边走都不熟。你们去过的地方多，替我说说？",
+    "先跟我们一起走吧。各地怎样防山火、运药粮，都能看看。南蛮这边留人接应，见到合用的办法，回来也能教给族人。",
+    "好，我去取兵器。山里的路我带你们走，出了山，可就得你们带我了。"
+  ]
+};
+ for(const [id,rows]of Object.entries(endings)){
+  const d=H.definitions[id];if(!d)continue;
+  for(const stage of Object.values(d.stages))if(stage.npc?.choices?.some(c=>Object.hasOwn(c,'recruit'))){stage.npc.turns=rows.map((text,i)=>({speaker:i===1?'hero':'npc',text}));stage.npc.lines=rows.filter((_,i)=>i!==1);}
+ }
+ const depart=H.definitions.taishici.stages['depart-for-wu'].npc;
+ depart.turns=[{speaker:'npc',text:'母亲的药够用，邻家大嫂也答应来照看，我能放心出门几日了。只是往哪边去，还没有想定。'},{speaker:'hero',text:'不妨去建业见见周瑜。江东正缺能独当一面的人，你又重信义，我想你们谈得来。我替你引荐，去不去由你。'},{speaker:'npc',text:'好，我去见见。先前说过的比试可别忘了，咱们约在建业教场，比一场再喝酒！'}];
+ const convoy=H.definitions.lusu.stages.convoy.npc;
+ convoy.turns[0].text='公瑾来信，建业收容的流民越来越多，粮食快不够了。我手里尚有些粮，只是沿江几处都来求援，一时不知道该先往哪里送。';
+ convoy.turns[1].text='先送建业吧，渡口还能接应别处的人。你也不妨在那里落脚，和周瑜商量往后怎样送粮。这趟我们陪你去，准备走哪条路？';
+ const api={endings};root.RecruitmentIntentions=api;if(node)module.exports=api;
 })(globalThis);
 
 </script>
@@ -9351,7 +9574,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  function mob(role,index){const type={soldier:'spear',crossbow:'crossbow',assassin:'dagger',guard:'shield'}[role],weapon=I.create('weapon-'+type,'blue','luoyang-'+role+'-'+index),skills=role==='soldier'?['spear-cut']:role==='crossbow'?W.forWeapon(weapon).slice(0,1):role==='assassin'?W.forWeapon(weapon).slice(0,1):['shield-taunt','spear-cut'];return {...G.create(role==='guard'?'imperialCaptain':role==='crossbow'?'imperialSkirmisher':'imperialGuard',15),id:'luoyang-'+role+'-'+index,name:{soldier:'西凉军士',crossbow:'西凉弩手',assassin:'府中刺客',guard:'府前护卫'}[role],characterId:role==='assassin'?'thief':'imperial-soldier',weapon,skills,priorities:W.prioritiesFor(skills),equipment:{armor:I.create('iron-armor','blue')},armor:10,resistance:8,targetRule:'random'};}
  function battleGear(u,role){const defensive=role==='guard'||role==='gaoshun',arcane=role==='liru';return {...u,weapon:{...u.weapon,power:role==='lvbu'?20:18},equipment:{...u.equipment,armor:{uid:'luoyang-armor-'+role,id:'luoyang-armor',name:defensive?'陷阵重甲':'西凉战甲',slot:'armor',quality:'blue',attributes:{constitution:defensive?65:45,armor:defensive?95:60,resistance:arcane?60:18}},accessory1:{uid:'luoyang-seal-'+role,id:'luoyang-seal',name:'西凉军印',slot:'accessory',quality:'blue',attributes:{war:arcane?0:5,intelligence:arcane?5:0,technique:8}},accessory2:u.equipment?.accessory2}};}
  function enemies(phase){if(phase==='dongzhuo')return [(node?require('./dongzhuo-boss.js'):root.DongzhuoBoss).unit()];return phases[phase].roster.map(([id,row],i)=>{let u=battleGear(Cast.definitions[id]?Cast.unit(id,15,{boss:true}):mob(id,i),id);if(id==='lvbu'){
-    u.weapon={...u.weapon,skills:[{base:'sword-critical',name:'无双戟击',scaling:{war:2.4}},{base:'spear-break',name:'方天横扫',scaling:{war:.65}}]};u.skills=W.forWeapon(u.weapon);u.priorities=W.prioritiesFor(u.skills);
+    u.weapon=W.resolveWeapon(u.weapon);u.skills=W.forWeapon(u.weapon);u.priorities=W.prioritiesFor(u.skills);
    }else if(id==='liru'){
     u.weapon={...u.weapon,skills:[{name:'封息毒雾',kind:'tactic',side:'enemy',scope:'all',element:'wood',cooldown:3.5,scaling:{intelligence:.7},weaponCoefficient:1,hitChance:.9,criticalChance:0,effects:[{id:'poison',chance:1,duration:14,period:1,base:3,coefficient:.14,stat:'technique'}]}]};u.skills=W.forWeapon(u.weapon);u.priorities=W.prioritiesFor(u.skills);
    }else if(id==='huaxiong'){
@@ -9431,7 +9654,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   const Feedback=node?require('./adventure-feedback.js'):root.AdventureFeedback;
   const T=node?require('./trophies.js'):root.TrophyCatalog;
   const Journal=node?require('./conversation-journal.js'):root.ConversationJournal;
-  const Chapter=node?require('./chapter-one.js'):root.ChapterOne;if(node){require('./early-dungeons.js');require('./dialogue-voices.js');}
+  const Chapter=node?require('./chapter-one.js'):root.ChapterOne;if(node){require('./early-dungeons.js');require('./dialogue-voices.js');require('./recruitment-intentions.js');}
   const Progression=node?require('./quest-progression.js'):root.QuestProgression;
   const X=node?require('./experience.js'):root.CharacterExperience,Q=node?require('./timed-choice.js'):root.TimedChoice;
   const copy=x=>JSON.parse(JSON.stringify(x,(key,data)=>['weaponProficiencies','weaponExperience','proficiencies'].includes(key)?undefined:data)),countries=['wei','shu','wu'],recruitCountries=[...countries,'other','yellow'],placeId=id=>Object.hasOwn(D.placeAliases,id)?D.placeAliases[id]:id,neighbors=id=>D.roads.flatMap(([a,b])=>a===id?[b]:b===id?[a]:[]),safeObject=value=>value&&typeof value==='object'&&!Array.isArray(value)?value:{};
@@ -9450,7 +9673,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     if(root.PengpaiAssets?.protagonists[character.appearance]){const art=root.PengpaiAssets.protagonists[character.appearance];unit.fullbody={src:art.src,...(art.crop?{crop:art.crop}:{})};unit.portrait={src:art.src,crop:art.portrait};}
     return unit;
   }
-  function normalizeRecruitHome(unit){const P=node?require('./passives.js'):root.BattlePassives;if(P.heroDefaults[unit.characterId||unit.id])unit.passives=P.forUnit(unit);if(unit.homeNode==='ye'&&H.definitions[unit.characterId||unit.id]?.country==='wei')unit.homeNode=Courts.definitions.wei.place;return unit;}
+  function normalizeRecruitHome(unit){if((unit.characterId||unit.id)==='zhenji')unit.homeNode='xuchang';const P=node?require('./passives.js'):root.BattlePassives;if(P.heroDefaults[unit.characterId||unit.id])unit.passives=P.forUnit(unit);if(unit.homeNode==='ye'&&H.definitions[unit.characterId||unit.id]?.country==='wei')unit.homeNode=Courts.definitions.wei.place;return unit;}
   function normalize(character,value={}){
     character=G.normalizeCharacter(character);const s=copy(safeObject(value));if(s.weaponCatalogVersion!==1&&s.weaponType){const C=node?require('./weapon-catalog.js'):root.WeaponCatalog;s.weaponType=C.legacyAliases[s.weaponType]||s.weaponType;}const nodeId=placeId(s.nodeId),used=new Set(),recruits={};for(const country of recruitCountries)recruits[country]=(Array.isArray(s.recruits?.[country])?s.recruits[country]:[]).filter(id=>{if(typeof id!=='string'||!id||used.has(id))return false;used.add(id);return true;});
     const companions=(Array.isArray(s.companions)?s.companions:[]).filter(u=>u&&typeof u.id==='string'&&u.id!=='hero').filter((u,i,a)=>a.findIndex(x=>x.id===u.id)===i).map(G.normalizeKnownPotentials).map(X.normalizeRecord).map(W.migrateWeaponPlan).map(normalizeRecruitHome),ids=new Set(['hero',...companions.map(u=>u.id)]);
@@ -9464,7 +9687,9 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     state.trainingWins=Object.fromEntries(D.trainingOptions.map(t=>[t.id,Math.max(0,Math.floor(Number(s.trainingWins?.[t.id])||0))]));
     state.recruitAssignments=Object.fromEntries(countries.map(country=>[country,typeof s.recruitAssignments?.[country]==='boolean'?s.recruitAssignments[country]:!!(s.courtDreams?.[Courts.definitions[country].id]||s.recruitReports?.[country]?.length)]));
     state.recruitReports=Object.fromEntries(countries.map(country=>[country,[...new Set((Array.isArray(s.recruitReports?.[country])?s.recruitReports[country]:[]).filter(id=>state.recruits[country].includes(id)))]]));
-    const stages=['available','entry','supplies','rescue','escort','return','decision','complete'],oldQuest=safeObject(s.quests?.changshan);state.quests={changshan:{stage:stages.includes(oldQuest.stage)?oldQuest.stage:'available',arrivalIndex:Math.max(0,Math.min(N.storyConversations.changshanEntry.length-1,Math.floor(Number(oldQuest.arrivalIndex)||0))),arrivalSeen:!!oldQuest.arrivalSeen,zhaoInvitation:!!oldQuest.zhaoInvitation,healerDecision:!!oldQuest.healerDecision,healerStayDecided:!!oldQuest.healerStayDecided,escortIntroSeen:!!oldQuest.escortIntroSeen,escortIntroIndex:Math.max(0,Math.min(N.storyConversations.escortArrival.length-1,Math.floor(Number(oldQuest.escortIntroIndex)||0))),healerRescued:!!oldQuest.healerRescued||!!oldQuest.healerJoined||Number(oldQuest.grainWins)>0||(s.afterBattle?.kind==='story'&&s.afterBattle.phase==='rescue')||companions.some(u=>u.id==='zhenji')||recruits.wei.includes('zhenji')||['escort','return','decision','complete'].includes(oldQuest.stage),healerJoined:!!oldQuest.healerJoined||companions.some(u=>u.id==='zhenji')||recruits.wei.includes('zhenji'),grainWins:Math.max(0,Math.min(2,Number.isInteger(oldQuest.grainWins)?oldQuest.grainWins:(['rescue','escort','return','decision','complete'].includes(oldQuest.stage)?2:0)))},side:copy(safeObject(s.quests?.side))};
+    const stages=['available','entry','supplies','rescue','escort','return','decision','complete'],oldQuest=safeObject(s.quests?.changshan);state.quests={changshan:{storyVersion:2,stage:stages.includes(oldQuest.stage)?oldQuest.stage:'available',arrivalIndex:Math.max(0,Math.min(N.storyConversations.changshanEntry.length-1,Math.floor(Number(oldQuest.arrivalIndex)||0))),arrivalSeen:!!oldQuest.arrivalSeen,zhaoInvitation:!!oldQuest.zhaoInvitation,healerDecision:!!oldQuest.healerDecision,healerStayDecided:!!oldQuest.healerStayDecided,escortIntroSeen:!!oldQuest.escortIntroSeen,escortIntroIndex:Math.max(0,Math.min(N.storyConversations.escortArrival.length-1,Math.floor(Number(oldQuest.escortIntroIndex)||0))),healerRescued:!!oldQuest.healerRescued||!!oldQuest.healerJoined||(oldQuest.storyVersion!==2&&oldQuest.stage!=='rescue'&&Number(oldQuest.grainWins)>0)||(s.afterBattle?.kind==='story'&&s.afterBattle.phase==='rescue')||companions.some(u=>u.id==='zhenji')||recruits.wei.includes('zhenji')||['escort','return','decision','complete'].includes(oldQuest.stage),healerJoined:!!oldQuest.healerJoined||companions.some(u=>u.id==='zhenji')||recruits.wei.includes('zhenji'),grainWins:Math.max(0,Math.min(2,Number.isInteger(oldQuest.grainWins)?oldQuest.grainWins:(['rescue','escort','return','decision','complete'].includes(oldQuest.stage)?2:0)))},side:copy(safeObject(s.quests?.side))};
+    if(oldQuest.storyVersion!==2&&state.quests.changshan.healerRescued&&!state.quests.changshan.healerJoined&&!oldQuest.healerDecision)state.quests.changshan.healerStayDecided=true;
+    if(state.quests.changshan.stage==='rescue'&&state.quests.changshan.grainWins>=2){const q=state.quests.changshan;q.stage='escort';q.healerRescued=true;q.healerDecision=!q.healerStayDecided&&!q.healerJoined;}
     state.trophies=T.normalize(s.trophies);state.trophyEquipment={};const usedTrophies=new Set();for(const [id,list]of Object.entries(safeObject(s.trophyEquipment)))if(Array.isArray(list))state.trophyEquipment[id]=Array.from({length:2},(_,i)=>{const uid=list[i];if(typeof uid!=='string'||usedTrophies.has(uid)||!state.trophies.some(t=>t.uid===uid))return null;usedTrophies.add(uid);return uid;});state.trophySerial=Math.max(Number(s.trophySerial)||0,...state.trophies.map(t=>Number(t.uid.replace('trophy-',''))||0));state.trophyClaims=copy(safeObject(s.trophyClaims));
     state.equipmentRewards=copy(safeObject(s.equipmentRewards));state.economyVersion=1;state.money=Math.max(0,Math.floor(Number(s.money??200)||0));state.inventory=Array.isArray(s.inventory)?copy(s.inventory).filter(i=>i&&typeof i.uid==='string').map(i=>i.slot==='weapon'||i.type?{...I.weaponRecord(i),slot:'weapon'}:i):[];state.itemSerial=Math.max(0,Math.floor(Number(s.itemSerial)||0));state.battleSerial=Math.max(0,Math.floor(Number(s.battleSerial)||0));state.heroEquipment=copy(s.heroEquipment||{armor:I.create('cloth-armor','white','initial-cloth'),accessory1:null,accessory2:null});state.showParty=s.showParty!==false;state.departurePractice=state.nodeId==='camp'&&['offer','training'].includes(s.departurePractice)?s.departurePractice:null;state.roadSeed=typeof s.roadSeed==='string'?s.roadSeed:Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);state.serviceRumors={tavern:['heard','visited'].includes(s.serviceRumors?.tavern)?s.serviceRumors.tavern:null,tavernPlace:Tavern.capitals.includes(s.serviceRumors?.tavernPlace)?s.serviceRumors.tavernPlace:null};state.outfitted=!!s.outfitted||!!s.weaponType||!!s.weapon;state.pendingReward=s.pendingReward?copy(s.pendingReward):null;if(Array.isArray(state.pendingReward?.items))state.pendingReward.items=state.pendingReward.items.map(item=>item?.slot==='trophy'?(T.normalize([item])[0]||item):item);state.afterBattle=s.afterBattle?copy(s.afterBattle):null;state.npcTalks=copy(safeObject(s.npcTalks));state.journal=Journal.normalize(s.journal);state.trackerCollapsed=!!s.trackerCollapsed;state.trackedQuestIds=Array.isArray(s.trackedQuestIds)?[...new Set(s.trackedQuestIds.filter(id=>typeof id==='string'))]:null;
     for(const quest of N.sideQuests){const old=safeObject(state.quests.side[quest.id]),oldRounds=old.rounds||(s.questProgressVersion===2?quest.rounds:quest.rounds===5?10:quest.rounds),wins=Math.floor((Number(old.wins)||0)*quest.rounds/oldRounds);state.quests.side[quest.id]={heard:!!old.heard,accepted:!!old.accepted,wins:Math.max(0,Math.min(quest.rounds,wins)),rounds:quest.rounds,paid:!!old.paid};
@@ -9569,6 +9794,12 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       if(slot==='weapon'){const member=id==='hero'?null:this.state.companions.find(u=>u.id===id),skills=W.forWeapon(item);if(member){member.skills=skills;member.priorities=W.prioritiesFor(skills);}if(this.state.tactics[id])delete this.state.tactics[id].priorities;}
       this.state.troops[id]=Math.min(hp,this.members().find(u=>u.id===id).maxSoldiers);return true;
     }
+    equipmentEntries(){return [...this.state.inventory,...this.members().flatMap(u=>['weapon','armor','accessory1','accessory2'].flatMap(slot=>{const item=this.equipped(u.id,slot);return item?[{...copy(item),slot:slot.startsWith('accessory')?'accessory':slot,ownerId:u.id,ownerName:u.name,equipmentSlot:slot,entryKey:'equipped:'+u.id+':'+slot}]:[];}))];}
+    transferEquipment(fromId,sourceSlot,toId,targetSlot){
+      if(this.pending||this.journey||fromId===toId&&sourceSlot===targetSlot)return false;const item=this.equipped(fromId,sourceSlot),target=this.members().find(u=>u.id===toId);
+      if(!item||!target||!I.compatible(item,targetSlot)||!I.canEquip(target,item))return false;
+      if(!this.changeEquipment(fromId,sourceSlot,null))return false;const moved=this.state.inventory.at(-1);if(this.changeEquipment(toId,targetSlot,moved.uid))return true;this.changeEquipment(fromId,sourceSlot,moved.uid);return false;
+    }
     buyItem(template){const t=I.templates[template];if(!t||t.unique||this.state.money<t.price||this.pending||this.journey)return false;this.state.money-=t.price;this.addItem(template);return true;}
     sellItem(uid){const item=this.state.inventory.find(i=>i.uid===uid);if(!item||this.pending||this.journey)return false;this.state.money+=I.sellPrice(item);this.state.inventory=this.state.inventory.filter(i=>i.uid!==uid);return true;}
     sellItems(uids){
@@ -9629,7 +9860,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       if(court){if(this.state.companions.some(u=>u.id===court.id))npcs.unshift({...court,courtId:court.id,id:court.id+'-clerk',name:D.factions[court.country].name+'国主簿',art:'town-doctor',delegate:true});else npcs.unshift(court);}
       const tavernNpc=Tavern.npc(id);if(tavernNpc)npcs.push(tavernNpc);
       if(id==='changshan'&&stage!=='complete'&&!this.state.companions.some(u=>u.id==='zhaoyun'))npcs.unshift(D.questNpcs.zhaoyun);
-      if(id==='zhongshan-county'&&(this.state.quests.changshan.healerRescued||this.state.quests.changshan.healerJoined||['return','decision','complete'].includes(stage))&&!this.state.companions.some(u=>u.id==='zhenji')&&!this.state.residents.zhenji)npcs.unshift(D.questNpcs.zhenji);
+      if(id===(this.state.quests.changshan.healerStayDecided?'xuchang':'zhongshan')&&this.state.quests.changshan.healerRescued&&!this.state.companions.some(u=>u.id==='zhenji')&&!this.state.residents.zhenji)npcs.unshift(D.questNpcs.zhenji);
       for(const u of Object.values(this.state.residents))if(u.origin!=='tavern'&&u.homeNode===id&&!npcs.some(n=>n.id===u.id))npcs.push({id:u.id,name:u.name,art:u.characterId||u.id,side:'left',role:'companion',roleLabel:'同行'});
       for(const data of N.sideQuests){const q=this.state.quests.side[data.id];if(q.accepted&&!q.paid&&q.wins<data.rounds&&data.place===id)npcs.push({id:'side-enemy-'+data.id,name:data.enemyName||'拦路盗匪',art:data.enemyArt||'brigand',role:'sideBattle',roleLabel:'剿匪',questId:data.id,side:'left'});}
       for(const d of Object.values(H.definitions)){const q=this.state.heroQuests[d.id];if(!this.heroQuestVisible(d,q))continue;const n=H.npc(d.id,q);if(!n||H.place(d.id,q)!==id||d.stages[q.stage].strictDialogue)continue;const existing=npcs.findIndex(other=>(other.courtId||other.id)===n.id);
@@ -9651,21 +9882,21 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     moveTrackedQuest(id,direction){const ids=this.trackedQuests().map(q=>q.id),from=ids.indexOf(id),to=from+direction;if(![-1,1].includes(direction)||from<0||to<0||to>=ids.length)return false;[ids[from],ids[to]]=[ids[to],ids[from]];this.state.trackedQuestIds=ids;return true;}
     trackQuest(id,on){const q=this.quests().find(q=>q.id===id);if(!q||on&&q.complete||!(q.category==='main'&&q.id!=='chapter-one'||q.heard||q.accepted||q.complete))return false;const ids=this.trackedQuests().map(q=>q.id);if(on&&!ids.includes(id)){ids.push(id);}this.state.trackedQuestIds=on?ids:ids.filter(key=>key!==id);return true;}
     quests(){
-      const cacheKey=this.questStateKey()+'|'+this.state.nodeId;if(this.questListCache?.key===cacheKey)return this.questListCache.list;const q=this.state.quests.changshan,at=id=>this.state.nodeId===id,objectives={available:'前往常山，查看村口的动静',entry:'与赵云合力击退村口盗匪',supplies:(q.healerRescued||q.healerJoined)?(at('zhongshan')?'夺回中山粮仓':'前往中山夺回粮仓')+' · '+q.grainWins*50+'%':at('zhongshan')?'向仓守打听粮车下落':'前往中山打听粮车下落',rescue:at('zhongshan-county')?'救出被扣押的甄家医者':'前往毋极寻找甄家医者',escort:'护送粮车返回常山',return:'向常山里正复命',decision:'与赵云商议去留',complete:'常山的乡民已安顿妥当'};
-      const list=[...D.questDefinitions.map(t=>({...t,complete:t.id==='changshan'?q.stage==='complete':this.coalitionReady(),taskStatus:t.id==='changshan'?(q.stage==='complete'?null:q.stage==='available'?'available':['return','decision'].includes(q.stage)?'ready':'active'):(this.coalitionReady()?null:'active'),objective:t.id==='changshan'?(q.zhaoInvitation?'与赵云商议中山之行':q.healerDecision?'与甄姑娘商议去留':objectives[q.stage]):'为魏、蜀、吴招募英雄'})),...(q.stage==='complete'?[{id:'visit-courts',title:'拜访三府',category:'main',recommendedLevel:1,accepted:true,complete:this.courtsVisited(),taskStatus:this.courtsVisited()?null:'active',target:Courts.definitions[countries.find(c=>!this.state.recruitAssignments[c])||'wei'].place,objective:countries.map(c=>{const d=Courts.definitions[c];return D.placeMap[d.place].name+' · '+d.name+'  '+(this.state.recruitAssignments[c]?1:0)+'/1';}).join(String.fromCharCode(10))}]:[]),...Object.values(H.definitions).filter(d=>this.state.heroQuests[d.id].stage!=='locked'&&this.heroQuestVisible(d)).map(d=>({...d,recommendedLevel:Progression.recommended(d,d.stages[this.state.heroQuests[d.id].stage]),target:H.place(d.id,this.state.heroQuests[d.id]),heard:!!this.state.heroQuests[d.id].heard,accepted:!!this.state.heroQuests[d.id].accepted,complete:this.state.heroQuests[d.id].stage==='complete',taskStatus:this.state.heroQuests[d.id].stage==='complete'?null:this.state.heroQuests[d.id].stage==='freed'?'ready':this.state.heroQuests[d.id].accepted||this.state.heroQuests[d.id].stage!==d.start?'active':'available',objective:this.state.heroQuests[d.id].stage===d.start&&this.state.nodeId!==H.place(d.id,this.state.heroQuests[d.id])?'前往'+D.placeMap[H.place(d.id,this.state.heroQuests[d.id])].name+'查探消息':d.stages[this.state.heroQuests[d.id].stage].objective})),...N.sideQuests.map(t=>{
+      const cacheKey=this.questStateKey()+'|'+this.state.nodeId;if(this.questListCache?.key===cacheKey)return this.questListCache.list;const q=this.state.quests.changshan,at=id=>this.state.nodeId===id,objectives={available:'前往常山，查看村口的动静',entry:'与赵云合力击退村口盗匪',supplies:(at('zhongshan')?'夺回中山粮仓':'前往中山夺回粮仓')+' · '+q.grainWins*50+'%',rescue:at('zhongshan')?'救出粮仓后院被扣押的人':'前往中山，救出粮仓后院被扣押的人',escort:'护送粮车返回常山',return:'向常山里正复命',decision:'与赵云商议同行',complete:'常山的乡民已安顿妥当'};
+      const list=[...D.questDefinitions.map(t=>({...t,complete:t.id==='changshan'?q.stage==='complete':this.coalitionReady(),taskStatus:t.id==='changshan'?(q.stage==='complete'?null:q.stage==='available'?'available':['return','decision'].includes(q.stage)?'ready':'active'):(this.coalitionReady()?null:'active'),objective:t.id==='changshan'?(q.zhaoInvitation?'与赵云商议中山之行':q.healerDecision?'与甄姑娘商议同行':objectives[q.stage]):'为魏、蜀、吴招募英雄'})),...(q.stage==='complete'?[{id:'visit-courts',title:'拜访三府',category:'main',recommendedLevel:1,accepted:true,complete:this.courtsVisited(),taskStatus:this.courtsVisited()?null:'active',target:Courts.definitions[countries.find(c=>!this.state.recruitAssignments[c])||'wei'].place,objective:countries.map(c=>{const d=Courts.definitions[c];return D.placeMap[d.place].name+' · '+d.name+'  '+(this.state.recruitAssignments[c]?1:0)+'/1';}).join(String.fromCharCode(10))}]:[]),...Object.values(H.definitions).filter(d=>this.state.heroQuests[d.id].stage!=='locked'&&this.heroQuestVisible(d)).map(d=>({...d,recommendedLevel:Progression.recommended(d,d.stages[this.state.heroQuests[d.id].stage]),target:H.place(d.id,this.state.heroQuests[d.id]),heard:!!this.state.heroQuests[d.id].heard,accepted:!!this.state.heroQuests[d.id].accepted,complete:this.state.heroQuests[d.id].stage==='complete',taskStatus:this.state.heroQuests[d.id].stage==='complete'?null:this.state.heroQuests[d.id].stage==='freed'?'ready':this.state.heroQuests[d.id].accepted||this.state.heroQuests[d.id].stage!==d.start?'active':'available',objective:this.state.heroQuests[d.id].stage===d.start&&this.state.nodeId!==H.place(d.id,this.state.heroQuests[d.id])?'前往'+D.placeMap[H.place(d.id,this.state.heroQuests[d.id])].name+'查探消息':d.stages[this.state.heroQuests[d.id].stage].objective})),...N.sideQuests.map(t=>{
         const s=this.state.quests.side[t.id],giver=N.npcs.find(n=>n.id===t.giver).name,done=s.wins>=t.rounds,target=s.accepted&&!done?t.place:t.giverPlace;
         const kind=t.repeatable?'委托':'支线',objective=s.paid?kind+'已完成':!s.accepted?'向'+D.placeMap[t.giverPlace].name+'的'+giver+(t.repeatable?'询问委托':'打听难处'):done?'返回'+D.placeMap[t.giverPlace].name+'向'+giver+'复命':(at(t.place)?'在':'前往')+D.placeMap[t.place].name+'剿匪 · '+Math.floor(s.wins/t.rounds*100)+'%';
         return {...t,heard:!!s.heard,recommendedLevel:Progression.recommended(t),category:t.repeatable?'commission':'side',complete:s.paid,taskStatus:s.paid?null:!s.accepted?'available':done?'ready':'active',accepted:s.accepted,target,objective};
-      }),...(this.state.serviceRumors.tavern?[{id:'tavern-recruit',title:'酒肆访客',category:'side',recommendedLevel:1,heard:true,accepted:true,complete:this.state.serviceRumors.tavern==='visited',taskStatus:this.state.serviceRumors.tavern==='visited'?null:'active',target:this.state.serviceRumors.tavernPlace||this.tavernRumor().place,objective:this.state.serviceRumors.tavern==='visited'?'已向酒肆掌柜打听过同行的人':'前往'+D.placeMap[this.state.serviceRumors.tavernPlace||this.tavernRumor().place].name+'，向酒肆掌柜打听同行的人'}]:[]),...(Chapter.quest(this)?[Chapter.quest(this)]:[]),...countries.filter(country=>this.state.recruitAssignments[country]).map(country=>{const d=Courts.definitions[country];return {id:'report-'+country,title:D.factions[country].name+'国招贤',category:'commission',repeatable:true,recommendedLevel:1,accepted:true,complete:false,taskStatus:this.pendingReports(country).length?'ready':'active',target:d.place,objective:this.pendingReports(country).length?'前往'+D.placeMap[d.place].name+'，向'+d.name+'复命':'寻访愿意为'+D.factions[country].name+'国效力的将士，招募后向'+d.name+'复命'};})].map(q=>({...q,completionOrder:this.state.questCompletions[q.id]||0})).sort((a,b)=>Number(a.complete)-Number(b.complete)||(a.complete?b.completionOrder-a.completionOrder:(a.recommendedLevel||1)-(b.recommendedLevel||1)));this.questListCache={key:cacheKey,list};return list;
+      }),...(this.state.serviceRumors.tavern?[{id:'tavern-recruit',title:'酒肆访客',category:'side',recommendedLevel:1,heard:true,accepted:true,complete:this.state.serviceRumors.tavern==='visited',taskStatus:this.state.serviceRumors.tavern==='visited'?null:'active',target:this.state.serviceRumors.tavernPlace||this.tavernRumor().place,objective:this.state.serviceRumors.tavern==='visited'?'已向酒肆掌柜打听过同行的人':'前往'+D.placeMap[this.state.serviceRumors.tavernPlace||this.tavernRumor().place].name+'，向酒肆掌柜打听同行的人'}]:[]),...(Chapter.quest(this)?[Chapter.quest(this)]:[]),...countries.filter(country=>this.state.recruitAssignments[country]).map(country=>{const d=Courts.definitions[country];return {id:'report-'+country,title:D.factions[country].name+'国招贤',category:'commission',repeatable:true,recommendedLevel:1,accepted:true,complete:false,taskStatus:this.pendingReports(country).length?'ready':'active',target:this.pendingReports(country).length?d.place:null,objective:this.pendingReports(country).length?'前往'+D.placeMap[d.place].name+'，向'+d.name+'复命':'寻访愿意为'+D.factions[country].name+'国效力的将士，招募后向'+d.name+'复命'};})].map(q=>({...q,completionOrder:this.state.questCompletions[q.id]||0})).sort((a,b)=>Number(a.complete)-Number(b.complete)||(a.complete?b.completionOrder-a.completionOrder:(a.recommendedLevel||1)-(b.recommendedLevel||1)));this.questListCache={key:cacheKey,list};return list;
     }
-    npcQuestIds(npc){const stage=this.state.quests.changshan.stage,ids=[...(npc.relatedQuests||[])];if(npc.role==='tavern'&&this.state.serviceRumors.tavern==='heard')ids.push('tavern-recruit');if(npc.role==='chapter')ids.push('chapter-one');if(npc.role==='court'){ids.push('report-'+npc.country);if(this.state.quests.changshan.stage==='complete'&&!this.state.recruitAssignments[npc.country])ids.push('visit-courts');}if(npc.questId)ids.push(npc.questId);if(npc.heroQuest)for(const d of Object.values(H.definitions))if(H.place(d.id,this.state.heroQuests[d.id])===this.state.nodeId&&H.npc(d.id,this.state.heroQuests[d.id])?.id===npc.id)ids.push(d.id);for(const data of N.sideQuests)if(data.giver===npc.id)ids.push(data.id);if(npc.id==='zhaoyun'&&!['return','complete'].includes(stage)&&npc.role!=='companion'||npc.id==='changshan-elder'&&stage==='return'||npc.id==='grain-steward'&&stage==='supplies'||npc.id==='refugee-laborer'&&stage==='rescue')ids.push('changshan');return [...new Set(ids)];}
+    npcQuestIds(npc){const stage=this.state.quests.changshan.stage,ids=[...(npc.relatedQuests||[])];if(npc.role==='tavern'&&this.state.serviceRumors.tavern==='heard')ids.push('tavern-recruit');if(npc.role==='chapter')ids.push('chapter-one');if(npc.role==='court'){ids.push('report-'+npc.country);if(this.state.quests.changshan.stage==='complete'&&!this.state.recruitAssignments[npc.country])ids.push('visit-courts');}if(npc.questId)ids.push(npc.questId);if(npc.heroQuest)for(const d of Object.values(H.definitions))if(H.place(d.id,this.state.heroQuests[d.id])===this.state.nodeId&&H.npc(d.id,this.state.heroQuests[d.id])?.id===npc.id)ids.push(d.id);for(const data of N.sideQuests)if(data.giver===npc.id)ids.push(data.id);if(npc.id==='zhenji'&&this.state.quests.changshan.healerDecision)ids.push('changshan');if(npc.id==='zhaoyun'&&!['return','complete'].includes(stage)&&npc.role!=='companion'||npc.id==='changshan-elder'&&stage==='return'||npc.id==='grain-steward'&&stage==='supplies'||npc.id==='refugee-laborer'&&stage==='rescue')ids.push('changshan');return [...new Set(ids)];}
     npcQuestStatus(npc){const ids=this.npcQuestIds(npc),statuses=this.quests().filter(q=>ids.includes(q.id)).map(q=>q.taskStatus);return ['ready','available','active'].find(status=>statuses.includes(status))||null;}
     questNpc(id){const d=H.definitions[id],q=this.state.heroQuests[id];if(d&&q&&this.heroQuestVisible(d,q)&&q.accepted&&H.place(id,q)===this.state.nodeId&&H.npc(id,q))return {...H.npc(id,q),selectedQuest:true};return this.sceneNpcs().find(n=>this.npcQuestIds(n).includes(id))||null;}
     entryQuestNpc(){const npcs=this.sceneNpcs(),here=this.state.nodeId,currentTasks=new Set(this.questMarkers().filter(mark=>mark.place===here).map(mark=>mark.questId)),progress=new Map(),offers=new Map();for(const q of this.quests()){const npc=npcs.find(n=>this.npcQuestIds(n).includes(q.id))||this.questNpc(q.id);if(!npc)continue;if(q.taskStatus==='available')offers.set(q.id,npc);else if(q.taskStatus==='ready'||q.taskStatus==='active'&&currentTasks.has(q.id))progress.set(q.id,npc);}const candidates=progress.size?progress:offers;if(candidates.size!==1)return null;const [id,npc]=[...candidates][0];return H.definitions[id]?{...H.npc(id,this.state.heroQuests[id]),selectedQuest:true}:npc;}
-    questDestination(){const q=this.state.quests.changshan;if(q.zhaoInvitation)return 'changshan';if(q.healerDecision)return 'zhongshan';if(q.stage==='complete'){const d=Object.values(H.definitions).find(d=>!['locked','complete'].includes(this.state.heroQuests[d.id].stage)&&(this.state.heroQuests[d.id].accepted||this.state.heroQuests[d.id].heard));return d?H.place(d.id,this.state.heroQuests[d.id]):null;}return {available:'changshan',entry:'changshan',supplies:'zhongshan',rescue:'zhongshan-county',escort:'changshan',return:'changshan',decision:'changshan'}[this.state.quests.changshan.stage]||null;}
+    questDestination(){const q=this.state.quests.changshan;if(q.zhaoInvitation)return 'changshan';if(q.healerDecision)return 'zhongshan';if(q.stage==='complete'){const d=Object.values(H.definitions).find(d=>!['locked','complete'].includes(this.state.heroQuests[d.id].stage)&&(this.state.heroQuests[d.id].accepted||this.state.heroQuests[d.id].heard));return d?H.place(d.id,this.state.heroQuests[d.id]):null;}return {available:'changshan',entry:'changshan',supplies:'zhongshan',rescue:'zhongshan',escort:'changshan',return:'changshan',decision:'changshan'}[this.state.quests.changshan.stage]||null;}
     questMarkers(){
       const cacheKey=this.questStateKey()+'|'+this.state.nodeId;if(this.markerCache?.key===cacheKey)return this.markerCache.markers;const nearHere=new Set([this.state.nodeId,...neighbors(this.state.nodeId)]),markers=Object.values(H.definitions).filter(d=>this.heroQuestVisible(d)&&!['locked','complete'].includes(this.state.heroQuests[d.id].stage)&&(this.state.heroQuests[d.id].accepted||this.state.heroQuests[d.id].heard||nearHere.has(H.place(d.id,this.state.heroQuests[d.id])))).map(d=>({place:H.place(d.id,this.state.heroQuests[d.id]),questId:d.id,category:'story',title:d.title,accepted:!!this.state.heroQuests[d.id].accepted})),near=new Set([this.state.nodeId,...neighbors(this.state.nodeId)]),destination=this.questDestination(),started=this.state.quests.changshan.stage!=='available';
-      if(this.state.quests.changshan.stage!=='complete'&&destination&&(started||near.has(destination)))markers.push({place:destination,questId:'changshan',category:'main',title:'常山归途',accepted:started});
+      if(this.state.quests.changshan.stage!=='complete'&&destination)markers.push({place:destination,questId:'changshan',category:'main',title:'常山归途',accepted:started});
       for(const quest of N.sideQuests){const q=this.state.quests.side[quest.id];if(!q.paid&&(q.accepted||near.has(quest.giverPlace)))markers.push({place:q.accepted&&q.wins<quest.rounds?quest.place:quest.giverPlace,questId:quest.id,category:quest.repeatable?'commission':'side',title:quest.title,accepted:q.accepted});}
       if(this.state.serviceRumors.tavern==='heard')markers.push({place:this.state.serviceRumors.tavernPlace||this.tavernRumor().place,questId:'tavern-recruit',category:'side',title:'酒肆访客',accepted:true});
       if(this.state.quests.changshan.stage==='complete')for(const country of countries.filter(c=>!this.state.recruitAssignments[c])){const d=Courts.definitions[country];markers.push({place:d.place,questId:'visit-courts',category:'main',title:'拜访三府 · '+d.name,accepted:true});}
@@ -9706,16 +9937,16 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       this.pending={kind:'story',phase,to:this.state.nodeId,checkpoint,memberIds:this.members().map(u=>u.id),seed:this.state.seed+':story:'+phase+':'+q.grainWins};return true;
     }
     zhaoYunUnit(){
-      const weapon={type:'spear',name:'白蜡枪',power:10},skills=W.forWeapon(weapon),u={...G.create('zhaoyun',3),id:'zhaoyun',name:'赵云',characterId:'zhaoyun',homeNode:'chengdu',guest:true,experience:0,experienceVersion:2,weaponPlanVersion:3,passives:['zhaoyun-courage','zhaoyun-seven-crossings','zhaoyun-ever-victorious','zhaoyun-loyal-guard'],equipment:{armor:I.armorRecord({name:'轻甲'},'zhaoyun-initial-armor'),accessory1:null,accessory2:null},weapon,attack:10,armor:6,resistance:3,skills,priorities:W.prioritiesFor(skills)};
+      const weapon={type:'spear',name:'白蜡枪',power:10},skills=W.forWeapon(weapon),u={...G.create('zhaoyun',3),id:'zhaoyun',name:'赵云',characterId:'zhaoyun',homeNode:'chengdu',guest:true,experience:0,experienceVersion:2,weaponPlanVersion:3,passives:root.BattlePassives.forUnit({id:'zhaoyun'}),equipment:{armor:I.armorRecord({name:'轻甲'},'zhaoyun-initial-armor'),accessory1:null,accessory2:null},weapon,attack:10,armor:6,resistance:3,skills,priorities:W.prioritiesFor(skills)};
       return u;
     }
     zhenJiUnit(){
       const weapon={type:'needle',name:'金针',power:10},skills=W.forWeapon(weapon),priorities=W.prioritiesFor(skills);for(const rule of priorities){const skill=W.skills[rule.skill];if(skill.kind==='heal'){rule.selfThreshold=.8;rule.allyThreshold=.8;}if(skill.kind==='buff')rule.disabled=true;}
-      return {...G.create('zhenji',this.character.level),id:'zhenji',unitType:'general',name:'甄姬',characterId:'zhenji',homeNode:'zhongshan-county',guest:true,experience:0,experienceVersion:2,weaponPlanVersion:3,passives:['benevolent-healer','zhenji-clear-water','zhenji-serenity'],weapon,attack:10,armor:3,resistance:5,equipment:{armor:I.armorRecord({name:'绣纹轻衣'},'zhenji-initial-armor'),accessory1:null,accessory2:null},skills,priorities};
+      return {...G.create('zhenji',this.character.level),id:'zhenji',unitType:'general',name:'甄姬',characterId:'zhenji',homeNode:'xuchang',guest:true,experience:0,experienceVersion:2,weaponPlanVersion:3,passives:root.BattlePassives.forUnit({id:'zhenji'}),weapon,attack:10,armor:3,resistance:5,equipment:{armor:I.armorRecord({name:'绣纹轻衣'},'zhenji-initial-armor'),accessory1:null,accessory2:null},skills,priorities};
     }
     recruitZhenJi(){
-      const q=this.state.quests.changshan;if(q.healerJoined||this.pending||this.journey||!['zhongshan','zhongshan-county'].includes(this.state.nodeId)||!this.canRecruit())return false;
-      const unit=this.prepareRecruit(this.zhenJiUnit());if(['escort','return','decision','complete'].includes(q.stage)){delete unit.guest;q.healerStayDecided=true;}this.state.companions.push(unit);this.state.troops[unit.id]=E.maxHealth(unit.constitution);if(!this.state.recruits.wei.includes(unit.id))this.state.recruits.wei.push(unit.id);
+      const q=this.state.quests.changshan;if(this.state.residents.zhenji?.homeNode===this.state.nodeId)return this.inviteResident('zhenji');if(!q.healerRescued||q.healerJoined||this.pending||this.journey||!['zhongshan','zhongshan-county','xuchang'].includes(this.state.nodeId)||!this.canRecruit())return false;
+      const unit=this.prepareRecruit(this.zhenJiUnit());if(q.healerStayDecided||['escort','return','decision','complete'].includes(q.stage)){delete unit.guest;q.healerStayDecided=true;}this.state.companions.push(unit);this.state.troops[unit.id]=E.maxHealth(unit.constitution);if(!this.state.recruits.wei.includes(unit.id))this.state.recruits.wei.push(unit.id);
       if(this.state.activeIds.length>=this.activeLimit()){const replaced=[...this.state.activeIds].reverse().find(id=>!['hero','zhaoyun'].includes(id));if(replaced)this.state.activeIds=this.state.activeIds.filter(id=>id!==replaced);}
       if(this.state.activeIds.length<this.activeLimit())this.state.activeIds.push(unit.id);q.healerRescued=true;q.healerJoined=true;q.healerDecision=false;return true;
     }
@@ -9736,11 +9967,15 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       this.state.companions.push(u);this.state.troops[u.id]=E.maxHealth(u.constitution);if(this.state.activeIds.length>=this.activeLimit())this.state.activeIds.pop();this.state.activeIds.push(u.id);q.stage='supplies';q.zhaoInvitation=false;return true;
     }
 
-    finishZhenStay(stay){const q=this.state.quests.changshan,u=this.state.companions.find(u=>u.id==='zhenji');if(!q.healerDecision||!u||this.pending||this.journey)return false;delete u.guest;q.healerDecision=false;q.healerStayDecided=true;if(!stay)this.dismiss('zhenji');return true;}
+    finishZhenStay(stay){
+      const q=this.state.quests.changshan;if(!q.healerDecision||this.pending||this.journey)return false;let u=this.state.companions.find(u=>u.id==='zhenji');
+      if(stay&&!u){if(!this.recruitZhenJi())return false;u=this.state.companions.find(u=>u.id==='zhenji');}if(u){delete u.guest;u.homeNode='xuchang';}
+      q.healerDecision=false;q.healerStayDecided=true;if(!stay){if(u)this.dismiss('zhenji');else{const unit=this.prepareRecruit(this.zhenJiUnit());delete unit.guest;this.state.residents.zhenji={...unit,homeNode:'xuchang',startSoldiers:I.apply(unit).maxSoldiers};}}return true;
+    }
 
     advanceChangshan(){
       const q=this.state.quests.changshan,id=this.state.nodeId;
-      if(q.stage==='supplies'&&id==='zhongshan'&&!q.healerRescued&&!q.healerJoined&&!q.zhaoInvitation){q.stage='rescue';return true;}
+      if(['supplies','rescue'].includes(q.stage)&&id==='zhongshan'&&q.grainWins>=2&&!q.zhaoInvitation){q.healerRescued=true;q.healerDecision=!q.healerStayDecided;q.stage='escort';return true;}
       if(q.stage==='return'&&id==='changshan'){q.stage='decision';return true;}return false;
     }
     beginQuestBattle(){return this.beginStoryBattle('rescue');}
@@ -9752,10 +9987,10 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       const u=this.state.companions.find(u=>u.id===id);if(!u||u.guest||this.pending||this.journey)return false;const homeNode=u.homeNode||(id==='zhangliang'?'camp':null);if(!D.placeMap[homeNode])return false;
       this.state.residents[id]={...copy(u),homeNode,condition:this.state.conditions[id],startSoldiers:this.state.troops[id]??E.maxHealth(u.constitution)};this.state.companions=this.state.companions.filter(u=>u.id!==id);this.state.reserveOrder=this.state.reserveOrder.filter(value=>value!==id);this.state.activeIds=this.state.activeIds.filter(value=>value!==id);if(!this.state.activeIds.length)this.state.activeIds=['hero'];delete this.state.troops[id];delete this.state.conditions[id];return true;
     }
-    inviteResident(id){this.syncCompanionLevels();const u=this.state.residents[id];if(!u||(u.origin==='tavern'&&!this.tavernAvailable())||this.state.releasedRetainers.includes(id)||(u.homeNode!==this.state.nodeId&&!(u.origin==='tavern'&&this.tavernAvailable()))||this.pending||this.journey||this.state.companions.some(c=>c.id===id)||!this.canRecruit())return false;this.state.companions.push(copy(u));this.state.troops[id]=u.startSoldiers??E.maxHealth(u.constitution);if(u.condition)this.state.conditions[id]=u.condition;if(this.state.activeIds.length<this.activeLimit())this.state.activeIds.push(id);delete this.state.residents[id];return true;}
+    inviteResident(id){this.syncCompanionLevels();const u=this.state.residents[id];if(!u||(u.origin==='tavern'&&!this.tavernAvailable())||this.state.releasedRetainers.includes(id)||(u.homeNode!==this.state.nodeId&&!(u.origin==='tavern'&&this.tavernAvailable()))||this.pending||this.journey||this.state.companions.some(c=>c.id===id)||!this.canRecruit())return false;this.state.companions.push(copy(u));if(id==='zhenji'){this.state.quests.changshan.healerJoined=true;this.state.quests.changshan.healerStayDecided=true;if(!this.state.recruits.wei.includes(id))this.state.recruits.wei.push(id);}this.state.troops[id]=u.startSoldiers??E.maxHealth(u.constitution);if(u.condition)this.state.conditions[id]=u.condition;if(this.state.activeIds.length<this.activeLimit())this.state.activeIds.push(id);delete this.state.residents[id];return true;}
     campAdvice(){
       if(!Object.values(this.state.trainingWins).some(Boolean))return ['我还是担心你在路上碰到乱兵。要是不急着走，先去教场找我三弟练练吧，他就在那边，想试什么兵器都能陪你，不会的也可以问他。'];
-      if(this.state.quests.changshan.stage!=='complete')return [{available:'常山就在营地西北边，离得不远。前些天来投宿的人说，赵子龙在那里照顾逃难的乡亲，应该就是你想找的人，你可以先过去问问。',entry:'你要找的赵子龙就在常山村里。到了跟乡亲们打听一下，他们都认得他，也知道他平时在哪里帮忙。',supplies:(this.state.quests.changshan.healerRescued||this.state.quests.changshan.healerJoined)?'甄姑娘和伤者都平安就好。粮仓里若还有贼，你们先和子龙把粮夺回来，再安排人装车。常山的乡亲还在等着呢。':'中山的粮食一直没送到，看来不是临时耽误。你和子龙一起过去，把仓守找来问问，看看是路不通，还是粮车出了事情。',rescue:'听说甄姑娘被带去了毋极，你们先去找人。我二弟这里还有一些药，路上如果需要，可以回来拿，别让伤者一直拖着。',escort:'能把粮找回来就好。回常山的时候慢一点，车上还有伤者，中途觉得不舒服就停下来歇歇，不用为了赶路一直颠着他们。',return:'到了常山先找里正，让他叫人卸粮、分发。大家已经等了很久，村口一下围太多人，反而容易把车上的伤者挤着。',decision:'常山的事情暂时安排好了，你们也能歇一会儿。子龙以后准备去哪里，你问过没有？既然一起忙了这么久，也该坐下来好好聊聊。'}[this.state.quests.changshan.stage]||'你这趟出去还顺利吗？遇到什么不好处理的事情，告诉我们听听，能帮忙的地方，我们再一起想办法。'];
+      if(this.state.quests.changshan.stage!=='complete')return [{available:'常山就在营地西北边，离得不远。前些天来投宿的人说，赵子龙在那里照顾逃难的乡亲，应该就是你想找的人，你可以先过去问问。',entry:'你要找的赵子龙就在常山村里。到了跟乡亲们打听一下，他们都认得他，也知道他平时在哪里帮忙。',supplies:(this.state.quests.changshan.healerRescued||this.state.quests.changshan.healerJoined)?'甄姑娘和伤者都平安就好。粮仓里若还有贼，你们先和子龙把粮夺回来，再安排人装车。常山的乡亲还在等着呢。':'中山的粮食一直没送到，看来不是临时耽误。你和子龙一起过去，把仓守找来问问，看看是路不通，还是粮车出了事情。',rescue:'中山粮仓里还扣着人？先别急着运粮，把后院的门打开，看看有没有伤者。我二弟这里还有些药，实在不够用，就让人回来取。',escort:'能把粮找回来就好。回常山的时候慢一点，车上还有伤者，中途觉得不舒服就停下来歇歇，不用为了赶路一直颠着他们。',return:'到了常山先找里正，让他叫人卸粮、分发。大家已经等了很久，村口一下围太多人，反而容易把车上的伤者挤着。',decision:'常山的事情暂时安排好了，你们也能歇一会儿。子龙以后准备去哪里，你问过没有？既然一起忙了这么久，也该坐下来好好聊聊。'}[this.state.quests.changshan.stage]||'你这趟出去还顺利吗？遇到什么不好处理的事情，告诉我们听听，能帮忙的地方，我们再一起想办法。'];
       if(!this.state.visited.includes('changshan'))return ['我听说赵子龙还在常山照顾流民，你可以先去村里找他。路上要是受伤，记得回来让我二弟看看，不要觉得回来一趟麻烦就硬撑。'];
       if(this.coalitionReady())return ['魏、蜀、吴都有了愿意帮忙的人，现在可以认真商量怎么对付董卓了。你先去跟各家负责的人谈谈，确定谁能出兵、谁来接应，再到洛阳去。'];
       const clue=D.clues.filter(c=>H.definitions[c.id]&&!this.state.recruits[c.faction].includes(c.id)&&!this.state.visited.includes(c.place)).sort((a,b)=>(this.findRoute(a.place)?.distance??Infinity)-(this.findRoute(b.place)?.distance??Infinity))[0];
@@ -9826,7 +10061,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
         return {id:'camp-training',title:training.label,scene:Scenes.arrange(copy(D.townScenes.camp),enemies),allies:[...this.trainingAllies(training),...extraAllies],enemies,passives:heroPassives(),rules:{difficulty:this.character.difficulty,partySlots:this.activeLimit(),bossBattle:!!training.rivals,level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true,seed:this.pending.seed}};
       }
       if(['story','side'].includes(this.pending.kind)){
-        const p=this.pending,data=p.kind==='story'?N.storyBattles[p.phase]:N.sideQuests.find(q=>q.id===p.questId),level=data.fixedCombatLevel||Progression.recommended(data),count=p.kind==='story'?data.count:data.rounds===5?[2,3,2,3,5][this.state.quests.side[data.id].wins]:[2,3,5][Math.min(2,this.state.quests.side[data.id].wins)],enemies=(data.bossId?Optional.roster(data.bossId):(node?require('./enemy-catalog.js'):root.EnemyCatalog).roster(level,count,p.kind==='story'?(data.pattern||'earlyPhysical'):data.pattern||['patrol','arcane','venom','armored','ambush'][E.seedNumber(p.questId)%5])).map((u,i)=>({...u,...(root.CharacterAssets?root.CharacterAssets.resolve(u.characterId):{}),id:'local-enemy-'+i}));
+        const p=this.pending,data=p.kind==='story'?N.storyBattles[p.phase]:N.sideQuests.find(q=>q.id===p.questId),level=data.fixedCombatLevel||Progression.recommended(data),count=p.kind==='story'?data.count:data.rounds===5?[2,3,2,3,5][this.state.quests.side[data.id].wins]:[2,3,5][Math.min(2,this.state.quests.side[data.id].wins)],enemies=(data.bossId?Optional.roster(data.bossId):(node?require('./enemy-catalog.js'):root.EnemyCatalog).roster(level,count,p.kind==='story'?(data.pattern||'earlyPhysical'):data.pattern||['patrol','arcane','venom','armored','ambush'][E.seedNumber(p.questId)%5])).map((u,i)=>({...u,...(root.CharacterAssets?root.CharacterAssets.resolve(u.characterId):{}),...(p.kind==='story'&&p.phase==='escort'&&i===0?{constitution:Math.floor(u.constitution*.5)}:{}),...(p.kind==='side'&&i===0&&data.enemyName?{name:data.enemyName}:{}),...(p.kind==='side'&&i===0&&data.enemyArt?{characterId:data.enemyArt,...(root.CharacterAssets?root.CharacterAssets.resolve(data.enemyArt):{})}:{}),id:'local-enemy-'+i}));
         return {id:'local-'+p.kind,title:data.title,scene:Scenes.arrange(Scenes.get(data.sceneId||'rural-road'),enemies),allies:[...this.storyAllies(p.phase),...extraAllies],enemies,passives:heroPassives(),rules:{difficulty:this.character.difficulty,partySlots:this.activeLimit(),bossBattle:!!data.bossId,allySp:0,hit:true,critical:true,seed:p.seed}};
       }
       const troops=this.members(),allies=this.state.activeIds.map(id=>troops.find(u=>u.id===id)).filter(Boolean),encounter=D.encounters[this.pending.encounterId];if(!encounter)throw new Error('遭遇配置不存在');
@@ -9840,10 +10075,10 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       for(const u of result.units||[])if(u.side==='ally'&&this.members().some(m=>m.id===u.id)){this.state.troops[u.id]=u.soldiers;this.state.conditions[u.id]=u.dead?'dead':u.wounded?'wounded':'healthy';}
       const defeated=(result.units||[]).filter(u=>u.side==='enemy'),foes=defeated.length?defeated:scenario.enemies,firstVictory=pending.kind==='story'&&pending.phase==='entry'&&this.character.level===1;this.lastReward=this.awardExperience(member=>practice?0:X.reward(foes,member)+(firstVictory&&member===this.character?20:0),this.members().map(u=>u.id));if(firstVictory)this.lastReward.milestone={label:'初战历练',experience:20};
       const rng=E.seededRandom(pending.seed+':loot:'+this.state.battleSerial++),drops=pending.kind==='training'||practice?{money:0,items:[]}:I.loot(foes,rng);this.state.money+=drops.money;this.lastReward.money=drops.money;this.lastReward.items=drops.items.map(i=>this.addItem(i));
-      if(pending.kind==='story'){const q=this.state.quests.changshan;if(pending.phase==='entry'){q.stage='supplies';q.zhaoInvitation=!this.state.companions.some(u=>u.id==='zhaoyun');}else if(pending.phase==='grain'){q.grainWins++;q.stage=q.grainWins>=2?'escort':'supplies';if(q.grainWins>=2&&!q.healerStayDecided&&this.state.companions.some(u=>u.id==='zhenji'))q.healerDecision=true;this.lastReward.progress={label:'夺回粮车',value:q.grainWins/2};}else if(pending.phase==='rescue'){q.healerRescued=true;this.recruitZhenJi();q.stage=q.grainWins>=2?'escort':'supplies';}else if(pending.phase==='escort')q.stage='return';this.state.inside=true;}
+      if(pending.kind==='story'){const q=this.state.quests.changshan;if(pending.phase==='entry'){q.stage='supplies';q.zhaoInvitation=!this.state.companions.some(u=>u.id==='zhaoyun');}else if(pending.phase==='grain'){q.grainWins++;q.stage=q.grainWins>=2?'escort':'supplies';if(q.grainWins>=2){q.healerRescued=true;if(!q.healerStayDecided)q.healerDecision=true;}this.lastReward.progress={label:'夺回粮车',value:q.grainWins/2};}else if(pending.phase==='rescue'){q.healerRescued=true;q.healerDecision=!q.healerStayDecided;q.stage=q.grainWins>=2?'escort':'supplies';}else if(pending.phase==='escort')q.stage='return';this.state.inside=true;}
       if(pending.kind==='side'){const data=N.sideQuests.find(q=>q.id===pending.questId),q=this.state.quests.side[data.id];q.wins++;this.lastReward.progress={label:data.title,value:q.wins/data.rounds};this.state.inside=true;if(data.dungeon&&q.wins>=data.rounds){q.paid=true;this.lastReward.title=data.repeatable?'委托完成':'支线完成';this.lastReward.items.push(this.addItem(I.roll(data.item,'green',rng,undefined,data.fixedCombatLevel)));this.state.money+=data.money;this.lastReward.money+=data.money;this.markQuestComplete(data.id);}}
       if(pending.kind==='heroQuest'){const d=H.definitions[pending.questId],fight=d.battles[pending.phase];this.state.heroQuests[d.id].stage=fight.next;Story.apply(this,fight.effects);this.lastReward.progress={label:d.title,value:d.id==='ganning'&&pending.phase==='breach'?.5:1};if(practice)this.rest();this.state.inside=true;}
-      if(pending.kind==='story')this.lastReward.items.push(...this.claimEquipmentReward('story:'+pending.phase));
+      if(pending.kind==='story'){this.lastReward.items.push(...this.claimEquipmentReward('story:'+pending.phase));if(pending.phase==='grain'&&this.state.quests.changshan.grainWins>=2)this.lastReward.items.push(...this.claimEquipmentReward('story:rescue'));}
       const bonus=(pending.kind==='heroQuest'?H.definitions[pending.questId].battles[pending.phase]:pending.kind==='story'?N.storyBattles[pending.phase]:null)?.reward;if(bonus){this.state.money+=bonus.money||0;this.lastReward.money+=bonus.money||0;for(const item of bonus.items||[])this.lastReward.items.push(this.addItem(item.templateId,item.quality));}
       if(pending.kind==='chapter'){let next=Chapter.phases[pending.phase].next;if(next==='gate'&&this.state.story.flags.lvbuConvinced)next='street';this.state.chapterOne.stage=next;this.state.inside=true;this.lastReward.progress={label:'洛阳战线',value:(Object.keys(Chapter.phases).indexOf(pending.phase)+1)/6};}
       this.lastReward.items.push(...this.trophyDrops(pending,scenario,E.seededRandom(pending.seed+':trophies:'+this.state.battleSerial),practice));
@@ -9865,18 +10100,22 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  'use strict';
  const T=typeof module!=='undefined'&&module.exports?require('./trophies.js'):root.TrophyCatalog,clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
  function tabs(v,p,f){if(p.slot||p.trophySlot!=null)return;const w=(f.w-40)/2;['装备','遗物'].forEach((name,i)=>v.button(name,f.x+16+i*(w+8),f.y+62,w,34,()=>{p.category=i?'trophies':'equipment';p.scroll=0;p.selected=null;},{active:(p.category==='trophies')===!!i}));}
- function character(v,u,left,y,inner,size,readonly,previous,{gap=12}={}){if(readonly)return;const x=left+inner-size;v.text('遗物',x+size/2,y+10,14,'#bda779','center');for(let slot=0;slot<2;slot++){const item=T.equipped(v.model.state,u.id)[slot],yy=y+24+slot*(size+gap);root.WorldPanels.itemIcon(v,item,x,yy,size,'trophy-empty');if(!item)v.text('+',x+size/2,yy+size/2,23,'#a29472','center');v.hits.push({x,y:yy,w:size,h:size,label:item?'查看遗物 '+item.name:'装备遗物 '+(slot+1),action:()=>{v.panel=item?{type:'trophyDetail',item,unitId:u.id,trophySlot:slot,previous,scroll:0}:{type:'inventory',category:'trophies',unitId:u.id,trophySlot:slot,previous,scroll:0};}});}}
+ function character(v,u,left,y,inner,size,readonly,previous,{gap=12}={}){
+  if(readonly&&!u.trophies?.length)return;const x=left+inner-size,items=readonly?u.trophies:T.equipped(v.model.state,u.id);v.text('遗物',x+size/2,y+10,14,'#bda779','center');
+  for(let slot=0;slot<2;slot++){const item=items[slot],yy=y+24+slot*(size+gap);root.WorldPanels.itemIcon(v,item,x,yy,size,'trophy-empty');if(!item&&!readonly)v.text('+',x+size/2,yy+size/2,23,'#a29472','center');if(item||!readonly)v.hits.push({x,y:yy,w:size,h:size,label:item?'查看遗物 '+item.name:'装备遗物 '+(slot+1),action:()=>{v.panel=item?{type:'trophyDetail',item,unitId:u.id,trophySlot:slot,readonly:!!readonly,previous,scroll:0}:{type:'inventory',category:'trophies',unitId:u.id,trophySlot:slot,previous,scroll:0};}});}
+ }
+
  function warehouse(v){const p=v.panel,f=v.frame(p.trophySlot!=null?'选择遗物':'背包',640),left=f.x+16,w=f.w-32,c=v.ctx,selecting=p.trophySlot!=null,top=f.y+(selecting?106:144),bottom=f.y+f.h-18;tabs(v,p,f);
   const statsY=f.y+(selecting?74:116);v.text(v.model.state.money+' 文',left,statsY,14,'#e2c380');v.text(v.model.state.trophies.length+' 件',left+w,statsY,14,'#a9bdc4','right');
   const filter=p.trophyFilter||'all';root.WorldPanels.textButton(v,'筛选',f.x+f.w-154,f.y+9,48,30,()=>{v.panel={type:'trophyFilter',previous:p};},filter!=='all');root.WorldPanels.textButton(v,'排序',f.x+f.w-100,f.y+9,48,30,()=>{v.panel={type:'trophySort',previous:p};});
-  const items=[...v.model.state.trophies].reverse().filter(t=>filter==='all'||T.totals([t])[filter]);if(p.trophySort==='level')items.sort((a,b)=>b.level-a.level);
+  const items=[...v.model.state.trophies].reverse().filter(t=>filter==='all'||T.totals([t])[filter]);if(p.trophySort==='level')items.sort((a,b)=>b.level-a.level);items.sort((a,b)=>Number(!!v.model.trophyOwner(b.uid))-Number(!!v.model.trophyOwner(a.uid)));
   const cols=Math.max(3,Math.floor(w/90)),gap=10,cw=(w-gap*(cols-1))/cols,rowH=148;p.maxScroll=Math.max(0,Math.ceil(items.length/cols)*rowH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);const before=v.hits.length,first=Math.floor(p.scroll/rowH)*cols,end=Math.min(items.length,Math.ceil((p.scroll+bottom-top)/rowH)*cols);c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
-  for(let i=first;i<end;i++){const item=items[i],x=left+i%cols*(cw+gap),y=top+Math.floor(i/cols)*rowH-p.scroll,owner=v.model.trophyOwner(item.uid),name=v.model.members().find(u=>u.id===owner?.id)?.name||'未佩戴';root.WorldPanels.itemIcon(v,item,x+(cw-52)/2,y+4,52);v.text(item.name,x+cw/2,y+76,14,item.unique?'#e0bd77':'#bbc8c8','center');v.text('遗物',x+cw/2,y+98,14,'#8fa49a','center');v.text(name,x+cw/2,y+121,12,owner?'#9fbe97':'#829691','center');v.hits.push({x,y,w:cw,h:138,label:item.name+' '+item.level+'级 '+name,action:()=>{v.panel={type:'trophyDetail',item,unitId:p.unitId,trophySlot:p.trophySlot,previous:p,scroll:0};}});}
+  for(let i=first;i<end;i++){const item=items[i],x=left+i%cols*(cw+gap),y=top+Math.floor(i/cols)*rowH-p.scroll,owner=v.model.trophyOwner(item.uid),name=v.model.members().find(u=>u.id===owner?.id)?.name||'';root.WorldPanels.itemIcon(v,item,x+(cw-52)/2,y+4,52);if(owner)root.WorldPanels.ownerBadge(v,owner.id,x+(cw-52)/2,y+4,52);v.text(item.name,x+cw/2,y+76,14,item.unique?'#e0bd77':'#bbc8c8','center');v.text('遗物',x+cw/2,y+98,14,'#8fa49a','center');if(name)v.text(name,x+cw/2,y+121,12,'#9fbe97','center');v.hits.push({x,y,w:cw,h:138,label:item.name+' '+item.level+'级 '+name,action:()=>{v.panel={type:'trophyDetail',item,unitId:p.unitId,trophySlot:p.trophySlot,previous:p,scroll:0};}});}
   c.restore();v.hits=v.hits.filter((h,i)=>i<before||h.y>=top&&h.y+h.h<=bottom);if(!items.length){v.text(filter==='all'?'尚未收藏遗物':'没有符合条件的遗物',left+w/2,top+90,16,'#a4b3ac','center');v.wrap('完成任务、击败首领或野外战斗，都可能带回遗物。',left+24,top+126,w-48,{size:14,line:25,color:'#899b92'});}if(p.maxScroll){const h=bottom-top,thumb=Math.max(24,h*h/(h+p.maxScroll));v.box(left+w-2,top+(h-thumb)*p.scroll/p.maxScroll,2,thumb,'#a59165',null);}
  }
  function detail(v){const p=v.panel,item=v.model.state.trophies.find(t=>t.uid===p.item?.uid)||p.item,t=T.templates[item?.templateId];if(!t){v.closeWorldPanel();return;}const owned=v.model.state.trophies.some(t=>t.uid===item.uid),owner=v.model.trophyOwner(item.uid),ownerName=v.model.members().find(u=>u.id===owner?.id)?.name,unit=v.model.members().find(u=>u.id===p.unitId),slot=p.trophySlot,cost=T.costs[item.level-1],canAct=owned&&!p.readonly&&!v.model.pending&&!v.model.journey;
-  const f=v.frame('',760,{maxWidth:420}),left=f.x+20,w=f.w-40,top=f.y+116,bottom=f.y+f.h-(p.readonly?22:160),c=v.ctx;root.WorldPanels.itemIcon(v,item,left,f.y+17,66);v.text(item.name,left+82,f.y+37,20,item.unique?'#e0bd77':'#d5d7c6');v.text('遗物 · '+(item.unique?'独特':'稀有')+'  '+item.level+'/8级',left+82,f.y+69,14,'#b4b9a5');v.text(ownerName?'佩戴：'+ownerName:'未佩戴',left,f.y+99,14,'#a7c19d');
-  const totals=T.totals([item]),totalLines=Object.entries(totals).map(([key,value])=>T.format({key,value})),descriptionLines=root.PengpaiUI.wrapLines(c,item.description,w),contentH=36+totalLines.length*26+28+8*34+descriptionLines.length*24+42;p.maxScroll=Math.max(0,contentH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);let y=top-p.scroll;c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();v.text('当前加成',left,y+15,16,'#d8c18b');y+=36;for(const text of totalLines){v.text(text,left+8,y+9,16,'#bed9b0');y+=26;}v.text('成长词条 · '+(item.unique?'固定':'随机'),left,y+14,16,'#d8c18b');y+=36;
+  const c=v.ctx,measureW=Math.min(420,v.w-28)-40,totals=T.totals([item]),totalLines=Object.entries(totals).map(([key,value])=>T.format({key,value}));c.font=`14px ${root.PengpaiUI.font}`;const descriptionLines=root.PengpaiUI.wrapLines(c,item.description,measureW),acquisitionLines=root.PengpaiUI.wrapLines(c,'获取：'+item.acquisition,measureW),contentH=36+totalLines.length*26+36+8*34+20+descriptionLines.length*24+16+acquisitionLines.length*24,headerH=ownerName?116:98,footerH=p.readonly?22:150,f=v.frame('',headerH+contentH+footerH,{maxWidth:420}),left=f.x+20,w=f.w-40,top=f.y+headerH,bottom=f.y+f.h-footerH;root.WorldPanels.itemIcon(v,item,left,f.y+17,66);v.text(item.name,left+82,f.y+37,20,item.unique?'#e0bd77':'#d5d7c6');v.text('遗物 · '+(item.unique?'独特':'稀有')+'  '+item.level+'/8级',left+82,f.y+69,14,'#b4b9a5');if(ownerName)v.text('佩戴：'+ownerName,left,f.y+99,14,'#a7c19d');
+  p.maxScroll=Math.max(0,contentH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);let y=top-p.scroll;c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();v.text('当前加成',left,y+15,16,'#d8c18b');y+=36;for(const text of totalLines){v.text(text,left+8,y+9,16,'#bed9b0');y+=26;}v.text('成长词条 · '+(item.unique?'固定':'随机'),left,y+14,16,'#d8c18b');y+=36;
   for(let i=0;i<8;i++){const r=item.rolls[i],fixed=t.unique?t.profile[i][0]:t.fixed[i+1],text=r?T.format(r):t.unique?T.format({key:fixed,value:t.profile[i][1]}):fixed?T.attributes[fixed].name+' +'+T.attributes[fixed].range.map(n=>T.percent(n*(i===7?3:1))).join('～'):i===7?(t.last?.length?'随机属性／特殊词条':'随机属性 · 三倍成长'):'随机属性';v.box(left,y,w,30,r?'#222c28':'#1b2423',null,3);v.text((i+1)+'级',left+10,y+15,13,r?'#c2c6b3':'#70847b');v.text(text,left+57,y+15,14,r?'#d7dcc8':'#83998b');if(i+1===p.highlightLevel)v.text('新',left+w-13,y+15,12,'#e4c276','right');else if(!r)v.text('未解锁',left+w-10,y+15,11,'#647c70','right');y+=34;}
   y+=12;y=v.wrap(item.description,left,y+8,w,{size:14,line:24,color:'#a6b8ad'});v.wrap('获取：'+item.acquisition,left,y+16,w,{size:13,line:24,color:'#829b8b'});c.restore();if(p.maxScroll)v.box(left+w+7,top+(bottom-top-24)*p.scroll/p.maxScroll,2,24,'#a28f63',null);
   if(p.readonly)return;
@@ -9896,13 +10135,14 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
 (function(root){
  'use strict';
  const node=typeof module!=='undefined'&&module.exports,I=node?require('./items.js'):root.ItemCatalog,E=node?require('./engine.js'):root.BattleEngine,X=node?require('./experience.js'):root.CharacterExperience,C=node?require('./weapon-catalog.js'):root.WeaponCatalog;
- const clamp=(n,a,b)=>Math.max(a,Math.min(b,n)),color=i=>I.qualities[i?.quality]?.color||'#a9b9bc',slots=[['weapon','武器'],['armor','防具'],['accessory1','饰品'],['accessory2','饰品']];
+ const clamp=(n,a,b)=>Math.max(a,Math.min(b,n)),color=i=>i?.id==='fangtian-halberd'?'#c08bea':I.qualities[i?.quality]?.color||'#a9b9bc',slots=[['weapon','武器'],['armor','防具'],['accessory1','饰品'],['accessory2','饰品']];
  const displayAttribute=value=>Math.floor(Number(value)||0);
  const questColors={available:'#59dce5',active:'#f3f6f4',ready:'#e9c365'};
  function questIcon(v,status,x,y,size=25){const tint=questColors[status];if(!tint)return;v.box(x,y,size,size,'#17201ff5',tint,3);v.text('!',x+size/2,y+size*.53,20,tint,'center');}
  function icon(v,id,x,y,size,tint){root.RpgIcons.draw(v.ctx,id,x,y,size,{image:src=>v.image(src),disabled:tint==='#425966'});}
  function iconButton(v,label,x,y,size,action,active=false){v.box(x,y,size,size,active?'#61502b':'#0c2531ed',active?'#e3c384':'#7d959b',4);icon(v,label,x+5,y+5,size-10,active?'#ffe2a2':'#d5e5df');v.hits.push({x,y,w:size,h:size,label,action});}
  function textButton(v,label,x,y,w,h,action,active=false){v.box(x,y,w,h,active?'#51472c':'#252c27',active?'#b79a68':'#766e57',2);v.text(label,x+w/2,y+h/2,14,active?'#f1ddb5':'#dcd8c5','center');v.hits.push({x,y,w,h,label,action});}
+ function ownerBadge(v,id,x,y,size){const u=v.model.members().find(u=>u.id===id),portrait=u?.portrait||(id==='hero'?(()=>{const a=root.PengpaiAssets?.protagonists?.[v.model.character.appearance];return a?{src:a.src,crop:a.portrait}:null;})():root.CharacterAssets?.manifest?.characters?.[u?.characterId||id]?root.CharacterAssets.resolve(u?.characterId||id).portrait:null);if(!portrait)return;v.box(x+size-16,y+size-16,23,23,'#16231e','#c6ad74',3);v.portrait?.(portrait,x+size-15,y+size-15,21,{frame:false});}
  function bar(v,x,y,w,h,value,fill='#40aab9',trail=value){v.box(x,y,w,h,'#07151e','#557780',3);v.ctx.fillStyle='#ecedce';v.ctx.fillRect(x+2,y+2,(w-4)*clamp(trail,0,1),h-4);v.ctx.fillStyle=fill;v.ctx.fillRect(x+2,y+2,(w-4)*clamp(value,0,1),h-4);}
  function itemIcon(v,item,x,y,size,empty){const tint=color(item);v.box(x,y,size,size,'#0a1d28',item?tint:'#3e5865',4);icon(v,root.RpgIcons.resolveItem(item,empty),x+7,y+7,size-14,item?tint:'#425966');if(item?.slot==='trophy'){v.box(x+size-23,y+size-17,22,16,'#172019','#8d805d',2);root.PengpaiUI.centeredText(v,item.level,x+size-23,y+size-17,22,16,11,'#ead8ad');}}
  function character(){
@@ -10016,11 +10256,16 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   for(const [key,value]of Object.entries(item.attributes||{}))rows.push([labels[key]||key,ranges?.attributes[key]?rangeText(ranges.attributes[key]):(value>=0?'+':'')+(['healingBonus','hitBonus','criticalBonus','dodge','physicalLifesteal'].includes(key)?Math.round(value*100)+'%':value)]);if(item.statusImmunities?.length)rows.push(['状态免疫',item.statusImmunities.map(id=>root.BattleStatuses.definitions[id]?.name||id).join('、')]);if(item.unique)rows.push(['获取',item.acquisition]);
   if(ranges)rows.push(['随机属性',ranges.count+'条 · 随机 '+rangeText(ranges.random)]);
   if(item.questItem)rows.push(['用途','任务道具']);
-  const target=this.model.members().find(u=>u.id===(p.unitId||'hero')),canAct=!item.questItem&&!p.readonly&&!this.model.pending&&!this.model.journey;let action,label;
+  const owner=this.model.members().find(u=>u.id===p.equipmentOwnerId),target=this.model.members().find(u=>u.id===(p.unitId||(p.transaction?'hero':null))),canAct=!item.questItem&&!p.readonly&&!this.model.pending&&!this.model.journey;let action,label;
   if(canAct&&p.transaction==='buy'){label='购买 '+item.price+'文';action=()=>{if(this.model.buyItem(item.templateId)){const acquired=this.model.state.inventory.at(-1);this.save();this.openItemDetail(acquired,{unitId:p.unitId||'hero',previous:p.previous,revealed:true});root.GameAudio?.play?.('buff');}else this.notify('铜钱不足。');};}
   else if(canAct&&p.transaction==='sell'&&this.model.state.inventory.some(i=>i.uid===item.uid)){label='出售 '+I.sellPrice(item)+'文';action=()=>{if(this.model.sellItem(item.uid)){this.save();this.panel=p.previous;this.notify('已出售 '+item.name);}};}
   else if(canAct&&target&&p.equipped){label='卸下';action=()=>{if(this.model.changeEquipment(target.id,p.slot,null)){this.save();this.panel=p.previous;}};}
-  else if(canAct&&target&&this.model.state.inventory.some(i=>i.uid===item.uid)){const slot=p.slot||(item.slot==='accessory'?(!target.equipment?.accessory1?'accessory1':'accessory2'):item.slot);if(I.compatible(item,slot)&&I.canEquip(target,item)){label='装备';action=()=>{if(this.model.changeEquipment(target.id,slot,item.uid)){this.save();this.panel=p.previous?.slot&&p.previous.previous?.type==='character'?p.previous.previous:p.previous;}};}}
+  else if(canAct&&(owner||this.model.state.inventory.some(i=>i.uid===item.uid))){
+   const slot=p.slot||(item.slot==='accessory'?(!target?.equipment?.accessory1?'accessory1':'accessory2'):item.slot);
+   if(!target){label=owner?'转给…':'装备给…';action=()=>{this.panel={type:'equipmentTarget',item,equipmentOwnerId:owner?.id,equipmentSlot:p.equipmentSlot,previous:p,scroll:0};};}
+   else if(I.compatible(item,slot)&&I.canEquip(target,item)&&!(owner?.id===target.id&&p.equipmentSlot===slot)){label=owner?'转给 '+target.name:'装备给 '+target.name;action=()=>{const ok=owner?this.model.transferEquipment(owner.id,p.equipmentSlot,target.id,slot):this.model.changeEquipment(target.id,slot,item.uid);if(ok){this.save();this.notify('已为'+target.name+'装备 '+item.name);this.panel=p.previous?.slot&&p.previous.previous?.type==='character'?p.previous.previous:p.previous;}};}
+  }
+  if(owner)rows.push(['装备者',owner.name]);
   const canReplace=canAct&&target&&p.equipped,compareSlot=p.slot||(item.slot==='accessory'?(!target?.equipment?.accessory1?'accessory1':'accessory2'):item.slot),showCompare=!item.rollPreview&&canAct&&target&&p.transaction!=='sell'&&I.compatible(item,compareSlot)&&I.canEquip(target,item);
   if(showCompare&&!p.comparison)p.comparison=this.model.compareEquipment(target.id,compareSlot,p.equipped?null:item);
   const comparison=showCompare?p.comparison:null,changes=comparison?.changes||[],compareH=comparison?42+Math.max(1,changes.length)*26:0;
@@ -10034,15 +10279,26 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   c.restore();if(p.maxScroll)this.box(left+w+8,top+(bottom-top-24)*p.scroll/p.maxScroll,2,24,'#a28f63',null);
   if(p.transaction)this.text(this.model.state.money+' 文',left,f.y+f.h-footerH+14,14,'#e2c380');
   if(canReplace)this.button('更换',left,f.y+f.h-92,w,32,()=>{this.panel={type:'inventory',unitId:target.id,slot:p.slot,scroll:0,previous:p.previous};});
-  if(action)this.button(label,left,f.y+f.h-48,w,32,()=>{action();if(label==='装备'&&this.model.equipped(target.id,compareSlot)?.uid===item.uid)this.notify('已装备 '+item.name);});
+  if(action)this.button(label,left,f.y+f.h-48,w,32,()=>{action();});
   this.hits.unshift({x:0,y:0,w:this.w,h:this.h,label:'关闭装备详情',action:()=>this.closeWorldPanel()});
+ }
+ function equipmentTarget(){
+  const p=this.panel,item=p.item,members=this.model.members().filter(u=>I.canEquip(u,item)),f=this.frame('选择装备者',Math.min(720,112+members.length*80)),left=f.x+18,w=f.w-36,top=f.y+64,bottom=f.y+f.h-18,c=this.ctx;
+  p.maxScroll=Math.max(0,members.length*80-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);const before=this.hits.length;c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
+  for(const [i,u]of members.entries()){
+   const y=top+i*80-p.scroll,targets=item.slot==='accessory'?['accessory1','accessory2']:[item.slot||'weapon'],bw=(w-8*(targets.length-1))/targets.length;this.text(u.name,left,y+8,16,'#dacbaa');
+   targets.forEach((slot,index)=>{const old=this.model.equipped(u.id,slot),same=p.equipmentOwnerId===u.id&&p.equipmentSlot===slot;this.button((targets.length>1?(index+1)+' · ':'')+(old?.name||'空位'),left+index*(bw+8),y+25,bw,34,()=>{
+    const ok=p.equipmentOwnerId?this.model.transferEquipment(p.equipmentOwnerId,p.equipmentSlot,u.id,slot):this.model.changeEquipment(u.id,slot,item.uid);if(ok){this.save();this.notify('已为'+u.name+'装备 '+item.name);this.panel=p.previous?.previous||null;}
+   },{disabled:same});});
+  }
+  c.restore();this.hits=this.hits.filter((hit,i)=>i<before||hit.y>=top&&hit.y+hit.h<=bottom);if(!members.length)this.text('队伍中暂无可使用这件装备的角色',left+w/2,top+34,14,'#a6b5ab','center');
  }
  function inventory(){
   if(this.panel.category==='trophies')return root.TrophyPanels.warehouse(this);
-  const p=this.panel,shop=p.type==='shop',selling=shop&&p.shopMode==='sell',prefs=preferences(this,p),source=shop&&!selling?(p.shopItems||=I.shopTemplates().map(id=>I.preview(id,'white','shop-'+id,this.model.character.level))):shop||p.slot?this.model.state.inventory:[...this.model.state.inventory,...root.StoryRules.itemRecords(this.model)],query={...prefs,slot:p.slot||prefs.slot,types:p.slot&&p.slot!=='weapon'?[]:prefs.types},queryKey=JSON.stringify(query);
-  if(p.itemSource!==source||p.itemLength!==source.length||p.queryKey!==queryKey){p.itemSource=source;p.itemLength=source.length;p.queryKey=queryKey;p.items=I.select(source,query).filter(item=>!p.slot||I.canEquip(this.model.members().find(u=>u.id===p.unitId),item));}
-  const items=p.items;if(p.selected&&!items.some(item=>item.uid===p.selected))p.selected=null;
-  const f=this.frame(p.slot?'选择'+slots.find(s=>s[0]===p.slot)[1]:shop?(selling?'出售':'购买'):'背包',600),left=f.x+16,w=f.w-32,c=this.ctx,top=f.y+(p.slot?106:shop?140:144),bottom=f.y+f.h-(selling?64:16),cols=Math.max(3,Math.floor(w/96)),cw=(w-8*(cols-1))/cols,rowH=120;
+  const p=this.panel,shop=p.type==='shop',selling=shop&&p.shopMode==='sell',prefs=preferences(this,p),source=shop&&!selling?(p.shopItems||=I.shopTemplates().map(id=>I.preview(id,'white','shop-'+id,this.model.character.level))):shop?this.model.state.inventory:p.slot?this.model.equipmentEntries():[...this.model.equipmentEntries(),...root.StoryRules.itemRecords(this.model)],query={...prefs,slot:p.slot||prefs.slot,types:p.slot&&p.slot!=='weapon'?[]:prefs.types},queryKey=JSON.stringify(query);
+  if(p.itemSource!==source||p.itemLength!==source.length||p.queryKey!==queryKey){p.itemSource=source;p.itemLength=source.length;p.queryKey=queryKey;p.items=I.select(source,query).sort((a,b)=>Number(!!b.ownerId)-Number(!!a.ownerId)).filter(item=>!p.slot||I.canEquip(this.model.members().find(u=>u.id===p.unitId),item)&&!(item.ownerId===p.unitId&&item.equipmentSlot===p.slot));}
+  const items=p.items;if(p.selected&&!items.some(item=>(item.entryKey||item.uid)===p.selected))p.selected=null;
+  const f=this.frame(p.slot?'选择'+slots.find(s=>s[0]===p.slot)[1]:shop?(selling?'出售':'购买'):'背包',600),left=f.x+16,w=f.w-32,c=this.ctx,top=f.y+(p.slot?106:shop?140:144),bottom=f.y+f.h-(selling?64:16),cols=Math.max(3,Math.floor(w/96)),cw=(w-8*(cols-1))/cols,rowH=shop?120:148;
   textButton(this,'筛选',f.x+f.w-154,f.y+9,48,30,()=>{this.panel={type:'inventoryFilter',inventory:p,previous:p,scroll:0};},!!(prefs.qualities.length||prefs.types.length||prefs.slot!=='all'));
   textButton(this,'排序',f.x+f.w-100,f.y+9,48,30,()=>{this.panel={type:'inventorySort',inventory:p,previous:p,scroll:0};});
   if(!shop)root.TrophyPanels.tabs(this,p,f);
@@ -10051,7 +10307,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   this.text(items.length+' 件',left+w,f.y+(p.slot?76:116),14,'#a9bdc4','right');
   p.maxScroll=Math.max(0,Math.ceil(items.length/cols)*rowH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);const before=this.hits.length,first=Math.floor(p.scroll/rowH)*cols,end=Math.min(items.length,Math.ceil((p.scroll+bottom-top)/rowH)*cols);
   c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
-  for(let i=first;i<end;i++){const item=items[i],x=left+(i%cols)*(cw+8),y=top+Math.floor(i/cols)*rowH-p.scroll;if(p.selected===item.uid)this.box(x,y,cw,108,'#c6b26a14','#e6d295',3);itemIcon(this,item,x+(cw-44)/2,y+8,44);this.text(item.name,x+cw/2,y+70,14,color(item),'center');this.text(I.typeLabel(item),x+cw/2,y+94,14,'#8fa49a','center');this.hits.push({x,y,w:cw,h:108,label:'选择 '+item.name,action:()=>{p.selected=item.uid;this.openItemDetail(item,{unitId:p.unitId,slot:p.slot,...(shop?{transaction:selling?'sell':'buy'}:{}),readonly:!!item.questItem,previous:p});}});}
+  for(let i=first;i<end;i++){const item=items[i],x=left+(i%cols)*(cw+8),y=top+Math.floor(i/cols)*rowH-p.scroll;if(p.selected===(item.entryKey||item.uid))this.box(x,y,cw,rowH-10,'#c6b26a14','#e6d295',3);itemIcon(this,item,x+(cw-44)/2,y+8,44);if(item.ownerId)ownerBadge(this,item.ownerId,x+(cw-44)/2,y+8,44);this.text(item.name,x+cw/2,y+70,14,color(item),'center');this.text(I.typeLabel(item),x+cw/2,y+94,14,'#8fa49a','center');if(!shop&&item.ownerName)this.text(item.ownerName,x+cw/2,y+121,12,'#9fbe97','center');this.hits.push({x,y,w:cw,h:rowH-10,label:'选择 '+item.name+(item.ownerName?' · '+item.ownerName:''),action:()=>{p.selected=item.entryKey||item.uid;this.openItemDetail(item,{unitId:p.unitId,slot:p.slot,equipmentOwnerId:item.ownerId,equipmentSlot:item.equipmentSlot,...(shop?{transaction:selling?'sell':'buy'}:{}),readonly:!!item.questItem,previous:p});}});}
   c.restore();this.hits=this.hits.filter((hit,i)=>i<before||hit.y>=top&&hit.y+hit.h<=bottom);
   if(p.maxScroll){const h=bottom-top,thumb=Math.max(22,h*h/(h+p.maxScroll)),y=top+(h-thumb)*p.scroll/p.maxScroll;this.box(left+w-3,y,3,thumb,'#78959e',null,1);}
   if(!items.length)this.text(source.length?'没有符合条件的装备':p.slot?'没有可更换的装备':selling?'没有可出售的装备':'背包是空的',f.x+f.w/2,(top+bottom)/2,14,'#8fa6af','center');
@@ -10110,7 +10366,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   const trophyId=q.id==='changshan'?'peace-jade':q.id==='reed-shrine'?'sacred-censer':q.id==='visit-courts'?'three-courts-seal':null;if(trophyId){let item=root.TrophyCatalog.create(trophyId,'quest-preview-'+trophyId);if(q.id==='visit-courts')while(item.level<8)item=root.TrophyCatalog.upgrade(item);items.push(item);}
   if(q.id==='chapter-one')for(const [name,iconId,description]of [['战斗经验','任务','击败守军后，按每场战斗获得经验。'],['铜钱','./assets/ui/copper-coins-v1.webp','击败守军后，按每场战斗获得铜钱。'],['随机装备','iron-armor','战斗中有概率掉落随机属性装备。'],['稀有遗物','trophy-scale','战斗中有较低概率掉落遗物。']])items.push({name,iconId,description,slot:'quest',questItem:true,quality:'white'});
   if(q.id.startsWith('report-'))money=view.model.pendingReports(q.id.slice(7)).length*root.FactionCourts.rewardPerHero;
-  return {money,items,recruits:q.id==='changshan'?[{id:'zhaoyun',name:'赵云'}]:hero?[{id:hero.id,name:hero.name}]:[]};
+  return {money,items,recruits:hero?[{id:hero.id,name:hero.name}]:[]};
  }
  function tasks(){
   const p=this.panel;this.model.readQuests();p.category||=this.model.state.questTab;p.statusFilter||='active';
@@ -10160,11 +10416,13 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   if(rewards.recruits.length){this.text('同行之缘',left,y,16,'#d8c18b');y+=24;for(const recruit of rewards.recruits){const art=root.CharacterAssets?.resolve(recruit.id)?.portrait;this.box(left,y,w,76,'#222825','#6b6951',3);if(art)this.portrait(art,left+10,y+10,54);this.text(recruit.name,left+78,y+27,18,'#dfcfaa');this.text('完成故事后，可商议同行',left+78,y+53,14,'#a6b3a4');this.hits.push({x:left,y,w,h:76,label:'观察 '+recruit.name,action:()=>{const unit=this.model.recruitPreview(recruit.id);if(unit){this.panel={type:'character',unitId:unit.id,unit,readonly:true,previous:p};this.invalidate();}}});y+=88;}}
   if(!rewards.money&&!rewards.items.length&&!rewards.recruits.length){this.text('后续',left,y,16,'#d8c18b');y=this.wrap(q.id==='coalition'?'三国人手齐备后，洛阳战线将开启。':'完成眼前的事，继续新的旅程。',left,y+29,w,{size:14,line:24,color:'#abb4a5'});}
   p.maxScroll=Math.max(0,y+(p.scroll||0)+12-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);c.restore();this.hits=this.hits.filter((hit,i)=>i<oldHits||hit.y>=top&&hit.y+hit.h<=bottom);
+  if(offer&&p.forced){this.button(p.acceptLabel||'同行',left,f.y+f.h-56,w,36,()=>{p.onAccept();this.invalidate();},{active:true});return;}
   if(offer){const bw=(w-10)/2;this.button('稍后再说',left,f.y+f.h-56,bw,36,()=>{this.panel=p.previous||null;this.invalidate();});this.button(q.repeatable?'接下委托':'答应相助',left+bw+10,f.y+f.h-56,bw,36,()=>{p.onAccept();this.invalidate();},{active:true});return;}
+  if(q.id==='visit-courts'&&!q.complete){const courts=Object.values(root.FactionCourts.definitions),bw=(w-16)/3;courts.forEach((d,i)=>{const visited=!!this.model.state.recruitAssignments[d.country];this.button(root.WorldData.placeMap[d.place].name+(visited?' · 已访':''),left+i*(bw+8),f.y+f.h-56,bw,36,()=>goQuest(this,{...q,target:d.place}),{active:!visited});});return;}
   const returnLabel=p.previous?.type==='tasks'?'返回手记':'返回场景';this.button(q.complete?returnLabel:place?'前往 '+place.name:returnLabel,left,f.y+f.h-56,w,36,()=>{if(q.complete||!place)this.panel=p.previous||null;else goQuest(this,q);this.invalidate();},{active:!q.complete&&!!place});
  }
- const handlers={character,characterDetails:details,tasks,taskFilter,trackerOrder,party,memberActions,formation,inventory,inventoryFilter,inventorySort,shop:inventory,reward,taskDetail,taskOffer:taskDetail,itemDetail,bulkSell};
- const api={displayAttribute,icon,iconButton,textButton,bar,itemIcon,questIcon,questColors,draw(v){if(root.TrophyPanels?.draw(v))return true;const p=v.panel,fn=handlers[p?.type];if(!fn)return false;if(['itemDetail','bulkSell'].includes(p.type)&&handlers[p.previous?.type]){v.panel=p.previous;try{handlers[p.previous.type].call(v);}finally{v.panel=p;}}fn.call(v);return true;}};root.WorldPanels=api;if(node)module.exports=api;
+ const handlers={equipmentTarget,character,characterDetails:details,tasks,taskFilter,trackerOrder,party,memberActions,formation,inventory,inventoryFilter,inventorySort,shop:inventory,reward,taskDetail,taskOffer:taskDetail,itemDetail,bulkSell};
+ const api={displayAttribute,icon,iconButton,textButton,ownerBadge,bar,itemIcon,questIcon,questColors,draw(v){if(root.TrophyPanels?.draw(v))return true;const p=v.panel,fn=handlers[p?.type];if(!fn)return false;if(['itemDetail','bulkSell'].includes(p.type)&&handlers[p.previous?.type]){v.panel=p.previous;try{handlers[p.previous.type].call(v);}finally{v.panel=p;}}fn.call(v);return true;}};root.WorldPanels=api;if(node)module.exports=api;
 })(globalThis);
 
 </script>
@@ -10244,8 +10502,18 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   if(!view.locatorSprite){const canvas=document.createElement('canvas');canvas.width=160;canvas.height=176;const c=canvas.getContext('2d');c.scale(2,2);c.translate(40,72);const glow=c.createRadialGradient(0,0,2,0,0,30);glow.addColorStop(0,'#ffe2a075');glow.addColorStop(1,'#ffe2a000');c.fillStyle=glow;c.fillRect(-32,-32,64,64);c.strokeStyle='#172b2b';c.lineWidth=5;c.beginPath();c.ellipse(0,0,24,9,0,0,Math.PI*2);c.stroke();c.strokeStyle='#f9d886';c.lineWidth=2;c.stroke();c.strokeStyle='#fff0b9';c.lineWidth=1;c.beginPath();c.ellipse(0,0,18,6,0,0,Math.PI*2);c.stroke();for(const angle of [0,Math.PI/2,Math.PI,Math.PI*1.5]){c.beginPath();c.moveTo(Math.cos(angle)*25,Math.sin(angle)*9);c.lineTo(Math.cos(angle)*30,Math.sin(angle)*12);c.stroke();}c.translate(0,-64);c.shadowColor='#fff0aa';c.shadowBlur=8;c.fillStyle='#ffe3a0';c.strokeStyle='#122b31';c.lineWidth=2;c.beginPath();c.moveTo(0,8);c.lineTo(-8,-3);c.lineTo(0,0);c.lineTo(8,-3);c.closePath();c.fill();c.stroke();view.locatorSprite=canvas;}
   const c=view.ctx;c.save();c.globalAlpha=.82+.15*Math.sin(now*.003);c.drawImage(view.locatorSprite,p.x-40,p.y-72,80,88);c.restore();
  }
+ function questPointer(view,entry,now){
+  if(!view.questPointerSprite){
+   const canvas=document.createElement('canvas');canvas.width=80;canvas.height=100;const c=canvas.getContext('2d');c.scale(2,2);c.translate(20,3);
+   c.shadowColor='#0b1717';c.shadowBlur=5;c.shadowOffsetY=2;const gold=c.createLinearGradient(0,0,0,38);gold.addColorStop(0,'#fff4c5');gold.addColorStop(.5,'#e9c475');gold.addColorStop(1,'#ae723c');c.fillStyle=gold;c.strokeStyle='#403322';c.lineWidth=2;
+   c.beginPath();c.moveTo(0,1);c.lineTo(5,7);c.lineTo(3,18);c.lineTo(13,14);c.lineTo(14,20);c.lineTo(0,38);c.lineTo(-14,20);c.lineTo(-13,14);c.lineTo(-3,18);c.lineTo(-5,7);c.closePath();c.fill();c.stroke();
+   c.shadowBlur=0;c.strokeStyle='#fff0bd';c.lineWidth=1;c.beginPath();c.moveTo(-10,20);c.lineTo(0,32);c.lineTo(10,20);c.moveTo(0,8);c.lineTo(0,25);c.stroke();view.questPointerSprite=canvas;
+  }
+  const x=entry.label.x+entry.label.w/2,y=entry.label.y-52+Math.sin(now*.003)*4;view.ctx.drawImage(view.questPointerSprite,x-20,y,40,50);
+  return{x:x-22,y:entry.label.y-58,w:44,h:58};
+ }
  const prepare=(data,image)=>terrain({image},data);
- const api={textureSource,buildingSource,terrain,prepare,settlement,ocean,locator};root.WorldMapArt=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+ const api={textureSource,buildingSource,terrain,prepare,settlement,ocean,locator,questPointer};root.WorldMapArt=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
 
 </script>
@@ -10287,7 +10555,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   class CanvasWorld{
     constructor(canvas,options){
       this.canvas=canvas;this.ctx=canvas.getContext('2d');this.options=options;this.character=options.character;this.model=options.model||new M.World(this.character,options.progress?.world);this.hits=[];this.busts=new Map();this.panel=this.model.state.pendingReward?{type:'reward',reward:copy(this.model.state.pendingReward),started:performance.now(),scroll:0}:!this.model.state.departurePractice&&!this.model.pending&&this.model.state.introStep===0?{type:'mapIntro'}:!this.model.state.departurePractice&&this.model.state.introStep===1?{type:'mapGuide'}:null;this.knownCompanions=new Set([...this.model.state.companions.map(u=>u.id),...Object.keys(this.model.state.residents)]);this.selected=null;this.zoom=this.model.state.mapZoom;this.camera={x:0,y:0};this.revision=0;this.drawnRevision=-1;this.disposed=false;this.raf=0;this.battle=null;
-      this.resize=this.resize.bind(this);this.down=this.down.bind(this);this.move=this.move.bind(this);this.up=this.up.bind(this);this.cancel=()=>{PartyInput.cancel(this);this.invalidate();};this.key=e=>{if(this.advanceWithKeyboard(e))return;if(e.key==='Escape'&&!this.battle){if(this.panel?.type==='journal'){this.closeWorldPanel();this.invalidate();return;}if(this.panel?.type==='event'){const leave=this.panel.decision.choices.find(c=>['leave','continue'].includes(c.action));if(leave)this.finishEvent(leave.id);return;}if(this.dialogue){if(this.dialogue.choices?.length>1)return;this.dialogueExit()?.();this.invalidate();return;}if(this.journey)return;if(this.panel?.type==='mapIntro'){this.advanceIntroduction();return;}if(this.panel?.type==='mapGuide'){this.finishIntroduction();return;}this.closeWorldPanel();this.dialogue=null;this.selected=null;this.invalidate();}};this.wheel=e=>{if(PartyInput.wheel(this,e))return;const p=this.scrollPanel();if(p&&['character','characterDetails','party','formation','npcObserve','npcSkill','passiveInfo','inventory','inventoryFilter','inventorySort','shop','reward','tasks','taskDetail','taskOffer','trackerOrder','journal','itemDetail','trophyDetail','trophyTarget','tactics','skillInfo','tavern'].includes(p.type)){e.preventDefault();p.scroll=clamp((p.scroll||0)+e.deltaY,0,p.maxScroll||0);this.invalidate();}};
+      this.resize=this.resize.bind(this);this.down=this.down.bind(this);this.move=this.move.bind(this);this.up=this.up.bind(this);this.cancel=()=>{PartyInput.cancel(this);this.invalidate();};this.key=e=>{if(this.advanceWithKeyboard(e))return;if(e.key==='Escape'&&!this.battle){if(this.panel?.type==='journal'){this.closeWorldPanel();this.invalidate();return;}if(this.panel?.type==='event'){const leave=this.panel.decision.choices.find(c=>['leave','continue'].includes(c.action));if(leave)this.finishEvent(leave.id);return;}if(this.dialogue){if(this.dialogue.choices?.length>1)return;this.dialogueExit()?.();this.invalidate();return;}if(this.journey)return;if(this.panel?.type==='mapIntro'){this.advanceIntroduction();return;}if(this.panel?.type==='mapGuide'){this.finishIntroduction();return;}this.closeWorldPanel();this.dialogue=null;this.selected=null;this.invalidate();}};this.wheel=e=>{if(PartyInput.wheel(this,e))return;const p=this.scrollPanel();if(p&&['character','characterDetails','party','formation','npcObserve','npcSkill','passiveInfo','inventory','inventoryFilter','inventorySort','shop','reward','tasks','taskDetail','taskOffer','trackerOrder','journal','itemDetail','trophyDetail','trophyTarget','equipmentTarget','tactics','skillInfo','tavern'].includes(p.type)){e.preventDefault();p.scroll=clamp((p.scroll||0)+e.deltaY,0,p.maxScroll||0);this.invalidate();}};
       root.GameAssetLoader?.track?.(this,{onReady:src=>{this.townBackdrop=null;this.mapLayer=null;if(src===root.WorldMapArt?.textureSource)root.WorldMapArt.prepare(D,root.GameAssetLoader.peek);}});
       for(const [event,fn]of [['pointerdown',this.down],['pointermove',this.move],['pointerup',this.up],['pointercancel',this.cancel],['keydown',this.key],['wheel',this.wheel]])canvas.addEventListener(event,fn,{passive:false});
       this.observer=new ResizeObserver(this.resize);this.observer.observe(canvas);canvas.dataset.storyStage='world';this.resize();if(options.standalone)return;this.save(this.model.pending?.checkpoint);if(this.model.pending)Promise.resolve().then(()=>{if(!this.disposed)this.startBattle();});else if(this.panel?.type==='reward')this.animate();else if(this.model.state.departurePractice&&!this.panel)Promise.resolve().then(()=>{if(!this.disposed)this.resumeDeparturePractice();});else if(this.model.state.inside&&this.model.state.nodeId==='changshan'&&['available','entry'].includes(this.model.state.quests.changshan.stage)&&!this.panel)Promise.resolve().then(()=>{if(!this.disposed)this.startChangshanArrival();});else if(this.model.state.inside&&this.model.state.nodeId==='changshan'&&this.model.state.quests.changshan.stage==='escort'&&!this.panel)Promise.resolve().then(()=>{if(!this.disposed)this.startEscortArrival();});else if(this.model.state.quests.changshan.healerDecision&&!this.panel)Promise.resolve().then(()=>{if(!this.disposed)this.offerZhenStay();});else if(this.model.state.inside&&this.model.state.nodeId==='changshan'&&this.model.state.quests.changshan.stage==='return'&&!this.panel)Promise.resolve().then(()=>{if(!this.disposed)this.nearbyDialogue(this.model.sceneNpcs().find(n=>n.id==='changshan-elder'));});else if(this.model.state.quests.changshan.stage==='decision'&&!this.panel)Promise.resolve().then(()=>{if(!this.disposed)this.questDialogue(D.questNpcs.zhaoyun);});else if(this.model.state.chapterOne.stage==='aftermath'&&!this.panel)Promise.resolve().then(()=>{if(!this.disposed)this.showChapterEnding();});else if(this.requiredHeroScene()&&!this.panel)Promise.resolve().then(()=>{if(!this.disposed)this.resumeForcedHeroScene();});else if((this.model.journey||this.model.state.routeTarget)&&!this.panel)Promise.resolve().then(()=>{if(!this.disposed)this.startNextLeg();});
@@ -10321,11 +10589,13 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       if(npc.questId){const data=root.NearbyContent.sideQuests.find(t=>t.id===npc.questId);this.speak(npc,{lines:[data.id==='grain-escort'?'粮车就在我们这里。你们想把粮带走，先看看能不能从我们手里抢回去，别站在这里说废话！':'这段路现在由我们守着，想过去就把东西留下。要是不肯交，那就别怪我们动手了！'],choices:[{label:data.dungeon?'继续探索':'剿匪',action:()=>{if(this.model.beginSideBattle(data.id))this.startBattle();}},{label:'离开',dismiss:true,action:()=>this.closeDialogue()}]});return true;}const N=root.NearbyContent,q=this.model.state.quests.changshan;
       if(npc.id==='changshan-elder'&&q.stage==='return'){this.speak(npc,{lines:['你们总算回来了！刚才村口又闹起来，我还怕伤着车上的人。先把粮车推进院里吧，我叫乡亲们来帮忙卸。','这一趟让你们费心了，今晚就在村里歇着吧。住处已经收拾好了，乡亲们也想请大家吃顿饭，当面说声谢谢。'],onComplete:()=>{this.model.advanceChangshan();this.save();this.questDialogue(D.questNpcs.zhaoyun);}});return true;}
       if(npc.id==='grain-steward'&&q.stage==='supplies'){
-        if(!q.healerRescued&&!q.healerJoined)this.speak(npc,{lines:['赵将军，你们来了，我正愁找不到人帮忙。贼不光占了粮仓，还把甄姑娘和几个伤者抓走了，说要让甄家拿粮来换人。','他们把人带到了毋极，赶车的跟过去打听了消息。你们先去找他，仓里的粮暂时搬不完，我留在这里看着，有变化就叫人通知你们。'],choices:[{label:'赶往毋极救人',action:()=>{q.stage='rescue';this.save();this.closeDialogue();}}]});
-        else this.speak(npc,{lines:[q.grainWins?'前院剩下的人都退到后仓去了，我看见他们在往门口堆东西。里面全是粮袋，你们进去时慢一点，别让灯火碰上了。':this.model.members().some(u=>u.id==='zhenji')?'甄姑娘也回来了，救出来的伤者都安顿好了吗？仓里还有人守着，前院人数少一点，可以先从这边进去，再想办法进后仓。':'听说甄姑娘和伤者都平安了，我也放心了。仓里还有人守着，前院人数少一点，可以先从这边进去，再想办法进后仓。'],choices:[{label:q.grainWins?'夺取后仓':'夺取前仓',action:()=>{if(this.model.beginStoryBattle('grain'))this.startBattle();}},{label:'稍后再来',action:()=>this.closeDialogue()}]});return true;
+        this.speak(npc,{lines:[q.grainWins?'前院的粮袋清点过了，封口还好。余下的贼退进了后仓，正往门口堆东西。里头都是干粮和草袋，你们小心些，千万别让他们点着火。':'赵将军，你们可来了！这些粮是乡亲们凑给常山的，贼却把仓门锁了，连送粮的人也不放进去。前仓守的人少些，你们若能把门夺回来，我就叫人备车。','袋口都缝着各家的记号，认起来不难。我们守在外头，接出来一袋就清点一袋，你们只管顾好自己，别为了粮食伤着。'],choices:[{label:q.grainWins?'夺取后仓':'夺取前仓',action:()=>{if(this.model.beginStoryBattle('grain'))this.startBattle();}},{label:'稍后再来',action:()=>this.closeDialogue()}]});return true;
       }
-      if(npc.id==='refugee-laborer'&&q.stage==='rescue'){this.speak(npc,{lines:['是中山的仓守叫你们来的吧？甄姑娘就在祠堂后院，跟几个伤者关在一起。我刚才还听见她在跟守卫争，要他们拿水进去。','车停在墙后，等你们把门口的人拦住，我就进去接伤者。先让他们上车，我们再一起走，免得一直留在院子里被人抓住。'],choices:[{label:'救出甄姑娘',action:()=>{if(this.model.beginStoryBattle('rescue'))this.startBattle();else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}},{label:'先整顿一下',action:()=>this.closeDialogue()}]});return true;}
+      if(npc.id==='refugee-laborer'&&q.stage==='rescue'){
+        this.model.advanceChangshan();this.showZhenRescue();return true;
+      }
       if(npc.id==='zhenji'){
+        if(q.healerDecision){this.offerZhenStay();return true;}
         if(!q.healerJoined&&(q.healerRescued||['return','decision','complete'].includes(q.stage)))this.speak(npc,{lines:['这边的伤者已经有人接着照顾，我也能放心出门了。你们还缺人手吗？我学过些医术，若能同行，路上也好照看大家。'],choices:[{label:'请同行',action:()=>{if(this.model.recruitZhenJi()){this.save();this.closeDialogue();}else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}},{label:'改日再会',action:()=>this.closeDialogue()}]});
         else this.speak(npc,{lines:['让我看看手上的伤，好些了吗？你们在外面赶路，伤口容易磨开，觉得疼就告诉我，别等布条全湿了才想起来换。'],choices:[{label:'请她疗伤',action:()=>{this.model.rest();this.save();this.speak(npc,{lines:['已经重新包好了，你轻轻动一下，看看还有没有特别疼的地方。晚上要是又发热或者肿起来，记得来找我。']});}},{label:'聊聊药箱',action:()=>this.speak(npc,{lines:['这药箱是从家里带出来的，扣子坏过两回，我又找人修好了。里面的针和医书都用了很多年，哪样放在哪层，我已经很熟悉，换个新的反倒不习惯。']})},{label:'告辞',action:()=>this.closeDialogue()}]});return true;
       }
@@ -10391,7 +10661,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     }
     partyTop(){return Math.min(this.h-12,...this.occupiedPartyRects().map(r=>r.y));}
     resize(){if(this.disposed||this.battle)return;Object.assign(this,Viewport.resize(this.canvas,this.ctx));this.mapRect={x:0,y:0,w:this.w,h:this.h};this.zoom=Math.max(this.minimumZoom(),this.zoom);this.model.state.mapZoom=this.zoom;if(this.zoomAnimation)this.zoomAnimation.to=Math.max(this.minimumZoom(),this.zoomAnimation.to);if(!this.journey)this.focusLocation();this.invalidate();}
-    panelAnimating(){if(this.trackerDragPanel?.drag)return true;if(this.panel?.type==='tasks'&&this.model.quests().some(q=>q.category===(this.panel.category||'story')&&['available','ready'].includes(q.taskStatus)))return true;if(this.model.state.inside&&!this.panel&&!this.dialogue&&this.townQuestAnimating)return true;if(!this.panel&&!this.dialogue&&!this.battle&&this.model.state.questNotice?.unread)return true;if(['party','trackerOrder','tasks'].includes(this.panel?.type)&&this.panel.drag)return true;if(this.zoomAnimation)return true;if(this.panel?.type==='character'){const u=this.panel.unit||this.model.members().find(u=>u.id===this.panel.unitId);return !!u&&!u.dead&&(u.startSoldiers??u.soldiers??u.maxSoldiers)>0;}return this.panel?.type==='reward'&&performance.now()-this.panel.started<(this.panel.animationDuration??1700);}
+    panelAnimating(){if(!this.model.state.inside&&!this.panel&&!this.dialogue&&this.questPointersVisible)return true;if(this.trackerDragPanel?.drag)return true;if(this.panel?.type==='tasks'&&this.model.quests().some(q=>q.category===(this.panel.category||'story')&&['available','ready'].includes(q.taskStatus)))return true;if(this.model.state.inside&&!this.panel&&!this.dialogue&&this.townQuestAnimating)return true;if(!this.panel&&!this.dialogue&&!this.battle&&this.model.state.questNotice?.unread)return true;if(['party','trackerOrder','tasks'].includes(this.panel?.type)&&this.panel.drag)return true;if(this.zoomAnimation)return true;if(this.panel?.type==='character'){const u=this.panel.unit||this.model.members().find(u=>u.id===this.panel.unitId);return !!u&&!u.dead&&(u.startSoldiers??u.soldiers??u.maxSoldiers)>0;}return this.panel?.type==='reward'&&performance.now()-this.panel.started<(this.panel.animationDuration??1700);}
     idleVisible(){return this.model.state.showParty!==false&&!this.dialogue&&(!this.panel||['event','slidingPuzzle'].includes(this.panel.type))&&!this.battle&&!this.disposed&&this.viewMembers().some(u=>this.model.state.activeIds.includes(u.id)&&u.startSoldiers>0);}
     invalidate({visualOnly=false}={}){if(this.disposed)return;if(!visualOnly)this.revision++;if(this.raf)return;this.raf=requestAnimationFrame(()=>{this.raf=0;if(!this.battle){this.tickZoom(performance.now());this.tickJourney();this.draw();if((this.journey&&!this.journey.paused)||this.idleVisible()||this.panelAnimating())this.animate();}});}
     animate(){
@@ -10457,7 +10727,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       }
       this.mapEntries=entries;c.save();c.beginPath();c.rect(r.x,r.y,r.w,r.h);c.clip();
       for(const {node,p,icon,label}of entries){for(const [box,center]of [[icon,p],[label,{x:label.x+label.w/2,y:label.y+label.h/2}]]){const x=Math.max(r.x,box.x),y=Math.max(r.y,box.y),w=Math.min(r.x+r.w,box.x+box.w)-x,h=Math.min(r.y+r.h,box.y+box.h)-y;if(w>0&&h>0)this.hits.push({x,y,w,h,center,placeId:node.id,action:()=>this.selectPlace(node.id)});}}
-      this.drawTraveler();c.restore();if(this.dialogue)return;const shade=c.createLinearGradient(0,0,0,76);shade.addColorStop(0,'#07192390');shade.addColorStop(1,'#07192300');c.fillStyle=shade;c.fillRect(0,0,this.w,76);
+      this.drawTraveler();this.drawQuestPointers(entries,marks);c.restore();if(this.dialogue)return;const shade=c.createLinearGradient(0,0,0,76);shade.addColorStop(0,'#07192390');shade.addColorStop(1,'#07192300');c.fillStyle=shade;c.fillRect(0,0,this.w,76);
       this.button('+',this.w-52,118,34,34,()=>this.changeZoom(D.mapRules.zoomStep));this.button('−',this.w-52,160,34,34,()=>this.changeZoom(1/D.mapRules.zoomStep));Panels.iconButton(this,'定位',this.w-52,204,34,()=>this.focusLocation());this.drawQuestArrows();if(this.panel?.type!=='mapIntro')this.drawDestination();
     }
     drawMapRegion(r,marks){
@@ -10479,6 +10749,10 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       c.restore();return entries;
     }
     drawPlaceIcon(node,p,options){root.WorldMapArt.settlement(this,node,p,options);}
+    drawQuestPointers(entries,marks,now=performance.now()){
+      this.questPointersVisible=false;if(this.dialogue)return;const targets=new Set(marks.filter(mark=>mark.accepted||mark.questId==='changshan').map(mark=>mark.place));
+      for(const entry of entries){if(!targets.has(entry.node.id)||entry.label.y<74||entry.label.y-58>this.h)continue;const box=root.WorldMapArt.questPointer(this,entry,now);this.questPointersVisible=true;this.hits.push({...box,placeId:entry.node.id,label:'任务目标 '+entry.node.name,action:()=>this.selectPlace(entry.node.id)});}
+    }
     terrainViewport(r=this.mapRect){const a=this.mapAnchor(),scale=D.geography.rasterScale;return [(this.camera.x+(r.x-a.x)/this.zoom)*scale,(this.camera.y+(r.y-a.y)/this.zoom)*scale,r.w/this.zoom*scale,r.h/this.zoom*scale,r.x,r.y,r.w,r.h];}
 
     artSprite(art,width,height){
@@ -10542,14 +10816,16 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       const q=this.model.state.quests.changshan,stage=q.stage;
       if(npc.id==='zhaoyun'&&['available','entry'].includes(stage)){this.startChangshanArrival();return;}
       if(npc.id==='zhaoyun'&&q.zhaoInvitation){this.offerZhaoJourney();return;}
-      if(npc.id==='zhaoyun'&&stage==='decision'){this.speak(npc,{lines:['粮食分下去了，伤者也都安顿好了，乡亲们终于能安心歇几天。这次要不是你帮忙，救人和运粮赶在一起，我一个人确实照顾不过来。','我一直想去成都看看，听说玄德公在那里安置了不少流民。现在村里的事安排好了，如果你还缺人，我可以先陪你走一段，等到了那边再一起去见他。'],choices:[{label:'留下同行（推荐）',action:()=>this.finishZhaoQuest(true)},{label:'先去成都',action:()=>this.finishZhaoQuest(false)}]});return;}
-      if(npc.id==='zhaoyun'){this.speak(npc,{lines:[{supplies:'中山有座粮仓，之前答应送粮到常山，后来却一直没有消息。我想过去问问，你愿不愿意一起？路上多个人，也能互相照应。',rescue:'仓守说，赶车的人已经跟到毋极去了，知道甄姑娘被关在哪里。我们先去找他，把人救出来，粮仓那边再回来处理。',escort:'粮都装好了，伤者也坐上了车。你在前面带路，我在后面照看，要是有人喊停，就等一等，别让车夫为了赶路把伤者颠坏了。',return:'乡亲们出来迎接了，我们先把粮车推进院子。里正知道哪几户急着用粮，让他安排分发，别全堵在村口。',complete:'这几天已经有人在修农具，商量着什么时候回田里看看了。能重新种地，大家就不用总靠别人送粮，我也能放心一些。'}[stage]||'稍等我一会儿，我去问问乡亲们还缺什么，确认都安排好就回来。']});return;}
+      if(npc.id==='zhaoyun'&&stage==='decision'){
+        this.playConversation([{npc,lines:['粮食分下去了，伤者也都安顿好，乡亲们终于能安心歇几天。这次救人与运粮赶在一起，多亏你肯帮忙。','我只想找一位真肯为天下万民着想的人。诸侯的名号听得多了，可谁肯管这些挨饿的乡亲，我还没亲眼见过。']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['可以去成都找刘备。我听说他收留了不少流民，你不妨亲自见见他。我也想请你先与我们同行，路上再遇到这样的事，有你在，我心里踏实些。']}],()=>this.speak(npc,{lines:['刘备……我也听过他救济流民的事。既然你这样说，我就去见一见。眼下乡亲们已安顿妥当，你若还缺人手，我愿先与你同行。'],choices:[{label:'与子龙同行',action:()=>this.finishZhaoQuest(true)}]}));return;
+      }
+      if(npc.id==='zhaoyun'){this.speak(npc,{lines:[{supplies:'中山有座粮仓，之前答应送粮到常山，后来却一直没有消息。我想过去问问，你愿不愿意一起？路上多个人，也能互相照应。',rescue:'粮食已经夺回，后院却还有人被锁在屋里。车夫听见了呼救，正在那边等我们；先把门打开，看看里面的人有没有受伤。',escort:'粮都装好了，伤者也坐上了车。你在前面带路，我在后面照看，要是有人喊停，就等一等，别让车夫为了赶路把伤者颠坏了。',return:'乡亲们出来迎接了，我们先把粮车推进院子。里正知道哪几户急着用粮，让他安排分发，别全堵在村口。',complete:'这几天已经有人在修农具，商量着什么时候回田里看看了。能重新种地，大家就不用总靠别人送粮，我也能放心一些。'}[stage]||'稍等我一会儿，我去问问乡亲们还缺什么，确认都安排好就回来。']});return;}
       this.nearbyDialogue(npc);
     }
     startChangshanArrival(){
       const q=this.model.state.quests.changshan;if(this.disposed||this.battle||this.dialogue||this.model.pending||this.model.journey||this.model.state.nodeId!=='changshan'||!['available','entry'].includes(q.stage))return false;
       const fight=()=>{if(!this.disposed&&this.model.beginStoryBattle('entry'))this.startBattle();};if(q.arrivalSeen){fight();return true;}
-      const turns=root.NearbyContent.storyConversations.changshanEntry,speakers={villager:{id:'entry-villager',name:'村民',art:'villager',side:'left'},hero:{id:'hero',name:this.character.name,art:'hero',side:'right'},thief:{id:'entry-thief',name:'盗贼',art:'thief',side:'left'},zhaoyun:{...D.questNpcs.zhaoyun,name:'青年枪客'}};
+      const turns=root.NearbyContent.storyConversations.changshanEntry,speakers={villager:{id:'entry-villager',name:'村民',art:'villager',side:'left'},hero:{id:'hero',name:this.character.name,art:'hero',side:'right'},thief:{id:'entry-thief',name:'盗贼',art:'thief',side:'left'},zhaoyun:{...D.questNpcs.zhaoyun,name:'赵云'}};
       const show=()=>{if(this.disposed)return;const line=turns[q.arrivalIndex];this.speak(speakers[line.speaker],{lines:[line.text],forced:true,onComplete:()=>{if(this.disposed)return;if(q.arrivalIndex+1<turns.length){q.arrivalIndex++;show();}else{q.arrivalSeen=true;q.arrivalIndex=0;this.save();fight();}}});this.save();this.invalidate();};show();return true;
     }
     startEscortArrival(){
@@ -10573,11 +10849,12 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       const show=index=>{if(this.disposed||this.model.state.heroQuests[id].stage!==stage)return;const turn=turns[index],actor=turn.speaker==='hero'?{id:'hero',name:this.character.name,art:'hero',side:'right',sceneId:npc.sceneId}:turn.speaker==='npc'?npc:{...(root.RecruitmentContent.actors[turn.speaker]||npc),sceneId:npc.sceneId},last=index===turns.length-1;this.speak(actor,{lines:[turn.text],forced,choices:last?choices:undefined,onComplete:last?undefined:()=>show(index+1)});this.invalidate();};show(0);
     }
     openQuestOffer(questId,options={}){this.dialogue=null;this.panel={type:'taskOffer',questId,scroll:0,previous:null,...options};this.invalidate();}
-    offerZhaoJourney(){this.openQuestOffer('changshan',{offerObjective:'前往中山打听粮车下落，帮助常山取回乡粮。',offerDescription:'村里的粮快吃完了，中山答应送来的也一直没到。我想过去问问，可这边还需要人照看，正好你来了，我也想问问你愿不愿意帮忙。\n你能不能陪我去一趟中山？先把粮车的情况问清楚，办完这件事，乡亲们才能有饭吃，我也能放心考虑以后的安排。',onAccept:()=>{if(this.model.startChangshan()){this.save();this.speak(D.questNpcs.zhaoyun,{lines:['那我们一起去中山。先找那里的仓守，他认得送粮的人，应该知道粮车为什么一直没有出发。']});}else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}});}
+    offerZhaoJourney(){this.openQuestOffer('changshan',{forced:true,acceptLabel:'与子龙同行',offerObjective:'前往中山打听粮车下落，帮助常山取回乡粮。',offerDescription:'村里的粮快吃完了，中山答应送来的也一直没到。我想过去问问，可这边还需要人照看，正好你来了，我也想问问你愿不愿意帮忙。\n你能不能陪我去一趟中山？先把粮车的情况问清楚，办完这件事，乡亲们才能有饭吃，我也能放心考虑以后的安排。',onAccept:()=>{if(this.model.startChangshan()){this.save();this.speak(D.questNpcs.zhaoyun,{lines:['那我们一起去中山。先找那里的仓守，他认得送粮的人，应该知道粮车为什么一直没有出发。']});}else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}});}
 
-    offerZhenStay(){this.speak(D.questNpcs.zhenji,{lines:['药箱和粮食都找回来了，这一趟我也总算帮上了忙。看着那些伤者都坐上车，我才觉得能安心离开这里。','之前救出来的人已经有人照顾，我想继续跟你们同行，不知道你们方不方便？暂时人手够了，我就先回毋极，有需要再来找我。'],choices:[{label:'留下同行（推荐）',action:()=>{if(this.model.finishZhenStay(true)){this.save();this.speak(D.questNpcs.zhenji,{lines:['那我就跟大家一起走。药箱我会带着，路上谁觉得不舒服，早点告诉我，也好在严重之前处理。']});}}},{label:'先回毋极',action:()=>{if(this.model.finishZhenStay(false)){this.save();this.speak(D.questNpcs.zhenji,{lines:['好，我先回毋极照顾那边的伤者。你们以后要找我，问问甄家的侍女就知道我在哪里，她会带你们过来。']});}}}]});}
+    offerZhenStay(){const npc=D.questNpcs.zhenji;this.playConversation([{npc,lines:['伤者已交给城里的郎中照看，我也没什么放不下的了。只是兵荒马乱的，我还没想好该往哪里走。']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['不如和我们一起走吧。我们要把粮送回常山，路上也能彼此照应。等这趟忙完，再托人给你家里捎封信，免得他们担心。']}],()=>this.speak(npc,{lines:['好，那就一起走吧。药箱我来背，你们谁觉得伤口疼，别忍着不说。'],forced:true,choices:[{label:'与甄姬同行',action:()=>{if(this.model.finishZhenStay(true)){this.save();this.closeDialogue();}else{this.notify(this.model.lastRecruitError||'请先为甄姬腾出一处同行位置。');this.panel={type:'party',previous:null};}}}]}));}
+    showZhenRescue(){this.model.rest();this.save();this.playConversation([{npc:D.questNpcs.zhaoyun,lines:['两处粮仓都夺回来了，粮袋上的封口也还在。我去叫仓守装车……等等，后院怎么有人敲门？']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['锁在外头，钥匙就挂在墙上。我来开门，里面的人往后退些！']},{npc:D.questNpcs.zhenji,lines:['先扶这位老人出来，他的腿还不能落地。药箱在墙边，劳烦替我拿一下……好了，人都在这里。','多谢相救。我姓甄，原先在中山给乡亲们看伤，那伙人听说甄家有粮，就把我和伤者扣在后仓，逼我写信回家。刚才听见外面的贼退了，我们才敢敲门。']}],()=>{if(this.model.state.quests.changshan.healerDecision)this.offerZhenStay();});}
 
-    finishZhaoQuest(stay){if(!this.model.finishChangshan(stay))return;this.save();this.speak(D.questNpcs.zhaoyun,{lines:[stay?'我愿意继续跟你走。村里的事情已经安顿好，我们先把你手里的事办完，以后有机会再一起去成都。':'我先去成都看看那边的情况。你以后经过成都，记得来找我，需要一起出门帮忙的话，也不用再客气。','你说想找些愿意出来做事的人，我倒听过一点消息。前些天有北海来的乡亲，说太史慈正在那里照顾生病的母亲，城里的药铺又被人抢了，一直在想办法找药。你若往东走，不妨到北海找他问问，有没有能帮忙的地方。','不过北海离这儿可不近，沿路什么情形，我也没摸清。常山的樵夫正为山道上的贼发愁，巨鹿那边也有人在找失了消息的粮车。不妨先去帮帮他们，添些盘缠，把兵器使顺手了，再走这趟远路。'],onComplete:()=>{if(this.model.state.pendingReward)this.showReward(this.model.state.pendingReward);}});}
+    finishZhaoQuest(stay){if(!this.model.finishChangshan(stay))return;this.save();this.speak(D.questNpcs.zhaoyun,{lines:[stay?'我愿意继续跟你走。村里的事情已经安顿好，我们先把你手里的事办完，以后有机会再一起去成都。':'那我依你所言，先去成都拜访刘备。你以后经过成都，记得来找我，需要一起出门帮忙的话，也不用再客气。','对了，北海似乎也有一位义士，名叫太史慈。我听过他替人解围的事，是个有胆识的人。最近听说他母亲病了，正在四处寻药。你若要找愿意相助的人，不妨去北海看看，也许正能帮上他的忙。','不过北海离这儿可不近，沿路什么情形，我也没摸清。常山的樵夫正为山道上的贼发愁，巨鹿那边也有人在找失了消息的粮车。不妨先去帮帮他们，添些盘缠，把兵器使顺手了，再走这趟远路。'],onComplete:()=>{if(this.model.state.pendingReward)this.showReward(this.model.state.pendingReward);}});}
     scrollPanel(){return ['tacticsEditor','practiceWeapons'].includes(this.panel?.type)?this.panel.editor.panel:this.panel;}
     resumeDeparturePractice(){
       if(this.model.state.departurePractice==='training'){this.showDepartureTrainer();return;}
@@ -10687,7 +10964,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       const d=this.dialogue,w=this.w,h=this.h,c=this.ctx,last=d.index===d.lines.length-1,choices=last&&d.choices?d.choices:[{label:'继续',action:()=>this.advanceDialogue()}],columns=choices.length>3?2:1,rows=Math.ceil(choices.length/columns),buttonH=choices.length>3?36:40,gap=7;
       const textLeft=26,textWidth=w-textLeft*2;c.font=`16px ${UI.font}`;const textRows=UI.wrapLines(c,d.lines[d.index],textWidth),panelH=Math.min(h-114,90+textRows.length*25+rows*(buttonH+gap)+22),top=h-panelH,side=d.npc.side||'left';
       if(d.npc.art)root.PengpaiStory.CanvasStory.prototype.bust.call(this,d.npc.art,side,top,true);
-      const fade=c.createLinearGradient(0,top-24,0,h);fade.addColorStop(0,'#081b2600');fade.addColorStop(.2,'#081b26ed');fade.addColorStop(1,'#081b26ff');c.fillStyle=fade;c.fillRect(0,top-24,w,panelH+24);c.strokeStyle='#bcab8644';c.beginPath();c.moveTo(24,top+45);c.lineTo(w-24,top+45);c.stroke();this.text(d.npc.name,side==='right'?w-26:26,top+24,16,'#ead1a2',side==='right'?'right':'left');
+      const fade=c.createLinearGradient(0,top-24,0,h);fade.addColorStop(0,'#081b2600');fade.addColorStop(.2,'#081b26ed');fade.addColorStop(1,'#081b26ff');c.fillStyle=fade;c.fillRect(0,top-24,w,panelH+24);c.strokeStyle='#bcab8644';c.beginPath();c.moveTo(24,top+45);c.lineTo(w-24,top+45);c.stroke();this.text(d.npc.id==='hero'?d.npc.name:UI.dialogueName(d.npc.name),side==='right'?w-26:26,top+24,16,'#ead1a2',side==='right'?'right':'left');
       textRows.forEach((text,i)=>this.text(text,textLeft,top+71+i*25,16,'#e4e7de'));this.hits=[];
       const y=h-20-rows*(buttonH+gap),bw=(textWidth-gap*(columns-1))/columns;choices.forEach((choice,i)=>{const full=columns===2&&i===choices.length-1&&choices.length%2===1;this.button(choice.label,textLeft+(i%columns)*(bw+gap),y+Math.floor(i/columns)*(buttonH+gap),full?textWidth:bw,buttonH,choice.action);});UI.singleChoiceHit(this.hits,w,h,choices);
     }
@@ -10801,19 +11078,16 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       if(!context)return;
       if(context.kind==='chapter'){if(victory&&this.model.state.chapterOne.stage==='aftermath')this.showChapterEnding();else if(victory)this.chapterDialogue(root.ChapterOne.npc(this.model));else this.speak({id:'luoyang-scout',name:'联军斥候',art:'imperial-soldier',side:'left'},{lines:['先退到这边来，伤者我会叫人去接！你们先把伤处理好，再商量该怎么打，前面那些守军不是只靠硬冲就能过去的。']});return;}
       if(context.kind==='heroQuest'){const d=root.HeroQuests.definitions[context.questId],fight=d.battles[context.phase];if(victory){const npc=root.HeroQuests.npc(context.questId,this.model.state.heroQuests[context.questId]);if(npc&&root.HeroQuests.place(context.questId,this.model.state.heroQuests[context.questId])===this.model.state.nodeId)this.heroQuestDialogue({...npc,selectedQuest:true});}else if(fight.duel||fight.friendly){const id=fight.duel||context.questId;this.speak({id,name:root.RecruitmentContent.actors[id]?.name||d.name,art:id,side:'left'},{lines:fight.failureLines||['先停一下，别带着伤硬撑。今天没赢，改天再试就是了，我会在这里等。你回去想想刚才哪里没应付好，准备妥当再来。']});}else this.speak({id:'hero',name:this.character.name,art:'hero',side:'right'},{lines:['先退出来把伤养好。这次不能照原来的办法再冲了，等大家缓过来，把对面的招式和我们手里的兵器重新合计一下。']});return;}
-      if(context.kind==='training'){const followup=()=>{if(this.model.state.departurePractice==='training'){this.showDepartureTrainer();return;}if(victory&&context.trainingId==='three-brothers'&&!this.model.state.companions.some(u=>u.id==='zhangliang'))this.speak(D.townNpcs.camp.find(n=>n.id==='zhangliang'),{lines:['好家伙，你们连我们三个都打赢了！我在营里也待得闷，你们以后出门能不能叫上我？比起天天在教场练，我更想出去看看。'],choices:[{label:'请同行',action:()=>this.inviteZhangLiang()},{label:'改日再请',action:()=>this.closeDialogue()}]});};if(context.trainingId==='straw-dummy'){this.speak(D.townNpcs.camp.find(n=>n.id==='zhangliang'),{lines:['这几下总算顺手些了吧？稻草人不会躲，也不会还手。要是还想试试怎么应付别人的招式，就叫个人来陪你练。'],onComplete:followup});return;}this.speak(D.townNpcs.camp.find(n=>n.id==='zhangbao'),{lines:['过来坐，我替你们看看伤。刚才那几下打得不轻，已经重新包扎好了，再歇一会儿。想接着练也不用急，我三弟下手总不知道轻重。'],onComplete:followup});return;}
+      if(context.kind==='training'){const followup=()=>{if(this.model.state.departurePractice==='training'){this.showDepartureTrainer();return;}if(victory&&context.trainingId==='three-brothers'&&!this.model.state.companions.some(u=>u.id==='zhangliang'))this.playConversation([{npc:D.townNpcs.camp.find(n=>n.id==='zhangliang'),lines:['好家伙，你们连我们三个都打赢了！营里教场的事有人接手，我这身力气若只用来陪练，也总觉得还差点什么。可出了营该先做什么，我还真没想好。']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['不妨先跟我们走一程。运粮、护送，都需要有人肯顶在前面；你在营里见过乡亲的苦，知道该护住谁。黄巾营地仍留作接应，有事我们就回来。']}],()=>this.speak(D.townNpcs.camp.find(n=>n.id==='zhangliang'),{lines:['你把要做的事说清楚，俺就放心了。那就听你的，看你们什么时候方便动身。'],choices:[{label:'请同行',action:()=>this.inviteZhangLiang()},{label:'改日再请',action:()=>this.closeDialogue()}]}));};if(context.trainingId==='straw-dummy'){this.speak(D.townNpcs.camp.find(n=>n.id==='zhangliang'),{lines:['这几下总算顺手些了吧？稻草人不会躲，也不会还手。要是还想试试怎么应付别人的招式，就叫个人来陪你练。'],onComplete:followup});return;}this.speak(D.townNpcs.camp.find(n=>n.id==='zhangbao'),{lines:['过来坐，我替你们看看伤。刚才那几下打得不轻，已经重新包扎好了，再歇一会儿。想接着练也不用急，我三弟下手总不知道轻重。'],onComplete:followup});return;}
       if(context.kind==='story'){
         if(!victory){this.speak(D.questNpcs.zhaoyun,{lines:['先别追了，都退回来！大家身上都有伤，再打下去只会越来越难照顾。等包扎好，我们再想想该从哪边过去。']});return;}
         if(context.phase==='entry'){
           this.playConversation([{npc:D.questNpcs.zhaoyun,lines:['刚才有没有伤着？让我看看。一直顾着把他们赶走，还没问你的名字。我叫赵云，字子龙。最近在村里帮着照顾那些逃难来的乡亲。']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['你就是赵子龙？我叫'+this.character.name+'，从黄巾营地来的，本来就是想来找你。刚进村就听见这边吵起来，正想打听怎么回事，他们就拦着不让走了。']},{npc:D.questNpcs.zhaoyun,lines:['原来你是来找我的，那正好留下坐坐。先到乡医那里，让他把伤检查一下，等大家都安顿好，我们再慢慢聊。']}],()=>{this.model.rest();this.save();if(this.model.state.quests.changshan.zhaoInvitation)this.offerZhaoJourney();});return;
         }
-        if(context.phase==='rescue'&&!this.model.members().some(u=>u.id==='zhenji')){
-          this.speak(D.questNpcs.zhenji,{lines:['谢谢你们把我们救出来。我姓甄，原本在中山给伤者看病，那伙人听说我家里有粮，就把我扣下，逼我写信回家，让家里送粮来换人。','我先留在毋极照顾这些伤者。你们还得去夺粮，别在这里耽搁了；等安排好同行的人，再来找我，我也想帮你们一把。'],forced:true,onComplete:()=>this.notify('队伍已满（'+this.model.rosterLimit()+'/'+this.model.rosterLimit()+'），甄姬暂留毋极，可空位后邀请。')});return;
-        }
-        if(context.phase==='grain'&&this.model.state.quests.changshan.healerJoined){this.model.rest();this.save();}
-        if(context.phase==='grain'&&this.model.state.quests.changshan.healerDecision){this.offerZhenStay();return;}
+        if(context.phase==='rescue'||context.phase==='grain'&&this.model.state.quests.changshan.grainWins>=2&&this.model.state.quests.changshan.healerDecision){this.showZhenRescue();return;}
+        if(context.phase==='grain'){this.model.rest();this.save();}
         const followup=root.NearbyContent.storyBattles[context.phase]?.followup;if(followup&&this.model.canBeginStoryBattle(followup.phase)){this.speak(D.questNpcs[followup.speaker],{lines:followup.lines,onComplete:()=>{if(this.model.beginStoryBattle(followup.phase)){this.save(this.model.pending.checkpoint);this.startBattle({continuous:true});}}});return;}
-        const lines={grain:this.model.state.quests.changshan.grainWins<2?['前院的粮袋都还在，我已经请仓守来清点。其他贼跑进了后仓，我们先在这里缓口气，别让他们趁着这会儿又把粮搬出去。']:['前后都清点过了，只少了几袋，剩下的够乡亲们吃一阵。我去帮着装车，你也歇一会儿，等装好就一起回常山。'],rescue:['谢谢你们把我们救出来。我姓甄，原本在中山给伤者看病，那伙人听说我家里有粮，就把我扣下，逼我写信回家，让家里送粮来换人。','还有几个伤者需要继续换药，可我的药箱留在中山粮仓了。听说你们也要回去夺粮，能不能带我一起？取回药以后，我也能在路上照顾大家。'],escort:['他们退了，粮车也没事。把车停在院门口吧，乡亲们已经过来帮忙了。里正在那边，我叫他一声。']}[context.phase];this.speak(context.phase==='rescue'?D.questNpcs.zhenji:D.questNpcs.zhaoyun,{lines:lines||['我去看看乡亲们和伤者怎么样了。你也先坐下来歇歇，等大家都到齐，我们再商量下一步的安排。'],forced:true,onComplete:context.phase==='escort'?()=>this.nearbyDialogue(this.model.sceneNpcs().find(n=>n.id==='changshan-elder')):undefined});return;
+        const lines={grain:this.model.state.quests.changshan.grainWins<2?['前院的粮袋都还在，我已经请仓守来清点。其他贼跑进了后仓，我们直接过去，别让他们把仓门堵上。']:['前后都清点过了，只少了几袋，剩下的够乡亲们吃一阵。我去帮着装车，你也歇一会儿，等装好就一起回常山。'],escort:['他们退了，粮车也没事。把车停在院门口吧，乡亲们已经过来帮忙了。里正在那边，我叫他一声。']}[context.phase];this.speak(context.phase==='rescue'?D.questNpcs.zhenji:D.questNpcs.zhaoyun,{lines:lines||['我去看看乡亲们和伤者怎么样了。你也先坐下来歇歇，等大家都到齐，我们再商量下一步的安排。'],forced:true,onComplete:context.phase==='escort'?()=>this.nearbyDialogue(this.model.sceneNpcs().find(n=>n.id==='changshan-elder')):undefined});return;
       }
       if(!victory)this.panel={type:'notice',title:'战败',text:'已读取战前存档，准备好后可以再次挑战。'};else if(this.journey||this.model.journey||this.model.state.routeTarget)this.resumeJourney();
     }
@@ -10977,6 +11251,20 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       line('nanhua','先从近的地方试试吧，赵子龙就在常山照顾逃难的百姓。常山离营地不远，你能先在那里熟悉一下情况，不用马上跑遍天下。','nanhua'),
       line('hero','人是能找到，可我跟他们非亲非故的，凭什么劝他们走？','nanhua'),
       line('yuji','先去见一面，问问他们遇到了什么困难。能帮的事情就帮一帮，熟悉以后再谈以后的打算，愿意跟着走的人，也可以先和你同行。','yuji'),
+      line('hero','可他们凭什么信我？我到了城门口，说是三位神仙让我来的，只怕连门都进不去。','nanhua'),
+      line('zuoci','这倒不难。你先别走，我把能作主的人请来。','zuoci'),
+      line('narrator','左慈抬袖一拂，雾中又亮起三道人影。有人手中还握着笔，有人披着外衣，显然也是从睡梦中被唤来的。',null),
+      line('simayi','这是何处？……孔明，公瑾？你们怎么也在这里？','simayi'),
+      line('zhouyu','我方才还在府中。三位前辈，这是用了什么法术？','zhouyu'),
+      line('nanhua','不必惊慌。请三位宰相入梦，是有一件事相托。这位叫{name}，从后世而来，知道一些你们尚未经历的事。','nanhua'),
+      line('zhugeliang','后世之人？这……莫非连我等今日所为，也早已记在书中？','zhugeliang'),
+      line('hero','我只读过一些书。这里已经和书里不同了，我说的也未必都准。','zhugeliang'),
+      line('yuji','如今朝廷落在董卓手里，各地战乱不断。我们请他走访乡里，寻访能人。路上若有难处，还望三位相助，别让他孤身奔走。','yuji'),
+      line('simayi','董卓把持朝政，许昌也屡受其害。若能联络各方共讨董卓，我愿相助。你到了许昌，报我的名字，门吏自会带你入府。','simayi'),
+      line('zhugeliang','成都也正缺人手。你若寻到愿意救民于水火之人，可来府中找我。钱粮、住处，届时一同商议。','zhugeliang'),
+      line('zhouyu','江东亦不愿坐看洛阳生乱。三家合兵，总好过各自为战。到了建业便来找我，我会交代府里的人候着。','zhouyu'),
+      line('hero','那我先从常山走起。等路上安稳些，就去三位府上拜访。','simayi'),
+      line('zuoci','人都认过了，可别到了门前又把他当骗子赶出去。至于董卓，待人手齐备，咱们再商量。','zuoci'),
       {...line('nanhua','我们知道这趟有危险，不能让你白白承担。等这里的事情办好，我们会负责送你回去，让你能重新见到家里人，这件事一定会做到。','nanhua'),choices:[{id:'gold',label:'那可不够，还要十万两黄金'},{id:'stay',label:'我不想回去'}]}
     ]},
     dawn:{scene:'camp',title:'序章 · 天明',next:'departure',lines:[
@@ -10999,7 +11287,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     ]}
   };
   const stages=['arrival','first-fight','aftermath','manual-fight','reinforcements','prepare','squad-fight','camp','dream','dawn','departure','world','complete'];
-  const dreamEnding=line('narrator','营帐外有人开始叫大家吃早饭。你还想再问，三个人的身影却慢慢消失在雾里。等你睁开眼，看到的已经是帐篷的布顶。',null);
+  const dreamEnding=line('narrator','营帐外有人开始叫大家吃早饭。你还想再问，众人的身影却慢慢消失在雾里。等你睁开眼，看到的已经是帐篷的布顶。',null);
   const dreamBranches={
     gold:[
       line('hero','送我回去本来就是你们该做的。我还得替你们跑遍各地，弄不好连命都搭进去。事情办成以后，再给我十万两黄金，怎么样？','nanhua'),
@@ -11032,7 +11320,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   function hero(character){return {id:'hero',name:character.name,...G.characterAt(character),...assets('hero',character.appearance,true),weapon:null,attack:1,armor:0,resistance:0,healthOverride:1,maxSoldiers:1,startSoldiers:1,skills:['punch'],priorities:[{skill:'punch',when:'always'}]};}
   function general(id,level=10){
     const data={
-      zhangjiao:{name:'张角',attack:8,armor:8,resistance:8,weapon:{type:'staff',id:'fire-god-staff',name:'火神杖',school:'thunder'},skills:['staff-shock','staff-storm'],passives:['thunder-lord'],priorities:[{skill:'staff-storm',when:'enemyCount',threshold:3},{skill:'staff-shock',when:'always',frequency:'sometimes'}]},
+      zhangjiao:{name:'张角',attack:8,armor:8,resistance:8,weapon:{type:'staff',name:'木杖'},skills:W.forWeapon({type:'staff'}),passives:['thunder-lord'],priorities:W.prioritiesFor(W.forWeapon({type:'staff'}))},
       zhangbao:{name:'张宝',attack:8,armor:8,resistance:10,weapon:{type:'scripture',name:'太平经'},skills:W.forWeapon({type:'scripture'}),priorities:[{skill:'scripture-2',when:'healThresholds',selfThreshold:.85,allyThreshold:.85},{skill:'scripture-3',when:'enemyCount',threshold:2,disabled:true}]},
       zhangliang:{name:'张梁',passives:['zhangliang-might','zhangliang-hardy'],attack:8,armor:12,resistance:6,weapon:{type:'spear',name:'铁枪'},skills:W.forWeapon({type:'spear'}),priorities:W.prioritiesFor(W.forWeapon({type:'spear'}))}
     };
@@ -11074,7 +11362,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     resize(){if(this.disposed||this.view)return;Object.assign(this,Viewport.resize(this.canvas,this.ctx));this.draw();}
     rememberLine(){
       const row=P.linesFor(this.progress.stage,this.progress)?.[this.progress.index];if(!row)return;
-      const names={hero:this.character.name,narrator:'旁白',zhangjiao:'张角',zhangbao:'张宝',zhangliang:'张梁',nanhua:'南华',yuji:'于吉',zuoci:'左慈','imperial-soldier':'官兵',villager:'老人'};
+      const names={hero:this.character.name,narrator:'旁白',zhangjiao:'张角',zhangbao:'张宝',zhangliang:'张梁',simayi:'司马懿',zhugeliang:'诸葛亮',zhouyu:'周瑜',nanhua:'南华',yuji:'于吉',zuoci:'左慈','imperial-soldier':'官兵',villager:'老人'};
       this.progress.history=root.ConversationJournal.append(this.progress.history,{name:names[row.speaker]||row.speaker,text:row.text.replaceAll('{name}',this.character.name),chapter:P.chapters[this.progress.stage]?.title});
     }
     openHistory(){this.panel={type:'history',scroll:null};this.draw();}
@@ -11142,8 +11430,8 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       const content=line.text.replaceAll('{name}',this.character.name);c.font=`16px ${FONT}`;const rows=UI.wrapLines(c,content,w-52),panelH=Math.max(208,112+rows.length*25+(line.choices?100:0)),top=h-panelH,partner=line.partner;
       if(line.speaker==='hero')this.bust('hero','right',top,true);else if(line.speaker!=='narrator')this.bust(partner,line.side||'left',top,true);
       const fade=c.createLinearGradient(0,top-24,0,top+panelH);fade.addColorStop(0,'#081b2600');fade.addColorStop(.25,'#081b26ed');fade.addColorStop(1,'#081b26ff');c.fillStyle=fade;c.fillRect(0,top-24,w,panelH+24);c.strokeStyle='#bcab8644';c.beginPath();c.moveTo(24,top+45);c.lineTo(w-24,top+45);c.stroke();
-      const names={zhangjiao:'张角',zhangbao:'张宝',zhangliang:'张梁',nanhua:'南华',zuoci:'左慈',yuji:'于吉','imperial-soldier':'官兵',villager:'老人',narrator:'',hero:this.character.name};
-      const right=(line.side|| (line.speaker==='hero'?'right':'left'))==='right';this.text(names[line.speaker]||'',right?w-26:26,top+24,16,'#ead1a2',right?'right':'left');
+      const names={zhangjiao:'张角',zhangbao:'张宝',zhangliang:'张梁',simayi:'司马懿',zhugeliang:'诸葛亮',zhouyu:'周瑜',nanhua:'南华',zuoci:'左慈',yuji:'于吉','imperial-soldier':'官兵',villager:'老人',narrator:'',hero:this.character.name};
+      const right=(line.side|| (line.speaker==='hero'?'right':'left'))==='right';this.text(line.speaker==='hero'?names.hero:UI.dialogueName(names[line.speaker]||''),right?w-26:26,top+24,16,'#ead1a2',right?'right':'left');
       rows.forEach((row,i)=>this.text(row,26,top+73+i*25,16));
       if(line.choices){line.choices.forEach((choice,i)=>this.button(choice.label,26,h-108+i*49,w-52,41,()=>this.chooseDream(choice.id)));}else{this.text('›',w-32,h-30,24,'#c7b386','center');UI.singleChoiceHit(this.hits,w,h,[{action:()=>this.next()}]);}
       if(this.saveError)this.text('存档写入失败',w/2,65,12,'#edaa92','center');

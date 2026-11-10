@@ -33,6 +33,16 @@
   if(!view.locatorSprite){const canvas=document.createElement('canvas');canvas.width=160;canvas.height=176;const c=canvas.getContext('2d');c.scale(2,2);c.translate(40,72);const glow=c.createRadialGradient(0,0,2,0,0,30);glow.addColorStop(0,'#ffe2a075');glow.addColorStop(1,'#ffe2a000');c.fillStyle=glow;c.fillRect(-32,-32,64,64);c.strokeStyle='#172b2b';c.lineWidth=5;c.beginPath();c.ellipse(0,0,24,9,0,0,Math.PI*2);c.stroke();c.strokeStyle='#f9d886';c.lineWidth=2;c.stroke();c.strokeStyle='#fff0b9';c.lineWidth=1;c.beginPath();c.ellipse(0,0,18,6,0,0,Math.PI*2);c.stroke();for(const angle of [0,Math.PI/2,Math.PI,Math.PI*1.5]){c.beginPath();c.moveTo(Math.cos(angle)*25,Math.sin(angle)*9);c.lineTo(Math.cos(angle)*30,Math.sin(angle)*12);c.stroke();}c.translate(0,-64);c.shadowColor='#fff0aa';c.shadowBlur=8;c.fillStyle='#ffe3a0';c.strokeStyle='#122b31';c.lineWidth=2;c.beginPath();c.moveTo(0,8);c.lineTo(-8,-3);c.lineTo(0,0);c.lineTo(8,-3);c.closePath();c.fill();c.stroke();view.locatorSprite=canvas;}
   const c=view.ctx;c.save();c.globalAlpha=.82+.15*Math.sin(now*.003);c.drawImage(view.locatorSprite,p.x-40,p.y-72,80,88);c.restore();
  }
+ function questPointer(view,entry,now){
+  if(!view.questPointerSprite){
+   const canvas=document.createElement('canvas');canvas.width=80;canvas.height=100;const c=canvas.getContext('2d');c.scale(2,2);c.translate(20,3);
+   c.shadowColor='#0b1717';c.shadowBlur=5;c.shadowOffsetY=2;const gold=c.createLinearGradient(0,0,0,38);gold.addColorStop(0,'#fff4c5');gold.addColorStop(.5,'#e9c475');gold.addColorStop(1,'#ae723c');c.fillStyle=gold;c.strokeStyle='#403322';c.lineWidth=2;
+   c.beginPath();c.moveTo(0,1);c.lineTo(5,7);c.lineTo(3,18);c.lineTo(13,14);c.lineTo(14,20);c.lineTo(0,38);c.lineTo(-14,20);c.lineTo(-13,14);c.lineTo(-3,18);c.lineTo(-5,7);c.closePath();c.fill();c.stroke();
+   c.shadowBlur=0;c.strokeStyle='#fff0bd';c.lineWidth=1;c.beginPath();c.moveTo(-10,20);c.lineTo(0,32);c.lineTo(10,20);c.moveTo(0,8);c.lineTo(0,25);c.stroke();view.questPointerSprite=canvas;
+  }
+  const x=entry.label.x+entry.label.w/2,y=entry.label.y-52+Math.sin(now*.003)*4;view.ctx.drawImage(view.questPointerSprite,x-20,y,40,50);
+  return{x:x-22,y:entry.label.y-58,w:44,h:58};
+ }
  const prepare=(data,image)=>terrain({image},data);
- const api={textureSource,buildingSource,terrain,prepare,settlement,ocean,locator};root.WorldMapArt=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+ const api={textureSource,buildingSource,terrain,prepare,settlement,ocean,locator,questPointer};root.WorldMapArt=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

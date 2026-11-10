@@ -8,17 +8,16 @@
   add('punch','拳击','physical','enemy','single',{weaponCoefficient:0});
   add('spear-cut','直刺','physical','enemy','single');add('spear-sweep','横扫枪','physical','enemy','all',{scaling:{war:.8}});
   add('sword-cut','劈斩','physical','enemy','single');add('sword-sweep','横扫','physical','enemy','all',{scaling:{war:.8}});
-  // 火神杖沿用杖方向的范围和倍率，专武将火焰换成雷电与麻痹。
+  // 旧技能 ID 留作存档与反应技兼容，不再配置专属兵器。
   skills['staff-shock']={...JSON.parse(JSON.stringify(skills['staff-fire'])),id:'staff-shock',name:'电击',element:'thunder',effects:[{id:'paralysis',chance:.25,duration:8,speedMultiplier:.5}]};
   skills['staff-storm']={...JSON.parse(JSON.stringify(skills['staff-flame'])),id:'staff-storm',name:'落雷阵',element:'thunder',effects:[]};
   const specials={
-    'fire-god-staff':{id:'fire-god-staff',type:'staff',name:'火神杖',skills:['staff-shock','staff-storm']},
-    'fangtian-halberd':{id:'fangtian-halberd',type:'halberd',proficiencyType:'spear',name:'方天画戟',skills:['sword-critical','spear-break']}
+    'fangtian-halberd':{id:'fangtian-halberd',type:'spear',name:'方天画戟',quality:'purple',unique:true,exclusive:true,skills:[{base:'sword-critical',scope:'all'}]}
   };
   const canonical=value=>Array.isArray(value)?value.map(canonical):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(k=>[k,canonical(value[k])])):value;
   const fingerprint=value=>{let n=2166136261;for(const c of JSON.stringify(canonical(value)))n=Math.imul(n^c.codePointAt(0),16777619);return (n>>>0).toString(36);};
-  const special=weapon=>!!weapon&&(Array.isArray(weapon.skills)||!!specials[weapon.id]||weapon.type==='staff'&&weapon.school==='thunder');
-  function resolveWeapon(weapon){if(!weapon)return null;const preset=specials[weapon.id]||(weapon.type==='staff'&&weapon.school==='thunder'?specials['fire-god-staff']:{});return {...copy(preset),...copy(weapon)};}
+  const special=weapon=>!!weapon&&(Array.isArray(weapon.skills)||!!specials[weapon.id]);
+  function resolveWeapon(weapon){if(!weapon)return null;if(weapon.id==='fire-god-staff'){const {skills:oldSkills,school,exclusive,unique,...ordinary}=copy(weapon);return {...ordinary,id:'weapon-staff',name:'木杖',type:'staff'};}const preset=specials[weapon.id]||{};return weapon.id==='fangtian-halberd'?{...copy(weapon),...copy(preset)}:{...copy(preset),...copy(weapon)};}
   function definitionsForWeapon(weapon){
     const resolved=resolveWeapon(weapon);if(!resolved)return [copy(skills.punch)];
     const type=C.types.find(t=>t.id===(C.aliases[resolved.type]||resolved.type));
@@ -39,6 +38,7 @@
   const prioritiesFor=ids=>ids.map(id=>{const s=skills[id];if(!s)throw new TypeError('未知技能：'+id);return s.kind==='buff'?{skill:id,when:'always'}:s.kind==='heal'?{skill:id,when:'healThresholds',selfThreshold:.65,allyThreshold:.65}:s.scope==='all'?{skill:id,when:'enemyCount',threshold:2}:{skill:id,when:'always',frequency:'sometimes'};});
   function migrateWeaponPlan(unit){
     const out=JSON.parse(JSON.stringify(unit));out.equipment=equipment.normalize(out.equipment);
+    const hero=out.origin!=='tavern'&&(out.characterId||out.id);if(out.weapon&&hero&&out.heroLoadoutVersion!==1){const legacy=out.weapon.id==='fire-god-staff'||['green-dragon-glaive','serpent-spear','zhouyu-featherfan','luxun-featherfan'].includes(out.weapon.id)||['飞翼枪','白羽扇'].includes(out.weapon.name);if(legacy){const type=hero==='zhangjiao'?'staff':hero==='zhangfei'?'spear':hero==='guanyu'?'blade':hero==='machao'?'spear':'fan';const I=typeof module!=='undefined'&&module.exports?require('./items.js'):root.ItemCatalog;out.weapon=I.create('weapon-'+type,out.weapon.quality||'green',out.weapon.uid);out.skills=forWeapon(out.weapon);out.priorities=prioritiesFor(out.skills);out.weaponPlanMigrated=true;}out.heroLoadoutVersion=1;}
     if(out.weaponPlanVersion!==3&&!special(out.weapon)){
       const oldType=out.weapon?.type,nextType=C.legacyAliases[oldType]||oldType;if(out.weapon)out.weapon.type=nextType;
       if(out.weapon&&C.types.some(t=>t.id===nextType)&&(!out.skills?.length||out.skills.some(id=>!['punch','spear-cut','spear-sweep','sword-cut','sword-sweep'].includes(id)))){const next=forWeapon(out.weapon);if(JSON.stringify(out.skills)!==JSON.stringify(next)){out.skills=next;out.priorities=prioritiesFor(out.skills);out.weaponPlanMigrated=true;}}

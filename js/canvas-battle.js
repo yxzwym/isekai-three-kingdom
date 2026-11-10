@@ -52,7 +52,7 @@
       if (!canvas?.getContext) throw new TypeError('需要传入 canvas 元素');
       this.canvas=canvas;this.ctx=canvas.getContext('2d');this.options=options;this.visuals=new Map();this.textTextures=new Map();this.spriteBuilds=0;this.dpr=1;this.background=null;this.ariaLabel='';this.metrics=options.profile?new Presentation.FrameStats():null;this.images=new Map();this.imageIds=new WeakMap();this.imageSerial=0;this.sprites=new Map();this.hits=[];this.floats=[];this.vfx=new root.BattleVFX.BattleEffects();this.aim=null;this.panel=null;this.focus=-1;this.disposed=false;
       this.click=this.click.bind(this);this.key=this.key.bind(this);this.resize=this.resize.bind(this);this.frame=this.frame.bind(this);
-      this.down=this.down.bind(this);this.up=this.up.bind(this);this.move=this.move.bind(this);this.cancel=this.cancel.bind(this);this.context=e=>e.preventDefault();this.wheel=e=>{if(['tactics','inspect','skillInfo','passiveInfo','result'].includes(this.panel?.type)){e.preventDefault();this.panel.scroll=clamp(this.panel.scroll+e.deltaY,0,this.panel.maxScroll||0);}};
+      this.down=this.down.bind(this);this.up=this.up.bind(this);this.move=this.move.bind(this);this.cancel=this.cancel.bind(this);this.context=e=>e.preventDefault();this.wheel=e=>{if(['tactics','inspect','skillInfo','passiveInfo','result','character','characterDetails','itemDetail','trophyDetail','npcSkill'].includes(this.panel?.type)){e.preventDefault();this.panel.scroll=clamp((this.panel.scroll||0)+e.deltaY,0,this.panel.maxScroll||0);}};
       root.GameAssetLoader?.track?.(this,{onReady:()=>{this.buildBackground();this.preparePortraits();}});
       canvas.addEventListener('pointerdown',this.down);canvas.addEventListener('pointerup',this.up);canvas.addEventListener('pointermove',this.move);canvas.addEventListener('pointercancel',this.cancel);canvas.addEventListener('contextmenu',this.context);canvas.addEventListener('wheel',this.wheel,{passive:false});canvas.addEventListener('keydown',this.key);
       this.observer=new ResizeObserver(this.resize);this.observer.observe(canvas);
@@ -272,6 +272,17 @@
       this.button('开战',(this.w-w)/2,y+18,w,48,()=>{this.options.onPrepared?.(this);this.battle.start();},true);
     }
     openInspect(u){if(u&&!(u.side==='enemy'&&u.soldiers<=0))this.panel={type:'inspect',id:u.id,scroll:0};}
+    openCharacter(u,previous=null){if(u)this.panel={type:'character',unitId:u.id,readonly:true,previous,scroll:0};}
+    drawCharacterPanel(){
+      if(!this.characterView){
+        const node=typeof module!=='undefined'&&module.exports,WorldView=node?require('./canvas-world.js').CanvasWorld:root.WorldMap.CanvasWorld;if(node)require('./trophy-panels.js');
+        const v=this.characterView=Object.create(WorldView.prototype);Object.defineProperty(v,'panel',{get:()=>this.panel,set:panel=>{this.panel=panel;}});
+        v.canvas=this.canvas;v.ctx=this.ctx;v.options={allowDismiss:false};v.memberPreview=()=>this.battle;v.image=src=>this.image(src);v.closeWorldPanel=()=>this.closePanel();v.invalidate=()=>{};
+        v.model={members:()=>this.battle.units.filter(u=>u.side==='ally'),pending:true,state:{money:0,trophies:[]},trophyOwner:uid=>{for(const u of this.battle.units){const slot=(u.trophies||[]).findIndex(t=>t?.uid===uid);if(slot>=0)return{id:u.id,slot};}return null;}};
+      }
+      const v=this.characterView,p=this.panel;if(p.type==='character'){const u=this.battle.unit(p.unitId);if(!u){this.closePanel();return;}p.unit={...u,startSoldiers:u.soldiers,trophies:u.trophies?.length?u.trophies:[null,null]};}
+      Object.assign(v,{w:this.w,h:this.h,dpr:this.dpr||1,hits:[]});v.model.state.trophies=this.battle.units.flatMap(u=>(u.trophies||[]).filter(Boolean));v.drawPanel();this.hits=v.hits;
+    }
     openSkillInfo(u,id){
       if(!u?.skills.includes(id)||!this.battle.skills[id])return;
       this.panel={type:'skillInfo',id:u.id,skill:id,previous:this.panel,scroll:0};
@@ -311,6 +322,7 @@
       for(const line of info.lines.slice(1)){for(const wrapped of this.wrapInfo(line,w-44)){this.text(wrapped,x+22,row,14,'#d2e0df','left');row+=23;}row+=8;}c.restore();p.maxScroll=Math.max(0,row+(p.scroll||0)-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);
     }
     drawPanel() {
+      if(['character','characterDetails','itemDetail','trophyDetail','npcSkill'].includes(this.panel.type)||this.panel.type==='passiveInfo'&&typeof this.panel.passive==='object')return this.drawCharacterPanel();
       if(this.panel.type==='tactics')return this.drawTactics();
       if(this.panel.type==='inspect')return this.drawInspect();
       if(this.panel.type==='skillInfo')return this.drawSkillInfo();
@@ -346,7 +358,7 @@
       if(!this.press||(e.pointerId!==undefined&&e.pointerId!==this.press.pointer))return;const p=this.point(e),dx=p.x-this.press.x,dy=p.y-this.press.y;
       if(!this.press.axis&&Math.max(Math.abs(dx),Math.abs(dy))>7)this.press.axis=this.press.hit?.kind==='slider'&&Math.abs(dx)>Math.abs(dy)?'slider':'scroll';
       if(this.press.axis==='slider'){clearTimeout(this.pressTimer);this.press.moved=true;this.press.hit.change(p.x);}
-      else if(this.press.axis==='scroll'){clearTimeout(this.pressTimer);this.press.moved=true;if(['tactics','inspect','skillInfo','passiveInfo','result'].includes(this.panel?.type))this.panel.scroll=clamp(this.press.scroll-dy,0,this.panel.maxScroll||0);}
+      else if(this.press.axis==='scroll'){clearTimeout(this.pressTimer);this.press.moved=true;if(['tactics','inspect','skillInfo','passiveInfo','result','character','characterDetails','itemDetail','trophyDetail','npcSkill'].includes(this.panel?.type))this.panel.scroll=clamp(this.press.scroll-dy,0,this.panel.maxScroll||0);}
     }
     up(e){
       if(!this.press||e.pointerId!==this.press.pointer)return;const press=this.press,p=this.point(e);this.cancel();
@@ -363,8 +375,8 @@
         if(skill.kind==='heal'){
           if(r.when!=='healThresholds'){const t=r.when==='always'?1.01:Number(r.threshold)||0;r.selfThreshold=r.when==='selfBelow'?t:r.when==='allyBelow'||r.when==='always'?t:0;r.allyThreshold=r.when==='selfBelow'?0:t;}
           if(r.disabled){r.selfThreshold=0;r.allyThreshold=0;}r.when='healThresholds';
-        }else if(['physical','tactic'].includes(skill.kind)){r.when=skill.scope==='all'?'enemyCount':'always';r.threshold=skill.scope==='all'?Math.max(1,Math.floor(r.threshold)||1):0;}
-        else if(skill.kind==='buff')r.displayThreshold=r.disabled?0:r.when==='always'?1.01:Number(r.threshold)||0;
+        }else if(['physical','tactic'].includes(skill.kind)){if(skill.scope==='all'){r.when=r.when==='always'?'always':'enemyCount';r.threshold=r.when==='always'?0:clamp(Math.floor(r.threshold)||2,2,5);}else{r.when='always';r.threshold=0;}}
+        else if(skill.kind==='buff'){r.when='always';r.threshold=0;delete r.displayThreshold;delete r.frequency;}
       }
       this.aim=null;this.panel={type:'tactics',id:u.id,rules,targetRule:u.targetRule,scroll:0,maxScroll:0};
     }
@@ -381,7 +393,7 @@
       const p=this.panel,u=this.battle.unit(p.id);if(!u||!['ready','running'].includes(this.battle.status)){this.panel=null;return;}
       const contentHeight=p.rules.reduce((height,r)=>height+(this.battle.skills[r.skill].kind==='heal'?166:114),70);
       const c=this.ctx,{x,y:top,w,h}=this.panelFrame(`${u.name} · 施法设置`,contentHeight+65),pad=17,left=x+pad,bottom=top+h-18;
-      this.box(x+w-104,top+9,48,32,'#252c27','#766e57',2);this.text('属性',x+w-80,top+25,14,'#dcd8c5');this.hits.push({x:x+w-104,y:top+9,w:48,h:32,label:'属性',action:()=>{this.panel={type:'inspect',id:u.id,scroll:0,previous:p};}});
+      this.box(x+w-104,top+9,48,32,'#252c27','#766e57',2);this.text('属性',x+w-80,top+25,14,'#dcd8c5');this.hits.push({x:x+w-104,y:top+9,w:48,h:32,label:'属性',action:()=>this.openCharacter(u,p)});
       const start=top+49,viewHeight=bottom-start;let y=start-p.scroll;
       p.maxScroll=Math.max(0,contentHeight-viewHeight);p.scroll=clamp(p.scroll,0,p.maxScroll);y=start-p.scroll;
       c.save();c.beginPath();c.rect(x,start,w,viewHeight);c.clip();const before=this.hits.length;
@@ -392,8 +404,8 @@
         this.box(left-5,y,w-pad*2+10,height-8,'#102a32','#2d4a54',4);this.box(left,y+5,36,36,'#0b222d','#7b9ba6');this.drawSkillIcon(skill,left,y+5,36,root.BattleVFX.COLORS[root.BattleVFX.kindOf(skill)]);this.text(skill.name,left+44,y+23,14,'#d9e9e9','left');this.text(this.skillRole(skill),left+w-pad*2-8,y+23,12,skill.kind==='heal'?'#8fdfae':'#b5c6d4','right');
         this.hits.push({x:left-2,y:y+3,w:40,h:40,label:`查看${skill.name}详情`,action:()=>this.openSkillInfo(u,skill.id)});
         if(heal){percent(r,'selfThreshold','治疗自己',y+49);percent(r,'allyThreshold','治疗队友',y+103);}
-        else if(group){const count=Math.max(2,this.battle.config.tacticsEnemyCount||0,this.battle.units.filter(t=>t.side==='enemy').length,Math.floor(r.threshold)||2);this.slider('施放条件',left+9,y+49,w-(pad+9)*2,r.disabled?0:Math.max(1,Math.min(count,r.threshold)-1),count-1,v=>{r.disabled=v===0;r.when='enemyCount';r.threshold=v+1;},v=>v===0?'从不释放':`至少 ${v+1} 人`);}
-        else if(skill.buff?.taunt){const value=clamp(Math.round((r.displayThreshold||0)*100),0,101);this.slider('施放条件',left+9,y+49,w-(pad+9)*2,value,101,value=>{r.displayThreshold=value/100;r.disabled=value===0;},value=>value>0&&value<101?`自身生命低于 ${value}%`:thresholdLabel(value));}
+        else if(group)this.slider('施放条件',left+9,y+49,w-(pad+9)*2,r.disabled?0:r.when==='always'?5:clamp(r.threshold-1,1,4),5,v=>{r.disabled=v===0;r.when=v===5?'always':'enemyCount';r.threshold=v===5?0:v+1;},v=>v===0?'从不释放':v===5?'始终释放':`至少 ${v+1} 人`);
+        else if(skill.kind==='buff')this.slider('施放条件',left+9,y+49,w-(pad+9)*2,r.disabled?0:1,1,value=>{r.disabled=value===0;r.when='always';r.threshold=0;},value=>value?'始终保持':'从不释放');
         else this.slider('施放频率',left+9,y+49,w-(pad+9)*2,r.disabled?0:r.frequency==='sometimes'?1:2,2,v=>{r.disabled=v===0;r.frequency=v===1?'sometimes':'always';r.when='always';r.threshold=0;},v=>['从不释放','偶尔释放','始终释放'][v]);
         y+=height;
       });
@@ -404,10 +416,10 @@
     }
     commitTactics(){
       const p=this.panel;if(p?.type!=='tactics')return;const u=this.battle.unit(p.id);if(!u){this.panel=null;return;}
-      for(const r of p.rules)if(this.battle.skills[r.skill].kind==='buff'){if(this.battle.skills[r.skill].buff?.taunt){const t=r.displayThreshold??1.01;r.when=t>=1.01?'always':'selfBelow';r.threshold=t;}else{r.when='always';r.threshold=0;}delete r.displayThreshold;}
+      for(const r of p.rules)if(this.battle.skills[r.skill].kind==='buff'){r.when='always';r.threshold=0;delete r.displayThreshold;delete r.frequency;}
       this.battle.setTactics(u.id,{rules:p.rules,targetRule:p.targetRule});this.panel=null;this.options?.onTacticsSave?.(u,this);
     }
-    closePanel(){if(this.panel?.type==='tactics')this.commitTactics();else if(['skillInfo','passiveInfo','inspect'].includes(this.panel?.type))this.panel=this.panel.previous||null;else this.panel=null;}
+    closePanel(){if(this.panel?.type==='tactics')this.commitTactics();else if(this.panel?.previous||['skillInfo','passiveInfo','inspect'].includes(this.panel?.type))this.panel=this.panel.previous||null;else this.panel=null;}
     notify(text){this.notice={text,until:performance.now()+2000};}
     notifyStatus(u,status){this.notice={unitId:u.id,statusId:status.id,statusName:status.name,until:performance.now()+2000};}
     drawNotice(now){

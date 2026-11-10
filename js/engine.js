@@ -32,19 +32,20 @@
   }
   function raceMultiplier(skill,target){const tags=new Set([target?.species||'humanoid',...(target?.tags||[])]);return 1+Object.entries(skill.raceBonuses||{}).reduce((n,[tag,value])=>n+(tags.has(tag)?value:0),0);}
   function calculate({attacker={},target={},skill={},critical=1,damageType=skill.damageType||skill.kind||'physical'}){
-    if(attacker.soldiers<=0)return {raw:0,amount:0,factors:[]};const healing=skill.kind==='heal',physical=damageType==='physical',protectionValue=healing||damageType==='true'||(physical&&attacker.ignoreArmor)||(!physical&&attacker.ignoreResistance)?0:Math.max(0,Number(target[physical?'armor':'resistance'])||0)*(1-clamp(Number(attacker[physical?'armorPierce':'resistancePierce'])||0,0,1))-Math.max(0,Number(attacker[physical?'armorPenetration':'resistancePenetration'])||0);
+    if(skill.kind==='physical'&&attacker.physicalTrueDamage)damageType='true';if(attacker.soldiers<=0)return {raw:0,amount:0,factors:[]};const healing=skill.kind==='heal',physical=skill.kind==='physical'||damageType==='physical',protectionValue=healing||damageType==='true'||(physical&&attacker.ignoreArmor)||(!physical&&attacker.ignoreResistance)?0:Math.max(0,Number(target[physical?'armor':'resistance'])||0)*(1-clamp(Number(attacker[physical?'armorPierce':'resistancePierce'])||0,0,1))-Math.max(0,Number(attacker[physical?'armorPenetration':'resistancePenetration'])||0);
     const base=skillValue(attacker,skill),bonus=healing?(1+(Number(attacker.healingBonus)||0)):(1+(Number(attacker[physical?'physicalBonus':'tacticBonus'])||0)),beforeMitigation=Math.max(0,base*bonus*(healing?1:Math.max(0,Number(attacker.damageMultiplier??1)))*(healing?1:critical)*raceMultiplier(skill,target)*(healing?1:(skill.kind==='physical'||skill.kind==='tactic')&&attacker.executeThreshold&&target.soldiers/target.maxSoldiers<=attacker.executeThreshold?(attacker.executeMultiplier||1):1)),protection=healing?1:mitigation(protectionValue)*(damageType==='true'?1:clamp(1-(Number(target[physical?'physicalReduction':'tacticReduction'])||0),0,1)),raw=beforeMitigation*protection;
     return {raw,amount:Math.max(1,Math.floor(raw)),damageType,armor:physical?Math.max(0,protectionValue):undefined,resistance:physical?undefined:Math.max(0,protectionValue),beforeMitigation,mitigation:protection,factors:[['技能面板',base],['效果加成',bonus],...(!healing&&attacker.damageMultiplier!==undefined&&attacker.damageMultiplier!==1?[['被动增伤',attacker.damageMultiplier]]:[]),['暴击倍率',healing?1:critical],['减伤后倍率',protection]],formula:healing?'技能治疗量':damageType==='true'?'真实伤害':'技能伤害 × 50÷(50＋减伤属性)'};
   }
   function physical(options){return calculate({...options,skill:options.skill||{kind:'physical',scaling:{war:1},weaponCoefficient:1},damageType:options.damageType||'physical'});}
   function tactic(options){return calculate({...options,attacker:options.attacker||{intelligence:attr(options.intelligence),attack:0},skill:options.skill,damageType:options.skill.damageType||options.skill.kind});}
-  function criticalChance(unit,config,skill={}){return unit.guaranteedCritical?1:clamp((Number(skill.criticalChance)||0)+(Number(skill.criticalBonus)||0)+(Number(unit.criticalBonus)||0)+(skill.kind==='tactic'?(Number(unit.tacticCriticalBonus)||0):0)+Math.max(0,Number(unit.technique)||0)/2000,0,1);}
+  function criticalChance(unit,config,skill={}){return unit.guaranteedCritical||skill.kind==='physical'&&unit.physicalGuaranteedCritical?1:clamp((Number(skill.criticalChance)||0)+(Number(skill.criticalBonus)||0)+(Number(unit.criticalBonus)||0)+(skill.kind==='tactic'?(Number(unit.tacticCriticalBonus)||0):0)+Math.max(0,Number(unit.technique)||0)/2000,0,1);}
   function hitChance(actor,target,skill,dodge=0){return skill.alwaysHit?1:clamp((skill.hitChance??.4)+(Number(actor.hitBonus)||0)+(Math.max(0,Number(actor.technique)||0)/Math.max(1,Number(target.speed)||0))*.3-dodge,0,1);}
   function normalizeRule(rule,skill){
     const r=copy(rule);if(!skill)return r;
     if(['physical','tactic'].includes(skill.kind)){
-      return {skill:rule.skill,disabled:!!rule.disabled,when:skill.scope==='all'?'enemyCount':'always',threshold:skill.scope==='all'?(rule.when==='enemyCount'?Math.max(2,Math.floor(Number(rule.threshold)||2)):2):0,...(rule.frequency==='sometimes'?{frequency:'sometimes'}:{})};
+      return {skill:rule.skill,disabled:!!rule.disabled,when:skill.scope==='all'&&rule.when!=='always'?'enemyCount':'always',threshold:skill.scope==='all'&&rule.when!=='always'?Math.max(2,Math.floor(Number(rule.threshold)||2)):0,...(rule.frequency==='sometimes'?{frequency:'sometimes'}:{})};
     }
+    if(skill.kind==='buff'&&skill.side!=='enemy')return {skill:rule.skill,disabled:!!rule.disabled,when:'always',threshold:0};
     return r;
   }
   class Battle {
@@ -135,7 +136,7 @@
       for(const stat of ['healingBonus','physicalBonus','tacticBonus','physicalReduction','tacticReduction','hitBonus','criticalBonus','armorPenetration','resistancePenetration','armorPierce','resistancePierce','criticalDamageBonus','tacticCriticalBonus','tacticCriticalDamageBonus','physicalLifesteal','executeThreshold'])out[stat]=(Number(u[stat])||0)+(p[stat]||0);
       for(const stat of ['intervalMultiplier','executeMultiplier'])out[stat]=(Number(u[stat])||1)*(p[stat]||1);
       for(const [kind,mult]of [['physical','physicalMultiplier'],['tactic','tacticMultiplier'],['healing','healingMultiplier']])if(p[mult]!==undefined)out[kind+'Bonus']=(1+out[kind+'Bonus'])*p[mult]-1;
-      out.damageMultiplier=Number(u.damageMultiplier??1)*(p.damageMultiplier||1);out.guaranteedCritical=!!(u.guaranteedCritical||p.guaranteedCritical);out.ignoreArmor=!!(u.ignoreArmor||p.ignoreArmor);out.ignoreResistance=!!(u.ignoreResistance||p.ignoreResistance);
+      out.physicalTrueDamage=!!(u.physicalTrueDamage||p.physicalTrueDamage);out.damageMultiplier=Number(u.damageMultiplier??1)*(p.damageMultiplier||1);out.guaranteedCritical=!!u.guaranteedCritical;out.physicalGuaranteedCritical=!!p.guaranteedCritical;out.ignoreArmor=!!(u.ignoreArmor||p.ignoreArmor);out.ignoreResistance=!!(u.ignoreResistance||p.ignoreResistance);
       let taken=p.takenMultiplier||1;for(const id of u.passives){const stats=this.passives[id]?.stats||{},maximum=Number(stats.missingHealthDamageBonus)||0;if(maximum>0)out.damageMultiplier*=1+maximum*clamp(1-u.soldiers/u.maxSoldiers,0,1);if(stats.lowTroopsThreshold&&u.soldiers/u.maxSoldiers<=stats.lowTroopsThreshold){out.damageMultiplier*=stats.lowTroopsDamageMultiplier||1;taken*=stats.lowTroopsTakenMultiplier||1;}}
       if(taken!==1)out.physicalReduction=1-(1-out.physicalReduction)*taken;if(taken!==1||p.tacticTakenMultiplier!==undefined)out.tacticReduction=1-(1-out.tacticReduction)*taken*(p.tacticTakenMultiplier||1);out.weaponPower=out.attack;return out;
     }
@@ -269,8 +270,8 @@
       const weakestFoe=[...foes].sort((a,b)=>a.soldiers-b.soldiers||a.order-b.order)[0],candidates=[];
       for(const r of u.priorities){
         if(r.disabled)continue;const skill=this.skills[r.skill];if(!skill||!u.skills.includes(r.skill)||this.availableSp(u)<skill.cost)continue;
-        const threshold=Number(r.threshold);let target=skill.side==='ally'?weakestFriend:skill.side==='self'?u:sortedFoes[0],enabled=false,always=r.when==='always'&&r.frequency!=='sometimes'&&(skill.kind==='heal'||skill.scope!=='all');
-        if(['physical','tactic'].includes(skill.kind))enabled=skill.scope==='all'?foes.length>=Math.max(1,Number(r.threshold)||1):true;
+        const threshold=Number(r.threshold);let target=skill.side==='ally'?weakestFriend:skill.side==='self'?u:sortedFoes[0],enabled=false,always=r.when==='always'&&r.frequency!=='sometimes';
+        if(['physical','tactic'].includes(skill.kind))enabled=skill.scope==='all'&&r.when!=='always'?foes.length>=Math.max(2,Number(r.threshold)||2):true;
         else if(r.when==='healThresholds'){
           const self=Number(r.selfThreshold)||0,ally=Number(r.allyThreshold)||0;
           if(self>0&&u.soldiers<u.maxSoldiers&&u.soldiers/u.maxSoldiers<=self){target=u;enabled=true;always=self>1;}
@@ -342,7 +343,7 @@
         if(!healingSkill&&!target.wounded&&this.config.hit&&!skill.alwaysHit){const dodge=this.dodgeChance(target,skill.kind),hit=hitChance(actor,victim,skill,dodge),roll=this.rng();if(roll>=hit){miss=dodge>0&&roll<hitChance(actor,victim,skill,0)?'闪避':'未命中';if(miss==='闪避'){target.stats.dodges++;dodged.push(target);}}}
         // Explicit dodge passives still function in deterministic tutorial scenarios.
         else if(!healingSkill&&!target.wounded&&this.dodgeChance(target,skill.kind)>0&&this.rng()<this.dodgeChance(target,skill.kind)){miss='闪避';target.stats.dodges++;dodged.push(target);}
-        if(!miss&&!healingSkill){critical=!!actor.guaranteedCritical||(this.config.critical&&this.rng()<criticalChance(actor,this.config,skill));multiplier=critical?1.5+(actor.criticalDamageBonus||0)+(skill.kind==='tactic'?(actor.tacticCriticalDamageBonus||0):0):1;}
+        if(!miss&&!healingSkill){critical=!!actor.guaranteedCritical||skill.kind==='physical'&&!!actor.physicalGuaranteedCritical||(this.config.critical&&this.rng()<criticalChance(actor,this.config,skill));multiplier=critical?1.5+(actor.criticalDamageBonus||0)+(skill.kind==='tactic'?(actor.tacticCriticalDamageBonus||0):0):1;}
         calc=miss?{raw:0,amount:0,factors:[],formula:miss}:calculate({attacker:actor,target:victim,skill,critical:multiplier});
         const healing = skill.kind === 'heal';
         const result=miss?{before,after:before,actual:0}:healing?this.healUnit(u,target,calc.amount):this.damageUnit(u,target,calc.amount,{ignoreWounds:!!skill.ignoreWounds});

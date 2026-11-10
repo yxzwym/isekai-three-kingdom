@@ -78,7 +78,7 @@
   return:S('camp','将巨鹿发生的事告诉张角','zhangjiao',[
    ['npc','他们打着黄巾军的名号抢粮，我不能说一句不知情就不管。粮食先退给乡亲，牵涉的人我也会逐个问，查清楚是谁在纵容他们。'],['hero','乡亲们最担心的，是今天退了粮，明天那些人又来。你最好留几个人在这里，让他们遇到事情能找到人说，不用再一路跑到营里。'],['npc','你提醒得对。我会安排人留守，也会亲自去附近几个村子看看。有些事情只听送来的消息，确实发现不了问题。']],[N('与张角商议同行','freed')]),
   freed:End('zhangjiao','camp',[['npc','营里已经有人照看，我想跟你们出去走走。那些不敢进营说话的乡亲，见到我在村里，也许愿意把遇到的事情告诉我。'],['hero','我们一起去吧。需要回营的时候再回来，路上的事情也不必都急着一天办完，先把大家的难处问清楚。']])
- },{abuse:{stage:['abuse'],next:'trace',title:'巨鹿还粮',sceneId:'farmland',count:3,enemyKind:'bandit'},trace:{stage:['trace'],next:'return',title:'广宗追查',sceneId:'rural-road',count:4,enemyKind:'bandit'}});
+ },{abuse:{stage:['abuse'],next:'trace',title:'巨鹿还粮',sceneId:'farmland',count:3,enemyKind:'bandit',leaderName:'强盗首领',leaderArt:'brigand'},trace:{stage:['trace'],next:'return',title:'广宗追查',sceneId:'rural-road',count:4,enemyKind:'bandit',leaderName:'强盗首领',leaderArt:'brigand'}});
  R('zhangbao','营中药箱',{
   rumor:S('camp','与张宝商议补充药材','zhangbao',[
    ['npc','我也想出去看看，只是营里的伤者还离不开人。原定送来的药迟迟没到，要是药不够，我实在没法放心离开。'],['hero','那我去广宗找找送药的人。先把药备齐，等营里有人接手照顾伤者，你也能放心跟我们出去。']],[N('前往广宗取药','supplies')]),

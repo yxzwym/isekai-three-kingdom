@@ -15,8 +15,8 @@ test('滑条点击、连续拖动、两端越界都吸附到合法档位',()=>{
   assert.equal(sliderValue(-999,10,300,5),0);assert.equal(sliderValue(999,10,300,5),5);
   const values=Array.from({length:301},(_,i)=>sliderValue(10+i,10,300,101));assert.ok(values.every((v,i)=>i===0||v>=values[i-1]));assert.equal(new Set(values).size,102);
 });
-test('设置面板按1%保存治疗和嘲讽阈值，保留从不与始终两端',()=>{
-  for(const id of ['lusu','huanggai']){
+test('设置面板按1%保存治疗阈值，保留从不与始终两端',()=>{
+  for(const id of ['lusu']){
     const b=new Battle(D.createEffectsPreview());b.start();const u=b.unit(id),sliders=[],buttons=[];
     const view={battle:b,h:667,w:375,hits:[],ctx:{save(){},beginPath(){},rect(){},clip(){},restore(){}},
       panelFrame(){return{x:12,y:50,w:351,h:567};},box(){},skillRole:CanvasBattle.prototype.skillRole,drawSkillIcon(){},text(){},

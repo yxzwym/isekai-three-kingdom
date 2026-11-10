@@ -1,13 +1,14 @@
 (function(root){
  'use strict';
  const node=typeof module!=='undefined'&&module.exports,I=node?require('./items.js'):root.ItemCatalog,E=node?require('./engine.js'):root.BattleEngine,X=node?require('./experience.js'):root.CharacterExperience,C=node?require('./weapon-catalog.js'):root.WeaponCatalog;
- const clamp=(n,a,b)=>Math.max(a,Math.min(b,n)),color=i=>I.qualities[i?.quality]?.color||'#a9b9bc',slots=[['weapon','武器'],['armor','防具'],['accessory1','饰品'],['accessory2','饰品']];
+ const clamp=(n,a,b)=>Math.max(a,Math.min(b,n)),color=i=>i?.id==='fangtian-halberd'?'#c08bea':I.qualities[i?.quality]?.color||'#a9b9bc',slots=[['weapon','武器'],['armor','防具'],['accessory1','饰品'],['accessory2','饰品']];
  const displayAttribute=value=>Math.floor(Number(value)||0);
  const questColors={available:'#59dce5',active:'#f3f6f4',ready:'#e9c365'};
  function questIcon(v,status,x,y,size=25){const tint=questColors[status];if(!tint)return;v.box(x,y,size,size,'#17201ff5',tint,3);v.text('!',x+size/2,y+size*.53,20,tint,'center');}
  function icon(v,id,x,y,size,tint){root.RpgIcons.draw(v.ctx,id,x,y,size,{image:src=>v.image(src),disabled:tint==='#425966'});}
  function iconButton(v,label,x,y,size,action,active=false){v.box(x,y,size,size,active?'#61502b':'#0c2531ed',active?'#e3c384':'#7d959b',4);icon(v,label,x+5,y+5,size-10,active?'#ffe2a2':'#d5e5df');v.hits.push({x,y,w:size,h:size,label,action});}
  function textButton(v,label,x,y,w,h,action,active=false){v.box(x,y,w,h,active?'#51472c':'#252c27',active?'#b79a68':'#766e57',2);v.text(label,x+w/2,y+h/2,14,active?'#f1ddb5':'#dcd8c5','center');v.hits.push({x,y,w,h,label,action});}
+ function ownerBadge(v,id,x,y,size){const u=v.model.members().find(u=>u.id===id),portrait=u?.portrait||(id==='hero'?(()=>{const a=root.PengpaiAssets?.protagonists?.[v.model.character.appearance];return a?{src:a.src,crop:a.portrait}:null;})():root.CharacterAssets?.manifest?.characters?.[u?.characterId||id]?root.CharacterAssets.resolve(u?.characterId||id).portrait:null);if(!portrait)return;v.box(x+size-16,y+size-16,23,23,'#16231e','#c6ad74',3);v.portrait?.(portrait,x+size-15,y+size-15,21,{frame:false});}
  function bar(v,x,y,w,h,value,fill='#40aab9',trail=value){v.box(x,y,w,h,'#07151e','#557780',3);v.ctx.fillStyle='#ecedce';v.ctx.fillRect(x+2,y+2,(w-4)*clamp(trail,0,1),h-4);v.ctx.fillStyle=fill;v.ctx.fillRect(x+2,y+2,(w-4)*clamp(value,0,1),h-4);}
  function itemIcon(v,item,x,y,size,empty){const tint=color(item);v.box(x,y,size,size,'#0a1d28',item?tint:'#3e5865',4);icon(v,root.RpgIcons.resolveItem(item,empty),x+7,y+7,size-14,item?tint:'#425966');if(item?.slot==='trophy'){v.box(x+size-23,y+size-17,22,16,'#172019','#8d805d',2);root.PengpaiUI.centeredText(v,item.level,x+size-23,y+size-17,22,16,11,'#ead8ad');}}
  function character(){
@@ -121,11 +122,16 @@
   for(const [key,value]of Object.entries(item.attributes||{}))rows.push([labels[key]||key,ranges?.attributes[key]?rangeText(ranges.attributes[key]):(value>=0?'+':'')+(['healingBonus','hitBonus','criticalBonus','dodge','physicalLifesteal'].includes(key)?Math.round(value*100)+'%':value)]);if(item.statusImmunities?.length)rows.push(['状态免疫',item.statusImmunities.map(id=>root.BattleStatuses.definitions[id]?.name||id).join('、')]);if(item.unique)rows.push(['获取',item.acquisition]);
   if(ranges)rows.push(['随机属性',ranges.count+'条 · 随机 '+rangeText(ranges.random)]);
   if(item.questItem)rows.push(['用途','任务道具']);
-  const target=this.model.members().find(u=>u.id===(p.unitId||'hero')),canAct=!item.questItem&&!p.readonly&&!this.model.pending&&!this.model.journey;let action,label;
+  const owner=this.model.members().find(u=>u.id===p.equipmentOwnerId),target=this.model.members().find(u=>u.id===(p.unitId||(p.transaction?'hero':null))),canAct=!item.questItem&&!p.readonly&&!this.model.pending&&!this.model.journey;let action,label;
   if(canAct&&p.transaction==='buy'){label='购买 '+item.price+'文';action=()=>{if(this.model.buyItem(item.templateId)){const acquired=this.model.state.inventory.at(-1);this.save();this.openItemDetail(acquired,{unitId:p.unitId||'hero',previous:p.previous,revealed:true});root.GameAudio?.play?.('buff');}else this.notify('铜钱不足。');};}
   else if(canAct&&p.transaction==='sell'&&this.model.state.inventory.some(i=>i.uid===item.uid)){label='出售 '+I.sellPrice(item)+'文';action=()=>{if(this.model.sellItem(item.uid)){this.save();this.panel=p.previous;this.notify('已出售 '+item.name);}};}
   else if(canAct&&target&&p.equipped){label='卸下';action=()=>{if(this.model.changeEquipment(target.id,p.slot,null)){this.save();this.panel=p.previous;}};}
-  else if(canAct&&target&&this.model.state.inventory.some(i=>i.uid===item.uid)){const slot=p.slot||(item.slot==='accessory'?(!target.equipment?.accessory1?'accessory1':'accessory2'):item.slot);if(I.compatible(item,slot)&&I.canEquip(target,item)){label='装备';action=()=>{if(this.model.changeEquipment(target.id,slot,item.uid)){this.save();this.panel=p.previous?.slot&&p.previous.previous?.type==='character'?p.previous.previous:p.previous;}};}}
+  else if(canAct&&(owner||this.model.state.inventory.some(i=>i.uid===item.uid))){
+   const slot=p.slot||(item.slot==='accessory'?(!target?.equipment?.accessory1?'accessory1':'accessory2'):item.slot);
+   if(!target){label=owner?'转给…':'装备给…';action=()=>{this.panel={type:'equipmentTarget',item,equipmentOwnerId:owner?.id,equipmentSlot:p.equipmentSlot,previous:p,scroll:0};};}
+   else if(I.compatible(item,slot)&&I.canEquip(target,item)&&!(owner?.id===target.id&&p.equipmentSlot===slot)){label=owner?'转给 '+target.name:'装备给 '+target.name;action=()=>{const ok=owner?this.model.transferEquipment(owner.id,p.equipmentSlot,target.id,slot):this.model.changeEquipment(target.id,slot,item.uid);if(ok){this.save();this.notify('已为'+target.name+'装备 '+item.name);this.panel=p.previous?.slot&&p.previous.previous?.type==='character'?p.previous.previous:p.previous;}};}
+  }
+  if(owner)rows.push(['装备者',owner.name]);
   const canReplace=canAct&&target&&p.equipped,compareSlot=p.slot||(item.slot==='accessory'?(!target?.equipment?.accessory1?'accessory1':'accessory2'):item.slot),showCompare=!item.rollPreview&&canAct&&target&&p.transaction!=='sell'&&I.compatible(item,compareSlot)&&I.canEquip(target,item);
   if(showCompare&&!p.comparison)p.comparison=this.model.compareEquipment(target.id,compareSlot,p.equipped?null:item);
   const comparison=showCompare?p.comparison:null,changes=comparison?.changes||[],compareH=comparison?42+Math.max(1,changes.length)*26:0;
@@ -139,15 +145,26 @@
   c.restore();if(p.maxScroll)this.box(left+w+8,top+(bottom-top-24)*p.scroll/p.maxScroll,2,24,'#a28f63',null);
   if(p.transaction)this.text(this.model.state.money+' 文',left,f.y+f.h-footerH+14,14,'#e2c380');
   if(canReplace)this.button('更换',left,f.y+f.h-92,w,32,()=>{this.panel={type:'inventory',unitId:target.id,slot:p.slot,scroll:0,previous:p.previous};});
-  if(action)this.button(label,left,f.y+f.h-48,w,32,()=>{action();if(label==='装备'&&this.model.equipped(target.id,compareSlot)?.uid===item.uid)this.notify('已装备 '+item.name);});
+  if(action)this.button(label,left,f.y+f.h-48,w,32,()=>{action();});
   this.hits.unshift({x:0,y:0,w:this.w,h:this.h,label:'关闭装备详情',action:()=>this.closeWorldPanel()});
+ }
+ function equipmentTarget(){
+  const p=this.panel,item=p.item,members=this.model.members().filter(u=>I.canEquip(u,item)),f=this.frame('选择装备者',Math.min(720,112+members.length*80)),left=f.x+18,w=f.w-36,top=f.y+64,bottom=f.y+f.h-18,c=this.ctx;
+  p.maxScroll=Math.max(0,members.length*80-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);const before=this.hits.length;c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
+  for(const [i,u]of members.entries()){
+   const y=top+i*80-p.scroll,targets=item.slot==='accessory'?['accessory1','accessory2']:[item.slot||'weapon'],bw=(w-8*(targets.length-1))/targets.length;this.text(u.name,left,y+8,16,'#dacbaa');
+   targets.forEach((slot,index)=>{const old=this.model.equipped(u.id,slot),same=p.equipmentOwnerId===u.id&&p.equipmentSlot===slot;this.button((targets.length>1?(index+1)+' · ':'')+(old?.name||'空位'),left+index*(bw+8),y+25,bw,34,()=>{
+    const ok=p.equipmentOwnerId?this.model.transferEquipment(p.equipmentOwnerId,p.equipmentSlot,u.id,slot):this.model.changeEquipment(u.id,slot,item.uid);if(ok){this.save();this.notify('已为'+u.name+'装备 '+item.name);this.panel=p.previous?.previous||null;}
+   },{disabled:same});});
+  }
+  c.restore();this.hits=this.hits.filter((hit,i)=>i<before||hit.y>=top&&hit.y+hit.h<=bottom);if(!members.length)this.text('队伍中暂无可使用这件装备的角色',left+w/2,top+34,14,'#a6b5ab','center');
  }
  function inventory(){
   if(this.panel.category==='trophies')return root.TrophyPanels.warehouse(this);
-  const p=this.panel,shop=p.type==='shop',selling=shop&&p.shopMode==='sell',prefs=preferences(this,p),source=shop&&!selling?(p.shopItems||=I.shopTemplates().map(id=>I.preview(id,'white','shop-'+id,this.model.character.level))):shop||p.slot?this.model.state.inventory:[...this.model.state.inventory,...root.StoryRules.itemRecords(this.model)],query={...prefs,slot:p.slot||prefs.slot,types:p.slot&&p.slot!=='weapon'?[]:prefs.types},queryKey=JSON.stringify(query);
-  if(p.itemSource!==source||p.itemLength!==source.length||p.queryKey!==queryKey){p.itemSource=source;p.itemLength=source.length;p.queryKey=queryKey;p.items=I.select(source,query).filter(item=>!p.slot||I.canEquip(this.model.members().find(u=>u.id===p.unitId),item));}
-  const items=p.items;if(p.selected&&!items.some(item=>item.uid===p.selected))p.selected=null;
-  const f=this.frame(p.slot?'选择'+slots.find(s=>s[0]===p.slot)[1]:shop?(selling?'出售':'购买'):'背包',600),left=f.x+16,w=f.w-32,c=this.ctx,top=f.y+(p.slot?106:shop?140:144),bottom=f.y+f.h-(selling?64:16),cols=Math.max(3,Math.floor(w/96)),cw=(w-8*(cols-1))/cols,rowH=120;
+  const p=this.panel,shop=p.type==='shop',selling=shop&&p.shopMode==='sell',prefs=preferences(this,p),source=shop&&!selling?(p.shopItems||=I.shopTemplates().map(id=>I.preview(id,'white','shop-'+id,this.model.character.level))):shop?this.model.state.inventory:p.slot?this.model.equipmentEntries():[...this.model.equipmentEntries(),...root.StoryRules.itemRecords(this.model)],query={...prefs,slot:p.slot||prefs.slot,types:p.slot&&p.slot!=='weapon'?[]:prefs.types},queryKey=JSON.stringify(query);
+  if(p.itemSource!==source||p.itemLength!==source.length||p.queryKey!==queryKey){p.itemSource=source;p.itemLength=source.length;p.queryKey=queryKey;p.items=I.select(source,query).sort((a,b)=>Number(!!b.ownerId)-Number(!!a.ownerId)).filter(item=>!p.slot||I.canEquip(this.model.members().find(u=>u.id===p.unitId),item)&&!(item.ownerId===p.unitId&&item.equipmentSlot===p.slot));}
+  const items=p.items;if(p.selected&&!items.some(item=>(item.entryKey||item.uid)===p.selected))p.selected=null;
+  const f=this.frame(p.slot?'选择'+slots.find(s=>s[0]===p.slot)[1]:shop?(selling?'出售':'购买'):'背包',600),left=f.x+16,w=f.w-32,c=this.ctx,top=f.y+(p.slot?106:shop?140:144),bottom=f.y+f.h-(selling?64:16),cols=Math.max(3,Math.floor(w/96)),cw=(w-8*(cols-1))/cols,rowH=shop?120:148;
   textButton(this,'筛选',f.x+f.w-154,f.y+9,48,30,()=>{this.panel={type:'inventoryFilter',inventory:p,previous:p,scroll:0};},!!(prefs.qualities.length||prefs.types.length||prefs.slot!=='all'));
   textButton(this,'排序',f.x+f.w-100,f.y+9,48,30,()=>{this.panel={type:'inventorySort',inventory:p,previous:p,scroll:0};});
   if(!shop)root.TrophyPanels.tabs(this,p,f);
@@ -156,7 +173,7 @@
   this.text(items.length+' 件',left+w,f.y+(p.slot?76:116),14,'#a9bdc4','right');
   p.maxScroll=Math.max(0,Math.ceil(items.length/cols)*rowH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);const before=this.hits.length,first=Math.floor(p.scroll/rowH)*cols,end=Math.min(items.length,Math.ceil((p.scroll+bottom-top)/rowH)*cols);
   c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
-  for(let i=first;i<end;i++){const item=items[i],x=left+(i%cols)*(cw+8),y=top+Math.floor(i/cols)*rowH-p.scroll;if(p.selected===item.uid)this.box(x,y,cw,108,'#c6b26a14','#e6d295',3);itemIcon(this,item,x+(cw-44)/2,y+8,44);this.text(item.name,x+cw/2,y+70,14,color(item),'center');this.text(I.typeLabel(item),x+cw/2,y+94,14,'#8fa49a','center');this.hits.push({x,y,w:cw,h:108,label:'选择 '+item.name,action:()=>{p.selected=item.uid;this.openItemDetail(item,{unitId:p.unitId,slot:p.slot,...(shop?{transaction:selling?'sell':'buy'}:{}),readonly:!!item.questItem,previous:p});}});}
+  for(let i=first;i<end;i++){const item=items[i],x=left+(i%cols)*(cw+8),y=top+Math.floor(i/cols)*rowH-p.scroll;if(p.selected===(item.entryKey||item.uid))this.box(x,y,cw,rowH-10,'#c6b26a14','#e6d295',3);itemIcon(this,item,x+(cw-44)/2,y+8,44);if(item.ownerId)ownerBadge(this,item.ownerId,x+(cw-44)/2,y+8,44);this.text(item.name,x+cw/2,y+70,14,color(item),'center');this.text(I.typeLabel(item),x+cw/2,y+94,14,'#8fa49a','center');if(!shop&&item.ownerName)this.text(item.ownerName,x+cw/2,y+121,12,'#9fbe97','center');this.hits.push({x,y,w:cw,h:rowH-10,label:'选择 '+item.name+(item.ownerName?' · '+item.ownerName:''),action:()=>{p.selected=item.entryKey||item.uid;this.openItemDetail(item,{unitId:p.unitId,slot:p.slot,equipmentOwnerId:item.ownerId,equipmentSlot:item.equipmentSlot,...(shop?{transaction:selling?'sell':'buy'}:{}),readonly:!!item.questItem,previous:p});}});}
   c.restore();this.hits=this.hits.filter((hit,i)=>i<before||hit.y>=top&&hit.y+hit.h<=bottom);
   if(p.maxScroll){const h=bottom-top,thumb=Math.max(22,h*h/(h+p.maxScroll)),y=top+(h-thumb)*p.scroll/p.maxScroll;this.box(left+w-3,y,3,thumb,'#78959e',null,1);}
   if(!items.length)this.text(source.length?'没有符合条件的装备':p.slot?'没有可更换的装备':selling?'没有可出售的装备':'背包是空的',f.x+f.w/2,(top+bottom)/2,14,'#8fa6af','center');
@@ -215,7 +232,7 @@
   const trophyId=q.id==='changshan'?'peace-jade':q.id==='reed-shrine'?'sacred-censer':q.id==='visit-courts'?'three-courts-seal':null;if(trophyId){let item=root.TrophyCatalog.create(trophyId,'quest-preview-'+trophyId);if(q.id==='visit-courts')while(item.level<8)item=root.TrophyCatalog.upgrade(item);items.push(item);}
   if(q.id==='chapter-one')for(const [name,iconId,description]of [['战斗经验','任务','击败守军后，按每场战斗获得经验。'],['铜钱','./assets/ui/copper-coins-v1.webp','击败守军后，按每场战斗获得铜钱。'],['随机装备','iron-armor','战斗中有概率掉落随机属性装备。'],['稀有遗物','trophy-scale','战斗中有较低概率掉落遗物。']])items.push({name,iconId,description,slot:'quest',questItem:true,quality:'white'});
   if(q.id.startsWith('report-'))money=view.model.pendingReports(q.id.slice(7)).length*root.FactionCourts.rewardPerHero;
-  return {money,items,recruits:q.id==='changshan'?[{id:'zhaoyun',name:'赵云'}]:hero?[{id:hero.id,name:hero.name}]:[]};
+  return {money,items,recruits:hero?[{id:hero.id,name:hero.name}]:[]};
  }
  function tasks(){
   const p=this.panel;this.model.readQuests();p.category||=this.model.state.questTab;p.statusFilter||='active';
@@ -265,9 +282,11 @@
   if(rewards.recruits.length){this.text('同行之缘',left,y,16,'#d8c18b');y+=24;for(const recruit of rewards.recruits){const art=root.CharacterAssets?.resolve(recruit.id)?.portrait;this.box(left,y,w,76,'#222825','#6b6951',3);if(art)this.portrait(art,left+10,y+10,54);this.text(recruit.name,left+78,y+27,18,'#dfcfaa');this.text('完成故事后，可商议同行',left+78,y+53,14,'#a6b3a4');this.hits.push({x:left,y,w,h:76,label:'观察 '+recruit.name,action:()=>{const unit=this.model.recruitPreview(recruit.id);if(unit){this.panel={type:'character',unitId:unit.id,unit,readonly:true,previous:p};this.invalidate();}}});y+=88;}}
   if(!rewards.money&&!rewards.items.length&&!rewards.recruits.length){this.text('后续',left,y,16,'#d8c18b');y=this.wrap(q.id==='coalition'?'三国人手齐备后，洛阳战线将开启。':'完成眼前的事，继续新的旅程。',left,y+29,w,{size:14,line:24,color:'#abb4a5'});}
   p.maxScroll=Math.max(0,y+(p.scroll||0)+12-bottom);p.scroll=clamp(p.scroll||0,0,p.maxScroll);c.restore();this.hits=this.hits.filter((hit,i)=>i<oldHits||hit.y>=top&&hit.y+hit.h<=bottom);
+  if(offer&&p.forced){this.button(p.acceptLabel||'同行',left,f.y+f.h-56,w,36,()=>{p.onAccept();this.invalidate();},{active:true});return;}
   if(offer){const bw=(w-10)/2;this.button('稍后再说',left,f.y+f.h-56,bw,36,()=>{this.panel=p.previous||null;this.invalidate();});this.button(q.repeatable?'接下委托':'答应相助',left+bw+10,f.y+f.h-56,bw,36,()=>{p.onAccept();this.invalidate();},{active:true});return;}
+  if(q.id==='visit-courts'&&!q.complete){const courts=Object.values(root.FactionCourts.definitions),bw=(w-16)/3;courts.forEach((d,i)=>{const visited=!!this.model.state.recruitAssignments[d.country];this.button(root.WorldData.placeMap[d.place].name+(visited?' · 已访':''),left+i*(bw+8),f.y+f.h-56,bw,36,()=>goQuest(this,{...q,target:d.place}),{active:!visited});});return;}
   const returnLabel=p.previous?.type==='tasks'?'返回手记':'返回场景';this.button(q.complete?returnLabel:place?'前往 '+place.name:returnLabel,left,f.y+f.h-56,w,36,()=>{if(q.complete||!place)this.panel=p.previous||null;else goQuest(this,q);this.invalidate();},{active:!q.complete&&!!place});
  }
- const handlers={character,characterDetails:details,tasks,taskFilter,trackerOrder,party,memberActions,formation,inventory,inventoryFilter,inventorySort,shop:inventory,reward,taskDetail,taskOffer:taskDetail,itemDetail,bulkSell};
- const api={displayAttribute,icon,iconButton,textButton,bar,itemIcon,questIcon,questColors,draw(v){if(root.TrophyPanels?.draw(v))return true;const p=v.panel,fn=handlers[p?.type];if(!fn)return false;if(['itemDetail','bulkSell'].includes(p.type)&&handlers[p.previous?.type]){v.panel=p.previous;try{handlers[p.previous.type].call(v);}finally{v.panel=p;}}fn.call(v);return true;}};root.WorldPanels=api;if(node)module.exports=api;
+ const handlers={equipmentTarget,character,characterDetails:details,tasks,taskFilter,trackerOrder,party,memberActions,formation,inventory,inventoryFilter,inventorySort,shop:inventory,reward,taskDetail,taskOffer:taskDetail,itemDetail,bulkSell};
+ const api={displayAttribute,icon,iconButton,textButton,ownerBadge,bar,itemIcon,questIcon,questColors,draw(v){if(root.TrophyPanels?.draw(v))return true;const p=v.panel,fn=handlers[p?.type];if(!fn)return false;if(['itemDetail','bulkSell'].includes(p.type)&&handlers[p.previous?.type]){v.panel=p.previous;try{handlers[p.previous.type].call(v);}finally{v.panel=p;}}fn.call(v);return true;}};root.WorldPanels=api;if(node)module.exports=api;
 })(globalThis);

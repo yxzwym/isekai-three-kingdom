@@ -6,7 +6,7 @@ test('54个基础武器技能均有独立技能插画，同一武器的技能不
 });
 test('强化技能沿用对应图标，专武改名改倍率仍按技能模板解析，也可覆盖图标',()=>{
  for(const type of C.types)for(const skill of type.daySkills||[]){const base=skill.id.replace(/-day$/,'');if(S.ids.includes(base))assert.equal(S.resolve(skill).id,base);}
- const weapon=W.resolveWeapon({id:'fangtian-halberd',type:'halberd'}),definitions=W.definitionsForWeapon(weapon);assert.deepEqual(definitions.map(s=>S.resolve({...s,name:'专武绝技',scaling:{war:99}}).id),['sword-critical','spear-break']);
+ const weapon=W.resolveWeapon({id:'fangtian-halberd',type:'halberd'}),definitions=W.definitionsForWeapon(weapon);assert.deepEqual(definitions.map(s=>S.resolve({...s,name:'专武绝技',scaling:{war:99}}).id),['sword-critical']);
  assert.equal(S.resolve({...definitions[0],iconId:'hammer-1'}).id,'hammer-1');assert.deepEqual(S.resolve({icon:{src:'./custom-skill.webp',crop:{x:10,y:20,width:40,height:40}}}),{src:'./custom-skill.webp',crop:{x:10,y:20,width:40,height:40}});
  assert.notEqual(S.resolve(W.skills['staff-shock']).column+':'+S.resolve(W.skills['staff-shock']).row,S.resolve(W.skills['staff-storm']).column+':'+S.resolve(W.skills['staff-storm']).row);
 });

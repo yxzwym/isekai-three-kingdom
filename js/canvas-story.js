@@ -15,7 +15,7 @@
     resize(){if(this.disposed||this.view)return;Object.assign(this,Viewport.resize(this.canvas,this.ctx));this.draw();}
     rememberLine(){
       const row=P.linesFor(this.progress.stage,this.progress)?.[this.progress.index];if(!row)return;
-      const names={hero:this.character.name,narrator:'旁白',zhangjiao:'张角',zhangbao:'张宝',zhangliang:'张梁',nanhua:'南华',yuji:'于吉',zuoci:'左慈','imperial-soldier':'官兵',villager:'老人'};
+      const names={hero:this.character.name,narrator:'旁白',zhangjiao:'张角',zhangbao:'张宝',zhangliang:'张梁',simayi:'司马懿',zhugeliang:'诸葛亮',zhouyu:'周瑜',nanhua:'南华',yuji:'于吉',zuoci:'左慈','imperial-soldier':'官兵',villager:'老人'};
       this.progress.history=root.ConversationJournal.append(this.progress.history,{name:names[row.speaker]||row.speaker,text:row.text.replaceAll('{name}',this.character.name),chapter:P.chapters[this.progress.stage]?.title});
     }
     openHistory(){this.panel={type:'history',scroll:null};this.draw();}
@@ -83,8 +83,8 @@
       const content=line.text.replaceAll('{name}',this.character.name);c.font=`16px ${FONT}`;const rows=UI.wrapLines(c,content,w-52),panelH=Math.max(208,112+rows.length*25+(line.choices?100:0)),top=h-panelH,partner=line.partner;
       if(line.speaker==='hero')this.bust('hero','right',top,true);else if(line.speaker!=='narrator')this.bust(partner,line.side||'left',top,true);
       const fade=c.createLinearGradient(0,top-24,0,top+panelH);fade.addColorStop(0,'#081b2600');fade.addColorStop(.25,'#081b26ed');fade.addColorStop(1,'#081b26ff');c.fillStyle=fade;c.fillRect(0,top-24,w,panelH+24);c.strokeStyle='#bcab8644';c.beginPath();c.moveTo(24,top+45);c.lineTo(w-24,top+45);c.stroke();
-      const names={zhangjiao:'张角',zhangbao:'张宝',zhangliang:'张梁',nanhua:'南华',zuoci:'左慈',yuji:'于吉','imperial-soldier':'官兵',villager:'老人',narrator:'',hero:this.character.name};
-      const right=(line.side|| (line.speaker==='hero'?'right':'left'))==='right';this.text(names[line.speaker]||'',right?w-26:26,top+24,16,'#ead1a2',right?'right':'left');
+      const names={zhangjiao:'张角',zhangbao:'张宝',zhangliang:'张梁',simayi:'司马懿',zhugeliang:'诸葛亮',zhouyu:'周瑜',nanhua:'南华',zuoci:'左慈',yuji:'于吉','imperial-soldier':'官兵',villager:'老人',narrator:'',hero:this.character.name};
+      const right=(line.side|| (line.speaker==='hero'?'right':'left'))==='right';this.text(line.speaker==='hero'?names.hero:UI.dialogueName(names[line.speaker]||''),right?w-26:26,top+24,16,'#ead1a2',right?'right':'left');
       rows.forEach((row,i)=>this.text(row,26,top+73+i*25,16));
       if(line.choices){line.choices.forEach((choice,i)=>this.button(choice.label,26,h-108+i*49,w-52,41,()=>this.chooseDream(choice.id)));}else{this.text('›',w-32,h-30,24,'#c7b386','center');UI.singleChoiceHit(this.hits,w,h,[{action:()=>this.next()}]);}
       if(this.saveError)this.text('存档写入失败',w/2,65,12,'#edaa92','center');

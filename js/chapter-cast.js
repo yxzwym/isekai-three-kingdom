@@ -13,14 +13,8 @@
  ];
  const definitions=Object.fromEntries(entries.map(([id,name,country,type,home])=>[id,{id,name,country,type,home,level:10}]));
  const clone=value=>JSON.parse(JSON.stringify(value));
- Object.assign(definitions.guanyu,{weapon:{id:'green-dragon-glaive',name:'青龙偃月刀',skills:[{base:'sword-eagle',name:'青龙斩'},{base:'spear-break',name:'偃月横扫'}]},passives:['guanyu-righteous']});
- Object.assign(definitions.zhangfei,{weapon:{id:'serpent-spear',type:'spear',proficiencyType:'spear',name:'丈八蛇矛',skills:[{base:'axe-1',name:'燕人怒击'},{base:'spear-break',name:'蛇矛横扫'}]},passives:['zhangfei-roar']});
- Object.assign(definitions.machao,{weapon:{name:'飞翼枪'},passives:['machao-valiant']});
- Object.assign(definitions.lvbu,{weapon:{id:'fangtian-halberd',name:'方天画戟',type:'halberd',proficiencyType:'spear',skills:['sword-critical','spear-break']},passives:['lvbu-peerless'],guaranteedCritical:true,ignoreArmor:true});
- Object.assign(definitions.zhangjiao,{weapon:{id:'fire-god-staff',name:'火神杖'},passives:['thunder-lord']});
- Object.assign(definitions.zhugeliang,{type:'fan',weapon:{name:'白羽扇'},passives:['zhuge-eight-trigrams']});
- Object.assign(definitions.zhouyu,{type:'fan',weapon:{id:'zhouyu-featherfan',name:'朱羽扇',type:'fan',skills:[{base:'staff-fire',name:'焰火计'},{base:'staff-flame',name:'赤焰连营'}]},passives:['zhouyu-flames']});
- Object.assign(definitions.luxun,{type:'fan',weapon:{id:'luxun-featherfan',name:'青竹扇',type:'fan',skills:[{base:'staff-fire',name:'火伏计'},{base:'staff-flame',name:'连营焚野'}]},passives:['luxun-fire']});
+ Object.assign(definitions.lvbu,{weapon:{id:'fangtian-halberd',name:'方天画戟',type:'spear',unique:true,exclusive:true,quality:'purple'},passives:['lvbu-guishen','lvbu-wushuang']});
+ Object.assign(definitions.zhugeliang,{type:'fan'});Object.assign(definitions.zhouyu,{type:'fan'});Object.assign(definitions.luxun,{type:'fan'});
  Object.assign(definitions.huatuo,{passives:['huatuo-healer']});
  Object.assign(definitions.dongzhuo,{passives:['dongzhuo-soldier']});
  Object.assign(definitions.xuhuang,{passives:['xuhuang-steady','xuhuang-martial']});Object.assign(definitions.yujin,{passives:['yujin-discipline','yujin-guard']});Object.assign(definitions.caoren,{passives:['caoren-fortress','caoren-tenacious']});
@@ -36,7 +30,7 @@
  function unit(id,level,{boss=false}={}){
   const d=definitions[id];if(!d)throw new TypeError('未登记剧情人物：'+id);
   level??=d.level;
-  const weapon={...I.create('weapon-'+d.type,boss?'blue':'green',id+'-weapon'),...clone(d.weapon||{})},skills=W.forWeapon(weapon),growth=G.create(id,level),armor=I.create(boss?'iron-armor':'leather-armor',boss?'blue':'green',id+'-armor');
+  const type=(node?require('./hero-professions.js'):root.HeroProfessions).definitions[id]?.weaponType||d.type,weapon={...I.create('weapon-'+type,boss?'blue':'green',id+'-weapon'),...clone(d.weapon||{})},skills=W.forWeapon(weapon),growth=G.create(id,level),armor=I.create(boss?'iron-armor':'leather-armor',boss?'blue':'green',id+'-armor');
   const u={...growth,id,name:d.name,characterId:id,unitType:'general',homeNode:d.home,experience:0,experienceVersion:2,weaponPlanVersion:3,weapon,skills,priorities:W.prioritiesFor(skills),equipment:{armor,accessory1:boss?I.create('copper-ring','blue',id+'-ring'):null,accessory2:boss?I.create('wood-beads','blue',id+'-beads'):null},armor:boss?15:3,resistance:boss?15:3,passives:clone(d.passives||[])};
   if(d.guaranteedCritical)u.guaranteedCritical=true;if(d.ignoreArmor)u.ignoreArmor=true;return u;
  }

@@ -96,6 +96,20 @@
       line('nanhua','先从近的地方试试吧，赵子龙就在常山照顾逃难的百姓。常山离营地不远，你能先在那里熟悉一下情况，不用马上跑遍天下。','nanhua'),
       line('hero','人是能找到，可我跟他们非亲非故的，凭什么劝他们走？','nanhua'),
       line('yuji','先去见一面，问问他们遇到了什么困难。能帮的事情就帮一帮，熟悉以后再谈以后的打算，愿意跟着走的人，也可以先和你同行。','yuji'),
+      line('hero','可他们凭什么信我？我到了城门口，说是三位神仙让我来的，只怕连门都进不去。','nanhua'),
+      line('zuoci','这倒不难。你先别走，我把能作主的人请来。','zuoci'),
+      line('narrator','左慈抬袖一拂，雾中又亮起三道人影。有人手中还握着笔，有人披着外衣，显然也是从睡梦中被唤来的。',null),
+      line('simayi','这是何处？……孔明，公瑾？你们怎么也在这里？','simayi'),
+      line('zhouyu','我方才还在府中。三位前辈，这是用了什么法术？','zhouyu'),
+      line('nanhua','不必惊慌。请三位宰相入梦，是有一件事相托。这位叫{name}，从后世而来，知道一些你们尚未经历的事。','nanhua'),
+      line('zhugeliang','后世之人？这……莫非连我等今日所为，也早已记在书中？','zhugeliang'),
+      line('hero','我只读过一些书。这里已经和书里不同了，我说的也未必都准。','zhugeliang'),
+      line('yuji','如今朝廷落在董卓手里，各地战乱不断。我们请他走访乡里，寻访能人。路上若有难处，还望三位相助，别让他孤身奔走。','yuji'),
+      line('simayi','董卓把持朝政，许昌也屡受其害。若能联络各方共讨董卓，我愿相助。你到了许昌，报我的名字，门吏自会带你入府。','simayi'),
+      line('zhugeliang','成都也正缺人手。你若寻到愿意救民于水火之人，可来府中找我。钱粮、住处，届时一同商议。','zhugeliang'),
+      line('zhouyu','江东亦不愿坐看洛阳生乱。三家合兵，总好过各自为战。到了建业便来找我，我会交代府里的人候着。','zhouyu'),
+      line('hero','那我先从常山走起。等路上安稳些，就去三位府上拜访。','simayi'),
+      line('zuoci','人都认过了，可别到了门前又把他当骗子赶出去。至于董卓，待人手齐备，咱们再商量。','zuoci'),
       {...line('nanhua','我们知道这趟有危险，不能让你白白承担。等这里的事情办好，我们会负责送你回去，让你能重新见到家里人，这件事一定会做到。','nanhua'),choices:[{id:'gold',label:'那可不够，还要十万两黄金'},{id:'stay',label:'我不想回去'}]}
     ]},
     dawn:{scene:'camp',title:'序章 · 天明',next:'departure',lines:[
@@ -118,7 +132,7 @@
     ]}
   };
   const stages=['arrival','first-fight','aftermath','manual-fight','reinforcements','prepare','squad-fight','camp','dream','dawn','departure','world','complete'];
-  const dreamEnding=line('narrator','营帐外有人开始叫大家吃早饭。你还想再问，三个人的身影却慢慢消失在雾里。等你睁开眼，看到的已经是帐篷的布顶。',null);
+  const dreamEnding=line('narrator','营帐外有人开始叫大家吃早饭。你还想再问，众人的身影却慢慢消失在雾里。等你睁开眼，看到的已经是帐篷的布顶。',null);
   const dreamBranches={
     gold:[
       line('hero','送我回去本来就是你们该做的。我还得替你们跑遍各地，弄不好连命都搭进去。事情办成以后，再给我十万两黄金，怎么样？','nanhua'),
@@ -151,7 +165,7 @@
   function hero(character){return {id:'hero',name:character.name,...G.characterAt(character),...assets('hero',character.appearance,true),weapon:null,attack:1,armor:0,resistance:0,healthOverride:1,maxSoldiers:1,startSoldiers:1,skills:['punch'],priorities:[{skill:'punch',when:'always'}]};}
   function general(id,level=10){
     const data={
-      zhangjiao:{name:'张角',attack:8,armor:8,resistance:8,weapon:{type:'staff',id:'fire-god-staff',name:'火神杖',school:'thunder'},skills:['staff-shock','staff-storm'],passives:['thunder-lord'],priorities:[{skill:'staff-storm',when:'enemyCount',threshold:3},{skill:'staff-shock',when:'always',frequency:'sometimes'}]},
+      zhangjiao:{name:'张角',attack:8,armor:8,resistance:8,weapon:{type:'staff',name:'木杖'},skills:W.forWeapon({type:'staff'}),passives:['thunder-lord'],priorities:W.prioritiesFor(W.forWeapon({type:'staff'}))},
       zhangbao:{name:'张宝',attack:8,armor:8,resistance:10,weapon:{type:'scripture',name:'太平经'},skills:W.forWeapon({type:'scripture'}),priorities:[{skill:'scripture-2',when:'healThresholds',selfThreshold:.85,allyThreshold:.85},{skill:'scripture-3',when:'enemyCount',threshold:2,disabled:true}]},
       zhangliang:{name:'张梁',passives:['zhangliang-might','zhangliang-hardy'],attack:8,armor:12,resistance:6,weapon:{type:'spear',name:'铁枪'},skills:W.forWeapon({type:'spear'}),priorities:W.prioritiesFor(W.forWeapon({type:'spear'}))}
     };

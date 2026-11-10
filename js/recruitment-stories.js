@@ -41,7 +41,7 @@
  lu.stages['trial-talk']=S('xinye','与吕布约定同行的条件','lvbu',[
   ['npc','住处和粮食都到了，我没想到你们真会一户户把人接齐。可你们接下来要去洛阳，那里的仗不是救几辆车这么简单。'],['hero','我知道你在担心什么。如果我们连眼前这支队伍都带不好，就算你来了，也不过是把所有危险推给你。'],['npc','那就在营外试一场。你带平常同行的人，我也带两个亲卫，用自己的兵器，不让你故意占便宜。打不过就先去练，什么时候准备好了都能再来，我不会因为你输一场就不认人。']],[N('准备好后接受考验','trial')]);
  battle('lvbu','trial','xinye','lvbu','通过吕布的实战考验',[
-  ['npc','伤药已经放在旁边。大家站好，别只盯着我的戟，要看队友还能不能撑住。准备好了就来！']],'freed',{roster:()=>{const chapter=node?require('./chapter-one.js'):root.ChapterOne;return chapter.enemies('gate').map((u,i)=>({...u,id:'lvbu-trial-'+i,name:i?'吕布亲卫':u.name,...(i?{weapon:{...u.weapon,name:'练武长枪',power:25},equipment:{...u.equipment,armor:{id:'training-guard-armor',name:'练武皮甲',slot:'armor',quality:'green',attributes:{constitution:20,armor:40,resistance:12}}}}:{})}));},scene:'farmland',level:15});
+  ['npc','这回只试配合，我会收着力，你们不必顾忌。伤药就在旁边，撑不住便喊停。别只盯着我的戟，还得看住同伴！']],'freed',{roster:()=>{const chapter=node?require('./chapter-one.js'):root.ChapterOne;return chapter.enemies('gate').map((u,i)=>({...u,id:'lvbu-trial-'+i,name:i?'吕布亲卫':u.name,...(!i?{damageMultiplier:.35}:{}),...(i?{weapon:{...u.weapon,name:'练武长枪',power:25},equipment:{...u.equipment,armor:{id:'training-guard-armor',name:'练武皮甲',slot:'armor',quality:'green',attributes:{constitution:20,armor:40,resistance:12}}}}:{})}));},scene:'farmland',level:15});
  lu.stages.freed.npc.turns=[{speaker:'npc',text:'行，我跟你们走。不是因为赤兔，是因为你们答应照顾的人，最后都没有落下。到了洛阳，我也要当面问清楚，那些命令到底是谁下的。'},{speaker:'hero',text:'那就一起去。弟兄们留在这里照顾家人，有事随时回来。我们要做的事还很多，路上慢慢商量。'}];
  di.visibility={any:[{flags:{diaochanLead:true}},{chapterComplete:true}]};di.title='天香阁来信';
  di.stages.rumor=S('luoyang','把管事的口信带给貂蝉','diaochan',[

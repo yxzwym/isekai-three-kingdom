@@ -48,6 +48,6 @@ test('任务详情分别展示三条拜访进度与满级奖励，结算物品�
   v.hits.find(h=>h.label==='奖励详情 三府信符').action();assert.equal(v.panel.item.level,8);assert.equal(v.panel.readonly,true);assert.deepEqual(T.totals([v.panel.item]),{hitBonus:8});Panels.draw(v);assert.ok(!v.hits.some(h=>/装备给|升级至/.test(h.label)));
   const armor=w.addItem('iron-armor','green'),trophy=w.addTrophy('fang'),parent={type:'reward',reward:{items:[armor,trophy],gains:[],money:0},started:0,scroll:0};
   for(const item of [armor,trophy]){v.panel=parent;Panels.draw(v);v.hits.find(h=>h.label.endsWith(' '+item.name)).action();assert.equal(v.panel.readonly,true);Panels.draw(v);assert.ok(!v.hits.some(h=>/^(装备|更换|升级)/.test(h.label)));assert.equal(v.panel.previous,parent);v.closeWorldPanel();assert.equal(v.panel,parent);}
-  v.openItemDetail(armor,{previous:{type:'inventory'}});Panels.draw(v);assert.ok(v.hits.some(h=>h.label==='装备'));
+  v.openItemDetail(armor,{previous:{type:'inventory'}});Panels.draw(v);assert.ok(v.hits.some(h=>h.label==='装备给…'));
  }finally{global.RpgIcons=old;}
 });

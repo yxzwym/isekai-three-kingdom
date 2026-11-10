@@ -8,6 +8,12 @@ test('新地图默认能看到乡县，缩放平滑过渡并保存目标缩放�
 test('地图未接任务只在附近可见，接取后异地追踪，完成战斗后标记交付地点',()=>{
  const {v}=base(),w=v.model;w.arrive('chengdu');assert.equal(w.questMarkers().some(q=>q.title==='山道清剿'),false);w.arrive('changshan');assert.ok(w.questMarkers().some(q=>q.title==='山道清剿'&&!q.accepted));w.acceptSide('clear-mountain');w.arrive('chengdu');assert.ok(w.questMarkers().some(q=>q.place==='zhongshan'&&q.accepted));w.state.quests.side['clear-mountain'].wins=5;assert.ok(w.questMarkers().some(q=>q.place==='changshan'&&q.accepted));
 });
+
+test('下指针只标已接任务目标，同地合并，常山随阶段更新且点击可选中',()=>{
+ const {v}=base(),w=v.model,old=global.WorldMapArt,drawn=[];global.WorldMapArt={questPointer(view,entry,now){drawn.push([entry.node.id,now]);return{x:80,y:80,w:44,h:58};}};v.h=960;v.dialogue=null;
+ const entries=()=>['changshan','zhongshan','zhongshan-county'].map(id=>({node:D.placeMap[id],label:{x:100,y:180,w:60,h:22}}));
+ try{v.drawQuestPointers(entries(),w.questMarkers(),100);assert.deepEqual(drawn.map(d=>d[0]),['changshan']);assert.ok(v.panelAnimating());v.hits.find(h=>h.label==='任务目标 常山').action();assert.equal(v.selected,'changshan');w.state.quests.changshan.stage='supplies';drawn.length=0;v.hits=[];v.drawQuestPointers(entries(),w.questMarkers(),200);assert.deepEqual(drawn.map(d=>d[0]),['zhongshan']);w.acceptSide('clear-mountain');drawn.length=0;v.drawQuestPointers(entries(),w.questMarkers(),300);assert.equal(drawn.filter(d=>d[0]==='zhongshan').length,1);w.state.quests.changshan.stage='complete';w.state.quests.side['clear-mountain'].paid=true;drawn.length=0;v.drawQuestPointers(entries(),w.questMarkers(),400);assert.equal(drawn.length,0);assert.equal(v.questPointersVisible,false);}finally{global.WorldMapArt=old;}
+});
 test('地图拖动与点击互斥，拖过地标不会触发前往',()=>{const {v,count}=base();v.hits[0].placeId='julu';v.hits[0].center={x:80,y:220};v.down(e(50,220));v.move(e(150,300));v.up(e(150,300));assert.equal(count(),0);assert.notEqual(v.camera.x,740);});
 test('地图与弹窗切换后拒绝旧点击，未绘制的新界面也不会穿透旧按钮',()=>{const {v,count}=base();v.down(e(50,220));v.panel={type:'menu'};v.invalidate();v.up(e(50,220));assert.equal(count(),0);v.down(e(50,220));v.up(e(50,220));assert.equal(count(),0);});
 test('多个触点互不接管点击，狂点同一按钮不会在重绘前重复执行',()=>{const {v,count}=base();v.down(e(50,220));v.down(e(50,220,2));v.up(e(50,220,2));assert.equal(count(),0);v.up(e(50,220));assert.equal(count(),1);v.down(e(50,220));v.up(e(50,220));assert.equal(count(),1);v.drawnRevision=v.revision;v.down(e(50,220));v.up(e(50,220));assert.equal(count(),2);});

@@ -10,7 +10,7 @@
    f.pattern=f.fixedPattern||patternNames[(route+index++)%patternNames.length];
    if(!f.duel&&!f.roster&&!f.named){f.count=Math.max(f.count||3,3);if(!f.fixedPattern&&level>=10&&route%5===0){f.pattern='ambush';f.count=4;}f.enemyRoles=null;}
    if(duel){f.temporaryPassives=[...new Set([...(f.temporaryPassives||[]),'enemy-stun-resistance','enemy-healing-suppression'])];}
-   for(const stage of Object.values(d.stages||{}))if(stage.npc?.choices?.some(c=>c.battle===phase))stage.recommendedLevel=f.level;
+   for(const stage of Object.values(d.stages||{}))if(stage.npc?.choices?.some(c=>c.battle===phase)){stage.recommendedLevel=f.level;const npc=stage.npc;if(!f.roster&&!f.named&&!f.duel&&!H.definitions[npc.id]&&['brigand','thief','imperial-soldier','mountain-bandit','river-bandit','li-yong'].includes(npc.art)){f.leaderName=npc.name;f.leaderArt=npc.art;}}
   }if(d.id==='lvbu')d.battles.trial.temporaryPassives=[...(d.battles.trial.temporaryPassives||[]),'enemy-trial-armor'];if(d.id==='ganning'){d.battles.breach.count=5;d.battles.breach.pattern='shieldwall';d.battles.cell.count=5;d.battles.cell.pattern='siege';}if(d.id==='taishici')for(const key of ['jianye-meet','jianye-duel','freed'])d.stages[key].recommendedLevel=12;route++;
  }
  const early={'grain-escort':3,'cs-blackwood':3,'clear-mountain':3,'trade-road':4,'ye-quarry':5};

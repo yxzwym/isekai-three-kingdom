@@ -6,8 +6,8 @@
     if(context.kind==='story'){
       const beats={
         entry:['守住最后两袋粮','村民推开了紧闭的门。赵云记住了与你并肩的这一战。','与赵云商议，结伴前往中山。'],
-        rescue:['祠堂的门打开了',q.healerJoined?'伤者登上了车。甄姬带着金针加入队伍，往后有人替你照看伤势。':'伤者登上了车。甄姬已获救，暂留毋极；队伍有空位时可邀请。','返回中山，夺回前后两院的粮车。'],
-        grain:q.grainWins<2?['前仓夺回','仓守把各家缝制的粮袋一一认了出来。还有最后一院。','粮仓后院 · 还差一战。']:['粮车装好了','两院粮袋全数清点。车夫套好缰绳，只等你一声出发。','护送粮车回常山，给这趟奔波一个交代。'],
+        rescue:['粮仓的门打开了','被扣押的伤者终于走出后仓，门后的医者向你道谢。','与获救的医者交谈，再护送粮车回常山。'],
+        grain:q.grainWins<2?['前仓夺回','仓守把各家缝制的粮袋一一认了出来。还有最后一院。','粮仓后院 · 还差一战。']:['乡粮夺回','两院粮袋全数清点，后院的锁门却传来呼救声。','查看后院，救出被扣押的人。'],
         escort:['常山，开门！','孩子们追着粮车跑进村。你一路护住的，终于成了灶上的热粥。','与里正交谈，再与赵云商议同行。']
       };
       const beat=beats[context.phase];return beat?{title:beat[0],text:beat[1],next:beat[2]}:null;
@@ -31,7 +31,7 @@
   }
   function objective(world){
     const q=world.state.quests.changshan;
-    const steps={available:['第一程 · 常山','去常山看看赵云与乡亲们的难处'],entry:['第一程 · 守住村口','与赵云并肩，挡住抢粮的盗匪'],supplies:['为常山带回粮食',q.zhaoInvitation?'与赵云商议结伴':q.grainWins?'再夺后仓，粮车就能上路':q.healerRescued?'返回中山，找仓守夺粮':'前往中山，向仓守询问粮车'],rescue:['先把人救出来','前往毋极，找车夫接应甄姬'],escort:['最后一程 · 护粮归乡','护送粮车返回常山'],return:['常山的灶火','进村与里正交谈，看看乡亲们'],decision:['一杆愿意同行的枪','与赵云商议下一程']};
+    const steps={available:['第一程 · 常山','去常山看看赵云与乡亲们的难处'],entry:['第一程 · 守住村口','与赵云并肩，挡住抢粮的盗匪'],supplies:['为常山带回粮食',q.zhaoInvitation?'与赵云商议结伴':q.grainWins?'再夺后仓，粮车就能上路':q.healerRescued?'返回中山，找仓守夺粮':'前往中山，向仓守询问粮车'],rescue:['粮仓里的呼救','查看中山粮仓后院，救出被扣押的人'],escort:['最后一程 · 护粮归乡','护送粮车返回常山'],return:['常山的灶火','进村与里正交谈，看看乡亲们'],decision:['一杆愿意同行的枪','与赵云商议下一程']};
     return steps[q.stage]||null;
   }
   function questReward(world,quest){
@@ -41,7 +41,7 @@
       const progress=world.state.quests.side[data.id];
       return '任务奖励 · '+data.money+'文'+(item?' · '+quality+item.name:'')+(progress?.accepted?'　进度 '+Math.min(data.rounds,progress.wins)+'/'+data.rounds:'');
     }
-    if(quest.id==='changshan')return '完成后可邀 · 赵云　途中可结识甄姬';
+    if(quest.id==='changshan')return '任务奖励 · 常山平安佩';
     if(quest.id==='coalition')return '达成目标 · 开启洛阳战线';
     const hero=root.HeroQuests?.definitions[quest.id];
     return hero?'完成后可邀 · '+hero.name:'';

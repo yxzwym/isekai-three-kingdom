@@ -114,7 +114,7 @@
     ['mountain-bandits','山道拦路','mountainBandit','山贼','mountain-bandit','blade',['blade-cut'],3,2],
     ['brigands','行路遇匪','brigand','强盗','brigand','blade',['blade-cut'],4,2]
   ])encounters[id]={id,title,count,scene:{background:'./assets/story/village-road-v3.webp'},roster:[outlaw(profile,level,name,art,type,skills)],rules:{level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true}};
-  encounters['changshan-rescue']={id:'changshan-rescue',title:'毋极接应',count:2,scene:{background:'./assets/story/village-road-v3.webp'},roster:[outlaw('thief',1,'盗贼','thief','dagger',['dagger-fast'])],rules:{level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true}};
+  encounters['changshan-rescue']={id:'changshan-rescue',title:'粮仓接应',count:2,scene:{background:'./assets/story/village-road-v3.webp'},roster:[outlaw('thief',1,'盗贼','thief','dagger',['dagger-fast'])],rules:{level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true}};
   for(const [id,scene]of Object.entries({patrol:'rural-road',thieves:'forest-path','river-bandits':'river-dock','mountain-bandits':'bandit-camp',brigands:'bandit-camp','changshan-rescue':'market-street'}))encounters[id].scene=Scenes.get(scene);
   const questDefinitions=[
     {id:'coalition',title:'访贤合盟',category:'main',recommendedLevel:10,longTerm:true},

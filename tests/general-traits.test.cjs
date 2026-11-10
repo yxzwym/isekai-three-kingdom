@@ -1,8 +1,8 @@
 const test=require('node:test'),assert=require('node:assert/strict'),E=require('../js/engine.js'),P=require('../js/passives.js'),Prologue=require('../js/prologue.js'),R=require('../js/game-rules.js'),W=require('../js/weapon-skills.js'),{World}=require('../js/world.js');
-test('赵云两红两金、张梁蓝绿白三被动，旧存档迁移保留其他被动且不重复添加',()=>{
- const hero={name:'行客',...R.rollHero('normal',()=>.4)},w=new World(hero,{nodeId:'changshan'});w.startChangshan();const z=w.members().find(u=>u.id==='zhaoyun');assert.deepEqual(R.sortPassives(z.passives,P.definitions).map(id=>P.definitions[id].quality),['red','red','gold','gold']);
- const liang=Prologue.general('zhangliang',15);assert.deepEqual(liang.passives.map(id=>P.definitions[id].quality),['green','white','blue']);
- const old={...z,passives:['thunder-lord']},once=W.migrateWeaponPlan(old),twice=W.migrateWeaponPlan(once);assert.deepEqual(once.passives,twice.passives);assert.ok(once.passives.includes('thunder-lord'));assert.equal(once.passives.length,5);
+test('赵云单专属加通用、张梁无专属，旧存档删除多余专属且幂等',()=>{
+ const hero={name:'行客',...R.rollHero('normal',()=>.4)},w=new World(hero,{nodeId:'changshan'});w.startChangshan();const z=w.members().find(u=>u.id==='zhaoyun');assert.deepEqual(R.sortPassives(z.passives,P.definitions).map(id=>P.definitions[id].quality),['red','gold','blue']);
+ const liang=Prologue.general('zhangliang',15);assert.deepEqual(liang.passives.map(id=>P.definitions[id].quality),['blue','blue']);
+ const old={...z,passives:['thunder-lord']},once=W.migrateWeaponPlan(old),twice=W.migrateWeaponPlan(once);assert.deepEqual(once.passives,twice.passives);assert.ok(!once.passives.includes('thunder-lord'));assert.equal(once.passives.length,3);
  assert.deepEqual(W.migrateWeaponPlan({...liang,passives:[]}).passives,liang.passives);
 });
 test('金绿白被动参与通用物理增伤、减伤，计策与反击真实伤害不受物理减伤影响',()=>{

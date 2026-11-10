@@ -1,0 +1,24 @@
+const test=require('node:test'),assert=require('node:assert/strict');
+require('../js/character-assets.js');require('../js/skill-info.js');require('../js/trophy-panels.js');
+const {CanvasBattle}=require('../js/canvas-battle.js'),{CanvasWorld}=require('../js/canvas-world.js'),{World}=require('../js/world.js'),E=require('../js/engine.js'),R=require('../js/game-rules.js'),D=require('../js/data.js'),Panels=require('../js/world-panels.js');
+function canvasContext(texts=[]){return new Proxy({measureText:t=>({width:Array.from(String(t)).length*12}),fillText:t=>texts.push(String(t)),createLinearGradient:()=>({addColorStop(){}})},{get:(o,k)=>o[k]||(()=>{})});}
+test('战斗角色页调用原有角色面板和详细属性，读取实时血量及增益，装备遗物技能均可查看但不能换装',()=>{
+ const world=new World({name:'行舟',appearance:'scholar',...R.rollHero('normal',()=>.5)},{weaponType:'sword'}),trophy=world.addTrophy('peace-jade');world.equipTrophy('hero',0,trophy.uid);const battle=new E.Battle({allies:world.members(),enemies:[{id:'foe',constitution:100,skills:['strike']}]}),u=battle.unit('hero'),texts=[],v=Object.assign(Object.create(CanvasBattle.prototype),{battle,w:540,h:960,dpr:1,ctx:canvasContext(texts),canvas:{},image(){return null;},options:{}}),oldIcon=global.RpgIcons,oldSkill=CanvasBattle.prototype.drawSkillIcon,draw=Panels.draw;let draws=0;
+ global.RpgIcons={draw(){},resolveItem(){return 'sword';}};CanvasBattle.prototype.drawSkillIcon=()=>{};Panels.draw=view=>{draws++;return draw(view);};
+ try{
+  v.openTactics(u);const draft=v.panel;u.soldiers=37;u.statuses.push({id:'boost',warMultiplier:1.5,expiresAt:1000});v.openCharacter(u,draft);v.drawPanel();assert.ok(draws>0);assert.equal(v.characterView.memberPreview(u),battle);assert.ok(texts.includes('37 / '+u.maxSoldiers));assert.ok(texts.includes('武力 '+Math.floor(battle.effective(u).war)));assert.ok(texts.includes('装备'));assert.ok(texts.includes('遗物'));assert.ok(v.hits.some(h=>h.label==='详细属性'));assert.ok(!v.hits.some(h=>/队伍设置|技能设置|装备遗物/.test(h.label)));
+  const character=v.panel;v.hits.find(h=>h.label==='查看武器').action();v.drawPanel();assert.equal(v.panel.readonly,true);assert.ok(!v.hits.some(h=>/^(装备给|转给|卸下|更换)/.test(h.label)));v.closePanel();assert.equal(v.panel,character);
+  v.drawPanel();v.hits.find(h=>h.label==='查看遗物 常山平安佩').action();v.drawPanel();assert.ok(!v.hits.some(h=>/装备给|升级至|已满级/.test(h.label)));v.closePanel();v.drawPanel();v.hits.find(h=>h.label==='详细属性').action();v.drawPanel();assert.ok(texts.includes('潜力(每级)'));v.closePanel();v.closePanel();assert.equal(v.panel,draft);assert.equal(u.soldiers,37);assert.deepEqual(world.state.inventory,[]);
+ }finally{global.RpgIcons=oldIcon;CanvasBattle.prototype.drawSkillIcon=oldSkill;Panels.draw=draw;}
+});
+
+function tactics(battle){const sliders=[],v=Object.assign(Object.create(CanvasBattle.prototype),{battle,w:540,h:960,hits:[],ctx:canvasContext(),panelFrame(){this.hits=[];return{x:0,y:0,w:460,h:940};},box(){},text(){},drawSkillIcon(){},skillRole(){return '';},slider(label,x,y,w,value,max,change,format){sliders.push({label,value,max,change,format});}});global.BattleVFX=require('../js/canvas-effects.js');return{v,sliders};}
+test('群攻滑条固定六档，人数减少不改档；始终释放对单个目标生效并可保存重载',()=>{
+ for(const count of [1,3,5,8]){
+  const scenario=D.createChibi({random:false}),base=scenario.enemies[0];scenario.enemies=Array.from({length:count},(_,i)=>({...base,id:'e'+i}));const b=new E.Battle(scenario),u=b.unit('zhouyu'),{v,sliders}=tactics(b);b.setPriorities(u.id,[{skill:'huoshen',when:'enemyCount',threshold:5}]);v.openTactics(u);v.drawTactics();const slider=sliders.find(s=>s.max===5);assert.ok(slider);assert.deepEqual(Array.from({length:6},(_,i)=>slider.format(i)),['从不释放','至少 2 人','至少 3 人','至少 4 人','至少 5 人','始终释放']);assert.equal(slider.value,4);slider.change(5);v.commitTactics();assert.equal(u.priorities[0].when,'always');assert.equal(b.autoCommand(u).skill,'huoshen');v.openTactics(u);assert.equal(v.panel.rules.find(r=>r.skill==='huoshen').when,'always');
+ }
+});
+test('嘲讽与反击只提供从不或始终保持，旧生命阈值迁移后不会重复施放有效状态',()=>{
+ const world=new World({name:'行舟',...R.rollHero('normal',()=>.5)},{weaponType:'shield'}),b=new E.Battle({allies:world.members(),enemies:[{id:'foe',constitution:100,skills:['strike']}]}),u=b.unit('hero'),{v,sliders}=tactics(b);u.skills=['shield-taunt','shield-reflect'];b.start();
+ const buffs=u.skills.filter(id=>b.skills[id].kind==='buff');assert.ok(buffs.length>=2);b.setPriorities(u.id,buffs.map(skill=>({skill,when:'selfBelow',threshold:.2})));v.openTactics(u);v.drawTactics();assert.equal(sliders.filter(s=>s.max===1).length,buffs.length);for(const s of sliders.filter(s=>s.max===1))assert.deepEqual([s.format(0),s.format(1)],['从不释放','始终保持']);v.commitTactics();const first=b.autoCommand(u);assert.ok(buffs.includes(first.skill));const skill=b.skills[first.skill];b.addStatus(u,u,{...skill.buff,id:skill.buff.id||skill.id},skill);assert.notEqual(b.autoCommand(u)?.skill,first.skill);
+});

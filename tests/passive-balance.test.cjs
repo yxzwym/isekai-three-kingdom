@@ -5,7 +5,7 @@ const rates={white:.05,green:.1,blue:.15,gold:.2,red:.25};
 
 test('通用特质的增益幅度按品质固定为5%、10%、15%、20%、25%，条件阈值独立保留',()=>{
   for(const p of Object.values(P.definitions)){
-    if(p.exclusive||p.temporary||p.enemyOnly||p.quality==='rainbow')continue;
+    if(p.legacy||p.exclusive||p.temporary||p.enemyOnly||p.quality==='rainbow')continue;
     const rate=rates[p.quality];assert.ok(rate,p.id);
     for(const [stat,value]of Object.entries(p.stats)){
       if(['executeThreshold','lowTroopsThreshold'].includes(stat)){assert.equal(value,.3,p.id);assert.match(p.description,/低于30%/,p.id);continue;}
@@ -26,9 +26,9 @@ test('开局各品质伤害天赋的面板与实际技能伤害一致，不再�
 });
 
 test('英雄专属与敌方临时规则保留独立数值和机制',()=>{
-  assert.deepEqual(P.definitions['lvbu-peerless'].stats,{guaranteedCritical:true,ignoreArmor:true});
+  assert.deepEqual(P.definitions['lvbu-guishen'].stats,{guaranteedCritical:true});assert.deepEqual(P.definitions['lvbu-wushuang'].stats,{physicalTrueDamage:true});
   assert.equal(P.definitions['zhuge-eight-trigrams'].stats.physicalDodgeBonus,.5);
-  assert.equal(P.definitions['zhaoyun-courage'].stats.missingHealthDamageBonus,.5);
+  assert.equal(P.definitions['zhaoyun-courage'],undefined);
   assert.equal(P.definitions['thunder-lord'].triggers[0].on,'dodge');
   assert.equal(P.definitions['enemy-healing-suppression'].stats.opponentHealingMultiplier,.25);
   assert.equal(P.definitions['enemy-stun-resistance'].stats.immuneStun,true);
@@ -37,8 +37,8 @@ test('英雄专属与敌方临时规则保留独立数值和机制',()=>{
 
 
 test('通用与专属同名时按被动ID独立生效，随机特质不会获得英雄专属机制',()=>{
-  const b=new E.Battle({allies:[{id:'random',name:'诸葛亮',constitution:100,passives:['guishen','bagua']},{id:'lvbu',constitution:100,passives:['lvbu-peerless']},{id:'zhugeliang',constitution:100,passives:['zhuge-eight-trigrams']}],enemies:[]}),random=b.effective(b.unit('random')),lvbu=b.effective(b.unit('lvbu'));
+  const b=new E.Battle({allies:[{id:'random',name:'诸葛亮',constitution:100,passives:['guishen','bagua']},{id:'lvbu',constitution:100,passives:['lvbu-guishen','lvbu-wushuang']},{id:'zhugeliang',constitution:100,passives:['zhuge-eight-trigrams']}],enemies:[]}),random=b.effective(b.unit('random')),lvbu=b.effective(b.unit('lvbu'));
   assert.equal(random.guaranteedCritical,false);assert.equal(random.criticalBonus,.25);assert.equal(random.ignoreArmor,false);
   assert.equal(b.dodgeChance(b.unit('random'),'physical'),.25);assert.equal(b.dodgeChance(b.unit('zhugeliang'),'physical'),.5);
-  assert.equal(lvbu.guaranteedCritical,true);assert.equal(lvbu.ignoreArmor,true);
+  assert.equal(lvbu.physicalGuaranteedCritical,true);assert.equal(lvbu.physicalTrueDamage,true);
 });

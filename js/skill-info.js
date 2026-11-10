@@ -30,7 +30,7 @@
     if(buff)action='对'+target+'施放'+(skill.buff?.name||skill.name);
     else {
       const received=heal&&b.healingFactor?b.healingFactor(u):1,value=Math.floor(E.calculate({attacker:actor,target:{armor:0,resistance:0,species:'none'},skill}).amount*received);
-      const factor=heal?(1+(actor.healingBonus||0))*received:(1+(actor[skill.kind==='physical'?'physicalBonus':'tacticBonus']||0))*(actor.damageMultiplier??1),formula=skillFormula(skill).replace('武器威力',actor.weaponPower!==undefined&&actor.weaponPower!==actor.attack?'武器威力×'+n(actor.weaponPower/Math.max(1,actor.attack)):'武器威力'),displayed=calculated(value,factor===1?formula:'（'+formula+'）×'+n(factor));action=heal?'为'+target+'回复'+displayed+'点生命':'对'+target+'造成'+displayed+'点'+(skill.kind==='physical'?'物理':'计策')+'伤害';
+      const factor=heal?(1+(actor.healingBonus||0))*received:(1+(actor[skill.kind==='physical'?'physicalBonus':'tacticBonus']||0))*(actor.damageMultiplier??1),formula=skillFormula(skill).replace('武器威力',actor.weaponPower!==undefined&&actor.weaponPower!==actor.attack?'武器威力×'+n(actor.weaponPower/Math.max(1,actor.attack)):'武器威力'),displayed=calculated(value,factor===1?formula:'（'+formula+'）×'+n(factor));action=heal?'为'+target+'回复'+displayed+'点生命':'对'+target+'造成'+displayed+'点'+(skill.kind==='physical'?(actor.physicalTrueDamage?'真实':'物理'):'计策')+'伤害';
     }
     const attached=effects.filter(e=>e.id!==skill.buff?.id).map(e=>(e.chance===undefined?'附加':n(e.chance*100)+'%几率附加')+(S.definitions[e.id]?.name||e.name||e.id));
     lines.push(action+(attached.length?'，'+attached.join('，'):'')+'。');

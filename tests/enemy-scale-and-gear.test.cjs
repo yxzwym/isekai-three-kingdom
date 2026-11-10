@@ -18,8 +18,8 @@ test('董卓攻击是明确的技能公式和实际护甲结算，不截断伤�
 });
 
 test('敌方吕布的必暴击叠加仍在本作量级，调整不改变入队吕布的武器和专属特质',()=>{
- for(const roster of [Chapter.enemies('gate'),RC.enemies('lvbu','trial')]){const b=new E.Battle({allies:[general('zhaoyun',20)],enemies:roster}),u=b.units.find(u=>u.characterId==='lvbu'),a=b.effective(u);assert.ok(a.guaranteedCritical&&a.ignoreArmor);for(const id of u.skills)assert.ok(E.calculate({attacker:a,target:{armor:0},skill:b.skills[id],critical:1.5}).amount<600);}
- const ally=general('lvbu',20),b=new E.Battle({allies:[ally],enemies:Chapter.enemies('dongzhuo')}),u=b.living('ally')[0];assert.ok(b.effective(u).guaranteedCritical);assert.equal(b.skills['sword-critical'].scaling.war,4.8);
+ for(const roster of [Chapter.enemies('gate'),RC.enemies('lvbu','trial')]){const b=new E.Battle({allies:[general('zhaoyun',20)],enemies:roster}),u=b.units.find(u=>u.characterId==='lvbu'),a=b.effective(u);assert.ok(a.physicalGuaranteedCritical&&a.physicalTrueDamage);for(const id of u.skills)assert.ok(E.calculate({attacker:a,target:{armor:0},skill:b.skills[id],critical:1.5}).amount<900);}
+ const ally=general('lvbu',20),b=new E.Battle({allies:[ally],enemies:Chapter.enemies('dongzhuo')}),u=b.living('ally')[0];assert.ok(b.effective(u).physicalGuaranteedCritical);assert.equal(b.skills['sword-critical'].scaling.war,4.8);
 });
 
 test('女性战斗角色速度独立成长，旧队伍和驻地更新一次，不动等级、生命、经验或装备',()=>{
@@ -55,5 +55,5 @@ test('配装的回复、命中、穿甲和免疫真实生效，反复计算或�
  assert.ok(Math.abs(a.healingBonus-.23)<1e-9);assert.equal(again.healingBonus,a.healingBonus);assert.equal(again.speed,a.speed);
  const b=new E.Battle({allies:[gear],enemies:Chapter.enemies('dongzhuo')}),u=b.living('ally')[0],heal=b.skills[u.skills.find(id=>b.skills[id].kind==='heal')];assert.ok(E.calculate({attacker:b.effective(u),skill:heal}).amount>E.calculate({attacker:{...b.effective(u),healingBonus:b.effective(u).healingBonus-.23},skill:heal}).amount);
  const immune=I.apply({...unit,equipment:{accessory1:I.create('wind-ring')}});assert.ok(immune.statusImmunities.includes('paralysis'));const removed=I.apply({...immune,equipment:{accessory1:null}});assert.ok(!removed.statusImmunities.includes('paralysis'));assert.equal(removed.speed,base.speed);assert.equal(removed.dodge,0);
- const strike=general('zhaoyun',20),plain=new E.Battle({allies:[strike],enemies:Chapter.enemies('dongzhuo')}),equipped=new E.Battle({allies:[{...strike,equipment:{accessory1:I.create('breaker-ring')}}],enemies:Chapter.enemies('dongzhuo')});assert.equal(equipped.effective(equipped.living('ally')[0]).armorPenetration,8);assert.ok(E.hitChance({...plain.effective(plain.living('ally')[0]),hitBonus:.08},{speed:100},W.skills['spear-cut'])>E.hitChance(plain.effective(plain.living('ally')[0]),{speed:100},W.skills['spear-cut']));
+ const strike=general('zhaoyun',20),plain=new E.Battle({allies:[strike],enemies:Chapter.enemies('dongzhuo')}),equipped=new E.Battle({allies:[{...strike,equipment:{accessory1:I.create('breaker-ring')}}],enemies:Chapter.enemies('dongzhuo')});assert.equal(equipped.effective(equipped.living('ally')[0]).armorPenetration,8);assert.ok(E.hitChance({...plain.effective(plain.living('ally')[0]),hitBonus:.23},{speed:100},W.skills['spear-cut'])>E.hitChance(plain.effective(plain.living('ally')[0]),{speed:100},W.skills['spear-cut']));
 });

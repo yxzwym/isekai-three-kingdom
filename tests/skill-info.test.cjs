@@ -6,7 +6,7 @@ const ready=u=>{u.progress=1;u.ready=true;};
 test('官兵装备长枪且从零读条，不同武力速度自然错开首次施法',()=>{
   const b=battle(),soldiers=b.units.filter(u=>u.id.startsWith('soldier-'));
   assert.ok(soldiers.every(u=>u.weapon.type==='spear'&&u.skills.every(id=>id.startsWith('spear-'))));
-  assert.ok(b.units.every(u=>u.progress===0));b.start();b.advance(3.1);
+  assert.ok(b.units.every(u=>u.progress===0));for(const ally of b.units.filter(u=>u.side==='ally'))b.setMode(ally.id,'manual');b.start();b.advance(3.1);
   const first=soldiers.map(u=>b.events.find(e=>e.type==='action'&&e.actor===u.id));
   assert.ok(first.every(Boolean));assert.equal(new Set(first.map(e=>e.time)).size,4);
   for(let i=0;i<soldiers.length;i++)assert.ok(Math.abs(first[i].time-E.interval(soldiers[i],b.config))<.021);

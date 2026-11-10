@@ -4,26 +4,21 @@ require('../js/ui-theme.js');require('../js/presentation.js');const Panels=requi
 const hero=()=>({name:'行客',appearance:'scholar',difficulty:'normal',...R.rollHero('normal',()=>.4)});
 const memory=()=>{const values=new Map();return new R.SaveStore({getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v)});};
 
-test('真实常山五战逐段提供结果和下一步，奖励存读档不重复发放，失败保持战前任务',()=>{
+test('真实常山四战逐段提供结果和下一步，奖励存读档不重复发放，失败保持战前任务',()=>{
  let w=new World(hero(),{introStep:2});w.chooseWeapon('sword');const store=memory();
- for(const [place,phase] of [['changshan','entry'],['zhongshan-county','rescue'],['zhongshan','grain'],['zhongshan','grain'],['changshan','escort']]){
-  if(phase==='rescue'){w.arrive('zhongshan');assert.ok(w.advanceChangshan());}
+ for(const [place,phase] of [['changshan','entry'],['zhongshan','grain'],['zhongshan','grain'],['changshan','escort']]){
   w.arrive(place);assert.ok(w.beginStoryBattle(phase));const checkpoint=w.pending.checkpoint;
   const failed=new World(w.character,w.snapshot());failed.pending=JSON.parse(JSON.stringify(w.pending));assert.equal(failed.resolveBattle({result:'defeat'}),false);assert.equal(failed.state.quests.changshan.stage,checkpoint.quests.changshan.stage);assert.equal(failed.state.money,checkpoint.money);
   const b=new Battle(w.battleScenario());b.start();b.advance(180);assert.equal(b.status,'victory');assert.ok(w.resolveBattle(b.export()));const reward=w.lastReward;
-  assert.ok(reward.story.title);assert.ok(reward.story.next);if(phase==='rescue')assert.match(reward.story.text,/甄姬.*加入/);if(phase==='grain')assert.equal(reward.progress.value,w.state.quests.changshan.grainWins/2);
+  assert.ok(reward.story.title);assert.ok(reward.story.next);if(phase==='rescue')assert.match(reward.story.text,/医者/);if(phase==='grain')assert.equal(reward.progress.value,w.state.quests.changshan.grainWins/2);
   if(phase==='entry'){assert.equal(w.character.level,2);assert.equal(reward.milestone.experience,20);assert.match(reward.story.text,/20经验/);}
   const money=w.state.money;store.save(0,w.character,{stage:'world',world:w.snapshot()});const slot=store.slots()[0];w=new World(slot.character,slot.progress.world);assert.deepEqual(w.state.pendingReward.story,reward.story);assert.equal(w.state.money,money);assert.equal(w.resolveBattle(b.export()),false);assert.equal(w.state.money,money);
-  w.state.pendingReward=null;w.state.afterBattle=null;if(phase==='entry')assert.ok(w.startChangshan());if(phase==='grain'&&w.state.quests.changshan.healerDecision)w.finishZhenStay(true);w.rest();
+  w.state.pendingReward=null;w.state.afterBattle=null;if(phase==='entry')assert.ok(w.startChangshan());if(w.state.quests.changshan.healerDecision)w.finishZhenStay(true);w.rest();
  }
  assert.ok(w.advanceChangshan());assert.ok(w.finishChangshan(true));assert.equal(F.objective(w),null);assert.equal(w.counts().wei,1);assert.equal(w.counts().shu,1);
 });
 
-test('满队救人反馈明确甄姬留在毋极，不宣称加入，地图追踪匹配当前阶段',()=>{
- const w=new World(hero(),{introStep:2});w.state.quests.changshan.healerJoined=false;
- assert.match(F.battle({kind:'story',phase:'rescue'},w).text,/暂留毋极/);
- w.state.quests.changshan.stage='rescue';assert.match(F.objective(w)[1],/毋极/);w.state.quests.changshan.stage='decision';assert.match(F.objective(w)[1],/赵云/);
-});
+test('满队救人反馈不宣称自动加入，目标留在中山等待商议',()=>{const w=new World(hero(),{nodeId:'zhongshan',quests:{changshan:{storyVersion:2,stage:'supplies',grainWins:1}}});w.state.companions=Array.from({length:7},(_,i)=>({...G.create('zhangliang',2),id:'friend-'+i}));w.beginStoryBattle('grain');w.resolveBattle({result:'victory'});assert.ok(w.state.quests.changshan.healerRescued);assert.doesNotMatch(w.lastReward.story.text,/加入/);assert.equal(w.questDestination(),'zhongshan');assert.equal(w.counts().wei,0);});
 
 test('已经成长的旧档不领取初战补助，普通敌人经验公式保持不变',()=>{
  const X=require('../js/experience.js'),w=new World(G.characterAt(hero(),5),{introStep:2});w.chooseWeapon('sword');w.arrive('changshan');assert.ok(w.beginStoryBattle('entry'));const b=new Battle(w.battleScenario());b.start();b.advance(180);assert.equal(b.status,'victory');const expected=X.reward(b.units.filter(u=>u.side==='enemy'),w.character);w.resolveBattle(b.export());assert.equal(w.lastReward.milestone,undefined);assert.equal(w.lastReward.gains.find(g=>g.id==='hero').amount,expected);
@@ -40,7 +35,7 @@ test('升级面板显示由真实基础与潜力累计计算的属性增长，�
 test('新同伴的并肩提示只播放一次，反复保存和载入不重复庆祝',()=>{
  const {CanvasWorld}=require('../js/canvas-world.js'),w=new World(hero(),{introStep:2});w.chooseWeapon('sword');w.arrive('changshan');
  const v=Object.assign(Object.create(CanvasWorld.prototype),{model:w,knownCompanions:new Set(),invalidate(){}});assert.ok(w.startChangshan());
- try{v.celebrateCompanions();assert.match(v.recruitNotice.names,/赵云/);assert.match(v.recruitNotice.detail,/出战/);assert.deepEqual(v.recruitNotice.perks,['一身是胆','七进七出']);const first=v.recruitNotice;v.celebrateCompanions();assert.equal(v.recruitNotice,first);
+ try{v.celebrateCompanions();assert.match(v.recruitNotice.names,/赵云/);assert.match(v.recruitNotice.detail,/出战/);assert.deepEqual(v.recruitNotice.perks,['七进七出']);const first=v.recruitNotice;v.celebrateCompanions();assert.equal(v.recruitNotice,first);
   const loaded=new World(w.character,w.snapshot()),other=Object.assign(Object.create(CanvasWorld.prototype),{model:loaded,knownCompanions:new Set(loaded.state.companions.map(u=>u.id)),invalidate(){}});other.celebrateCompanions();assert.equal(other.recruitNotice,undefined);
  }finally{clearTimeout(v.recruitTimer);}
 });
@@ -49,7 +44,7 @@ test('任务回报预告读取真实钱物与阶段进度，不凭预览发奖�
  const w=new World(hero(),{introStep:2});w.state.quests.side['clear-mountain'].accepted=true;w.state.quests.side['clear-mountain'].wins=2;
  const before=JSON.stringify(w.snapshot()),data=global.NearbyContent.sideQuests.find(q=>q.id==='clear-mountain'),summary=F.questReward(w,{id:data.id});
  assert.ok(summary.includes(data.money+'文'));assert.ok(summary.includes(global.ItemCatalog.templates[data.item].name));assert.match(summary,/2\/5/);assert.equal(JSON.stringify(w.snapshot()),before);
- assert.match(F.questReward(w,{id:'changshan'}),/赵云/);assert.ok(!F.questReward(w,{id:'changshan'}).includes('董卓'));assert.equal(F.questReward(w,{id:'unknown'}),'');
+ assert.match(F.questReward(w,{id:'changshan'}),/常山平安佩/);assert.ok(!F.questReward(w,{id:'changshan'}).includes('董卓'));assert.equal(F.questReward(w,{id:'unknown'}),'');
 });
 
 test('任务列表只显示标题，详情展示图标奖励；查看奖励不改变进度、钱物',()=>{

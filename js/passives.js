@@ -107,17 +107,46 @@
     zhenji:[['serenity','静水凝心','blue','受到的计策伤害减少15%。',{tacticReduction:0.15}]]
   };
   for(const [hero,rows]of Object.entries(additions))for(const [suffix,name,quality,description,stats]of rows){const id=hero+'-'+suffix;definitions[id]={id,name,quality,description,stats,triggers:[]};}
-  // 人物名号、事迹与门派绑定的特质显示专属紫；普通资质仍按品质着色。
-  for(const id of ['xuchu-tiger','dianwei-guard','huangzhong-veteran','taishici-bold','maliang-white-brow','lusu-generous','ganning-brocade',
-    'liubei-fortitude','caocao-ambition','xiahoudun-defiance','guanyu-overawe','guanyu-martial','zhangfei-ferocity','machao-swift',
-    'zhouyu-elegance','zhouyu-steady','lvmeng-discipline','lvmeng-ambush','lvbu-flying','zhuge-divine','menghuo-endure',
-    'zhangjiao-taiping','zhangjiao-clarity','zhangbao-salve','dianwei-fury','ganning-night-raid','xuchu-steadfast'])definitions[id].exclusive=true;
+  // 专属仅保留一项；其余使用全角色共用的通用技能。
+  const roles={
+    physical:['hero-martial','hero-accuracy'],caster:['mastermind','hero-accuracy'],healer:['miracle','shadow'],
+    elitePhysical:['surprise','hero-accuracy','edge'],eliteCaster:['heavenly','hero-accuracy','shadow']
+  };
+  definitions['hero-martial']={id:'hero-martial',name:'武艺精熟',quality:'gold',description:'物理伤害提高20%。',stats:{physicalBonus:.2},triggers:[]};
+  definitions['hero-accuracy']={id:'hero-accuracy',name:'凝神命中',quality:'blue',description:'技能命中率增加15个百分点。',stats:{hitBonus:.15},triggers:[]};
+  definitions['hero-precision']={id:'hero-precision',name:'洞察破绽',quality:'gold',description:'技能命中率增加20个百分点。',stats:{hitBonus:.2},triggers:[]};
+  definitions['lvbu-guishen']={id:'lvbu-guishen',name:'鬼神',quality:'red',exclusive:true,description:'物理技能必定暴击。',stats:{guaranteedCritical:true},triggers:[]};
+  definitions['lvbu-wushuang']={id:'lvbu-wushuang',name:'无双',quality:'red',exclusive:true,description:'物理技能造成真实伤害，无视目标护甲与物理减伤。',stats:{physicalTrueDamage:true},triggers:[]};
+  const signatures={
+    liubei:['liubei-kind','healer'],caocao:['caocao-ambition','elitePhysical'],simayi:['simayi-deep','caster'],
+    xiahoudun:['xiahoudun-defiance','physical'],zhangliao:['zhangliao-assault','physical'],xunyu:['xunyu-counsel','healer'],jiaxu:['jiaxu-poison','caster'],
+    guanyu:['guanyu-righteous','elitePhysical'],zhangfei:['zhangfei-roar','physical'],machao:['machao-valiant','physical'],
+    sunquan:['sunquan-judgment','elitePhysical'],zhouyu:['zhouyu-flames','eliteCaster'],huanggai:['huanggai-tenacity','physical'],
+    lvmeng:['lvmeng-study','physical'],luxun:['luxun-fire','caster'],sunshangxiang:['sunshangxiang-bow','physical'],
+    zhugeliang:['zhuge-eight-trigrams','eliteCaster'],diaochan:['diaochan-grace','healer'],menghuo:['menghuo-strength','physical'],
+    huatuo:['huatuo-healer','healer'],dongzhuo:['dongzhuo-soldier','physical'],zhangjiao:['thunder-lord','caster'],
+    xuchu:['xuchu-tiger','physical'],dianwei:['dianwei-fury','physical'],huangzhong:['huangzhong-veteran','physical'],
+    taishici:['taishici-bold','physical'],maliang:['maliang-white-brow','healer'],lusu:['lusu-generous','healer'],ganning:['ganning-brocade','physical'],
+    zhaoyun:['zhaoyun-seven-crossings','physical'],zhenji:['zhenji-clear-water','healer'],
+    xuhuang:['xuhuang-steady','physical'],yujin:['yujin-discipline','physical'],caoren:['caoren-fortress','physical'],
+    yuanshao:['yuanshao-noble','physical'],yanliang:['yanliang-might','physical'],wenchou:['wenchou-charge','physical'],
+    guanlu:['guanlu-star','caster'],zhurong:['zhurong-hunter','physical'],huangyueying:['huangyueying-craft','physical']
+  };
+  const retired=new Set([...Object.values(heroDefaults).flat(),...Object.keys(definitions).filter(id=>Object.keys(signatures).some(hero=>id.startsWith(hero+'-')))]);
+  for(const id of Object.keys(definitions)){delete definitions[id].exclusive;if(retired.has(id))definitions[id].legacy=true;}
+  for(const [hero,[signature,role]]of Object.entries(signatures)){if(definitions[signature]){definitions[signature].exclusive=true;delete definitions[signature].legacy;}heroDefaults[hero]=[signature,...roles[role]];}
+  // 小将没有专属；吕布的两项能力分别显示和生效。
+  heroDefaults.zhangbao=['doctor','rapid'];heroDefaults.zhangliang=['unstoppable','hero-accuracy'];
+  heroDefaults.lvbu=['lvbu-guishen','lvbu-wushuang','shadow','hero-precision'];
+  definitions['lvbu-guishen'].exclusive=definitions['lvbu-wushuang'].exclusive=true;
+  delete definitions['zhaoyun-courage'];delete definitions['lvbu-peerless'];
   function forUnit(unit){
     const existing=Array.isArray(unit.passives)?unit.passives.filter(id=>!definitions[id]?.enemyOnly||unit.side==='enemy'):[];
-    // 教学专用的不败版本不叠加正式英雄天赋，避免改变新手战的节奏。
-    if(existing.some(id=>definitions[id]?.tutorialOnly))return [...new Set(existing)];
-    return [...new Set([...existing,...(heroDefaults[unit.characterId||unit.id]||[])])];
+    if(existing.some(id=>definitions[id]?.tutorialOnly))return [...new Set(existing.filter(id=>!retired.has(id)||definitions[id]?.tutorialOnly))];
+    const defaults=unit.origin!=='tavern'&&heroDefaults[unit.characterId||unit.id];
+    return defaults?[...new Set([...defaults,...existing.filter(id=>!retired.has(id)&&!definitions[id])])]:[...new Set(existing)];
   }
+  definitions['thunder-lord-tutorial'].exclusive=true;
   function complete(unit){return {...unit,passives:forUnit(unit)};}
   // 随机天赋和武将天赋共用同一份战斗定义；浏览器在规则表加载后首次取用。
   let randomInstalled=false;
