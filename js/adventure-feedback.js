@@ -39,7 +39,7 @@
     if(data){
       const item=root.ItemCatalog.templates[data.item],quality=root.ItemCatalog.qualities[data.quality]?.name||'';
       const progress=world.state.quests.side[data.id];
-      return '完成回报 · '+data.money+'文'+(item?' · '+quality+item.name:'')+(progress?.accepted?'　进度 '+Math.min(data.rounds,progress.wins)+'/'+data.rounds:'');
+      return '任务奖励 · '+data.money+'文'+(item?' · '+quality+item.name:'')+(progress?.accepted?'　进度 '+Math.min(data.rounds,progress.wins)+'/'+data.rounds:'');
     }
     if(quest.id==='changshan')return '完成后可邀 · 赵云　途中可结识甄姬';
     if(quest.id==='coalition')return '达成目标 · 开启洛阳战线';

@@ -58,7 +58,7 @@ test('任务列表只显示标题，详情展示图标奖励；查看奖励不�
   const texts=[],icons=[],view={w:width,h:720,hits:[],panel:{type:'tasks',category:'side',scroll:0},model:w,ctx:{measureText:s=>({width:[...String(s)].length*14}),save(){},restore(){},beginPath(){},rect(){},clip(){},fillRect(){},translate(){},scale(){},rotate(){},moveTo(){},lineTo(){},stroke(){},fill(){},closePath(){}},frame(){this.hits=[];return{x:14,y:18,w:width-28,h:684};},box(){},text(text){texts.push(String(text));},button(label,x,y,w,h,action){this.hits.push({label,x,y,w,h,action});},image(){return null;},invalidate(){},wrap(text,x,y,width,{line=24}={}){const rows=global.PengpaiUI.wrapLines(this.ctx,text,width);rows.forEach(t=>texts.push(t));return y+rows.length*line;},openItemDetail(item,options){this.preview={item,options};}};
   const old=global.RpgIcons;global.RpgIcons={draw(c,id){icons.push(id);},resolveItem:item=>item?.id||'empty'};
   try{Panels.draw(view);assert.ok(texts.includes('山道清剿'));assert.ok(!texts.some(t=>t.includes('180')||t.includes('回报')||t.includes('前往中山')));
-   const parent=view.panel;view.hits.find(h=>h.label==='山道清剿').action();assert.equal(view.panel.type,'taskDetail');assert.equal(view.panel.previous,parent);texts.length=0;Panels.draw(view);assert.ok(texts.includes('完成回报'));assert.ok(texts.includes('180 文'));assert.ok(icons.includes('金币'));const item=view.hits.find(h=>h.label==='奖励详情 皮甲');assert.ok(item);item.action();assert.equal(view.preview.options.readonly,true);assert.equal(view.preview.options.previous.type,'taskDetail');assert.equal(JSON.stringify(w.snapshot()),before);
+   const parent=view.panel;view.hits.find(h=>h.label==='山道清剿').action();assert.equal(view.panel.type,'taskDetail');assert.equal(view.panel.previous,parent);texts.length=0;Panels.draw(view);assert.ok(texts.includes('任务奖励'));assert.ok(texts.includes('180 文'));assert.ok(icons.includes('金币'));const item=view.hits.find(h=>h.label==='奖励详情 皮甲');assert.ok(item);item.action();assert.equal(view.preview.options.readonly,true);assert.equal(view.preview.options.previous.type,'taskDetail');assert.equal(JSON.stringify(w.snapshot()),before);
   }finally{global.RpgIcons=old;}
  }
 });
@@ -75,17 +75,17 @@ test('主菜单保留所有入口，继续旅程读取最新存档，手机按�
 
 test('城内不遮挡人物，窗口切换产生的极小像素比例也能安全绘制背景',()=>{
  const {CanvasWorld}=require('../js/canvas-world.js'),w=new World(hero(),{introStep:2,nodeId:'changshan',inside:true});
- const boxes=[],view=Object.assign(Object.create(CanvasWorld.prototype),{model:w,w:540,h:960,hits:[],partyTop:()=>760,ctx:{measureText:s=>({width:s.length*14})},text(){},box(...r){boxes.push(r);}});view.drawCurrentObjective();assert.equal(boxes[0][1],79);const tracked=view.trackerBounds(),Town=require('../js/town-layout.js');for(const count of [7,15,42]){const grid=Town.plan(540,tracked.y+tracked.h+53,760-61,count);assert.ok(grid.rects.every(r=>r.y>tracked.y+tracked.h&&r.y+r.h<=699));}view.model.state.trackerCollapsed=true;assert.equal(view.trackerBounds().h,40);
+ const boxes=[],view=Object.assign(Object.create(CanvasWorld.prototype),{model:w,w:540,h:960,hits:[],partyTop:()=>760,ctx:{measureText:s=>({width:s.length*14})},text(){},box(...r){boxes.push(r);}});view.drawCurrentObjective();assert.equal(boxes[0][1],79);const tracked=view.trackerBounds(),Town=require('../js/town-layout.js');for(const count of [7,15,42]){const grid=Town.plan(540,tracked.y+tracked.h+53,760-61,count);assert.ok(grid.rects.every(r=>r.y>tracked.y+tracked.h&&r.y+r.h<=699));}view.model.state.trackerCollapsed=true;assert.equal(view.trackerBounds().h,36);
  const oldDocument=global.document,oldLoader=global.GameAssetLoader;let rendered=false;
  const ctx={scale(){},fillRect(){}};global.document={createElement(){return {getContext:()=>ctx};}};global.GameAssetLoader={get:()=>null};
  try{Object.assign(view,{w:540,h:960,dpr:.001,ctx:{fillRect(){},drawImage(canvas){assert.ok(canvas.width>=1&&canvas.height>=1);rendered=true;}}});view.drawTownBackdrop();assert.ok(rendered);}
  finally{global.document=oldDocument;global.GameAssetLoader=oldLoader;}
 });
 
-test('阶段回报在320和375窄屏正常换行，继续按钮与奖励内容区域保持可用',()=>{
+test('所有胜利奖励忽略旧存档剧情字段，窄屏继续按钮与奖励区域可用',()=>{
  for(const [w,h]of [[320,568],[375,667],[540,960]]){
   const texts=[],rects=[],v={w,h,hits:[],panel:{type:'reward',reward:{story:{title:'祠堂的门打开了',text:'伤者登上了车。甄姬带着金针加入队伍，往后有人替你照看伤势。',next:'返回中山，夺回前后两院的粮车。'},gains:[],money:20},started:performance.now(),scroll:0},model:{members:()=>[],state:{}},ctx:{measureText:s=>({width:[...String(s)].length*14}),save(){},restore(){},beginPath(){},rect(...r){rects.push(r);},clip(){}},frame(title,height){texts.push(title);return{x:14,y:18,w:w-28,h:Math.min(height,h-36)};},box(){},text(s){texts.push(s);},button(label,x,y,bw,bh){this.hits.push({label,x,y,w:bw,h:bh});},image(){return null;}};
   const old=global.RpgIcons;global.RpgIcons={draw(){}};try{Panels.draw(v);}finally{global.RpgIcons=old;}
-  assert.ok(texts.includes('祠堂的门打开了'));assert.ok(!texts.some(t=>t.includes('接下来')||t.includes('返回中山')));const next=v.hits.find(h=>h.label==='继续');assert.ok(next&&next.y+next.h<=h);assert.ok(rects.at(-1)[3]>=44,'money reward remains visible');
+  assert.ok(!texts.includes('祠堂的门打开了'));assert.ok(!texts.some(t=>String(t).includes('伤者登上了车')));assert.ok(!texts.some(t=>t.includes('接下来')||t.includes('返回中山')));const next=v.hits.find(h=>h.label==='继续');assert.ok(next&&next.y+next.h<=h);assert.ok(rects.at(-1)[3]>=44,'money reward remains visible');
  }
 });

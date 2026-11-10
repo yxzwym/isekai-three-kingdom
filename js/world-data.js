@@ -20,6 +20,8 @@
   ];
   const mapLayout=typeof module!=='undefined'&&module.exports?require('./world-map-layout.js'):root.WorldMapLayout;
   const places=cityRows.map(([id,name,faction])=>({id,name,kind:'city',faction,...locate(id)}));
+  const territoryLabels={yellow:'黄巾',wei:'魏',shu:'蜀',wu:'吴',dong:'董卓',yuan:'袁绍',shuYuan:'袁术',liu:'刘表',ma:'马腾',zhang:'张鲁',gongsun:'公孙瓒'};
+  function placeHeading(place){return [place.name,territoryLabels[place.faction]].filter(Boolean).join(' · ');}
   const roads=[],link=(a,b)=>{if(a!==b&&!roads.some(r=>r.includes(a)&&r.includes(b)))roads.push([a,b]);};
   const routes=[
     ['xiangping','beiping','ji','zhongshan','julu','ganling','ye','shangdang','jinyang','anding','jincheng','wuwei'],
@@ -115,8 +117,8 @@
   encounters['changshan-rescue']={id:'changshan-rescue',title:'毋极接应',count:2,scene:{background:'./assets/story/village-road-v3.webp'},roster:[outlaw('thief',1,'盗贼','thief','dagger',['dagger-fast'])],rules:{level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true}};
   for(const [id,scene]of Object.entries({patrol:'rural-road',thieves:'forest-path','river-bandits':'river-dock','mountain-bandits':'bandit-camp',brigands:'bandit-camp','changshan-rescue':'market-street'}))encounters[id].scene=Scenes.get(scene);
   const questDefinitions=[
-    {id:'coalition',title:'访贤合盟',category:'main',recommendedLevel:10},
-    {id:'changshan',title:'常山归途',category:'story',recommendedLevel:1}
+    {id:'coalition',title:'访贤合盟',category:'main',recommendedLevel:10,longTerm:true},
+    {id:'changshan',title:'常山归途',category:'main',recommendedLevel:1}
   ];
   const questNpcs={
     zhaoyun:{id:'zhaoyun',name:'赵云',art:'zhaoyun',side:'left',role:'story',roleLabel:'剧情'},
@@ -145,6 +147,6 @@
   const placeAliases={jiujiang:'chaisang',...locationData.aliases};
   const travelTimeFactor=potential=>{const p=Math.max(0,Math.min(100,Number.isFinite(Number(potential))?Number(potential):50));return p<=50?2-p/50:1-(p-50)/100;};
   const travelDurationMs=(a,b,potential=50)=>Math.max(1,roadLength(a,b)/travelRules.speed*1000*travelTimeFactor(potential));
-  const api={mapRules,travelRules,travelTimeFactor,travelDurationMs,placeAliases,factions,places,roads,clues,weaponNames,roadEvents,encounters,townScenes,townNpcs,gateGuard,trainingOptions,questDefinitions,questNpcs,placeMap,roadPath,roadLength,roadPosition,geography,mapLayout,bounds:geography.bounds,cityIds:cityRows.map(row=>row[0])};
+  const api={mapRules,travelRules,travelTimeFactor,travelDurationMs,placeAliases,factions,territoryLabels,placeHeading,places,roads,clues,weaponNames,roadEvents,encounters,townScenes,townNpcs,gateGuard,trainingOptions,questDefinitions,questNpcs,placeMap,roadPath,roadLength,roadPosition,geography,mapLayout,bounds:geography.bounds,cityIds:cityRows.map(row=>row[0])};
   root.WorldData=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

@@ -26,8 +26,8 @@ test('招募按国家计数，七人满队阻止继续招募；离队后仍保�
  const w=world();for(const country of ['wei','shu','wu'])for(let i=0;i<3;i++){const id=country+'-'+i;assert.ok(w.recordRecruit(id,country,{name:id,homeNode:'camp',maxSoldiers:100,skills:['punch']}));assert.equal(w.recordRecruit(id,'wei'),false);if(w.members().length===7)assert.ok(w.dismiss(w.state.companions[0].id));}
  assert.deepEqual(w.counts(),{wei:3,shu:3,wu:3});assert.ok(w.coalitionReady());assert.ok(w.members().length<=7);assert.equal(w.setActive([]),false);
 });
-test('正常四人上阵、携带七人，未来可开放五人上阵；战斗接口仍支持额外友军',()=>{
- const w=world();for(let i=0;i<6;i++)assert.ok(w.recordRecruit('unit-'+i,'wei',{name:'人'+i,homeNode:'camp',maxSoldiers:120,skills:['punch']}));assert.equal(w.members().length,7);assert.equal(w.recordRecruit('overflow','wei',{name:'溢出'}),false);assert.ok(w.lastRecruitError.includes('队伍已满'));assert.equal(w.counts().wei,6);assert.equal(w.setActive(w.members().slice(0,5).map(u=>u.id)),false);assert.ok(w.setActive(['unit-5']));assert.equal(w.state.activeIds.includes('hero'),false);assert.equal(w.setActive(['unit-5','unit-5']),false);
+test('正常四人上阵、携带八人，未来可开放五人上阵；战斗接口仍支持额外友军',()=>{
+ const w=world();for(let i=0;i<7;i++)assert.ok(w.recordRecruit('unit-'+i,'wei',{name:'人'+i,homeNode:'camp',maxSoldiers:120,skills:['punch']}));assert.equal(w.members().length,8);assert.equal(w.recordRecruit('overflow','wei',{name:'溢出'}),false);assert.ok(w.lastRecruitError.includes('队伍已满'));assert.equal(w.counts().wei,7);assert.equal(w.setActive(w.members().slice(0,5).map(u=>u.id)),false);assert.ok(w.setActive(['unit-5']));assert.equal(w.state.activeIds.includes('hero'),false);assert.equal(w.setActive(['unit-5','unit-5']),false);
  assert.ok(w.unlockActiveLimit(5));assert.ok(w.setActive(w.members().slice(0,5).map(u=>u.id)));assert.equal(new World(w.character,w.snapshot()).activeLimit(),5);w.move('julu',{eventRoll:0});assert.equal(w.battleScenario().rules.partySlots,5);assert.equal(w.battleScenario({extraAllies:[{...w.members()[0],id:'story-extra'}]}).allies.length,6);
 });
 test('未开发城村拒入，附近村落开放、营地可休整；风闻不假装完成英雄招募',()=>{

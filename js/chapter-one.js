@@ -26,7 +26,7 @@
    }
    return {...u,boss:true,statusImmunities:[...new Set([...(u.statusImmunities||[]),'stun'])],id:'chapter-'+id+'-'+i,formationRow:row};});}
  function npc(world){if(world.state.nodeId!=='luoyang'||world.state.chapterOne.stage==='complete')return null;return {id:'luoyang-scout',name:'联军斥候',art:'imperial-soldier',role:'chapter',roleLabel:'讨董',side:'left'};}
- function quest(world){const q=world.state.chapterOne;if(!world.coalitionReady()&&!q.accepted&&q.stage!=='complete')return null;return {id:'chapter-one',title:'第一章 · 洛阳风起',category:'main',recommendedLevel:q.stage==='dongzhuo'?25:20,accepted:true,complete:q.stage==='complete',taskStatus:q.stage==='complete'?null:world.coalitionReady()?'ready':'active',target:'luoyang',objective:q.stage==='complete'?'第一章结束':q.stage==='aftermath'?'查看董卓恢复意识后发生的情况':['gather','rally'].includes(q.stage)?'前往洛阳，和联军斥候商量进攻安排':'击破'+(phases[q.stage]?.title||'洛阳守军')};}
+ function quest(world){const q=world.state.chapterOne;if(!world.coalitionReady()&&!q.accepted&&q.stage!=='complete')return null;return {id:'chapter-one',title:'第一章 · 洛阳风起',category:'main',recommendedLevel:q.stage==='dongzhuo'?25:20,accepted:!!q.accepted,complete:q.stage==='complete',taskStatus:q.stage==='complete'?null:world.coalitionReady()?'ready':'active',target:'luoyang',objective:q.stage==='complete'?'第一章结束':q.stage==='aftermath'?'查看董卓恢复意识后发生的情况':['gather','rally'].includes(q.stage)?'前往洛阳，和联军斥候商量进攻安排':'击破'+(phases[q.stage]?.title||'洛阳守军')};}
  const ending=[
   {id:'hero',name:null,art:'hero',side:'right',text:'大家先停一下！刚才董卓身后有个人影，你们看见没有？它像是从他身上钻出来，然后一下就不见了。'},
   {id:'dongzhuo',name:'董卓',art:'dongzhuo',side:'left',text:'我这是在洛阳？你们是什么人，怎么都站在这里……那盏灯先拿开一点，晃得我什么都看不清。'},
