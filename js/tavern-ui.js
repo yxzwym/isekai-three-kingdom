@@ -1,19 +1,32 @@
 (function(root){
  'use strict';
- const T=root.TavernRecruitment,C=root.WeaponCatalog,R=root.PengpaiRules,UI=root.PengpaiUI,Panels=root.WorldPanels,clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
- function money(v,f){Panels.icon(v,'金钱',f.x+18,f.y+50,22);v.text(v.model.state.money,f.x+46,f.y+62,14,'#e7c87d');}
+ const T=root.TavernRecruitment,C=root.WeaponCatalog,R=root.PengpaiRules,UI=root.PengpaiUI,G=root.CharacterGrowth,Panels=root.WorldPanels,clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+ function money(v,f){Panels.icon(v,'金钱',f.x+18,f.y+64,22);v.text(v.model.state.money,f.x+46,f.y+76,14,'#e7c87d');}
+ const potential=value=>value+'(+'+Number(G.growthPerLevel(value).toFixed(2))+')';
  function passive(v,ids,x,y,w,previous){return UI.passiveButtons(v,ids.map(id=>root.BattlePassives.definitions[id]),x,y,w,p=>{v.panel={type:'passiveInfo',passive:p,scroll:0,previous};});}
- function list(v){const p=v.panel,f=v.frame('酒肆招募',640),left=f.x+14,w=f.w-28,top=f.y+126,bottom=f.y+f.h-65,rows=v.model.state.tavern.candidates,rowH=Math.min(152,(bottom-top)/3);money(v,f);
-  for(const [i,id,label]of [[0,'candidates','待招募'],[1,'archive','已离队 '+v.model.archivedRetainers().length]])v.button(label,left+i*(w+6)/2,f.y+85,(w-6)/2,30,()=>{p.tab=id;p.scroll=0;},{active:(p.tab||'candidates')===id});
+ function list(v){const p=v.panel,f=v.frame('酒肆招募',780),left=f.x+14,w=f.w-28,top=f.y+192,bottom=f.y+f.h-65,rows=v.model.state.tavern.candidates,rowH=Math.min(168,(bottom-top)/3);money(v,f);
+  for(const [i,id,label]of [[0,'candidates','待招募'],[1,'archive','已离队 '+v.model.archivedRetainers().length]])v.button(label,left+i*(w+6)/2,f.y+112,(w-6)/2,30,()=>{p.tab=id;p.scroll=0;},{active:(p.tab||'candidates')===id});
   if(p.tab==='archive'){archive(v,p,f,left,w,top,bottom);return;}
   p.maxScroll=0;
-  v.button('刷新 · '+T.REFRESH_COST,f.x+f.w-138,f.y+47,120,30,()=>{if(v.model.refreshTavern()){v.save();v.invalidate();}else v.notify('金币不足');},{disabled:v.model.state.money<T.REFRESH_COST});
+  v.button('刷新 · '+T.REFRESH_COST,f.x+f.w-254,f.y+62,114,34,()=>{if(v.model.refreshTavern()){p.refreshResult='刷新 1 次 · 花费 '+T.REFRESH_COST+' 文';v.save();v.invalidate();}else v.notify('铜钱不足');},{disabled:v.model.state.money<T.REFRESH_COST});
+  v.button('批量刷新',f.x+f.w-132,f.y+62,114,34,()=>{v.panel={type:'tavernRefresh',grade:v.tavernTargetGrade||'gold',previous:p};});
+  v.text(p.refreshResult||'潜力决定每级成长，点击人物查看详情',left,f.y+170,14,'#b1bda7');
   if(!rows.length)v.text('暂无待招募的人，刷新后再来看看。',f.x+f.w/2,top+70,14,'#b4c7cb','center');
   rows.forEach((u,i)=>{const y=top+i*rowH,group=C.groups.find(g=>g.id===u.group),art=root.CharacterAssets.resolve(u.characterId).portrait;
    v.box(left,y,w,rowH-8,'#102c35','#57757c',4);v.hits.push({x:left,y,w,h:rowH-8,label:'招募候选 '+u.name,action:()=>{v.panel={type:'tavernOffer',candidateId:u.id,previous:p};}});v.portrait(art,left+8,y+9,76,{frame:false});v.text(u.name,left+96,y+21,16,T.gradeOf(u).color);v.text(group.name+' · '+T.gradeOf(u).name,left+w-12,y+21,14,T.gradeOf(u).color,'right');
-   const columns=[['war','武力'],['intelligence','智力'],['constitution','体质'],['speed','速度'],['technique','技巧']];columns.forEach(([key,label],n)=>{const col=n%2,row=Math.floor(n/2),x=left+96+col*(w-103)/2;v.text(label+' '+u.potentials[key],x,y+48+row*22,14,'#cbd9d6');});
-   passive(v,u.passives,left+5,y+rowH-38,w-10,p);
+   v.text('潜力（每级）',left+96,y+47,14,'#b4a783');v.text('招募 · '+T.hireCost(u)+' 文',left+w-12,y+47,14,'#d8bd87','right');const columns=[['war','武力'],['intelligence','智力'],['constitution','体质'],['speed','速度'],['technique','技巧']];columns.forEach(([key,label],n)=>{const col=n%2,row=Math.floor(n/2),x=left+96+col*(w-103)/2;v.text(label,x,y+70+row*22,14,'#cbd9d6');v.text(potential(u.potentials[key]),x+(w-103)/2-10,y+70+row*22,14,'#e0c27f','right');});
+   passive(v,u.passives,left+5,y+rowH-34,w-10,p);
   });v.text('队伍 '+v.model.members().length+'/'+v.model.rosterLimit()+'　出战 '+v.model.state.activeIds.length+'/'+v.model.activeLimit(),f.x+f.w/2,f.y+f.h-31,14,'#b6cbd0','center');
+ }
+ function refresh(v){const p=v.panel,f=v.frame('批量刷新',500),left=f.x+20,w=f.w-40;
+  v.text('出现目标资质或更高资质时停止',left,f.y+74,14,'#c8ceb9');
+  T.grades.forEach((grade,i)=>{v.button(grade.name,left,f.y+100+i*43,w,34,()=>{p.grade=grade.id;v.tavernTargetGrade=grade.id;},{active:p.grade===grade.id});});
+  v.text('每次 '+T.REFRESH_COST+' 文 · 最多 '+T.BATCH_LIMIT+' 次',left,f.y+338,14,'#e0c58c');
+  v.text('现有 '+v.model.state.money+' 文，可刷新 '+Math.min(T.BATCH_LIMIT,Math.floor(v.model.state.money/T.REFRESH_COST))+' 次',left,f.y+364,14,'#aebbab');
+  v.text('按实际次数扣费；铜钱不足时停止。',left,f.y+390,14,'#aebbab');
+  const found=v.model.state.tavern.candidates.some(u=>T.grades.findIndex(g=>g.id===T.gradeOf(u).id)>=T.grades.findIndex(g=>g.id===p.grade));
+  v.button('取消',left,f.y+f.h-62,(w-10)/2,38,()=>{v.panel=p.previous;});
+  v.button(found?'保留当前人才':'开始刷新',left+(w+10)/2,f.y+f.h-62,(w-10)/2,38,()=>{if(v.panel!==p)return;const result=v.model.refreshTavernUntil(p.grade);if(!result){v.notify('当前无法刷新');return;}const target=T.gradeOf(p.grade).name;p.previous.refreshResult=result.attempts===0&&result.found?'已有'+target+'或更高资质 · 未扣费':'刷新 '+result.attempts+' 次 · 花费 '+result.cost+' 文 · '+(result.found?'已找到':result.reason==='funds'?'铜钱不足':'达到上限');v.panel=p.previous;v.save();v.invalidate();},{active:true,disabled:!found&&v.model.state.money<T.REFRESH_COST});
  }
  function archive(v,p,f,left,w,top,bottom){const rows=v.model.archivedRetainers(),rowH=132,c=v.ctx;p.maxScroll=Math.max(0,rows.length*rowH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);const before=v.hits.length;c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
   if(!rows.length)v.text('暂无离队的同伴',f.x+f.w/2,top+65,14,'#b6cbd0','center');
@@ -23,17 +36,17 @@
   });c.restore();v.hits=v.hits.filter((h,i)=>i<before||h.y>=top&&h.y+h.h<=bottom);if(p.maxScroll){const height=bottom-top,thumb=Math.max(20,height*height/(height+p.maxScroll));v.box(f.x+f.w-7,top,2,height,'#18343e',null);v.box(f.x+f.w-7,top+(height-thumb)*(p.scroll||0)/p.maxScroll,2,thumb,'#8ba9ad',null);}v.text('邀请归队不收取金币',f.x+f.w/2,f.y+f.h-31,14,'#b6cbd0','center');
  }
  function release(v){const p=v.panel,u=v.model.state.companions.find(u=>u.id===p.unitId)||v.model.state.residents[p.unitId];if(!u||u.origin!=='tavern'){v.panel=p.returnPanel||null;return;}const f=v.frame('永久离队',252),left=f.x+22,w=f.w-44;v.text(u.name,f.x+f.w/2,f.y+69,18,'#ebc088','center');v.wrap('将从队伍和酒馆中移除，无法再次招募。装备会放回背包。',left,f.y+105,w,{size:14,line:24});v.button('取消',left,f.y+f.h-61,(w-10)/2,38,()=>v.closeWorldPanel());v.button('永久离队',left+(w+10)/2,f.y+f.h-61,(w-10)/2,38,()=>{if(v.model.releaseRetainer(u.id)){v.panel=p.returnPanel||{type:'party',scroll:0};v.save();v.notify(u.name+'已永久离队');}else v.notify('当前无法离队');},{active:true});}
- function offer(v){const p=v.panel,u=v.model.state.tavern.candidates.find(c=>c.id===p.candidateId);if(!u){v.closeWorldPanel();return;}const group=C.groups.find(g=>g.id===u.group),types=C.types.filter(t=>t.group===u.group),f=v.frame(u.name+' · '+group.name,types.length>3?654:610),left=f.x+16,w=f.w-32,c=v.ctx;money(v,f);
+ function offer(v){const p=v.panel,u=v.model.state.tavern.candidates.find(c=>c.id===p.candidateId);if(!u){v.closeWorldPanel();return;}const group=C.groups.find(g=>g.id===u.group),types=C.types.filter(t=>t.group===u.group),f=v.frame(u.name+' · '+group.name,types.length>3?690:646),left=f.x+16,w=f.w-32,c=v.ctx;money(v,f);
   const art=root.CharacterAssets.resolve(u.characterId),img=v.image(art.fullbody.src),modelBox={x:left+4,y:f.y+88,w:w*.45,h:180};if(img){const dst=root.BattleSystem.fitImage(img.naturalWidth,img.naturalHeight,modelBox);c.drawImage(img,dst.x,dst.y,dst.w,dst.h);}const statX=left+w*.5,statW=w*.5;
-  v.text(T.gradeOf(u).name+' · '+(u.modelName||'潜力'),statX,f.y+94,14,T.gradeOf(u).color);R.ATTRIBUTES.forEach(([key,name],i)=>{const y=f.y+110+i*29;v.box(statX,y,statW,27,'#102d36','#3f5d66',2);v.text(name,statX+8,y+13.5,14,'#cbdad7');v.text(u.potentials[key],statX+statW-8,y+13.5,14,'#e0c27f','right');});
-  passive(v,u.passives,left,f.y+279,w,p);let y=f.y+319;const cols=Math.min(3,types.length),cw=(w-12)/cols;
+  v.text(T.gradeOf(u).name+' · '+(u.modelName||'潜力'),statX,f.y+105,14,T.gradeOf(u).color);v.text('潜力（每级）',statX+statW-8,f.y+130,14,'#b4a783','right');R.ATTRIBUTES.forEach(([key,name],i)=>{const y=f.y+145+i*29;v.box(statX,y,statW,27,'#102d36','#3f5d66',2);v.text(name,statX+8,y+13.5,14,'#cbdad7');v.text(potential(u.potentials[key]),statX+statW-8,y+13.5,14,'#e0c27f','right');});
+  passive(v,u.passives,left,f.y+307,w,p);let y=f.y+347;const cols=Math.min(3,types.length),cw=(w-12)/cols;
   types.forEach((t,i)=>v.button(t.name,left+i%cols*(cw+6),y+Math.floor(i/cols)*37,cw,31,()=>{p.weaponType=t.id;},{active:p.weaponType===t.id}));y+=Math.ceil(types.length/cols)*37+12;
   if(p.weaponType){const unit=T.create(u,p.weaponType,v.model.character.level,v.model.state.nodeId),preview=v.memberPreview(unit),actor=preview.unit(unit.id),skills=actor.skills,icon=46,cw=w/skills.length;
    skills.forEach((id,i)=>{const skill=preview.skills[id],x=left+cw*(i+.5)-icon/2;v.box(x,y,icon,icon,'#0b222d','#6b8b90',3);root.SkillIcons.draw(c,skill,x+3,y+3,icon-6,{image:src=>v.image(src)});v.text(skill.name,left+cw*(i+.5),y+60,14,'#e6e3d4','center');v.text(root.BattleSkillInfo.describe(preview,actor,skill).role,left+cw*(i+.5),y+79,12,'#b6cdd0','center');v.hits.push({x:left+cw*i,y,w:cw,h:88,label:'查看'+skill.name+'详情',action:()=>{v.panel={type:'npcSkill',unit,unitId:unit.id,skill:id,preview,scroll:0,previous:p};}});});
   }else v.text('选择一件兵器，查看对应技能',f.x+f.w/2,y+39,14,'#b6cdd0','center');
   const selected=C.types.find(t=>t.id===p.weaponType);v.text(selected?'选定为'+selected.name+'后不可转职，可更换同类兵器。':'招募时选定兵器方向，之后不可转职。',f.x+f.w/2,f.y+f.h-77,12,'#e2bf85','center');
-  v.button('招募 · '+T.HIRE_COST,left,f.y+f.h-57,w,38,()=>{const joined=v.model.hireRetainer(u.id,p.weaponType);if(!joined){v.notify(v.model.lastRecruitError||'无法招募，请检查金币和兵器选择');return;}v.panel=p.previous;v.save();v.notify(joined.name+'已加入队伍');},{active:true,disabled:!selected||v.model.state.money<T.HIRE_COST});
+  v.button('招募 · '+T.hireCost(u),left,f.y+f.h-57,w,38,()=>{const joined=v.model.hireRetainer(u.id,p.weaponType);if(!joined){v.notify(v.model.lastRecruitError||'无法招募，请检查金币和兵器选择');return;}v.panel=p.previous;v.save();v.notify(joined.name+'已加入队伍');},{active:true,disabled:!selected||v.model.state.money<T.hireCost(u)});
  }
  function rename(v){const p=v.panel,u=v.model.members().find(u=>u.id===p.unitId)||v.model.state.residents[p.unitId];if(!u||u.origin!=='tavern'){v.closeWorldPanel();return;}const f=v.frame('更改姓名',208);if(!v.renameInput){const input=v.renameInput=document.createElement('input');input.id='recruitName';input.setAttribute('aria-label','队友姓名');input.maxLength=12;input.autocomplete='off';document.body.append(input);}const input=v.renameInput;input.onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();commit();}};if(p.inputUnit!==u.id){input.value=u.name;p.inputUnit=u.id;requestAnimationFrame(()=>{input.focus();input.select();});}input.hidden=false;const bounds={x:f.x+24,y:f.y+62,w:f.w-48,h:40},r=root.CanvasViewport.clientRect(v.canvas.getBoundingClientRect(),bounds);Object.assign(input.style,{left:r.left+'px',top:r.top+'px',width:bounds.w+'px',height:bounds.h+'px',fontSize:'16px',transformOrigin:'top left',transform:'scale('+r.scaleX+','+r.scaleY+')'});function commit(){if(v.model.renameRetainer(u.id,input.value)){v.closeWorldPanel();v.save();}else v.notify('请输入1至4个字');}v.text('最多4个字',f.x+24,f.y+123,14,'#abc1c4');v.button('保存姓名',f.x+24,f.y+147,f.w-48,36,commit,{active:true});}
- const api={draw(v){if(v.panel?.type!=='retainerRename'&&v.renameInput)v.renameInput.hidden=true;const fn={tavern:list,tavernOffer:offer,retainerRename:rename,retainerRelease:release}[v.panel?.type];if(!fn)return false;fn(v);return true;}};root.TavernUI=api;
+ const api={draw(v){if(v.panel?.type!=='retainerRename'&&v.renameInput)v.renameInput.hidden=true;const fn={tavern:list,tavernOffer:offer,tavernRefresh:refresh,retainerRename:rename,retainerRelease:release}[v.panel?.type];if(!fn)return false;fn(v);return true;}};root.TavernUI=api;
 })(globalThis);

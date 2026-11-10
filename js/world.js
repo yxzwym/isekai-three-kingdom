@@ -155,9 +155,15 @@
 
     tavernAvailable(){return this.state.inside&&Tavern.capitals.includes(this.state.nodeId)&&!this.pending&&!this.journey;}
     refreshTavern(){if(!this.tavernAvailable()||this.state.money<Tavern.REFRESH_COST)return false;this.state.money-=Tavern.REFRESH_COST;this.state.tavern.generation++;this.state.tavern.candidates=Tavern.generate(this.state.seed,this.state.tavern.generation);return true;}
+    refreshTavernUntil(grade,maxAttempts=Tavern.BATCH_LIMIT){
+      const target=Tavern.grades.findIndex(g=>g.id===grade);if(target<0||!Number.isInteger(maxAttempts)||maxAttempts<1||maxAttempts>Tavern.BATCH_LIMIT||!this.tavernAvailable())return false;
+      const matches=()=>this.state.tavern.candidates.some(c=>Tavern.grades.findIndex(g=>g.id===Tavern.gradeOf(c).id)>=target);let attempts=0;
+      while(!matches()&&attempts<maxAttempts&&this.refreshTavern())attempts++;
+      const found=matches();return {attempts,cost:attempts*Tavern.REFRESH_COST,found,reason:found?'found':attempts===maxAttempts?'limit':'funds'};
+    }
     hireRetainer(id,type){
-      if(!this.tavernAvailable()||this.state.releasedRetainers.includes(id)||this.state.money<Tavern.HIRE_COST||!this.canRecruit())return false;const candidate=this.state.tavern.candidates.find(c=>c.id===id),u=Tavern.create(candidate,type,this.character.level,this.state.nodeId);if(!u||this.state.companions.some(v=>v.id===id)||this.state.residents[id])return false;
-      this.state.money-=Tavern.HIRE_COST;this.state.companions.push(u);this.state.troops[id]=I.apply(u).maxSoldiers;if(this.state.activeIds.length<this.activeLimit())this.state.activeIds.push(id);this.state.tavern.candidates=this.state.tavern.candidates.filter(c=>c.id!==id);return u;
+      if(!this.tavernAvailable()||this.state.releasedRetainers.includes(id)||!this.canRecruit())return false;const candidate=this.state.tavern.candidates.find(c=>c.id===id);if(!candidate||this.state.money<Tavern.hireCost(candidate))return false;const u=Tavern.create(candidate,type,this.character.level,this.state.nodeId);if(!u||this.state.companions.some(v=>v.id===id)||this.state.residents[id])return false;
+      this.state.money-=Tavern.hireCost(candidate);this.state.companions.push(u);this.state.troops[id]=I.apply(u).maxSoldiers;if(this.state.activeIds.length<this.activeLimit())this.state.activeIds.push(id);this.state.tavern.candidates=this.state.tavern.candidates.filter(c=>c.id!==id);return u;
     }
     renameRetainer(id,name){const u=this.state.companions.find(u=>u.id===id)||this.state.residents[id];if(!u||u.origin!=='tavern'||typeof name!=='string')return false;const next=R.sanitizeName(name).trim();if(!next||R.nameLength(next)>4)return false;u.name=next;this.npcListCache=null;return true;}
     archivedRetainers(){return Object.values(this.state.residents).filter(u=>u.origin==='tavern'&&!this.state.releasedRetainers.includes(u.id)).reverse();}
