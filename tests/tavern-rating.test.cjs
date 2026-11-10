@@ -9,6 +9,6 @@ test('模拟器可重复添加同评级同兵器的独立角色，等级、装�
 });
 
 test('酒馆五档统一使用人才资质称谓，已招募角色与旧存档沿用相同评级',()=>{
- assert.deepEqual(T.grades.map(g=>g.name),['常才','良才','英才','奇才','旷世之才']);
+ assert.deepEqual(T.grades.map(g=>g.name),['常人','俊才','英杰','人杰','天纵之才']);
  for(const grade of T.grades){const candidate=T.candidate({id:'rated',group:'warrior',grade:grade.id,rng:E.seededRandom('rated')});const unit=T.create(candidate,'sword',7,'xuchang');assert.equal(T.gradeOf(candidate).name,grade.name);assert.equal(T.gradeOf(unit).name,grade.name);assert.equal(T.gradeOf(JSON.parse(JSON.stringify(unit))).name,grade.name);}
 });
