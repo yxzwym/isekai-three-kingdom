@@ -116,7 +116,7 @@
   for(const [id,scene]of Object.entries({patrol:'rural-road',thieves:'forest-path','river-bandits':'river-dock','mountain-bandits':'bandit-camp',brigands:'bandit-camp','changshan-rescue':'market-street'}))encounters[id].scene=Scenes.get(scene);
   const questDefinitions=[
     {id:'coalition',title:'访贤合盟',category:'main',recommendedLevel:10},
-    {id:'changshan',title:'常山归途',category:'story',recommendedLevel:3}
+    {id:'changshan',title:'常山归途',category:'story',recommendedLevel:1}
   ];
   const questNpcs={
     zhaoyun:{id:'zhaoyun',name:'赵云',art:'zhaoyun',side:'left',role:'story',roleLabel:'剧情'},

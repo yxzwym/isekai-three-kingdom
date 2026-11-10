@@ -92,13 +92,14 @@
     }
     preparePortraits(){
       if(!this.rects)return;
-      for(const r of this.rects){const u=r.unit,art=r.side==='enemy'?u.fullbody||u.portrait:u.portrait,img=this.image(art?.src);if(!img)continue;const source=(r.side==='enemy'&&!art.crop?this.combatSource(img):art.crop)||{x:0,y:0,width:img.naturalWidth,height:img.naturalHeight},dst=fitImage(source.width,source.height,r.figure),width=Math.max(1,Math.ceil(dst.w*Math.max(2,this.dpr)));
+      for(const r of this.rects){const u=r.unit,art=r.side==='enemy'?u.fullbody||u.portrait:u.portrait,img=this.image(art?.src);if(!img)continue;const source=(r.side==='enemy'&&!art.crop?this.combatSource(img,art):art.crop)||{x:0,y:0,width:img.naturalWidth,height:img.naturalHeight},dst=fitImage(source.width,source.height,r.figure),width=Math.max(1,Math.ceil(dst.w*Math.max(2,this.dpr)));
         if(r.side==='enemy'){const height=r.figure.h,width=height*source.width/source.height;dst.w=width;dst.h=height;dst.x=clamp(r.x+r.w/2-width/2,4,this.w-width-4);dst.y=r.figure.y;}
         const fade=art.status==='legacy';this.visuals.set(u.id,{sprite:this.sprite(img,source,width,false,fade),red:this.sprite(img,source,width,true,fade),dst});r.effectY=dst.y+dst.h*.56;r.effectWidth=dst.w;if(r.hudAbove)r.hud.y=dst.y-36;
       }
     }
-    combatSource(img){
-      this.combatSources||=new WeakMap();if(this.combatSources.has(img))return this.combatSources.get(img);const scale=Math.min(1,256/img.naturalHeight),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.ceil(img.naturalWidth*scale));canvas.height=Math.max(1,Math.ceil(img.naturalHeight*scale));const c=canvas.getContext('2d');c.drawImage(img,0,0,canvas.width,canvas.height);const pixels=c.getImageData(0,0,canvas.width,canvas.height).data;let left=canvas.width,top=canvas.height,right=0,bottom=0;for(let y=0;y<canvas.height;y++)for(let x=0;x<canvas.width;x++)if(pixels[(y*canvas.width+x)*4+3]>24){left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);}const source=left>right?{x:0,y:0,width:img.naturalWidth,height:img.naturalHeight}:{x:Math.max(0,left-2)/scale,y:Math.max(0,top-2)/scale,width:Math.min(canvas.width-left+2,right-left+5)/scale,height:Math.min(canvas.height-top+2,bottom-top+5)/scale};this.combatSources.set(img,source);return source;
+    combatSource(img,art={}){
+      const full={x:0,y:0,width:img.naturalWidth,height:img.naturalHeight},crop=art.combatCrop;
+      return crop&&[crop.x,crop.y,crop.width,crop.height].every(Number.isFinite)&&crop.x>=0&&crop.y>=0&&crop.width>0&&crop.height>0&&crop.x+crop.width<=full.width&&crop.y+crop.height<=full.height?crop:full;
     }
     buildBackground(){
       if(!this.w)return;const w=this.w,h=this.h,bg=this.image(this.scenario.scene?.background),canvas=document.createElement('canvas');canvas.width=Math.ceil(w*this.dpr);canvas.height=Math.ceil(h*this.dpr);const c=canvas.getContext('2d');c.setTransform(this.dpr,0,0,this.dpr,0,0);
@@ -284,7 +285,7 @@
       if(u.statusImmunities?.includes('stun')&&!u.passives.includes('enemy-stun-resistance'))pairs.push(['状态','抵抗眩晕']);
       for(let i=0;i<pairs.length;i++){const xx=left+(i%2)*(w-44)/2,yy=row+Math.floor(i/2)*26;this.text(pairs[i][0],xx,yy,14,'#acbec2','left');this.text(pairs[i][1],xx+(w-44)/2-10,yy,14,'#eddfbd','right');}
       row+=Math.ceil(pairs.length/2)*26+13;
-      if(potential){this.text('属性',left,row,14,'#acbec2','left');this.text('当前',left+(w-44)*.55,row,14,'#acbec2','right');this.text('潜力',right,row,14,'#d8bc8b','right');row+=27;for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.text(label,left,row,14,'#c5d3d5','left');this.text(u[key],left+(w-44)*.55,row,14,'#e4e2d4','right');this.text(u.potentials[key],right,row,14,'#ddc393','right');row+=27;}row+=14;}
+      if(potential){this.text('属性',left,row,14,'#acbec2','left');this.text('当前',left+(w-44)*.55,row,14,'#acbec2','right');this.text('潜力',right,row,14,'#d8bc8b','right');row+=27;for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.text(label,left,row,14,'#c5d3d5','left');this.text(number(u[key]),left+(w-44)*.55,row,14,'#e4e2d4','right');this.text(u.potentials[key],right,row,14,'#ddc393','right');row+=27;}row+=14;}
       if(u.side!=='enemy'){this.text('装备',left,row,14,'#ebd4a6','left');row+=25;this.text(u.weapon?.name||(u.weapon===null?'徒手':'未登记武器'),left,row,14,'#d6e2e3','left');this.text(`攻击 ${number(u.attack)}`,right,row,14,'#c5d3d5','right');row+=25;
       for(const [slot,label]of [['armor','盔甲'],['accessory1','饰品'],['accessory2','饰品']]){this.text(label,left,row,14,'#acbec2','left');this.text(u.equipment?.[slot]?.name||'未装备',right,row,14,'#c5d3d5','right');row+=25;}
       this.text('武器熟练度',left,row,14,'#ebd4a6','left');row+=28;const columns=Math.max(2,Math.min(3,Math.floor((w-44)/96))),cellW=(w-44)/columns;for(const group of root.WeaponCatalog.groupedTypes()){this.text(group.name,(left+right)/2,row,14,'#d9bf8e','center');row+=24;group.types.forEach((type,i)=>{const xx=left+i%columns*cellW,yy=row+Math.floor(i/columns)*26;this.text(type.name,xx,yy,14,'#acbec2','left');this.text(u.weaponProficiencies?.[type.id]||0,xx+cellW-14,yy,14,'#e4dfca','right');});row+=Math.ceil(group.types.length/columns)*26+12;}}

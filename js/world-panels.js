@@ -2,10 +2,11 @@
  'use strict';
  const node=typeof module!=='undefined'&&module.exports,I=node?require('./items.js'):root.ItemCatalog,E=node?require('./engine.js'):root.BattleEngine,X=node?require('./experience.js'):root.CharacterExperience,C=node?require('./weapon-catalog.js'):root.WeaponCatalog;
  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n)),color=i=>I.qualities[i?.quality]?.color||'#a9b9bc',slots=[['weapon','武器'],['armor','盔甲'],['accessory1','饰品'],['accessory2','饰品']];
+ const displayAttribute=(value,readonly=false)=>readonly?Math.floor(Number(value)||0):Number((Number(value)||0).toFixed(2));
  const questColors={available:'#59dce5',active:'#f3f6f4',ready:'#e9c365'};
  function questIcon(v,status,x,y,size=25){const tint=questColors[status];if(!tint)return;v.box(x,y,size,size,'#17201ff5',tint,3);v.text('!',x+size/2,y+size*.53,20,tint,'center');}
  function icon(v,id,x,y,size,tint){root.RpgIcons.draw(v.ctx,id,x,y,size,{image:src=>v.image(src),disabled:tint==='#425966'});}
- function iconButton(v,label,x,y,size,action,active=false){v.box(x,y,size,size,active?'#61502b':'#0c2531ed',active?'#e3c384':'#7d959b',4);icon(v,label,x+5,y+5,size-10,active?'#ffe2a2':'#d5e5df');root.PengpaiUI.buttonTrim(v,x,y,size,size,{active});v.hits.push({x,y,w:size,h:size,label,action});}
+ function iconButton(v,label,x,y,size,action,active=false){v.box(x,y,size,size,active?'#61502b':'#0c2531ed',active?'#e3c384':'#7d959b',4);icon(v,label,x+5,y+5,size-10,active?'#ffe2a2':'#d5e5df');v.hits.push({x,y,w:size,h:size,label,action});}
  function bar(v,x,y,w,h,value,fill='#40aab9',trail=value){v.box(x,y,w,h,'#07151e','#557780',3);v.ctx.fillStyle='#ecedce';v.ctx.fillRect(x+2,y+2,(w-4)*clamp(trail,0,1),h-4);v.ctx.fillStyle=fill;v.ctx.fillRect(x+2,y+2,(w-4)*clamp(value,0,1),h-4);}
  function itemIcon(v,item,x,y,size,empty){const tint=color(item);v.box(x,y,size,size,'#0a1d28',item?tint:'#3e5865',4);icon(v,root.RpgIcons.resolveItem(item,empty),x+7,y+7,size-14,item?tint:'#425966');if(item?.slot==='trophy'){v.box(x+size-23,y+size-17,22,16,'#172019','#8d805d',2);v.text(item.level+'',x+size-12,y+size-9,11,'#ead8ad','center');}}
  function character(){
@@ -44,7 +45,7 @@
   y+=passiveH;
   const gap=12,cw=(inner-gap)/2,pairs=[['war','武力','constitution','体质'],['intelligence','智力','armor','护甲'],['technique','技巧','resistance','抗性'],['speed','速度',...(u.statusImmunities?.includes('stun')?['stunProtection','抗晕']:[])]];
   this.box(left,y,inner,statsH,'#091d26','#37545e',3);
-  pairs.forEach((row,i)=>{const yy=y+i*27+13.5;for(let col=0;col<row.length/2;col++){const x=left+col*(cw+gap),key=row[col*2],label=row[col*2+1],potential=showPotential?u.potentials?.[key]:null;if(potential!=null){this.text(label+' '+Number(current[key].toFixed(2)),x+6,yy,14,'#eddfc0');this.text(potential+'(+'+Number(root.CharacterGrowth.growthPerLevel(potential).toFixed(2))+')',x+cw-6,yy,14,'#d6bb8b','right');}else{this.text(label,x+6,yy,14,'#a9bec3');this.text(key==='stunProtection'?'抵抗':Number(current[key].toFixed(2)),x+cw-6,yy,16,'#eddfc0','right');}}});
+  pairs.forEach((row,i)=>{const yy=y+i*27+13.5;for(let col=0;col<row.length/2;col++){const x=left+col*(cw+gap),key=row[col*2],label=row[col*2+1],potential=showPotential?u.potentials?.[key]:null;if(potential!=null){this.text(label+' '+displayAttribute(current[key],p.readonly),x+6,yy,14,'#eddfc0');this.text(p.readonly?String(Math.floor(potential)):potential+'(+'+Number(root.CharacterGrowth.growthPerLevel(potential).toFixed(2))+')',x+cw-6,yy,14,'#d6bb8b','right');}else{this.text(label,x+6,yy,14,'#a9bec3');this.text(key==='stunProtection'?'抵抗':displayAttribute(current[key],p.readonly),x+cw-6,yy,16,'#eddfc0','right');}}});
   y+=statsH+4;const hp=u.startSoldiers??u.soldiers??u.maxSoldiers;bar(this,left,y,inner,17,hp/u.maxSoldiers,'#ba222c');this.text(u.dead?'濒死':hp===0?'重伤':hp+' / '+u.maxSoldiers,f.x+f.w/2,y+8.5,14,'#fff0e5','center');
   if(showExperience){y+=compact?19:20;const required=X.required(u.level);bar(this,left,y,inner,13,required===Infinity?1:(u.experience||0)/required,'#b39751');this.text((u.experience||0)+' / '+(required===Infinity?'—':required),f.x+f.w/2,y+6.5,14,'#f4e2b7','center');}
   c.restore();this.hits=this.hits.filter((hit,i)=>i<headerHits||hit.y>=top&&hit.y+hit.h<=bottom);
@@ -60,12 +61,12 @@
   const f=this.frame(u.name+' · 详细属性',58+contentH+(canLeave?54:18)),left=f.x+20,w=f.w-40,top=f.y+58,bottom=f.y+f.h-(canLeave?54:18),c=this.ctx;
   p.maxScroll=Math.max(0,contentH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);let y=top-p.scroll;const beforeHits=this.hits.length;
   c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
-  this.text('属性',left,y+10,14,'#aec5ce');this.text('当前',left+w*(showPotential ? .58 : 1),y+10,14,'#aec5ce','right');if(showPotential)this.text('潜力(每级)',left+w,y+10,14,'#d6bb8b','right');y+=28;
-  for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.box(left,y,w,27,'#15313b',null);this.text(label,left+8,y+13.5,14);this.text(Number(current[key].toFixed(2)),left+w*(showPotential ? .58 : 1)-(showPotential?0:8),y+13.5,16,'#f4e0b3','right');if(showPotential)this.text(u.potentials?.[key]!=null?u.potentials[key]+'('+Number(root.CharacterGrowth.growthPerLevel(u.potentials[key]).toFixed(2))+')':'—',left+w-8,y+13.5,14,'#d6bb8b','right');y+=30;}
+  this.text('属性',left,y+10,14,'#aec5ce');this.text('当前',left+w*(showPotential ? .58 : 1),y+10,14,'#aec5ce','right');if(showPotential)this.text(p.readonly?'潜力':'潜力(每级)',left+w,y+10,14,'#d6bb8b','right');y+=28;
+  for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.box(left,y,w,27,'#15313b',null);this.text(label,left+8,y+13.5,14);this.text(displayAttribute(current[key],p.readonly),left+w*(showPotential ? .58 : 1)-(showPotential?0:8),y+13.5,16,'#f4e0b3','right');if(showPotential)this.text(u.potentials?.[key]!=null?p.readonly?Math.floor(u.potentials[key]):u.potentials[key]+'('+Number(root.CharacterGrowth.growthPerLevel(u.potentials[key]).toFixed(2))+')':'—',left+w-8,y+13.5,14,'#d6bb8b','right');y+=30;}
   y+=12;this.text('防护',left,y+10,14,'#aec5ce');this.text('当前',left+w*.58,y+10,14,'#aec5ce','right');this.text('对应减伤',left+w,y+10,14,'#aec5ce','right');y+=24;
   for(const [label,value,kind]of [['护甲',current.armor,'物理'],['抗性',current.resistance,'计策']]){
-   const percent=((1-E.mitigation(value))*100).toFixed(2).replace(/\.?0+$/,'');
-   this.box(left,y,w,27,'#15313b',null);this.text(label,left+8,y+13.5,14,'#b8cbd0');this.text(value,left+w*.58,y+13.5,16,'#f4e0b3','right');this.text(kind+' '+percent+'%',left+w-8,y+13.5,14,'#e0cf9f','right');y+=30;
+   const percent=p.readonly?Math.floor((1-E.mitigation(value))*100):((1-E.mitigation(value))*100).toFixed(2).replace(/\.?0+$/,'');
+   this.box(left,y,w,27,'#15313b',null);this.text(label,left+8,y+13.5,14,'#b8cbd0');this.text(displayAttribute(value,p.readonly),left+w*.58,y+13.5,16,'#f4e0b3','right');this.text(kind+' '+percent+'%',left+w-8,y+13.5,14,'#e0cf9f','right');y+=30;
   }
   if(trophyRows.length){y+=12;this.text('遗物加成',left,y+10,16,'#d8bc89');y+=24;for(const [key,value]of trophyRows){this.text(root.TrophyCatalog.attributes[key]?.name||key,left+8,y+12,14,'#aec5ae');this.text('+'+root.TrophyCatalog.percent(value),left+w-8,y+12,16,'#c4d7a8','right');y+=28;}}
   y+=12;this.text('武器熟练度',left,y+10,16,'#d8bc89');y+=24;
@@ -242,5 +243,5 @@
   this.button(q.complete?'返回手记':place?'前往 '+place.name:'返回手记',left,f.y+f.h-56,w,36,()=>{if(q.complete||!place)this.panel=p.previous;else goQuest(this,q);this.invalidate();},{active:!q.complete&&!!place});
  }
  const handlers={character,characterDetails:details,tasks,party,memberActions,formation,inventory,inventoryFilter,inventorySort,shop:inventory,reward,taskDetail,itemDetail,bulkSell};
- const api={icon,iconButton,bar,itemIcon,questIcon,questColors,draw(v){if(root.TrophyPanels?.draw(v))return true;const p=v.panel,fn=handlers[p?.type];if(!fn)return false;if(['itemDetail','bulkSell'].includes(p.type)&&handlers[p.previous?.type]){v.panel=p.previous;try{handlers[p.previous.type].call(v);}finally{v.panel=p;}}fn.call(v);return true;}};root.WorldPanels=api;if(node)module.exports=api;
+ const api={displayAttribute,icon,iconButton,bar,itemIcon,questIcon,questColors,draw(v){if(root.TrophyPanels?.draw(v))return true;const p=v.panel,fn=handlers[p?.type];if(!fn)return false;if(['itemDetail','bulkSell'].includes(p.type)&&handlers[p.previous?.type]){v.panel=p.previous;try{handlers[p.previous.type].call(v);}finally{v.panel=p;}}fn.call(v);return true;}};root.WorldPanels=api;if(node)module.exports=api;
 })(globalThis);

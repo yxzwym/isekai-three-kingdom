@@ -230,15 +230,15 @@
     }
 
     portrait(art,x,y,size,{frame=true}={}){const image=root.GameAssetLoader?.get(art?.src);if(frame)this.box(x,y,size,size,'#19343a','#668995');if(!image)return;const crop=art.crop||{x:0,y:0,width:image.naturalWidth,height:image.naturalHeight},c=this.ctx;c.save();c.beginPath();c.rect(x,y,size,size);c.clip();const scale=Math.max(size/crop.width,size/crop.height);c.drawImage(image,crop.x,crop.y,crop.width,crop.height,x+(size-crop.width*scale)/2,y+(size-crop.height*scale)/2,crop.width*scale,crop.height*scale);c.restore();}
-    npcRole(npc){if(npc.heroQuest)return 'story';
-      if(npc.questId)return 'story';
-      const q=this.model.state.quests.changshan,sideTask=root.NearbyContent.sideQuests.some(t=>t.giver===npc.id&&!this.model.state.quests.side[t.id]?.paid),storyTask=(npc.id==='zhaoyun'&&q.stage!=='complete'&&npc.role!=='companion')||(npc.id==='changshan-elder'&&q.stage==='return')||(npc.id==='grain-steward'&&q.stage==='supplies')||(npc.id==='refugee-laborer'&&q.stage==='rescue');
-      if(sideTask||storyTask)return 'story';
-      return ['quest','story'].includes(npc.role)?'civilian':npc.role;
+    npcRole(npc){
+      if(['healer','heal','training','merchant','companion','tavern'].includes(npc.role))return npc.role;
+      if(this.model.npcQuestStatus(npc))return 'story';
+      return ['civilian','rumor'].includes(npc.role)||npc.dungeonRumor?'rumor':null;
     }
     roleIcon(role,x,y,size=25,status=null){if(status){Panels.questIcon(this,status,x,y,size);return;}
-      const ids={healer:'heal',heal:'heal',advice:'任务',training:'shortBlade',merchant:'背包',companion:'人物',tavern:'人物',story:'任务'};
-      this.box(x,y,size,size,'#10232bee',null,3);
+      if(!role)return;const ids={training:'shortBlade',merchant:'背包',companion:'人物',tavern:'人物',story:'任务'};
+      if(!ids[role]&&!['rumor','heal','healer'].includes(role))return;this.box(x,y,size,size,'#10232bee',null,3);
+      if(role==='heal'||role==='healer'){const c=this.ctx,thick=Math.max(5,Math.round(size*.28)),length=Math.round(size*.76),cx=x+size/2,cy=y+size/2;c.save();c.fillStyle='#74bf73';c.fillRect(cx-thick/2,cy-length/2,thick,length);c.fillRect(cx-length/2,cy-thick/2,length,thick);c.restore();return;}
       if(ids[role])root.RpgIcons.draw(this.ctx,ids[role],x+1,y+1,size-2,{image:src=>this.image(src)});
       else{const c=this.ctx;c.save();c.beginPath();c.roundRect(x+3,y+4,size-6,size-11,3);c.moveTo(x+8,y+size-7);c.lineTo(x+5,y+size-2);c.lineTo(x+14,y+size-7);c.fillStyle='#c1d6cf';c.fill();c.fillStyle='#355461';for(let i=0;i<3;i++){c.beginPath();c.arc(x+8+i*4,y+10,1,0,7);c.fill();}c.restore();}
     }
@@ -381,14 +381,14 @@
     drawTown(){
       this.drawTownBackdrop();if(this.dialogue)return;const source=this.model.sceneNpcs(),c=this.ctx,key=this.model.state.nodeId;
       if(this.npcPageNode!==key){this.npcPageNode=key;this.npcPage=0;this.npcQuestOnly=false;}
-      const npcs=this.npcQuestOnly?source.filter(n=>this.model.npcQuestStatus(n)):source,tracking=this.trackerBounds(),heading=Math.max(91,tracking.y+tracking.h+14);this.text('人物 '+npcs.length+(this.npcQuestOnly?'/'+source.length:''),18,heading+10,14,'#d0c7aa');this.button(this.npcQuestOnly?'全部人物':'只看任务',this.w-118,heading-4,100,30,()=>{this.npcQuestOnly=!this.npcQuestOnly;this.npcPage=0;this.invalidate();});const grid=root.TownLayout.plan(this.w,heading+39,this.partyTop()-61,npcs.length,this.npcPage);this.npcPage=grid.page;this.townQuestAnimating=false;
-      for(const r of grid.rects){c.font=`14px ${UI.font}`;const npc=npcs[r.index],art=npc.art?root.CharacterAssets.resolve(npc.art).portrait:null,img=art?this.image(art.src):null,nameLines=UI.wrapLines(c,npc.name,r.w-6),nameH=nameLines.length>1?34:26,pictureH=Math.max(12,r.h-nameH),status=this.model.npcQuestStatus(npc);this.townQuestAnimating||=!!status;
+      const npcs=this.npcQuestOnly?source.filter(n=>this.model.npcQuestStatus(n)):source,tracking=this.trackerBounds(),gridTop=tracking.y+tracking.h+22;this.button(this.npcQuestOnly?'全部人物':'只看任务',this.w-118,tracking.y,100,30,()=>{this.npcQuestOnly=!this.npcQuestOnly;this.npcPage=0;this.invalidate();});const grid=root.TownLayout.plan(this.w,gridTop,this.partyTop()-61,npcs.length,this.npcPage);this.npcPage=grid.page;this.townQuestAnimating=false;
+      for(const r of grid.rects){c.font=`14px ${UI.font}`;const npc=npcs[r.index],art=npc.art?root.CharacterAssets.resolve(npc.art).portrait:null,img=art?this.image(art.src):null,nameLines=UI.wrapLines(c,npc.name,r.w-6),nameH=nameLines.length>1?34:26,pictureH=Math.max(12,r.h-nameH),status=this.model.npcQuestStatus(npc);
         this.box(r.x,r.y,r.w,r.h,'#0b2530','#5c7d88');if(img){const a=art.crop,dst=root.BattleSystem.fitImage(a.width,a.height,{x:r.x+1,y:r.y+1,w:r.w-2,h:pictureH-2});c.drawImage(img,a.x,a.y,a.width,a.height,dst.x,dst.y,dst.w,dst.h);}else if(npc.icon)root.RpgIcons.draw(c,npc.icon,r.x+8,r.y+8,Math.min(r.w-16,pictureH-12),{image:src=>this.image(src)});
         nameLines.slice(0,2).forEach((line,i)=>this.text(line,r.x+r.w/2,r.y+pictureH+(nameLines.length>1?9+i*15:13),14,'#e0dfc8','center'));const iconSize=Math.min(25,r.w*.28);this.roleIcon(this.npcRole(npc),r.x+r.w-iconSize-3,r.y+pictureH-iconSize-3,iconSize);if(status)Panels.questIcon(this,status,r.x+r.w-29,r.y+4,25);this.hits.push({...r,label:npc.name+' · '+npc.roleLabel,action:()=>this.interact(npc)});
       }
       if(grid.pager){const p=grid.pager;this.button('上一页',18,p.y,86,32,()=>{this.npcPage=Math.max(0,grid.page-1);this.invalidate();},{disabled:grid.page===0});this.text((grid.page+1)+' / '+grid.pages,this.w/2,p.y+16,14,'#cbbd9c','center');this.button('下一页',this.w-104,p.y,86,32,()=>{this.npcPage=Math.min(grid.pages-1,grid.page+1);this.invalidate();},{disabled:grid.page===grid.pages-1});}
-      if(!npcs.length)this.text('这里暂无待办人物',this.w/2,heading+94,14,'#a5b3a0','center');
-      this.button(this.model.state.nodeId==='camp'?'出营':'离开',28,this.partyTop()-48,this.w-56,36,()=>{this.model.leave();this.dialogue=null;this.save();this.focusLocation();});
+      if(!npcs.length)this.text('这里暂无待办人物',this.w/2,gridTop+64,14,'#a5b3a0','center');
+      this.button(this.model.state.nodeId==='camp'?'出营':'离开',18,this.partyTop()-48,this.w-36,36,()=>{this.model.leave();this.dialogue=null;this.save();this.focusLocation();});
     }
     drawDialogue(){
       this.rememberDialogue();
@@ -405,11 +405,12 @@
       const tabs=[['attributes','属性'],['equipment','装备'],['skills','技能']],tabW=(inner-12)/3;tabs.forEach(([id,label],i)=>this.button(label,left+i*(tabW+6),f.y+118,tabW,34,()=>{p.tab=id;p.scroll=0;},{active:p.tab===id}));
       const start=f.y+166,bottom=f.y+f.h-17,headerHits=this.hits.length;let y=start-(p.scroll||0);c.save();c.beginPath();c.rect(left,start,inner,bottom-start);c.clip();
       const section=title=>{this.text(title,left,y+12,16,'#e6ca94');c.strokeStyle='#38565d';c.beginPath();c.moveTo(left,y+30);c.lineTo(right,y+30);c.stroke();y+=compact?36:43;};
-      const pair=(label,value)=>{this.text(label,left,y+11,14,'#aebfc4');this.text(value,right,y+11,14,'#e4e5d7','right');y+=compact?27:31;};
+      const display=value=>Math.floor(Number(value)||0);
+      const pair=(label,value)=>{this.text(label,left,y+11,14,'#aebfc4');this.text(typeof value==='number'?display(value):value,right,y+11,14,'#e4e5d7','right');y+=compact?27:31;};
       if(p.tab==='attributes'){
         section('基础属性');const potential=root.CharacterGrowth.isGeneral(u)&&u.potentials;this.text('属性',left,y+9,14,'#92aeb7');this.text('当前',potential?left+inner*.55:right,y+9,14,'#92aeb7','right');if(potential)this.text('潜力',right,y+9,14,'#d7bb88','right');y+=compact?26:29;
-        for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.box(left,y-3,inner,28,'#102b34',null);this.text(label,left+9,y+10,14,'#d8e4e4');this.text(u[key],potential?left+inner*.55:right-9,y+10,14,'#eae4cb','right');if(potential)this.text(u.potentials[key],right-9,y+10,14,'#d8be8a','right');y+=compact?30:33;}
-        y+=compact?6:10;section('战斗能力');pair('生命',u.soldiers+' / '+u.maxSoldiers);pair('护甲',b.effective(u).armor);pair('抗性',b.effective(u).resistance);
+        for(const [key,label]of root.PengpaiRules.ATTRIBUTES){this.box(left,y-3,inner,28,'#102b34',null);this.text(label,left+9,y+10,14,'#d8e4e4');this.text(display(u[key]),potential?left+inner*.55:right-9,y+10,14,'#eae4cb','right');if(potential)this.text(display(u.potentials[key]),right-9,y+10,14,'#d8be8a','right');y+=compact?30:33;}
+        y+=compact?6:10;section('战斗能力');pair('生命',display(u.soldiers)+' / '+display(u.maxSoldiers));pair('护甲',b.effective(u).armor);pair('抗性',b.effective(u).resistance);
       }else if(p.tab==='equipment'){
         section('当前装备');pair('武器',u.weapon?.name||'未持兵器');pair('武器威力',u.attack);pair('盔甲',u.equipment?.armor?.name||'未装备');pair('饰品',u.equipment?.accessory1?.name||'未装备');pair('饰品',u.equipment?.accessory2?.name||'未装备');y+=8;section('武器熟练度');for(const group of root.WeaponCatalog.groupedTypes()){section(group.name);for(const type of group.types)pair(type.name,u.weaponProficiencies?.[type.id]||0);}
       }else{
@@ -498,6 +499,7 @@
       const result=this.model.beginTraining(id);if(!result.ok){this.panel={type:'notice',title:'教场',text:result.reason};this.dialogue=null;return;}this.dialogue=null;this.save(this.model.pending.checkpoint);this.startBattle();
     }
     startBattle({continuous=false}={}){
+      if(this.disposed||this.battle||!this.model.pending)return false;this.press=null;this.hits=[];
       const scenario=this.model.battleScenario(),settings=this.options.store.settings(),autoStart=continuous||this.model.pending.kind==='story'&&this.model.pending.phase==='entry';clearTimeout(this.eventTimer);this.panel=null;this.dialogue=null;
       const save=view=>{for(const unit of view.battle.units.filter(u=>u.side==='ally'))this.model.saveTactics(unit);this.save(this.model.pending?.checkpoint);};
       this.save(this.model.pending.checkpoint);this.battle=root.BattleSystem.mount(this.canvas,scenario,{...settings,autoStart,hideResult:true,onTacticsSave:(unit,view)=>save(view),onPrepareChange:save,onPrepared:save,onComplete:result=>{this.timer=setTimeout(()=>{if(this.disposed)return;const context={...this.model.pending};this.battle.destroy();this.battle=null;const victory=this.model.resolveBattle(result);if(!victory)this.journey=null;this.selected=null;this.resize();this.save(this.model.journey?.checkpoint);if(victory)this.showReward(this.model.lastReward);else this.afterBattle(context,false);this.invalidate();},600);}});if(this.model.pending.kind==='story'&&this.model.pending.phase==='entry')this.battle.notify('赵云赶来助阵');
