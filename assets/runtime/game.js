@@ -5912,54 +5912,54 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
  const node=typeof module!=='undefined'&&module.exports,G=node?require('./character-growth.js'):root.CharacterGrowth,I=node?require('./items.js'):root.ItemCatalog,W=node?require('./weapon-skills.js'):root.WeaponSkills;
  const np=(id,name,art,role,place,lines)=>({id,name,art,role,place,side:role==='healer'?'right':'left',roleLabel:{civilian:'交谈',quest:'任务',merchant:'商贩',healer:'疗伤'}[role]||'交谈',lines});
  const npcs=[
-  np('changshan-elder','里正','villager','quest','changshan',['你是想打听人，还是找个住的地方？西边有间空屋，我让人腾张铺位出来。走了一路，先在这里歇歇吧。','逃难来的乡亲暂时都住在村里，赵将军一直帮着照顾。住的地方还能再挤一挤，可粮食剩得不多了，大家都在发愁。']),
-  np('changshan-woodcutter','樵夫','laborer','quest','changshan',['你准备进山吗？山口那条近路先别走，我前两天在那里遇见了贼，柴和斧头都没保住，跑回来时还摔了一跤。','以前我天不亮就进山，如今得等邻居们一起出门。也不是人多就打得过，只是遇到事情，总能有人跑回来报信。']),
-  np('changshan-doctor','乡医','villager','healer','changshan',['身上有伤吗？到这边坐，把袖子挽起来，我看看伤口。别隔着衣服自己揉，脏东西揉进去，会更难处理。','想包扎的话就在这里坐会儿，轮到了我叫你。干净布条剩得不多，我还得找人再洗一些，伤重的先看，别着急。']),
-  np('changshan-maiden','阿禾','village-maiden','civilian','changshan',['西边那间屋子我已经扫干净了，晚上再铺些干草。今天投宿的人多，要是被子不够，我再去问邻居借几床。','东边那家的小孩今天总算肯出来玩了。刚来的时候，一听见马蹄声就躲到桌下，抱着他娘怎么也不肯松手，实在叫人心疼。']),
-  np('grain-steward','仓守','villager','quest','zhongshan',['这些粮是附近几家凑给常山乡亲的。我们还没把车备好，贼就来了，把守仓的人赶走，连仓门都给换了锁。','你看这些粮袋，线的颜色都不一样，是各家自己缝好送来的。我都点过数，只怕那伙人搬来搬去，把好好的粮食也糟蹋了。']),
-  np('road-merchant','行商','laborer','merchant','zhongshan',['要买兵器还是护具？我这里有些旧货，看着不新，刃口和甲扣都修过了，用起来没问题，你可以慢慢挑。','最近送货太难，一趟路常要绕好几个村子，走到天黑也未必能到。等道路安稳些，我再多进点东西，现在先卖手里这些。']),
-  np('grain-maiden','阿芹','village-maiden','civilian','zhongshan',['你们是来帮着运粮的吗？那伙人占着仓门，连原来在院里歇脚的人都没出来。我们去问，他们只说再靠近就动手，实在叫人放心不下。','甄姑娘给我弟弟包过伤，他一直怕疼不肯让人碰，还是她哄了半天才肯伸手。不知道她现在有没有受伤，我这几天一直惦记着。']),
-  np('refugee-laborer','车夫','laborer','quest','zhongshan',['车轮我已经修好了，就等把粮装上。你们若进仓，留意后院那扇门，方才有人过去时，里头好像敲了几下。','贼来以后，谁也不敢靠近那边。我把车推到仓外等着，真有人受了伤，横放几块木板，也能把人稳稳接出来。']),
-  np('wujii-servant','甄家侍女','maid','civilian','xuchang',['你们有没有见过我家姑娘？她出门给人看病，到现在都没回家。只听说她去了中山，路上又闹起了盗匪。我留在许昌等信，真怕送信的人跟她走岔了。','她出门时带了整箱药，跟我说用完就回来。我昨天还在等她回家，早知道外头这么乱，真该一起出来，至少有人能送个信。']),
-  np('julu-carrier','运粮老卒','villager','quest','julu',['粮车往广宗去了，本来说前天就回，可一直没消息。我想去找找，偏偏这条腿又犯了老伤，连上车都得有人扶。','你们从外面过来，有没有看见几辆运粮车？赶车的老冯脸上有道疤，年纪跟我差不多，要是见过，劳烦跟我说一声。']),
-  np('guangzong-worker','补车匠','laborer','civilian','julu-county',['车轮松了就推到这边来，我帮你看看。别觉得还能转就凑合上路，真在半道掉下来，伤着人不说，货也全得耽误。','这两天等着修的车太多，木料都快用光了。有急事的我先修，能等的就在旁边歇一会儿，轮到谁我会叫。']),
-  {...np('xinye-doctor','药铺郎中','villager','healer','xinye',['到这里坐吧，我先把伤口清理一下，再换上干净布条。包好以后别沾水，觉得又疼又热，就回来让我再看看。','衙门那边闹得很厉害，你们要是还准备过去办事，至少先把身上的伤处理好。带着伤硬撑，真碰到麻烦就更难脱身了。']),unlockQuest:'ganning'}
+  np('changshan-elder','里正','villager','quest','changshan',["寻人还是投宿？西边空屋能挤出个铺位。脚上都是泥，赶了远路吧，进来歇一歇。","逃难来的都收在村里，赵将军日日帮着张罗。人还能挤，锅里的粮却一天天少，愁人哪。"]),
+  np('changshan-woodcutter','樵夫','laborer','quest','changshan',["进山？别走山口那条近道！我前日碰着贼，柴、斧头全丢了，跑得太急，还栽了个跟头。","从前鸡没叫就上山，如今得等邻家一起。打是打不过，好歹能跑回一个报信，不至于丢了人还没人知晓。"]),
+  np('changshan-doctor','乡医','villager','healer','changshan',["袖子挽起，坐到亮处。别隔着衣裳揉，泥都揉进伤里了。让我瞧瞧。","布条不多，得煮过再用。伤重的先来，其余的坐一会儿，轮着叫，不会落下谁。"]),
+  np('changshan-maiden','阿禾','village-maiden','civilian','changshan',["西屋扫好了，晚些再铺干草。今日住的人多，被子若不够，我去隔壁借，你可别睡一半才喊冷。","东头那孩子今日跑出来玩了。刚来时一听马蹄，便往桌子底下钻，搂着他娘不松手。总算敢出门了。"]),
+  np('grain-steward','仓守','villager','quest','zhongshan',["粮是各家凑的，本要送常山。车还没备齐，贼便闯进来，把我们赶出来，仓锁也换了。我这把钥匙，如今只剩个铁疙瘩。","袋口的线各有颜色，都是乡亲自己缝的，数我也记得。只怕他们乱拖乱搬，洒在泥里，想捡都捡不起来。"]),
+  np('road-merchant','行商','laborer','merchant','zhongshan',["兵器还是护具？旧货，刃口重磨过，甲扣也换了。新不新先放一边，客官拿起试试，趁手要紧。","一车货绕三四个村，走到黑还摸不着城门。路再不好，我也只能守这些存货了。盼早些安生，好再添点货。"]),
+  np('grain-maiden','阿芹','village-maiden','civilian','zhongshan',["来运粮的？仓门叫人占了，连院里歇脚的都没放出来。我们近前一问，就亮刀，也不知道里头如今怎样。","甄姑娘替我弟弟看过伤。他怕疼，躲了半天，她竟真哄得他肯伸手了。如今姑娘自己困在里面，可别也伤着才好。"]),
+  np('refugee-laborer','车夫','laborer','quest','zhongshan',["轮子补好了，只等装粮。你们进仓时，看一眼后院那扇门吧。方才人从那儿过，里头有敲门声，我听着不像风。","车就停仓外，真接出伤者，横上几块板，慢慢推便是。贼在里面，我不敢进，只能先备着。"]),
+  np('wujii-servant','甄家侍女','maid','civilian','xuchang',["诸位见过我家姑娘吗？去中山看病，一直没回。路上正闹贼，我在许昌等信，又怕送信的和她走岔，真不知该往哪头找。","她背药箱走时，还说用完这箱便回。我只当两三日，谁知道……早该一起去，哪怕替她跑一封信也好。"]),
+  np('julu-carrier','运粮老卒','villager','quest','julu',["粮车去广宗，约好前日回，到如今半点信也没。我想去找，这条腿偏又犯病，爬上车都得人抬。","路上见过赶粮车的老冯吗？脸上有道疤，跟我差不多年纪。若见着，劳烦知会一声，我在这儿等着呢。"]),
+  np('guangzong-worker','补车匠','laborer','civilian','julu-county',["轮子松了？推来。别说还转得动，轴一脱，连车带货栽下去，哪里是你一只手扶得住的。","木料都快使尽了，外头还排着车。急着上路的先修，其余坐着等，我叫着呢，谁也别自己硬推走。"]),
+  {...np('xinye-doctor','药铺郎中','villager','healer','xinye',["坐这边。伤口清一清，换块干净布。包好别碰水，夜里发热，或伤处又肿，便来敲门。","衙门那边又闹起来了？你们要去，也先让我把血止住。真打起来，伤口不会管你赶不赶时辰。"]),unlockQuest:'ganning'}
  ];
  const conversations={
-  'changshan-elder':{afterReturn:['粮食已经分给各家了，剩下的也收进了仓里。今晚大家准备一起做顿饭，你们不急着赶路的话，就留下吃完再走吧。','早上有人想回去看看自家的田，我劝他们先等等。路上还有没有乱兵，得问清楚，不能刚吃上几顿饱饭，又出了事。']},
-  'changshan-maiden':{afterReturn:['昨天饭刚煮好，几个孩子就围在灶边等。好不容易分到碗里，烫得直吹气也不肯放下，看来之前真是饿坏了。','你们住过的铺位还留着，回来提前跟我说一声就行。我把被子晒一晒，再换些干草，晚上住着也舒服点。']},
-  'grain-steward':{afterReturn:['粮车平安送到，我这边也放心了。这两天我找人把仓门补好，再安排几个年轻人轮流守着，不能总让我一个老头留在这里。','那些破粮袋我都收着呢，洗干净再补一补还能用。你们路上要是缺袋子，来跟我拿，别又为了装点东西多跑一趟。']},
-  'grain-maiden':{afterRescue:['听说甄姑娘已经救出来了，太好了！我弟弟还问她什么时候再来，想把自己做的小竹篮送给她，说以后能用来装药。','我煮了些吃的，想送给粮仓里救出来的伤者。你们见到甄姑娘，帮我问问他们有没有什么不能吃的，我好重新准备。']},
-  'refugee-laborer':{afterRescue:['人接出来，车也没坏，我终于敢回家安心睡一觉了。你们以后还要运人运东西，提前来叫我，我把车收拾好再出发。','那几个伤者一路上都在跟我道谢，我让他们少说话，先留着力气养伤。盼着下次见面，他们都能自己站起来走路。']},
-  'wujii-servant':{afterRescue:['中山送来的信我收到了，多亏你们把姑娘救出来！她怕我们担心，报了平安，后面却写了满满一页伤者该怎么换药，还是那个总顾着别人的性子。','换洗的衣服我已经收好了。姑娘要是还跟你们出门，麻烦帮我提醒她按时吃饭，她一忙起来，常常只记得病人，忘了自己也饿着。']}
+  'changshan-elder':{afterReturn:["各家都分到了，余粮也入了仓。今晚大伙凑一桌饭，请你们坐上席，不急着走吧？灶都点上了。","早上几个人想回去看田，我拦了一回。还得问清路上有没有乱兵，才吃上几顿饭，别又折了人。"]},
+  'changshan-maiden':{afterReturn:["饭才起锅，那几个孩子就捧着碗等。烫得直吹，也不肯搁下。我多盛了半勺，他们还问能不能留给娘。","铺位留着呢。回来前捎句话，我晒晒被子，换层干草。别像上回，进门了才说要住。"]},
+  'grain-steward':{afterReturn:["常山收到粮，我这口气才敢松。仓门正补着，也叫几个年轻的轮着守，总不能回回指望我这把老骨头。","破袋子别扔，洗净缝好，还能装东西。你们缺了便来拿，路上哪值得为个口袋再花钱。"]},
+  'grain-maiden':{afterRescue:["甄姑娘真出来了？谢天谢地！我弟弟编了只小篮，天天问什么时候送去，说要给姑娘装药呢。","我想煮些吃食送伤者。见了甄姑娘，替我问问有什么忌口，免得一锅煮好，倒让人吃不得。"]},
+  'refugee-laborer':{afterRescue:["人送到了，车没散，我也能回家睡个囫囵觉。往后还运东西便叫我，早说一声，我先把轮子拧紧。","车上那几个，一路谢得我都不敢颠。下回见面，最好都能自己走来，别再坐我这辆伤车了。"]},
+  'wujii-servant':{afterRescue:["中山的信到了！姑娘平安，真多亏诸位。可你瞧她，报平安只两行，后头一整页又在嘱咐给人换药。还是这个性子。","换洗衣裳都收好了。姑娘随你们走，劳烦到饭点叫她一声。病人的药记得牢，自己的饭，倒回回忘。"]}
  };
  const sideQuests=[
-  {id:'clear-mountain',sceneId:'bandit-camp',title:'山道清剿',giver:'changshan-woodcutter',giverPlace:'changshan',place:'zhongshan',enemyName:'山道盗匪',enemyArt:'mountain-bandit',recommendedLevel:4,rounds:5,money:180,item:'leather-armor',quality:'green',description:'前往中山山道清理盗匪，再回常山向樵夫复命。',accept:'你们愿意帮忙，那真是太好了。那些贼就在通往中山的山道上，分散住着几间旧棚。到了找一找，把还没离开的也清出去，不能只赶跑眼前的一伙。'},
-  {id:'grain-escort',sceneId:'farmland',title:'营粮归路',giver:'julu-carrier',giverPlace:'julu',place:'julu-county',enemyName:'拦粮山贼',enemyArt:'mountain-bandit',recommendedLevel:3,rounds:2,money:100,item:'cloth-armor',quality:'green',description:'前往广宗击退拦粮山贼、护送粮车，再回巨鹿向老卒复命。',accept:'麻烦你们往广宗走一趟，粮车走的是那条旧驿道。找到人以后，先看看有没有受伤，要真被贼拦住了，也请把他们和粮车一起接出来。'},
-  {id:'trade-road',sceneId:'market-street',title:'商路肃清',giver:'road-merchant',giverPlace:'zhongshan',place:'zhongshan-county',enemyName:'商道匪首',enemyArt:'brigand',recommendedLevel:5,rounds:5,money:240,item:'copper-ring',quality:'green',description:'前往毋极清理商道盗匪，再回中山向行商复命。',accept:'毋极那边的商道有好几伙贼，专盯着落单的货车。你们要是肯帮忙清路，我们几个商人愿意一起出酬劳，等事情办好，一定按约给你们。'}
+  {id:'clear-mountain',sceneId:'bandit-camp',title:'山道清剿',giver:'changshan-woodcutter',giverPlace:'changshan',place:'zhongshan',enemyName:'山道盗匪',enemyArt:'mountain-bandit',recommendedLevel:4,rounds:5,money:180,item:'leather-armor',quality:'green',description:'前往中山山道清理盗匪，再回常山向樵夫复命。',accept:"中山山道那几间旧棚，都有贼住着。劳烦几处都去一趟，赶跑一伙，另一伙又要出来。我在村里等信，斧头也先不往山上带了。"},
+  {id:'grain-escort',sceneId:'farmland',title:'营粮归路',giver:'julu-carrier',giverPlace:'julu',place:'julu-county',enemyName:'拦粮山贼',enemyArt:'mountain-bandit',recommendedLevel:3,rounds:2,money:100,item:'cloth-armor',quality:'green',description:'前往广宗击退拦粮山贼、护送粮车，再回巨鹿向老卒复命。',accept:"粮车走广宗旧驿道，赶车的老冯脸上有疤。找到人，劳烦连车一块接回来。若伤着了，慢些走，粮晚一日不妨。"},
+  {id:'trade-road',sceneId:'market-street',title:'商路肃清',giver:'road-merchant',giverPlace:'zhongshan',place:'zhongshan-county',enemyName:'商道匪首',enemyArt:'brigand',recommendedLevel:5,rounds:5,money:240,item:'copper-ring',quality:'green',description:'前往毋极清理商道盗匪，再回中山向行商复命。',accept:"毋极商道，几伙贼各占一段，专等落单的车。我们商户凑了酬劳，诸位若肯清路，回来便照约交付，绝不赖账。"}
  ];
  function enemy(profile,level,name,art,type,skills,index=0){const weapon=I.create('weapon-'+type,'white','enemy-'+index);weapon.id='outlaw-'+type;weapon.skills=skills.map(id=>id==='blade-cut'?{base:id,name:'劈砍'}:id);skills=W.forWeapon(weapon);return {...G.create(profile,level),name,characterId:art,weapon,armor:3,resistance:3,equipment:{armor:I.create('cloth-armor','white','enemy-armor-'+index)},skills,targetRule:'random',priorities:skills.map(skill=>({skill,when:W.skills[skill].scope==='all'?'enemyCount':'always',threshold:2,frequency:'sometimes'}))};}
  const bandits=(level,count,captain=false)=>Array.from({length:count},(_,i)=>({...enemy(i===0&&captain?'brigand':i%2?'riverBandit':'thief',level,i===0&&captain?'盗匪头目':i%2?'山贼':'盗贼',i===0&&captain?'brigand':i%2?'mountain-bandit':'thief',i%2?'spear':'blade',i===0&&captain?['blade-sweep','blade-cut']:i%2?['spear-cut']:['blade-cut'],i),...(i===0&&captain?{formationRow:'front',statusImmunities:['stun'],passives:['enemy-stun-resistance']}:{})}));
  const storyConversations={changshanEntry:[
-  {speaker:'villager',text:'你想进村歇脚吗？先在这里等等吧，里面来了几个山贼，堵着人要粮，还把劝架的人打伤了，正吵得厉害。'},
-  {speaker:'hero',text:'村里看着也没剩多少粮，他们还来抢？附近没有能帮忙的人吗，大家就这么被堵在这里？'},
-  {speaker:'villager',text:'官府很久没管过了。最近有个使枪的年轻人在照应，可他刚去了村东……你看，那几个贼往这边来了，你先站远一点。'},
-  {speaker:'thief',text:'老头，那两袋粮还没搬出来？赶紧去拿！旁边那个也不许走，既然来了，把身上值钱的都留下。'},
-  {speaker:'hero',text:'村里的人已经快吃不上饭了，你们连最后这点粮也要拿走？他刚才还在告诉我，有人被你们打伤了。'},
-  {speaker:'thief',text:'怎么，你也想管？那就跟他们一起留下！把他绑起来，先搜搜他身上有没有钱，别让他跑了！'},
-  {speaker:'zhaoyun',text:'把人放开，别再动手。这些粮要留给村里的老人和孩子，你们拿走了，叫他们明天吃什么？'},
-  {speaker:'thief',text:'又是你！昨天放你一马，今天还敢来拦？弟兄们一起上，把他手里的枪夺下来，看他还怎么逞强！'},
-  {speaker:'zhaoyun',text:'这位朋友，帮我拦一下左边那个人，别让他进村去抓人。乡亲们先回屋，把门关好，这里我们来挡！'},
-  {speaker:'hero',text:'左边我来守，你小心后面还有一个。大叔，你也赶紧进屋，别留在路中间。'}
+  {speaker:'villager',text:"别往里走，山贼正要粮呢！劝架的才挨了打，门口乱得很，等一等再进村吧。"},
+  {speaker:'hero',text:"村里还剩几袋粮？他们怎么连这里也抢。官府没人管吗？"},
+  {speaker:'villager',text:"官府？多久没见过官差了。倒有个年轻人，枪使得好，一直照应我们，可他刚去村东……哎，贼过来了，你快让开！"},
+  {speaker:'thief',text:"老头，两袋粮呢？还藏着？旁边那个也站住，身上有钱便掏出来！"},
+  {speaker:'hero',text:"我路过的也要交？你们把粮拿光，村里这些人吃什么？"},
+  {speaker:'thief',text:"管得倒宽！绑上，身上搜干净，叫他跟老头一道待着！"},
+  {speaker:'zhaoyun',text:"放手。村里只余这两袋，你们带不走。乡亲，到我后面来。"},
+  {speaker:'thief',text:"使枪的又来了！一块上，夺了他的枪，看他还能拦几回！"},
+  {speaker:'zhaoyun',text:"这位朋友，左边劳你挡一挡！乡亲回屋，关门，别留在路上！"},
+  {speaker:'hero',text:"左边给我！你留神背后。大叔，快回屋！"}
  ]};
  storyConversations.escortArrival=[
-  {speaker:'villager',text:'子龙，你们把粮运回来了！快往村里推吧，大家都等着呢……后面那几个带刀的，也是跟你们一起回来的吗？'},
-  {speaker:'zhaoyun',text:'不是，他们应该一路跟着车。乡亲们先把粮推进去，进屋以后把门拴好，别在外头围着看。'},
-  {speaker:'thief',text:'前面的给我站住！从粮仓里搬了东西，拍拍手就想走？那几车粮今天得留下，你们谁也不许推！'},
-  {speaker:'hero',text:'他们果然没肯罢休，还追到村口来了。里面有孩子和伤者，不能让他们冲进去，我们得在这里把人拦住。'},
-  {speaker:'zhaoyun',text:'我守住村口这条路，你帮着照看粮车旁边。乡亲们快进去，等把门关好再出来帮忙，别让他们抓到人。'}
+  {speaker:'villager',text:"子龙！粮回来了！快进村，大伙正盼着……后头那几个带刀的，也是你们的人？"},
+  {speaker:'zhaoyun',text:"不是。别停，车先进院！乡亲回屋拴门，别围在这里！"},
+  {speaker:'thief',text:"站住！把老子的粮搬了就想走？车留下！谁敢再推，连人带车一块砍！"},
+  {speaker:'hero',text:"追得还真紧。孩子伤者都在村里，得拦在这儿，不能让他们进去。"},
+  {speaker:'zhaoyun',text:"村口我来守，粮车旁边交给你。乡亲，往院里走，关好门！"}
  ];
- const storyBattles={entry:{sceneId:'farmland',title:'常山村口',place:'changshan',scaling:'early',count:2},grain:{followup:{phase:'grain',speaker:'zhaoyun',lines:['前院的人已经退开，粮袋还在。后院还有几个正在搬东西，我们接着过去，别让他们堵了仓门。']},sceneId:'market-street',title:'夺回乡粮',place:'zhongshan',scaling:'early',count:3},rescue:{sceneId:'market-street',title:'粮仓救人',place:'zhongshan',scaling:'early',count:2},escort:{sceneId:'rural-road',title:'粮车归途',place:'changshan',scaling:'early',pattern:'earlyLeader',count:3}};
+ const storyBattles={entry:{sceneId:'farmland',title:'常山村口',place:'changshan',scaling:'early',count:2},grain:{followup:{phase:'grain',speaker:'zhaoyun',lines:["前仓守住了。后院还在搬东西，趁门没堵上，跟我过去！"]},sceneId:'market-street',title:'夺回乡粮',place:'zhongshan',scaling:'early',count:3},rescue:{sceneId:'market-street',title:'粮仓救人',place:'zhongshan',scaling:'early',count:2},escort:{sceneId:'rural-road',title:'粮车归途',place:'changshan',scaling:'early',pattern:'earlyLeader',count:3}};
  // 普通施法者使用独立的杂兵成长档案，数值随等级成长，不借用名将潜力。
  const casterProfiles={outlawCaster:[[3,9,7,10,8],[15,45,35,50,40]],fieldMedic:[[3,9,8,8,8],[15,45,40,40,45]],fieldPriest:[[3,9,8,7,8],[15,45,40,35,45]],outlawWitch:[[3,8,8,8,8],[15,45,40,40,45]]};
  for(const [id,[base,potential]]of Object.entries(casterProfiles))G.PROFILES[id]={baseAttributes:Object.fromEntries(G.KEYS.map((key,i)=>[key,base[i]])),potentials:Object.fromEntries(G.KEYS.map((key,i)=>[key,potential[i]]))};
@@ -5987,33 +5987,33 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
  const definition={id:'ganning',name:'甘宁',title:'江上锦帆',category:'story',recommendedLevel:10,country:'wu',place:'xinye',start:'rumor',stages:{
   locked:{objective:''},
   rumor:{objective:'前往新野查探消息',npc:{id:'ganning-neighbor',name:'街坊',art:'villager',...talk(
-   ['hero','大叔，我想打听件事。衙门门口怎么围着那么多人，里面是出了什么事吗？'],
-   ['npc','刚抓回来一个叫甘宁的水匪。听说他手下那群人总穿着鲜亮的衣服，腰上还挂铃铛，江上过船的，多半听说过他们。'],
+   ['hero',"大叔，衙门门口怎么围着这么多人？出了什么事？"],
+   ['npc',"抓了个水匪，叫甘宁。你瞧过江船没有？穿锦衣、挂铃铛的那伙，就是他的人。"],
    ['hero','我听过甘宁的名字。不过他不是一直在江上活动吗，怎么会在新野被抓住？'],
-   ['npc','官府前阵子说要招安，他就带人来了，哪知道一进衙门就被绑了。有人说县尉跟他有旧怨，也有人说招安就是个幌子。我也没亲眼看见，你可以去牢门口再问问。']),choices:[{label:'去衙门打听',next:'gate'}]}},
+   ['npc',"说是来受招安的，进衙门就给拿下了。县尉跟他有旧怨吧？我也是听人传，牢门那儿总比这儿知道得清楚。"]),choices:[{label:'去衙门打听',next:'gate'}]}},
   gate:{objective:'向新野狱卒打听探监的办法',npc:{id:'ganning-jailer',name:'狱卒',art:'imperial-soldier',observe:true,...talk(
-   ['hero','我想探望一下关在里面的甘宁。他现在能见人吗，要到哪里登记？'],
-   ['npc','县尉吩咐过，甘宁不许见客。你别在这里等了，今天换谁当值，都不会随便放人进去。'],
-   ['hero','我不是来领人的，只想问他几句话。有什么手续需要办，你告诉我，我不会进去给你惹麻烦。'],
-   ['npc','手续倒没那么复杂，只是放你进去，我总得担点风险。现在管事不在，你要是肯给些茶钱，我可以让你进去一会儿，别待得太久。']),choices:[{label:'打点狱卒',price:100,next:'prison'}]}},
+   ['hero',"官爷，我来探望甘宁。劳烦通融，让我们见上一面。"],
+   ['npc',"不见！县尉有令，甘宁不得会客。你等到换班也没用。"],
+   ['hero',"只说几句话，不领人走。要办什么手续，你指点一下。"],
+   ['npc',"这时候见他，手续可不好办。上头怪罪下来，我也吃罪不起。不过……茶钱若是备着，我倒能领你进去一会儿。"]),choices:[{label:'打点狱卒',price:100,next:'prison'}]}},
   prison:{strictDialogue:true,sceneId:'county-prison',objective:'进牢探望甘宁',npc:{id:'ganning',name:'甘宁',art:'ganning',observe:true,...talk(
-   ['npc','你是来找我的？我好像没见过你。是我那些弟兄请你来，还是外面有什么消息？'],
-   ['hero','我在街上听说你被抓了，才想进来看看。外面说官府答应招安，你也带人来了，怎么反倒把你关进了牢里？'],
-   ['npc','县尉派人跟我说，愿意给我和弟兄们安排个正经差事。我想着总不能一直在江上抢船，就来赴宴。谁知道酒还没喝完，外头就冲进来一群官兵。'],
-   ['hero','他把你们请来，连守卫都提前安排好了，根本没有打算跟你好好谈吧？'],
-   ['npc','前些时候，我扣过他的一条官船，船上装的东西不能让人知道。他怕我往外说，就拿招安骗我进城，再逼我认下抢村子的罪，好把以前的事一起掩盖。'],
-   ['hero','我进来时，外面还没贴处置你的告示。你在这里等消息，我出去找人问问，看看还有没有办法把事情说清楚。'],
-   ['npc','你帮我，我当然感激，可别让县尉知道你在查那条船。我已经吃过一次亏，不想再害你也被他们骗进来。']),choices:[{label:'出牢查看消息',next:'notice'}]}},
+   ['npc',"找我的？不认得你。是哪个弟兄托你来的？"],
+   ['hero',"街上听见你的名字，我就来了。听说你是来受招安的，怎么坐进了牢里？"],
+   ['npc',"县尉说，给我和弟兄们找个正经出路。我便带人赴宴了。酒没喝完，刀架到脖子上——这顿招安酒，可真够贵的。"],
+   ['hero',"门外的人早埋伏好了？他从头就没打算招安。"],
+   ['npc',"前阵子我扣过他一条官船，里头装的东西见不得光。他拿招安骗我，又逼我认下劫村的罪。等我死了，船上的事便没人再提。"],
+   ['hero',"外面还没贴问斩的告示。我出去打听，你等着，别先跟他们拼命。"],
+   ['npc',"肯来见我，便谢你这份情。不过那条官船的事，别叫县尉知道是我说的。我栽一回也罢，可别再搭上你。"]),choices:[{label:'出牢查看消息',next:'notice'}]}},
   notice:{objective:'查看新野衙门外的新告示',npc:{id:'ganning-notice',name:'告示牌',icon:'任务',...talk(
    ['npc','新野县衙告示：甘宁因聚众劫掠已被关押，定于三日后处斩。各处守卫须严加看守，禁止私自放行。'],
-   ['hero','这么快就定了处斩的日子，看来他根本不打算让甘宁开口。刚才那个狱卒肯放我进去，可以再找他问问，看还有没有救人的办法。']),choices:[{label:'商量救人办法',next:'plan'}]}},
+   ['hero',"三日后？连审都省了。得再找那个狱卒，他既肯收钱，总有门路。"]),choices:[{label:'商量救人办法',next:'plan'}]}},
   plan:{objective:'选择赎人，或强闯新野牢房',npc:{id:'ganning-jailer',name:'狱卒',art:'imperial-soldier',observe:true,...talk(
-   ['hero','我看见外面的告示了，甘宁三日后就要被处斩。你知不知道，还有什么办法能让他离开这里？'],
-   ['npc','你还真准备救他？刚才只是让你进去说几句话，放人可是另一回事，出了事我也得掉脑袋。'],
-   ['hero','我明白。如果真有办法，你把条件说清楚，我们再想办法。要是只想让我多付一次探监的钱，就不必了。'],
-   ['npc','管事那里肯收钱，名册上就能把人记成病死，再趁晚上放出去。不过要交的可不是一笔小钱，你们最好早些决定，押去刑场以后，我也帮不上忙。']),choices:[{label:'重金赎人',price:5000,next:'freed'},{label:'强闯衙门',battle:'breach'}]}},
-  breach:{objective:'击退新野衙门守卫',npc:{id:'ganning-guard',name:'官兵队长',art:'imperial-soldier',observe:true,...talk(['npc','把牢门关上，他们是来劫狱的！快去叫后院的人过来，别只顾着守大门，让他们从旁边钻进去！']),choices:[{label:'闯入外院',battle:'breach'}]}},
-  cell:{objective:'突破牢房守卫，救出甘宁',npc:{id:'ganning-cell-guard',name:'牢房守卫',art:'imperial-soldier',observe:true,...talk(['npc','都站住！里面的犯人还在我们手上，你们再往前走，我现在就进去杀了他！'],['hero','钥匙就在他腰上，得先把他拦住！别让他退进牢里，甘宁还在里面，我们跟上！']),choices:[{label:'夺取牢房',battle:'cell'}]}},
+   ['hero',"告示我看见了，三日后问斩。真要救人出来，还有没有路可走？"],
+   ['npc',"你还当真了？领你见一面，我敢。私放死囚，那可是拿我这颗脑袋换！"],
+   ['hero',"哪条路能走，要多少钱，你说个实数。若还是只许进去看一眼，就不必了。"],
+   ['npc',"管事的能把名册改作病死，夜里再放人。只是他的胃口，可不是几文茶钱能填的。你快些定，过了刑期，神仙也领不走。"]),choices:[{label:'重金赎人',price:5000,next:'freed'},{label:'强闯衙门',battle:'breach'}]}},
+  breach:{objective:'击退新野衙门守卫',npc:{id:'ganning-guard',name:'官兵队长',art:'imperial-soldier',observe:true,...talk(['npc',"关门！有人劫狱！去后院叫人，别叫他们绕过去！"]),choices:[{label:'闯入外院',battle:'breach'}]}},
+  cell:{objective:'突破牢房守卫，救出甘宁',npc:{id:'ganning-cell-guard',name:'牢房守卫',art:'imperial-soldier',observe:true,...talk(['npc',"站住！再过来一步，老子先宰了里头的！"],['hero',"拦住他！钥匙在他腰上，别让他退回牢里！"]),choices:[{label:'夺取牢房',battle:'cell'}]}},
   freed:{objective:'与甘宁商议去留',npc:{id:'ganning',name:'甘宁',art:'ganning',observe:true,...talk(
    ['npc','你居然真的把我救出来了。你走了那么久，我还以为外头出了事，或者你听说了我的底细，不肯再回来帮忙了。'],
    ['hero','我答应出去想办法，当然得回来告诉你结果。现在人平安出来了，你有没有地方能去，弟兄们还找得到吗？'],
@@ -8107,83 +8107,83 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  define('xuchu','许家村的壮士','wei','xujia','hammer','xuchang',7,{
   rumor:S('xujia','查看许家村口的争执','xu-farmer','庄稼汉','laborer',[
    ['npc','这些粮是留着明年下种的，不是吃剩下的！你们全拉走了，我们明年连地都种不了，还要怎么活？'],
-   ['hero','大叔，先松开车绳，他们已经在拔刀了。你退到我后面，粮车我们帮你看着，别为了拦车伤着自己。'],
+   ['hero',"大叔，松手！刀都出鞘了。到我身后来，车绳给我。"],
    ['xu-bandit','你跟这老头是一家的？不是就赶紧让开！我们拿了粮就走，少在这里给自己找麻烦。'],
-   ['xuchu','我才去田里看了一会儿，你们怎么又来了？上回已经说得很清楚，这些粮不能拿，把车给我放下！']], [next('帮忙护住粮车','meet')]),
+   ['xuchu',"俺才下趟田，你们又来了？上回没听清是吧？粮袋放下！"]], [next('帮忙护住粮车','meet')]),
   meet:S('xujia','与许褚一起守住粮车','xuchu','许褚','xuchu',[
    ['npc','你帮忙看着车头，我去拦后面的两个人。大叔，趁他们过不来，先把牛牵进院子，别让刀碰着它。'],
    ['hero','我守着这边。你也小心墙边那个人，他手藏在衣服里，应该还带着刀，别让他绕到你背后。']], [{label:'护住乡亲',battle:'village'}]),
   temple:S('north-temple','追到破庙，救回被抓的乡亲','xu-bandit','盗贼队长','brigand',[
-   ['npc','许褚，你还真追到这里来了？那几个人就在庙里，你再往前一步，我可不保证他们还能不能好好走出去。'],
-   ['xuchu','把乡亲放出来，有事冲着我说！粮食本来就是村里的，你们抢了东西还要伤人，这回别想再混过去。'],
-   ['hero','左边的窗子没有封住，我听见里面有人敲。你先跟他说话，我从那边进去，看看能不能把人带出来。']], [{label:'救出乡亲',battle:'temple'}]),
+   ['npc',"许褚，你还真敢来？人就在庙里。你那锤子再抬一寸，老子可就管不住手了！"],
+   ['xuchu',"把人放了！拿乡亲吓唬俺算什么本事，有胆的出来！"],
+   ['hero',"别急，左边窗子没封，里头有人敲。你再跟他说两句，我绕过去。"]], [{label:'救出乡亲',battle:'temple'}]),
   home:S('xujia','将乡亲和粮车送回许家村','xu-farmer','庄稼汉','laborer',[
-   ['npc','人都回来了就好！你们走以后，我一直怕那伙人急了会伤人，刚才听见车响，才敢出来看看。'],
+   ['npc',"回来了，回来了！快让我瞧瞧，伤着没有？方才听见车响，我还怕又是那帮贼。"],
    ['xuchu','庙里还堆着不少抢去的粮，我让几个人留下看着了。明天多找几辆车，把乡亲们的东西一起拉回来。'],
-   ['hero','以后在村口安排几个人轮流看着吧。有人来就早点通知大家，总比等他们到了粮仓门口，才急着去找人帮忙。'],
-   ['npc','我这就去跟里正说，叫大家晚上也轮着守。你们忙了一天，先进屋吃点东西吧，我去把灶上的饭热一热。']], [next('与许褚坐下聊聊','freed')]),
+   ['hero',"村口该设个望风的。哪家来了生人，喊一嗓子，守粮的人也来得及赶到。"],
+   ['npc',"这就跟里正说，夜里也得轮着守。你们进屋坐！饭还在灶上，我再热热。"]], [next('与许褚坐下聊聊','freed')]),
   freed:finish('xuchu','许褚','xujia','xuchang')
  },{village:{stage:['meet','village'],next:'pursuit',title:'许家村口',sceneId:'farmland',count:3,enemyKind:'bandit',guest:'xuchu'},temple:{stage:['temple'],next:'home',title:'破庙救人',sceneId:'bandit-camp',count:4,enemyKind:'bandit',guest:'xuchu'}},['xuchu-tiger']);
  H.definitions.xuchu.stages.village=H.definitions.xuchu.stages.meet;
  H.definitions.xuchu.stages.pursuit=S('xujia','与许褚追查盗匪落脚处','xuchu','许褚','xuchu',[
-  ['npc','刚才逃走的那几个往村北去了。他们之前抓了几个看田的乡亲，到现在也没放回来，我们不能只顾着把这车粮抢下来。'],
-  ['hero','你知道他们把人关在哪里吗？要是有地方可找，我们现在就过去，别等他们回去以后又换了地方。'],
-  ['npc','村北有间破庙，他们一直在那里过夜。我以前追过去，听见里面有人求救，可身边没人，不敢一个人硬闯，怕他们伤了乡亲。'],
-  ['hero','这次我们陪你去。先看清里面的情况，把人救出来，再找那些抢粮的人算账。']], [next('前往村北破庙','temple',{guest:'xuchu'})]);
+  ['npc',"跑的那几个往村北去了。前几日还抓了几个看田的，至今不见回来。粮夺下了，人可还在他们手里。"],
+  ['hero',"有地方可找吗？咱们追过去，免得他们跑回来又把人挪走。"],
+  ['npc',"村北破庙，贼就宿在那儿。俺追过一回，听见里面有人喊救命。就俺一个，顾得了打，顾不了人，没敢闯。"],
+  ['hero',"这回有人帮你。咱们去看看，先找关人的地方。"]], [next('前往村北破庙','temple',{guest:'xuchu'})]);
  define('dianwei','睢阳旧案','wei','suiyang','axe','xuchang',9,{
   rumor:S('suiyang','查看刘家门前的争执','liu-widow','刘氏','liu-widow',[
    ['npc','这笔粮我丈夫生前已经还清了，里正当时就在旁边！你们不去问他，凭什么直接来收我们的房子？'],
    ['li-servant','我们只照主人的吩咐搬东西。你要说理，自己去李府说，别挡在门口，再磨蹭，连门也给你拆了！'],
-   ['hero','先把柜子放下。她说有人能作证，你们连问都不问就来搬家里的东西，这怎么算是在讨债？'],
-   ['dianwei','他不是来讨债的，是来抢东西的。把手里的柜子放回去，别仗着她家没人，什么都敢砸。']], [next('拦住家丁','yard')]),
+   ['hero',"柜子放下！现成的证人在这儿，你们不问，倒先来搬东西？"],
+   ['dianwei',"讨债？这是抢。东西放回去！欺负孤儿寡母，也不怕叫人笑话。"]], [next('拦住家丁','yard')]),
   yard:S('suiyang','与典韦赶走李家家丁','li-servant','李府家丁','brigand',[
    ['npc','又是你这个姓典的！上次就坏了我们的事，今天还敢拦着？主人正愁找不到你，这回你也别想走！'],
-   ['dianwei','你回去告诉李永，是我让你们停手的。现在把搬出去的东西送回来，不许再碰这屋里的人。'],
-   ['hero','刘大嫂，先带孩子进屋，把门拴上。外面的事情我们来处理，你们别站在这些人旁边。']], [{label:'赶走家丁',battle:'yard'}]),
+   ['dianwei',"就说典韦拦的！想找我，叫李永自己来。搬走的东西，一样不少地送回来。"],
+   ['hero',"大嫂，带孩子进屋，拴好门。别出来，我们挡着。"]], [{label:'赶走家丁',battle:'yard'}]),
   night:S('suiyang','安顿刘氏母子','dianwei','典韦','dianwei',[
    ['liu-widow','多谢你们。我想先带孩子到他舅舅家住几天，行李以后再收。那些人知道这里就剩我们娘俩，我晚上实在不敢再住了。'],
    ['npc','我送你们过去。你兄弟住在东街，我认得他，路上有我跟着，李家的人也不敢拦你们。'],
-   ['hero','我去找里正，把还粮的事情写下来，再问问有没有别的人作证。明天早上我们碰头，看能不能把这桩债彻底说清楚。'],
-   ['npc','那就这么办。你先住西街的客店，我送完他们就过去，有什么消息也好互相告诉一声。']], [next('先去找里正作证','morning')]),
+   ['hero',"我去找里正，求他把还粮的日子写下来。有旁的证人，也一并请到。明早客店碰头。"],
+   ['npc',"成，你住西街客店。我把人送妥，便去找你。"]], [next('先去找里正作证','morning')]),
   morning:S('suiyang','查问刘氏母子的下落','liu-neighbor','邻妇','neighbor-woman',[
    ['npc','你是昨天帮刘家的那位吧？昨晚李家的人又去了东街，她兄弟让人打伤，刘氏和孩子……郎中赶过去，也没能救下来。'],
    ['hero','怎么会这样？典韦呢，他昨天护送他们去东街的，有没有人见过他？'],
    ['npc','他送到了，又出去找人帮着守门，半路让一伙人缠住了。天亮听见这个消息，连伤都没顾上包扎，就跑去李府找人算账了。'],
    ['hero','麻烦你告诉我李府怎么走，我得去找他。他现在又有伤又着急，不能让他一个人闯进去。']], [next('赶往李府','mansion')]),
   mansion:S('suiyang','闯入李府寻找典韦','li-servant','李府家丁','brigand',[
-   ['hero','典韦是不是进了这道门？我刚才听见里面有人喊，你们把他带到哪里去了？'],
+   ['hero',"刚才有人在里头喊！典韦是不是进了你家？人呢？"],
    ['npc','什么典韦？我们根本不认识，你赶紧走，李府不是让人随便进来的地方。'],
-   ['dianwei','我在院子里面！别直接往前跑，地上有机关，刚才那个地方会把人关起来！'],
-   ['hero','我听见你了，先别乱动。你们把门让开，我今天一定要进去，不会听一句不认识就走。']], [{label:'闯入院中',battle:'mansion'}]),
+   ['dianwei',"我在这儿！停下！地上有机关，别踩我前头那块板！"],
+   ['hero',"听见了！你别使蛮力，我这就进去。挡门的，让开！"]], [{label:'闯入院中',battle:'mansion'}]),
   cage:S('suiyang','解开墙上的机关，救出典韦','li-yong','李永','li-yong',[
    ['npc','一个接一个地来坏我的事，真当李家是好欺负的？我今天就把这院子烧了，你们要救人，就留在里面陪着！'],
-   ['dianwei','李永从后门跑了！先别去追，墙上的木板跟这道锁连着，你帮我看看，应该是从那儿打开的。'],
-   ['hero','我试过了，铁笼拉不起来，应该得先解开机关。你离笼门远一点，我去看看那些木板能不能挪动。'],
-   ['dianwei','对，就是你手边那几块。上面的横梁已经松了，挪的时候站到旁边去，别让它掉下来砸着你。']], [{label:'解开机关',puzzle:true,next:'tunnel'}],{sceneId:'bandit-camp'}),
+   ['dianwei',"李永跑后门了！别追，先看墙上，那几块木板连着锁。把它挪开，笼门兴许就能升起来。"],
+   ['hero',"抬不动，得解锁。你退后，我试试墙上的木板。"],
+   ['dianwei',"就那几块！当心头顶，横梁已经晃了，别正站在底下。"]], [{label:'解开机关',puzzle:true,next:'tunnel'}],{sceneId:'bandit-camp'}),
   tunnel:S('suiyang','从后院密道追上李永','dianwei','典韦','dianwei',[
-   ['npc','门终于开了，我还以为要让他关死在这里。先让我缓一口气，刚才拉了半天，手都使不上劲了。'],
-   ['hero','你先把伤口包一下。李永从后面的暗道走了，灯还亮着，应该没走远，等你能走了，我们一起去追。'],
-   ['npc','我可以走了。他手里还有那些借据，得一起找回来，不然我们一走，他又能拿去欺负别人。这回不能再让他跑掉。']], [{label:'追入密道',battle:'tunnel'}]),
+   ['npc',"可算出来了！让我喘口气……这笼子，险些把两条胳膊都拉脱了。"],
+   ['hero',"布给你，先裹住伤。暗道里的灯还亮着，李永走不远。能走了咱们就追。"],
+   ['npc',"走得！他还带着借据，不拿回来，明日又要有人倒霉。"]], [{label:'追入密道',battle:'tunnel'}]),
   freed:finish('dianwei','典韦','suiyang','xuchang')
  },{yard:{stage:['yard'],next:'night',title:'刘家院前',sceneId:'city-north',count:3,enemyKind:'retainer',guest:'dianwei'},mansion:{stage:['mansion'],next:'cage',title:'李府前院',sceneId:'city-north',count:4,enemyKind:'retainer'},tunnel:{stage:['tunnel'],next:'freed',title:'李府密道',sceneId:'bandit-camp',count:4,enemyKind:'retainer',guest:'dianwei',leaderName:'李永',leaderArt:'li-yong'}},['dianwei-guard']);
  define('huangzhong','长沙老将','shu','changsha','bow','chengdu',10,{
   rumor:S('changsha','向酒家询问街上的动静','cs-host','酒家掌柜','innkeeper',[
    ['npc','这酒还没温好，你先坐一会儿。哎，那几个人怎么又把马牵走了？黄老将军不是叫他们等马夫回来认的吗？'],
-   ['hero','那匹马怎么了？他们既然要卖，为什么还要等别人来认？是不是有什么事情没说清楚？'],
+   ['hero',"这马不是他们的？怎么还要叫马夫来认？"],
    ['npc','黄老将军说像是军中丢的马，腿上的旧伤也对得上。那些人一听要找马夫就急着走，你看，他已经追出去了。']], [next('跟出去看看','stable')]),
   stable:S('changsha','协助黄忠拦住卖马的人','huangzhong','黄忠','huangzhong',[
-   ['npc','这匹马左后腿伤过，鞍子下面还有旧烙印，都是军中的记号。马夫一会儿就到，你们要是真没偷马，等他认一认又有什么关系？'],
+   ['npc',"左后腿的伤，鞍底的烙印，老夫认得清楚。这是军马。马夫一来便知，你们急什么？"],
    ['horse-thief','我们也是花钱买来的，你说是军马就是军马？老人家，生意不是这么做的，把路让开，别一直拦着我们。'],
-   ['hero','既然你们花钱买的，就把卖马的人和收据说清楚。等马夫到了，当着大家的面认，总比现在拉着就跑好。'],
-   ['npc','当心，他们准备冲出去了！你帮我拦住右边那个人，马交给我，别让他们拿刀把马也伤了。']], [{label:'拦住马贼',battle:'street'}]),
+   ['hero',"卖马的人是谁？可留了字据？有凭证便拿出来，何必急着牵走。"],
+   ['npc',"要跑！拦右边！别往马身上招呼，那匹受不得惊。"]], [{label:'拦住马贼',battle:'street'}]),
   track:S('changsha','与黄忠追查失马的去向','huangzhong','黄忠','huangzhong',[
-   ['npc','马夫已经到了，说浏阳那边还丢了两匹马。刚才这几个人应该只是来试着卖一匹，剩下的多半还藏在城外。'],
-   ['hero','刚才逃走的人朝哪边去了？如果能跟上，说不定还能找到藏马的地方。'],
-   ['npc','他们从东门跑了。你有空的话，陪我过去一趟吧，拖得久了，我怕他们把剩下的马也转手卖掉。']], [next('前往浏阳找马','horses')]),
+   ['npc',"马夫认了，是军中走失的。浏阳还丢了两匹，怕也在他们手里。这些人只牵一匹来，是探探行情。"],
+   ['hero',"刚才跑的往哪边去了？顺着追，或许能找到马。"],
+   ['npc',"东门。可愿再陪老夫一程？他们知道露了馅，不会在城外久留。"]], [next('前往浏阳找马','horses')]),
   horses:S('changsha-county','找到浏阳道旁的失马','horse-thief','马贼头目','brigand',[
    ['npc','刚才回来的弟兄说，有个老头一直追着问马的事，就是你吧？这么大年纪了，还非得跟我们过不去？'],
-   ['huangzhong','把马放开，别拿刀在它旁边比画。刚才那一箭只是拦你，再想伤马，我可不会只射你身边的车板了。'],
-   ['hero','左边那两个人我来拦。你看着马，别让他们趁着我们说话，从后面的林子绕过去。']], [{label:'夺回失马',battle:'horses'}]),
+   ['huangzhong',"刀离马远些！方才射你脚边，是留情。再敢动，下一箭便换个地方。"],
+   ['hero',"后头那两个人我挡着，将军只管护马！"]], [{label:'夺回失马',battle:'horses'}]),
   school:S('changsha','回长沙向黄忠请教','huangzhong','黄忠','huangzhong',[
    ['npc','马夫已经把马都领回去了，路上也没再受伤。今天多亏你肯帮忙，不然我顾着马，确实很难把四散的人都拦住。'],
    ['hero','早就听说汉升将军的箭术，刚才亲眼看见，更觉得厉害了。等你有空，能不能教我怎么站、怎么瞄准？'],
@@ -8195,91 +8195,91 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   rumor:S('xiangyang','询问医馆外的争执','maliang','马良','maliang',[
    ['npc','这些药先让病人领走，花费我会补上。你们如果要找我弟弟，我可以带路，别一直堵在药铺门口，让病人连门都进不来。'],
    ['imperial-soldier','府里还等着问话，你别总找理由拖延。刘公子的伤到现在没好，你弟弟惹下的事，总得有人出来说清楚！'],
-   ['hero','这是怎么回事？药铺门口还有好几个伤者，你们这样吵，他们也没法好好看病。'],
+   ['hero',"官爷，门口这些人还等着看伤。有什么话，到旁边说吧。这位先生，究竟出了什么事？"],
    ['npc','我弟弟跟刘家的公子争吵，推搡时把人弄伤了，现在还关着。我想先把伤治好，可城里已经请过几位大夫，都没有见好。']], [next('问问能否帮忙','doctor')]),
   doctor:S('xiangyang','与马良商量请医的办法','maliang','马良','maliang',[
    ['npc','听药铺的人说，华先生这几天在宜城。我想去请他，又怕府里找不到人，以为我们要逃走，实在没法离开。'],
-   ['hero','季常，宜城不算远，我替你跑一趟。你把怎么受伤、现在有什么症状写下来，我带过去，也免得说漏了。'],
-   ['npc','我已经写好一张，麻烦你带上。刘家也派了人一起去，他一直照顾伤者，有什么细节不明白，可以让他告诉大夫。']], [next('前往宜城请医','clinic')]),
+   ['hero',"季常，我替你去宜城。劳烦把伤处、症状和用过的药写下，我好带给先生看。"],
+   ['npc',"都写在这里了。刘家照料伤者的仆人也随你去，信里说不清的，他见过，能答得上来。"]], [next('前往宜城请医','clinic')]),
   clinic:S('xiangyang-county','在宜城找到华佗','huatuo','华佗','huatuo',[
-   ['npc','伤口在哪儿、烧了多久，我从信里看见了。不过要换药，还得亲眼看看伤口，我跟你们去一趟，不能只照着几句话开方子。'],
-   ['hero','那我们陪你去襄阳。你看看还要带什么，车也能帮着安排，路上不用赶得太急。'],
+   ['npc',"信里说伤口流脓，发热不退。这须亲眼看，不能隔空开方。我随你们去襄阳。"],
+   ['hero',"那我去备车。先生要带什么，我们一道搬上去。"],
    ['npc','得先去后院把药箱取回来。昨天有几个逃兵来拿药，连针具和给孩子用的药都搬走了，现在还守在那里，不肯让我们进去。'],
-   ['hero','我们刚才经过，确实看见有人堵门。你留下照顾病人，我们过去跟他们说，让他们把药箱还回来。']], [next('去药铺后院','medicine')],{sceneId:'clinic-courtyard'}),
+   ['hero',"刚来时确实见到有人堵后门。先生留步，我们去取药箱。"]], [next('去药铺后院','medicine')],{sceneId:'clinic-courtyard'}),
   medicine:S('xiangyang-county','夺回被占用的药箱','medicine-looter','逃兵头目','imperial-captain',[
    ['npc','这些药已经归军里用了，受伤的弟兄都等着。你们在外面等，什么时候能拿回去，我们自会告诉你们。'],
-   ['hero','你们有伤员，可以请大夫照着伤情拿药，不能把整间药铺都搬走。城里的病人也在等，外面还有孩子发着烧呢。'],
+   ['hero',"要什么药，请大夫给你们开。针具也搬走，叫外头那些病人用什么？你听，街上还有孩子在哭。"],
    ['npc','轮得到你在这里教训人？把门关上，谁再往里走，就别怪我们动手！'],
-   ['hero','华先生，你先带病人从侧门走，别留在院子里。药箱的位置我们已经看见了，拿回来就交给你。']], [{label:'夺回药箱',battle:'medicine'}],{sceneId:'clinic-courtyard'}),
+   ['hero',"先生，带病人走侧门！药箱在架子上，我们去取。"]], [{label:'夺回药箱',battle:'medicine'}],{sceneId:'clinic-courtyard'}),
   return:S('xiangyang','陪华佗回襄阳诊治','maliang','马良','maliang',[
-   ['npc','华先生总算来了！府里已经说好了，病人就住在医馆后面。我带你们进去，他昨晚又发了热，我们都很着急。'],
-   ['huatuo','先把旧布拆开，让我看看。伤口里还有碎木没有清干净，怪不得总发热。拿盏灯过来，我得看得仔细些。'],
-   ['hero','灯我来拿着，你看看这个位置够不够亮，需要往哪边移就告诉我。'],
-   ['npc','我去把水烧上。旁边两位帮忙扶着他，别让受伤的那条胳膊乱动，有什么需要尽管叫我。']], [next('等候诊治结果','freed')],{sceneId:'clinic-courtyard'}),
+   ['npc',"先生可算来了！人在医馆后屋，昨夜又烧了一回。我领您进去。"],
+   ['huatuo',"拆开旧布……原来碎木还在里头，怪不得。灯拿近些，别挡着亮。"],
+   ['hero',"照这儿行吗？我拿稳，您动手。"],
+   ['npc',"我去烧水。二位扶着他些，别碰伤臂，先生还要清创。"]], [next('等候诊治结果','freed')],{sceneId:'clinic-courtyard'}),
   freed:finish('maliang','马良','xiangyang','chengdu')
  },{medicine:{stage:['medicine'],next:'return',title:'宜城药铺',sceneId:'clinic-courtyard',count:4,enemyKind:'retainer'}},['maliang-white-brow']);
  define('taishici','北海问药','wu','beihai','blade','jianye',5,{
   rumor:S('beihai','查看北海医馆门前的动静','beihai-neighbor','邻妇','neighbor-woman',[
    ['npc','药铺已经让你们抢了一回，今天还要来砸？老掌柜自己都受了伤，哪还有东西能给你们？'],
    ['medicine-bandit','没药就拿钱出来！你们这条街总不能每家都没钱吧，谁敢把门关上，我们就砸谁的门！'],
-   ['hero','大娘，先往屋里退，别站在棍子旁边。你们几个，把手里的东西放下，有什么话冲着我们说。'],
+   ['hero',"大娘，回屋！棍子不长眼。你们几位，要钱也犯不上砸药铺吧？"],
    ['taishici','昨晚就是他们抢了药车，今天还敢来。这位朋友，帮我守住门口，铺里还有病人，不能让他们冲进去。']], [next('与太史慈护住医馆','visit')]),
   visit:S('beihai','与太史慈赶走闹事的盗匪','taishici','太史慈','taishici',[
    ['npc','前面还有老人和孩子，别让他们跑进人群里。你帮我拦左边，我去拉住那辆车，先把这几个人分开。'],
-   ['hero','左边我会看着。你也留意一下巷子口，那里还藏着一个，别只顾着眼前的人。']], [{label:'护住医馆',battle:'street'}]),
+   ['hero',"巷口还藏着一个，我来挡。你顾住铺门！"]], [{label:'护住医馆',battle:'street'}]),
   doctor:S('beihai','与太史慈、华佗商议追回药材','taishici','太史慈','taishici',[
-   ['npc','谢谢你帮忙，我叫太史慈，字子义。本来是替母亲来抓药，到了才知道药车被抢，连看病的先生也伤了，只好先来帮着守门。'],
-   ['hero','子义，我听常山的人提过，令堂这阵子身体不好，才想着过来看看。她现在怎么样，药有没有断？'],
-   ['huatuo','我刚给她看过，暂时还稳得住。需要的药原本都有，可都装在那辆被抢走的车上，得尽快把药找回来。'],
-   ['npc','他们把车拉到都昌去了，我认得那条路。我和这位朋友去找，母亲这边，还得请先生帮忙照顾。'],
-   ['huatuo','你们路上当心，到了先找药车，别一见人就追。箱子里还有针具，搬的时候扶稳，别伤着自己的手。'],
-   ['hero','我们一起去都昌。大娘，劳烦你先帮先生照应一下病人，有消息了，我们会尽快赶回来。']], [next('与太史慈前往都昌','herbs',{guest:'taishici'})],{sceneId:'clinic-courtyard'}),
+   ['npc',"方才承你援手。我叫太史慈，字子义。来替母亲抓药，却碰上这伙人抢车打人，只能先替掌柜守住门。"],
+   ['hero',"子义，我从常山听说令堂病了，特意来看一眼。药还能接得上吗？"],
+   ['huatuo',"尚能稳住。可急用的几味药，全在被抢的车上。再拖几日，就不好说了。"],
+   ['npc',"贼把车拖到都昌了，我认得路。先生，母亲便拜托您了，我去把药取回来。"],
+   ['huatuo',"我在这儿，你放心。找药要紧，别追着贼走远。箱里有针具，搬时当心。"],
+   ['hero',"我陪子义去。大娘，铺里还劳您搭把手，我们取了药便回来。"]], [next('与太史慈前往都昌','herbs',{guest:'taishici'})],{sceneId:'clinic-courtyard'}),
   herbs:S('beihai-county','在都昌找回药车和采药人','herb-worker','采药人','herbalist',[
    ['npc','你们别直接过来，树后面还有人！我刚想把车推回去，就让他们从车上拽下来了，那边一直有人看着。'],
-   ['taishici','先蹲到车轮后面去，那里能挡一挡。我们看见那些人了，你别再自己上去拉车。'],
-   ['hero','药箱应该还在附近。我们从路口把他们引开，尽量别挤到车旁边，免得打坏东西，也伤了车后的人。']], [{label:'救下采药人',battle:'herbs'}]),
+   ['taishici',"蹲下，藏到车轮后头！人我看见了，你别动！"],
+   ['hero',"药箱也许还在车旁。把他们引到路口来，别打翻车，车后还有人！"]], [{label:'救下采药人',battle:'herbs'}]),
   depot:S('beihai-county','取回被藏进棚里的药箱','herb-worker','采药人','herbalist',[
    ['npc','车上现在只剩空筐，药箱被他们搬进棚子了。你们先坐下来，我还有点随身带的药，先把伤口包好，再过去找。'],
-   ['hero','你伤到腿没有，还能不能走？先把车推到路口停着，那里来往的人多，你也能找人帮忙。'],
-   ['taishici','你先照看一下他，我去棚子旁边看看。门口那几个还在，我们等把车安置好，再一起过去。']], [{label:'包扎后取回药箱',battle:'depot',restoreParty:true}]),
+   ['hero',"腿伤重不重？车先推到路口，那儿有人经过。我们去找药箱，你别再往里闯。"],
+   ['taishici',"你替他裹一下伤，我去瞧瞧棚子的门。那几个人还守着，得等你过来再动手。"]], [{label:'包扎后取回药箱',battle:'depot',restoreParty:true}]),
   mix:S('beihai','将药材送回北海医馆','huatuo','华佗','huatuo',[
-   ['npc','药箱放在这张桌上吧，这几包没受潮，都能用。子义，你先回去把水烧好，我配完药就过去，别让你母亲等急了。'],
-   ['taishici','我这就回去。她刚才有没有再发热，人醒着吗？我出去这么久，一直有些放心不下。'],
-   ['npc','刚刚睡着，邻居大嫂在屋里陪她。你回去轻一点，不用把她叫醒，先把水备好就行。'],
-   ['hero','剩下的药我帮你送进铺里。门口还有人在等着，先把急着用的几样整理出来吧。']], [next('去太史慈家看看','return')],{sceneId:'clinic-courtyard'}),
+   ['npc',"子义，箱子放这儿。药没受潮，还能用。你回家烧水，我配好便送过去。"],
+   ['taishici',"母亲还醒着吗？又发热没有？我这一路……心总悬着。"],
+   ['npc',"方才睡着了，大嫂守着。进门轻些，烧好水等着便是。"],
+   ['hero',"剩下的我搬进铺里。门外还等着人，急用的几样放上头吧。"]], [next('去太史慈家看看','return')],{sceneId:'clinic-courtyard'}),
   return:S('beihai','探望太史慈母亲','taishici','太史慈','taishici',[
-   ['npc','母亲已经喝了药，刚才还问你们吃过饭没有。这两天她连说话都费劲，今天总算肯多问几句，我也放心了不少。'],
-   ['hero','能有精神说话就是好事。让她安心歇着吧，我们到外面坐，不用这么多人都挤在屋里。'],
-   ['npc','院里有张桌子，我们过去坐。你从常山特意赶过来，我还没好好问过，是谁向你提起我的？']], [next('与太史慈聊聊来意','freed')],{sceneId:'clinic-courtyard'}),
+   ['npc',"母亲喝了药，精神好多了。方才还问，你们在外忙了一天，可吃过饭？前两日她连话都不肯说，今日竟催起我来了。"],
+   ['hero',"那我可不跟她客气。饭在院里吃，屋里留给她静养，咱们别吵着。"],
+   ['npc',"院里桌子现成，我去搬凳子。你方才说是从常山来，谁向你提起我的？"]], [next('与太史慈聊聊来意','freed')],{sceneId:'clinic-courtyard'}),
   freed:finish('taishici','太史慈','beihai','jianye')
  },{street:{stage:['visit','street'],next:'doctor',title:'北海医馆',sceneId:'city-north',count:2,enemyKind:'bandit',level:5,guest:'taishici'},herbs:{stage:['herbs'],next:'depot',title:'都昌救人',sceneId:'forest-path',count:3,enemyKind:'bandit',level:5,guest:'taishici'},depot:{stage:['depot'],next:'mix',title:'夺回药箱',sceneId:'bandit-camp',count:3,enemyKind:'bandit',level:5,guest:'taishici'}},['taishici-bold']);
  H.definitions.taishici.stages.street=H.definitions.taishici.stages.visit;
  define('lusu','长沙粮行','wu','changsha','scripture','jianye',7,{
   rumor:S('changsha','询问粮行前排队的乡民','lusu','鲁肃','lusu',[
    ['npc','每家先照人数领，孩子多的再添一些。大家别挤，仓里还备着粮，一个个来，今天都能领到。'],
-   ['hero','这些粮是你在分？我们从北边过来，很多地方连想买粮都买不到，你们这里还能接济这么多人，真不容易。'],
-   ['npc','是附近几家一起凑出来的，我只是帮忙照看。我叫鲁肃，字子敬。你们要是一路没带够，也可以来领一份，赶路不能一直饿着。'],
-   ['hero','谢谢，我们带的还够用。不过我倒很想跟子敬聊聊。我们正在各地找愿意帮忙的人，你分粮的时候这么周到，应该很了解大家缺什么。']], [next('和鲁肃聊聊粮队','convoy')]),
+   ['hero',"这么些粮，都是你拿出来的？北边有几处地方，攥着钱都买不着。"],
+   ['npc',"附近几家一道凑的，我只照看着分。我姓鲁，名肃，字子敬。你们也拿一份？路上缺粮，可不是小事。"],
+   ['hero',"我们带的够，谢谢子敬。你对各处粮情这么熟，我正想向你讨教，可有空说几句？"]], [next('和鲁肃聊聊粮队','convoy')]),
   convoy:S('changsha','与鲁肃商量护送粮车','lusu','鲁肃','lusu',[
    ['npc','原来是来找人商量事情的。你来得正好，我明天准备往江东送一批粮，公瑾来信说，建业收留了不少流民，已经快供应不上了。'],
    ['hero','那这一趟要送到建业去吗？路上那么多粮车，你们打算怎么护送，已经找好人手没有？'],
-   ['npc','先用车送到浏阳，再换船去建业。人手倒有，只是前一队到了渡口又退回来，说有人堵着码头，给了船钱还不让走。'],
-   ['hero','我们可以陪你到渡口看看。粮食一直放在这里也不是办法，先问清楚是什么人在拦路，再商量怎么过去。']], [next('护送粮车前往浏阳','dock',{guest:'lusu'})]),
+   ['npc',"车送浏阳，再换船。前一队到码头便被赶回来了，说船钱交过，还嫌不够，连粮都不肯卸。"],
+   ['hero',"我们陪你走一趟。到底是谁收的船钱，到了问他便知道。"]], [next('护送粮车前往浏阳','dock',{guest:'lusu'})]),
   dock:S('changsha-county','清理拦住粮队的水贼','dock-chief','水贼头目','river-bandit',[
    ['npc','这么多车粮，想从我们的码头上船？你们带的那点钱可不够，先把车停在这里，等我们查完再说。'],
-   ['lusu','这些粮是送给逃难的百姓的，船钱我们会照付。你们如果也缺吃的，可以商量着分一些，别把所有车都扣住，江东那边还等着。'],
+   ['lusu',"船钱照付，诸位若缺粮，我也可分些。可这几车，是给江东逃难之人的口粮，不能全扣在这里。"],
    ['npc','你说给多少就给多少？这码头现在由我们说了算。车和粮都留下，你们到旁边等着，没有吩咐不许动。'],
-   ['hero','子敬，让车夫先往后退，别停在水边。他们根本没想让我们过去，我们把乡亲安置好，再回来处理。']], [{label:'护住粮队',battle:'dock'}]),
+   ['hero',"子敬，叫车夫退开水边。他们要的不是船钱，是整车的粮。"]], [{label:'护住粮队',battle:'dock'}]),
   letter:S('jianye','陪鲁肃将粮送到建业','zhouyu','周瑜','zhouyu',[
-   ['npc','子敬，你总算到了。我前天还叫人去长沙送信，生怕你没收到消息，看来是跟你在路上错过了。'],
-   ['lusu','信我收到了，只是渡口出了些麻烦。多亏这几位帮忙，粮车才没被扣下。现在都卸好了，让管事按单子点一点，看有没有少。'],
-   ['npc','这一路辛苦你们了。我想请子敬留下帮忙，他说还想先听听你们的打算。你们接下来准备去哪里，需要他做些什么？'],
-   ['hero','我们会继续去各地查探，遇到缺粮、缺药，或者被人欺负的地方，就尽量帮忙。子敬愿意同行很好，有别的安排也不用勉强。'],
-   ['npc','我明白了。我给子敬写封介绍信，往后去江东各地办事，也方便跟当地的人说明来历。至于留在哪里，你们慢慢商量就好。']], [next('与鲁肃商议去留','freed')]),
+   ['npc',"子敬，你可来了！我前日还派人送信去长沙，想必与你错过了。渡口可有为难？"],
+   ['lusu',"信收着了，码头倒着实费了一番周折。承这几位相助，粮才保住。车已卸在外头，请管事照单点收。"],
+   ['npc',"多谢诸位。我正想借子敬几日，他却说还没问过你们的行程。你们接下来有何打算？"],
+   ['hero',"还得四处寻人，少不得赶远路。我想请子敬帮我们照看粮草，沿途若有人缺吃少药，他也熟悉门路。"],
+   ['npc',"那我备一封书信。到了江东各处，你们持信去见当地官吏，不必再为通行的事耽误。子敬愿留愿走，你们自去商量。"]], [next('与鲁肃商议去留','freed')]),
   freed:finish('lusu','鲁肃','jianye','jianye')
  },{dock:{stage:['dock'],next:'letter',title:'浏阳渡边',sceneId:'river-dock',count:4,enemyKind:'bandit',guest:'lusu'}},['lusu-generous']);
  actors['xu-bandit']={id:'xu-bandit',name:'盗贼队长',art:'brigand',side:'left'};actors['li-servant']={id:'li-servant',name:'李府家丁',art:'brigand',side:'left'};actors['horse-thief']={id:'horse-thief',name:'马贼头目',art:'brigand',side:'left'};actors['medicine-bandit']={id:'medicine-bandit',name:'盗贼',art:'thief',side:'left'};actors['imperial-soldier']={id:'imperial-soldier',name:'官兵',art:'imperial-soldier',side:'left'};
- const rumors={xuchu:'许家村最近常遭贼，村里的许褚几次把人赶走。你们如果经过那里，可以去他家坐坐，他很乐意招待过路的朋友。',dianwei:'睢阳李家的家丁又在欺负刘家那对母子。听说有个叫典韦的壮士看不过去，已经过去了。',huangzhong:'长沙有位黄老将军，年纪虽大，弓却拉得比年轻人还稳。听说他常去酒肆和马厩，你去那儿问问。',maliang:'襄阳马先生正在四处找大夫，好像是他弟弟闯了祸。我也只听了个大概，你到了城里，不妨亲自问问。',taishici:'太史慈就在北海。听说他母亲病着，城里的药铺偏偏又被人抢了。你们想找他的话，到医馆附近问问，邻家大嫂认得他。',lusu:'鲁肃在长沙收粮，打算送去江东。我见过他一回，做事很实在，跟他说话也不必拐弯抹角。',ganning:'新野前几日抓了个江上来的人，官府不许人探望。街坊们议论得多，你到了那里再问，比听我传话强。'};for(const [id,text]of Object.entries(rumors))H.definitions[id].rumor=text;
+ const rumors={xuchu:"许家村有个壮士，叫许褚，几回都替村人挡住了贼。你若去，田里粮仓都可找找，他闲不住。",dianwei:"睢阳李家又派人去搬刘家东西了，孤儿寡母，哪拦得住？姓典的壮士已经赶去，恐怕要闹大。",huangzhong:"长沙黄老将军，胡子白了，弓却拉得开。近来常去马厩，也不知是在看马，还是寻什么东西。",maliang:"襄阳马先生这阵子到处请医，听说弟弟伤了人，还押着呢。你要见他，去药铺门口找。",taishici:"北海的太史慈正替母亲寻药，偏药车叫人抢了。他日日在医馆附近，邻家那位大嫂认得他。",lusu:"长沙鲁子敬在收粮，说要送去江东。他分粮时，连谁家几口人都问，倒不只是个财主。",ganning:"新野抓了个叫甘宁的，江上来的。衙门外正贴告示呢，我瞧守门的脸色，恐怕没什么好事。"};for(const [id,text]of Object.entries(rumors))H.definitions[id].rumor=text;
  const conclusions={
   xuchu:[['npc','家里已经安排好轮流守夜的人，我爹也答应让我出门了。我准备去许昌看看，听说曹公正在找能做事的人，也许能帮我们把附近几处村子一起照应起来。'],['hero','那我们就一起走。你家里要是有消息送来，随时告诉我们，需要回来的时候，大家再一起商量。']],
   dianwei:[['npc','借据已经交给县里，里正也愿意作证，李永这回没法再随便说别人欠债了。只是刘大嫂和孩子已经不在，说什么都补不回来。'],['hero','我们先把他们的后事办好，也去看看受伤的家人。你身上的伤还没处理，别再一个人硬撑着跑。'],['npc','我知道，等这边都安排好，我想去许昌拜见曹公。你们要是还在外面走，我也能先跟着，路上再碰到这样的事，多个人总能多帮一点。']],
@@ -8298,22 +8298,22 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  const excluded=new Set(['camp']);
  for(const p of D.places.filter(p=>!p.requiresWater&&!excluded.has(p.id))){
   if(p.kind==='city')D.townScenes[p.id]=Scenes.town(p);else if(!D.townScenes[p.id])D.townScenes[p.id]=Scenes.get(p.kind==='city'?'market-street':p.kind==='port'?'river-dock':p.kind==='village'?'farmland':'rural-road');
-  if(!N.npcs.some(n=>n.place===p.id&&n.role==='civilian'))N.npcs.push({id:'resident-'+p.id,name:p.kind==='city'?'街坊':'乡人',art:'villager',place:p.id,side:'left',role:'rumor',roleLabel:'交谈',lines:['你们是从外头来的吧？这几天路上不太平，天黑以前最好找个地方落脚。','在这里住久了，附近几条路和几户人家我都熟悉。你们想找人，或者想问哪里能歇脚，跟我说就是，我知道的都会告诉你们。']});
-  if(p.kind==='city'&&!N.npcs.some(n=>n.place===p.id&&n.role==='merchant'))N.npcs.push({id:'merchant-'+p.id,name:'商贩',art:'laborer',place:p.id,side:'left',role:'merchant',roleLabel:'商贩',lines:['来看看吧，兵器和护具都有。赶路的人多，我也收些还能用的旧东西。']});
-  if(p.kind==='city'&&!N.npcs.some(n=>n.place===p.id&&n.role==='healer'))N.npcs.push({id:'doctor-'+p.id,name:'郎中',art:'villager',place:p.id,side:'right',role:'healer',roleLabel:'疗伤',lines:['有伤就先坐下，我看看。别等到走不动路了才想起来找大夫。']});
+  if(!N.npcs.some(n=>n.place===p.id&&n.role==='civilian'))N.npcs.push({id:'resident-'+p.id,name:p.kind==='city'?'街坊':'乡人',art:'villager',place:p.id,side:'left',role:'rumor',roleLabel:'交谈',lines:["从哪边来的？路上可还好走？天黑前找地方住吧，近来总听见半夜有人喊丢了车。","我在这里住了几十年。问人，问路，问哪家有张空铺，都能说上几句。你想打听什么？"]});
+  if(p.kind==='city'&&!N.npcs.some(n=>n.place===p.id&&n.role==='merchant'))N.npcs.push({id:'merchant-'+p.id,name:'商贩',art:'laborer',place:p.id,side:'left',role:'merchant',roleLabel:'商贩',lines:["客官瞧瞧，兵器、护具都有。旧的也收，只要还使得，价钱便能商量。"]});
+  if(p.kind==='city'&&!N.npcs.some(n=>n.place===p.id&&n.role==='healer'))N.npcs.push({id:'doctor-'+p.id,name:'郎中',art:'villager',place:p.id,side:'right',role:'healer',roleLabel:'疗伤',lines:["伤在哪儿？坐下，我瞧一眼。赶路也别连血都顾不得止。"]});
  }
  const commissions=[
- ['cs-blackwood','林间归路','changshan','blackwood','laborer',3,2,'bandit-camp','山贼','mountain-bandit','林子里有人专抢挑柴的乡亲。我妹妹昨日回来得晚，被他们赶进沟里，脚到现在还肿着。你要是有空，帮我们把那条路清出来吧。'],
- ['ye-quarry','石场欠账','ye','old-quarry','laborer',6,3,'bandit-camp','恶仆','brigand','石场换了个管事，工钱不发，还把工人的东西扣住了。官府没人肯管，你能不能去把他们赶走，让大伙先回家？'],
- ['beihai-road','归乡货车','beihai-county','beihai','village-maiden',5,2,'rural-road','盗贼','thief','我家那辆车停在城外，几个人围着不许走，说要查货。可他们连个官差的样子也没有，怕是在等着把车拉走。'],
- ['pingyuan-boats','河滩旧船','pingyuan','pingyuan-county','laborer',5,3,'river-dock','水贼','river-bandit','河滩上那几条船是我们吃饭的家伙，被一伙水贼占了。他们不许下水捕鱼，我们一家人可怎么过日子？'],
- ['qiao-harvest','秋粮未归','qiaoxian','qiaoxian-county','villager',7,2,'farmland','强盗','brigand','地里的粮眼看就能收，有伙贼却堵在田埂上，谁去就抢谁。再拖下去，一场雨下来就全坏了。'],
- ['suiyang-delivery','迟来的家书','suiyang','chenliu-county','village-maiden',8,2,'rural-road','盗贼','thief','送信的老伯被扣在己吾了。他只是替乡亲们带几封家书，哪里拿得出他们要的赎钱。劳烦你去看看，先把人带回来。'],
- ['xy-mill','磨坊停工','xiangyang','xiangyang-county','laborer',8,3,'farmland','山贼','mountain-bandit','宜城磨坊那边又来人闹事了。麦子堆着磨不了，城里几家饼铺都来催我，我实在没办法。'],
- ['cs-riverside','渡边灯火','changsha','changsha-county','villager',9,3,'river-dock','水贼','river-bandit','渡口的船夫昨夜跑回来了，说有人拆他的船板生火。你们如果去浏阳，帮他把那些人赶走，船还能补一补。'],
- ['jy-supplies','山道药担','jianye','jianye-county','village-maiden',9,2,'rural-road','强盗','brigand','药铺托人送来的药材被抢了，挑担的伙计也受了伤。就在秣陵那条小路，你如果能找回来，铺里愿意出一份酬谢。']
+ ['cs-blackwood','林间归路','changshan','blackwood','laborer',3,2,'bandit-camp','山贼','mountain-bandit',"林里那伙人，专挑背柴的抢。我妹妹昨晚被撵进沟，脚肿得鞋也穿不进。诸位若有本事，替我们清清路吧，往后还得去打柴呢。"],
+ ['ye-quarry','石场欠账','ye','old-quarry','laborer',6,3,'bandit-camp','恶仆','brigand',"新来的石场管事，工钱不发，连大伙的铺盖都扣了。告到官府也没人理。劳你们跑一趟，好歹先叫人拿上东西回家。"],
+ ['beihai-road','归乡货车','beihai-county','beihai','village-maiden',5,2,'rural-road','盗贼','thief',"城外那车是我家的。几个人围着说查货，既没文书，也没官衣。天快黑了，我怕一转眼，连车也寻不着了。"],
+ ['pingyuan-boats','河滩旧船','pingyuan','pingyuan-county','laborer',5,3,'river-dock','水贼','river-bandit',"船叫水贼占了，连网都不许取。一家老小指着河里这口饭，可不能只站岸上看水啊。"],
+ ['qiao-harvest','秋粮未归','qiaoxian','qiaoxian-county','villager',7,2,'farmland','强盗','brigand',"庄稼熟了，贼却守在田埂，谁割抢谁。一场雨下来就全烂在地里了，哪等得起？帮帮我们吧。"],
+ ['suiyang-delivery','迟来的家书','suiyang','chenliu-county','village-maiden',8,2,'rural-road','盗贼','thief',"送家书的老伯扣在己吾了。他替人捎个信，挣得了几个钱，哪有赎身的银子？劳你们带他回来，信晚些到，总好过人回不来。"],
+ ['xy-mill','磨坊停工','xiangyang','xiangyang-county','laborer',8,3,'farmland','山贼','mountain-bandit',"宜城磨坊又停了，贼堵着不叫开磨。麦子堆在外头，饼铺的日日来催，我还能空手给他磨出面来？"],
+ ['cs-riverside','渡边灯火','changsha','changsha-county','villager',9,3,'river-dock','水贼','river-bandit',"船夫昨夜跑来，哭说船板都叫水贼拆来烧了。去浏阳时，替他赶走那伙人吧！船没毁透，补补还能过河。"],
+ ['jy-supplies','山道药担','jianye','jianye-county','village-maiden',9,2,'rural-road','强盗','brigand',"秣陵那条小路，药担让人抢了，伙计带着伤逃回来。若能替铺里寻回药材，酬谢都好说，病人还等着用呢。"]
  ];
- for(const [id,title,giverPlace,place,art,recommendedLevel,rounds,sceneId,enemyName,enemyArt,accept]of commissions){const giver='giver-'+id;N.npcs.push({id:giver,name:art==='laborer'?'劳工':art==='village-maiden'?'乡女':'乡老',art,place:giverPlace,role:'quest',side:'left',roleLabel:'委托',lines:[accept,'你们一路过来，路上可还顺利？先在这里歇歇脚吧。']});N.sideQuests.push({id,title,giver,giverPlace,place,recommendedLevel,rounds,sceneId,enemyName,enemyArt,accept,money:100+recommendedLevel*20,item:recommendedLevel>7?'iron-armor':'leather-armor',quality:'green'});}
+ for(const [id,title,giverPlace,place,art,recommendedLevel,rounds,sceneId,enemyName,enemyArt,accept]of commissions){const giver='giver-'+id;N.npcs.push({id:giver,name:art==='laborer'?'劳工':art==='village-maiden'?'乡女':'乡老',art,place:giverPlace,role:'quest',side:'left',roleLabel:'委托',lines:[accept,"坐，脚歇过来再说。外头的路，总不能一口气走完。"]});N.sideQuests.push({id,title,giver,giverPlace,place,recommendedLevel,rounds,sceneId,enemyName,enemyArt,accept,money:100+recommendedLevel*20,item:recommendedLevel>7?'iron-armor':'leather-armor',quality:'green'});}
  for(const npc of N.npcs){if(npc.role==='merchant')npc.art='peddler';else if(npc.role==='healer')npc.art='town-doctor';}
  const api={landmark,registerCompanion:(id,factory)=>factories.set(id,factory),actors,companion,enemies};root.RecruitmentContent=api;if(node)module.exports=api;
 })(globalThis);
@@ -8334,11 +8334,11 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  I.templates['sage-robe']={id:'sage-robe',name:'绢布法衣',slot:'armor',attributes:{armor:1,resistance:18},price:90};
  I.templates['herbal-pendant']={id:'herbal-pendant',name:'药草香囊',slot:'accessory',attributes:{resistance:4},statusImmunities:['poison'],price:120};
  const definitions={
-  iron:{id:'iron',title:'石场铁卫',giverPlace:'ye',place:'old-quarry',sceneId:'bandit-camp',hint:'那个人穿着一身厚甲，我们砍了半天也没伤到多少，他一退到石堆后面，还能把伤重新包好。你们去之前最好想想办法，光靠拿刀上去砍，怕是跟我们一样吃亏。',item:'iron-armor'},
-  poison:{id:'poison',title:'芦泽毒踪',giverPlace:'pingyuan',place:'poison-marsh',sceneId:'river-dock',hint:'芦苇里有个会用毒的人，伤口明明不深，回来却浑身没劲，连站都站不稳。最好带上能解毒的同伴，商贩卖的药草香囊也能防一防，别像我们这样没准备就下去。',item:'herbal-pendant'},
-  reflection:{id:'reflection',title:'废垒雷声',giverPlace:'jibei',place:'fort-ruins',sceneId:'bandit-camp',hint:'前面拿盾的只顾着拦人，后面那两个才一直在放雷。我们盯着盾打，自己反倒被震伤，等反应过来，人已经倒了一片。你们得先想办法对付后面的人，别光跟那面盾耗着。',item:'wood-beads'}
+  iron:{id:'iron',title:'石场铁卫',giverPlace:'ye',place:'old-quarry',sceneId:'bandit-camp',hint:"那人甲太厚，刀砍上去都滑。躲到石后，还能自己裹伤！我们便吃了这亏，你们得换个法子，别尽朝铁甲上招呼。",item:'iron-armor'},
+  poison:{id:'poison',title:'芦泽毒踪',giverPlace:'pingyuan',place:'poison-marsh',sceneId:'river-dock',hint:"芦苇里那个会使毒！口子浅，回来却浑身发软。找个懂解毒的同去，或带商贩卖的药草香囊。我当时若备着，也少躺几日。",item:'herbal-pendant'},
+  reflection:{id:'reflection',title:'废垒雷声',giverPlace:'jibei',place:'fort-ruins',sceneId:'bandit-camp',hint:"盾在前，放雷的在后！我们只顾砸盾，叫后头那两个劈得倒了一片。能绕开便绕开，别跟那面铁板死耗。",item:'wood-beads'}
  };
- for(const d of Object.values(definitions)){const giver='challenge-'+d.id;N.npcs.push({id:giver,name:'伤兵',art:'imperial-soldier',place:d.giverPlace,role:'quest',side:'left',roleLabel:'支线',lines:[d.hint,'你们真要过去，先把伤治好，把要带的东西检查一遍。我在这里吃过亏，实在不想再看见有人让同伴抬着回来。']});N.sideQuests.push({id:'challenge-'+d.id,bossId:d.id,title:d.title,giver,giverPlace:d.giverPlace,place:d.place,sceneId:d.sceneId,recommendedLevel:10,rounds:1,money:300,item:d.item,quality:'green',enemyName:d.title,enemyArt:d.id==='poison'?'mountain-bandit':'imperial-soldier',accept:d.hint});}
+ for(const d of Object.values(definitions)){const giver='challenge-'+d.id;N.npcs.push({id:giver,name:'伤兵',art:'imperial-soldier',place:d.giverPlace,role:'quest',side:'left',roleLabel:'支线',lines:[d.hint,"真要去，把伤治透，带的兵器也看一看。我是叫同伴抬回来的，不想再看旁人也这般进门。"]});N.sideQuests.push({id:'challenge-'+d.id,bossId:d.id,title:d.title,giver,giverPlace:d.giverPlace,place:d.place,sceneId:d.sceneId,recommendedLevel:10,rounds:1,money:300,item:d.item,quality:'green',enemyName:d.title,enemyArt:d.id==='poison'?'mountain-bandit':'imperial-soldier',accept:d.hint});}
  function unit(profile,id,name,art,type,skills,extra={}){const weapon=I.create('weapon-'+type,'green',id+'-weapon');weapon.skills=skills;const actual=W.forWeapon(weapon);return {...G.create(profile,10),id,name,characterId:art,weapon,skills:actual,equipment:{armor:I.create('leather-armor')},armor:6,resistance:4,targetRule:'random',priorities:actual.map(skill=>({skill,when:W.skills[skill].scope==='all'?'enemyCount':'always',threshold:2,frequency:'always'})),...extra};}
  function buildRoster(id){if(id==='iron')return [unit('ironWarden','iron-warden','石场铁卫','imperial-soldier','hammer',['warden-renew','warden-strike'],{armor:180,resistance:0,experienceWeight:4})];if(id==='poison')return [unit('marshDoctor','marsh-doctor','使毒方士','mountain-bandit','gourd',['marsh-mist'],{formationRow:'back',experienceWeight:2}),...N.bandits(10,2).map((u,i)=>({...u,id:'marsh-outlaw-'+i,formationRow:'front'}))];return [unit('ruinGuard','ruin-guard','持盾守卫','imperial-soldier','spear',['shield-taunt','shield-reflect','spear-cut'],{formationRow:'front',armor:32}),...Array.from({length:2},(_,i)=>unit('ruinCaster','ruin-caster-'+i,'雷术方士','mountain-bandit','staff',['ruin-thunder'],{formationRow:'back',experienceWeight:1.5}))];}
  const roster=id=>buildRoster(id).map((u,i)=>({...u,...(u.id==='marsh-doctor'||u.id.startsWith('ruin-caster')?{characterId:'enemy-sorcerer'}:{}),boss:true,statusImmunities:[...new Set([...(u.statusImmunities||[]),'stun'])],passives:[...(u.passives||[]),...(i===0?[id==='iron'?'enemy-negative-immunity':'enemy-stun-resistance','enemy-wipe-'+(id==='iron'?300:id==='poison'?180:120)]:[]),...(u.id.startsWith('ruin-caster')?['enemy-ignore-taunt']:[])]}));
@@ -8353,24 +8353,24 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   // 各国军师接洽与招募赏钱；每名将臣的赏钱只发放一次。
   const rewardPerHero=500;
   const rulers={
-    wei:{id:'caocao',name:'曹操',minimum:5,before:['主公前些天南下，想把沿江几处渡口的人联络起来。最初还能收到回信，后来送信的人一直没到，我也在派人找。','现在还不能让你们贸然追过去。先把愿意来魏国做事的人找齐五位，城里的接应和粮路有人负责，我们才能腾出人手一起查。'],restored:'主公已经平安回来了，伤兵也都安顿好。你们这趟辛苦，往后要找他，可以到府里问，准备出门时他也会留个口信。'},
-    shu:{id:'liubei',name:'刘备',minimum:5,before:['主公去了江夏，想跟当地人商量安置流民。前面几封信说谈得不顺，如今该回信的时候却没有消息，我怕他还在为乡亲的住处跟人争执。','我想去接应，也得先有人照看成都。你们帮蜀国找到五位愿意做事的人，再来找我，我们就能把城里安排开，仔细查他的去处。'],restored:'主公和江夏的乡亲都平安到了成都。你想找他，我会替你传话；他若又准备出门，也得先把接应和行程交代清楚，不能再让大家干等。'},
-    wu:{id:'sunquan',name:'孙权',minimum:5,before:['主公去接应沿江的百姓了。柴桑送来的信越来越少，渡口又有人拦船，具体是哪一路人，我还在等探子回来确认。','先为江东找到五位愿意帮忙的将士。渡口和城里都得留够人手，到时若真要接应主公，我们才不会一出门，后面就没人照管。'],restored:'主公已经回到建业，接回来的百姓也有了住处。你要找他，我替你问问；若他正跟你们同行，城里的事情由我和主簿接着管。'}
+    wei:{id:'caocao',name:'曹操',minimum:5,before:["主公南下联络渡口，起初信未曾断，近日却连送信的人也不见了。我已遣斥候去探，尚无回报。","此刻不宜再散人手。魏国还须五位肯任事的将士，守住城池、粮路，接应才有余力。待你寻齐，再来找我，我会将查到的路告诉你。"],restored:"主公已平安归城，伤兵也入了医馆。此行有劳。要见他便来府里问，若人又出门，我也会留意他的行程。"},
+    shu:{id:'liubei',name:'刘备',minimum:5,before:["主公为流民的住处去了江夏。前信说两边相争，谈得艰难，如今连应到的信也误了时辰，实在叫人挂心。","成都还要有人守，亮一时抽不开身。先为蜀国寻得五位可任事之人，安顿下城内，便可调人接应。届时请再来，我将细说主公的去处。"],restored:"主公与江夏乡亲都已到了成都，医馆、住处也在照看。要寻他，我替你传话。若又出门，总得先把信使和接应留好。"},
+    wu:{id:'sunquan',name:'孙权',minimum:5,before:["主公去接沿江乡民，柴桑的信却越来越迟。渡口有人拦船，究竟哪一路，还须等斥候回报。","江东须先有五位将士任事，城内、渡口才调得开人。诸位寻齐再来，我备妥接应，也将主公行程交予你们。"],restored:"主公已回建业，乡民也都有了住处。若要找他，我替你通传；若正与你同行，城中自有我与主簿照料。"}
   };
   function rulerStatus(world,country){const data=rulers[country];if(!data)return null;const q=world.state.heroQuests[data.id];return {...data,count:world.state.recruits[country].length,ready:world.state.recruits[country].length>=data.minimum,complete:q.stage==='complete',stage:q.stage,accepted:q.accepted};}
   const definitions={
     wei:{country:'wei',place:'xuchang',id:'simayi',name:'司马懿',art:'simayi',side:'left',
-      welcome:['你终于到许昌了。那夜梦中一别，我还疑心只是怪梦，今日见到你，才算信了。曹公尚未回来，府里的事由我照看，先进来坐。','这里还需要能带兵、也肯管束手下的人。你们走的地方多，要是遇到愿意来魏国做事的将士，麻烦帮我们介绍一下，事后回来告诉我就好。'],
-      thanks:'他们已经来信，说了你们一路帮忙的事情。我让人备好了赏钱，你们收着吧，往后还要赶路，吃住和买药都用得上。',
-      idle:'你上次介绍来的人，我已经记好了。以后再碰到合适的，也可以叫他来这里找我，到了报你的名字，我们会安排接待。'},
+      welcome:["果真来了。那夜梦中相见，我醒后还疑了许久，今日在许昌见着你，才敢认。曹公尚未归，府中由我照看。入内坐吧。","军中缺能领兵、肯约束部下的人。你走乡野，若遇着合适的，替我引来许昌。事成来此复命，路上的花费，府里自会给你补上。"],
+      thanks:"来的人已向我说过了。这份赏钱收着，添些行装，也好再赶路。你的人情，我另记在心里。",
+      idle:"上回来的人已安置妥当。再有愿来的，报你姓名即可，门吏会领他入府，不叫他在外空等。"},
     shu:{country:'shu',place:'chengdu',id:'zhugeliang',name:'诸葛亮',art:'zhugeliang',side:'right',
-      welcome:['那夜梦中相约，今日总算见面了。从常山一路到成都，想必很不容易。主公尚未归来，我已叫人收拾了客房，你们先歇歇。','成都最近收留了不少逃难的人，住处、粮车、沿路护送都缺人照看。你们如果遇到愿意来帮忙的将士，麻烦替我们问问，介绍成了，路上的花费也该由我们出一些。'],
-      thanks:'你们介绍来的几位，已经说过一路发生的事情了。这份赏钱请收下，不能总让你们自己出钱赶路，大家愿意来，少不了你们费心。',
-      idle:'你带回的消息我都记下了。想休息就多住几天，府里有地方安排；准备继续走的话，也先把伤治好，不用刚到就急着出门。'},
+      welcome:["梦中之约，竟真有今日。常山到成都，路途不近。主公尚未归，客房却已替诸位留着，先洗去一路尘土吧。","流民日增，安置、运粮、护送，处处都缺人。若遇肯出力的将士，烦你代问一声，带来成都。引荐的酬劳，在此领取，莫再尽用自己的盘缠。"],
+      thanks:"几位都已到了，也说起沿路受你相助。谢仪备在这里，请收下。亮不能远迎，至少也该替你分担些路费。",
+      idle:"来信已记下。客房还留着，想住几日便住。伤若未愈，也别急着出城，成都总还管得起一碗饭。"},
     wu:{country:'wu',place:'jianye',id:'zhouyu',name:'周瑜',art:'zhouyu',side:'left',
-      welcome:['我已吩咐门吏，见你便请进府来。那夜三位仙长说过的事，我还记得。主公尚在外面接应百姓，眼下由我留守建业。你们这一路可还顺利？','来建业的乡亲越来越多，渡口要有人接应，城里也要安排吃住。你们在外头遇到愿意来江东做事的人，替我们带句话，办成以后回来，我会给大家备好路上的花费。'],
-      thanks:'这几位的事情我已经记好了，真是帮了江东的大忙。赏钱带上吧，接下来不管是找人还是救急，总有要花钱的地方。',
-      idle:'上次那份赏钱已经结清了，账上也都有记录。你们可以放心去办自己的事，再找到愿意来江东的人，回来告诉我，我会接着安排。'}
+      welcome:["门吏报你来了，我便知那夜非梦。三位仙长所托，公瑾记着。主公尚在外接应乡民，由我留守建业。一路水陆，可还顺利？","江东来投的乡亲日多，渡口、城内都需人手。诸位访得愿来江东的将士，请代传一信，引来此处。复命时，谢仪也一并领去。"],
+      thanks:"姓名都已录下，人也见过了，确是可用之才。谢仪请收，江东虽忙，总不能叫奔走的人空着行囊再上路。",
+      idle:"上回引荐的，已入册，谢仪也结清了。再有贤士肯来，仍在此处报知，我遣人相迎。"}
   };
   const npc=country=>{const d=definitions[country];return d?{id:d.id,name:d.name,art:d.art,side:d.side,place:d.place,country,role:'court',roleLabel:'招贤'}:null;};
   const at=place=>npc(Object.keys(definitions).find(c=>definitions[c].place===place));
@@ -8525,7 +8525,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   if(!out.rumor&&!out.viaCourt)out.rumor=rumors[id]||('听说'+d.name+'最近在'+D.placeMap[out.place].name+'。你们想找他的话，可以先去那里问问，我也只是听过路的人说起，具体怎么样还得见了面才知道。');
   return out;
  }
- const rumors={xunyu:'长安有位叫荀彧的先生，最近一直在书摊找散失的书。看他很着急，你们要是准备去那边，不妨问问有没有能帮忙的地方。',jiaxu:'听宛城来的人说，贾诩正在替城里想办法，外面来了不少兵，把出城的路也堵了。你们经过那里时，可以先找人问问情况。',zhangliao:'虎牢关的张辽管兵很严，过路的人都说，他不准手下随便扣车抢东西。想找能带兵的人，可以去关前问问他的消息。',guanyu:'解良有个面摊，总有官兵去找麻烦，最近让一个长胡子的汉子拦住了。听说那人叫关羽，还陪着父母住在附近。',zhangfei:'下邳的乡亲说，张飞最近一直在城外喝酒，好像跟自己人闹了别扭，谁劝也不肯进城。你们可以去问问那里的大娘，她见过他。',machao:'武威有个姓马的年轻将军，经常一个人在酒家坐着。听说家里的旧宅让人占了，他一直惦记着留在里面的东西。',huanggai:'武陵最近有采药的人进山后没回来，黄盖正准备去找。你们要是想找他，可以先到城里问问，他正在找熟悉山路的人帮忙。',lvmeng:'吕蒙进山后一直没有回来，他娘在武陵等得很着急。我看黄将军也在问这件事，你们到了可以去找他们，看看是不是需要帮忙。',luxun:'夷陵附近有座旧石阵，过路人说看见一个年轻人在里面绕了很久。想去看看就多带些水，别自己也跟着走进去，回头找不到路。',sunshangxiang:'孙家的姑娘最近常去建业渡口，听说想往柴桑走一趟。她会使弓，也总想找机会出门，你们可以去跟她聊聊。',lvbu:'洛阳吕布府里的管事，最近一直找人打听赤兔马。你们想拜访吕布，或许可以先找管事问问，他知道这匹马最后出现在哪里。',huatuo:'宜城的华佗大夫最近缺几味药，托出去采药的人也迟迟没回。他一直担心路上出了事，你们经过那边，可以问问有没有需要帮忙的。',menghuo:'建宁往南有座部落，孟获就住在那里。去过的人说，他对外来的客人戒心很重，你们要过去，最好先找寨里的老人问问。',zhangjiao:'巨鹿很久没下雨了，乡亲们正在找张角想办法。田里的庄稼快保不住，听说连井水也少了，你们有空的话，去看看能帮点什么。',zhangbao:'黄巾营地的张宝一直在等广宗送来的药，营里的伤者不少，药车不来，他哪里也去不了。你们可以回营问问具体的情况。'};
+ const rumors={diaochan:"天香阁的貂蝉姑娘正找人送信，听说几户织布的人家被抓了。她手上还留着交粮的凭据，想求个肯过问的人。",dongzhuo:"洛阳停兵了，城里开始开仓放人。董卓还在府中，听说正遣人核查那些被抓走的人家，不知这回是真是假。",xunyu:"长安的荀先生天天往书摊跑，找的都是战乱中散失的旧书。听说有辆书车没回来，连送书的伙计也没了音信。",jiaxu:"宛城让兵围了，郭汜张口便要粮。贾诩这几日都在府前看告示，你若入城，可去问问他。",zhangliao:"虎牢守将张辽，手下不敢扣车抢粮，过路人都念他的好。只是替董卓守关，他自己怕也有难处。",guanyu:"解良卖面的那家又让兵欺负了。幸亏有个长髯的拦着，好像叫关羽，正陪父母住在附近。",zhangfei:"下邳那个张飞，近来在城外喝得凶。人问他怎么不回去，他就瞪眼。良成那边的大娘见过，你问问她。",machao:"武威马将军又坐酒家了，一坐半日。旧宅叫人占了，听说家里还留着东西，他却总不肯回去。",huanggai:"武陵几个采药的入山未归，黄老将军正找带路人。你若有空入城，看看他身边还缺不缺帮手。",lvmeng:"吕蒙进山救人，自己也没回来。他娘等得饭都吃不下，黄将军正在打听，可别又出事。",luxun:"夷陵旧石阵里困着个年轻人，半日还在同一块石头旁打转。去看也记着带水，别再多困一个。",sunshangxiang:"孙家的姑娘这几日都在建业渡口，弓也背着。说是想去柴桑接人，家里偏不许她独行。",lvbu:"吕布府里的管事到处问赤兔马。将军不爱见说客，你若想拜访，不妨从这匹马问起。",huatuo:"宜城华先生正缺药，采药的人出去了迟迟不回。他愁的倒不是方子，怕山路上又有人出事。",menghuo:"建宁往南，孟获那座寨子近来不肯让外客进。要去先问寨老，别还没说话便叫人拿刀拦了。",zhangjiao:"巨鹿的井又见底了。乡亲等张先生来求雨，田里的苗可等不了，人都在晒场那边。",zhangbao:"营里张宝天天问广宗药车，伤者多，药眼看见底。他想出门也脱不开身，你回去便知。"};
  for(const d of Object.values(Cast.definitions))actor(d.id);
  actor('book-dealer','书贩','peddler');actor('village-aunt','大娘','neighbor-woman');actor('temple-keeper','守庙老人','villager');actor('stable-master','马场主人','laborer');actor('boatman','船夫','laborer');actor('camp-scout','斥候','imperial-soldier');actor('southern-elder','寨老','villager');actor('southern-woman','采药妇人','neighbor-woman');actor('palace-steward','府中管事','town-doctor');actor('river-guard','守军','imperial-soldier');actor('bandit-chief','盗匪头目','brigand');actor('medicine-apprentice','药童','villager');actor('tianxiang-keeper','天香阁管事','neighbor-woman');
  actor('herbalist','采药人','herbalist');actor('ganning','甘宁','ganning');
@@ -8541,66 +8541,66 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  K.landmark('wulin','乌林','chibi',-62,-38);K.landmark('liang-camp','下邳军营','xiapi',-48,-38,'camp');
  R('xunyu','长安访书',{
   rumor:S('changan','向荀彧询问书房里的争执','xunyu',[
-   ['npc','这些书上都留着原主人的姓名，怎么能说搬走就搬走？先把书放下，我去找人来认领，别真拿去垫了马厩。'],['hero','文若先生在找什么书？我可以帮着找找。刚才他们往哪边搬了？'],['npc','有《治论》《仇国论》，还有《乾象历注》《左氏春秋》和《战国策》。这些年搬家逃难，书也散了，我想尽量找齐，留给以后读书的人。']],[N('向书贩询问下落','dealer')]),
+   ['npc',"且慢！书上还写着主人的姓名，岂能拿去垫马厩？容我请人来认一认，莫再往车上扔了。"],['hero',"先生找的是哪些书？我记下来，也帮着留心。"],['npc',"《治论》《仇国论》《乾象历注》《左氏春秋》，还有一部《战国策》。人逃难，书也辗转流离；能多找回一卷，后来的读书人便少一分遗憾。"]],[N('向书贩询问下落','dealer')]),
   dealer:S('changan','向书贩打听被扣下的旧书','book-dealer',[
    ['npc','《治论》还在我这里，另外四本装在一辆书车上，被一伙逃兵扣在蓝田的院子里了。能把车要回来，这本我也愿意送给先生。'],['hero','他们只扣了车，还是连送书的人也一起抓了？'],['npc','我的伙计也没回来。他说去跟那些人讲讲道理，我等到现在，一点消息都没有。劳烦你们过去看看，别让他出了事。']],[N('前往蓝田寻找书车','cart')]),
   cart:S('changan-county','救回书贩伙计，取回书车','bandit-chief',[
-   ['npc','车上有什么都归我们了。想把那个人带走，就拿钱来换。别跟我说这些破书值多少钱，我不听这个。'],['hero','墙角坐着的应该就是那个伙计，他好像受了伤。我们先把他救出来，书车等会儿再推走。']],[F('救出伙计','cart')]),
+   ['npc','车上有什么都归我们了。想把那个人带走，就拿钱来换。别跟我说这些破书值多少钱，我不听这个。'],['hero',"伙计在墙角，腿上有血。得先放倒拦路的，别让他拿人作挡箭牌。"]],[F('救出伙计','cart')]),
   return:S('changan','将五部旧书交给荀彧','xunyu',[
-   ['npc','你们总算回来了。听说伙计受了伤，我一直担心，他现在怎么样？书车也带回来了？这趟真是辛苦你们了。'],['hero','伤口已经包扎过了，书也没少。先生接下来准备去哪里？我们正想找人帮忙，许昌那边也缺能出主意的人。']],[N('与荀彧商议去留','freed')]),
+   ['npc',"回来了！伙计伤得如何？方才有人报信，说你们连车也推回来了，我还不敢信。"],['hero',"已经裹好伤，书也齐了。先生看看，有没有淋坏的？我们在许昌也认得人，往后要去，能替你引荐。"]],[N('与荀彧商议去留','freed')]),
   freed:End('xunyu','changan',[['npc','我本来就准备去许昌，只是一直放不下这些书。现在书找齐了，我也能放心出门。你们要是不嫌麻烦，我想一起走。'],['hero','当然欢迎。正好路上有不少事情想请教文若先生，我们也能互相照应。']])
  },{cart:{stage:['cart'],next:'return',title:'蓝田书车',sceneId:'farmland',count:3,enemyKind:'bandit',effects:{items:{'xunyu-books':5}}}});
  R('jiaxu','宛城疑盒',{
   rumor:S('wan','查看宛城门口的围城告示','jiaxu',[
-   ['npc','郭汜派人送来的告示，要城里拿粮食换他退兵。仓里剩下的粮本来就不多，真交出去，百姓接下来吃什么？'],['hero','不能把粮都交给他。文和先生在这里站了这么久，是不是已经想到办法了？'],['npc','我有个主意，不过还得先去跟张将军商量。你愿意帮忙的话，陪我去一趟府里，等他答应了，我再告诉你怎么做。']],[N('陪贾诩进入太守府','mansion')]),
+   ['npc',"郭汜又来催粮。照他要的数交出去，他能不能退兵难说，城里的人倒是先得饿死。"],['hero',"先生一直盯着这告示，可是有主意了？"],['npc',"有个法子，总要张将军点头。诸位若不怕麻烦，随我入府一趟。"]],[N('陪贾诩进入太守府','mansion')]),
   mansion:S('wan','等候贾诩与张绣商议','jiaxu',[
-   ['npc','张将军已经答应了，会留在府里安排城中的事。我带这只盒子去见郭汜，出城的路被他的人盯着，还得请你们护送一程。'],['hero','你准备把这只盒子送给郭汜？里面到底装了什么？'],['npc','是份他一定想亲自打开的礼。先别在这里掀盖子，等到了他面前，你站到我身后就好。']],[F('护送贾诩出城','escape')]),
+   ['npc',"张将军应下了，城中由他照看。我带这只盒子去见郭汜，还请诸位送到营前。出城的路，他的人盯得紧。"],['hero',"给郭汜的？这么沉，里头装着什么？"],['npc',"一份他舍不得叫旁人代看的礼。别在此处开，到了营里，诸位站在我身后。"]],[F('护送贾诩出城','escape')]),
   camp:S('wan-county','将木盒送到郭汜营中','guosi',[
-   ['npc','你说这是张绣的首级？把盒子放过来，我要亲自看清楚，别想拿别人的脑袋骗我。'],['jiaxu','郭将军既然要亲自看，那就请靠近一些。你们往我身后站，盒盖打开以后，千万别伸手。'],['hero','盒子里的弩箭打中他了！他的手下已经围过来了，我们挡住营门，别让他们追进城去。']],[F('击退郭汜','camp')]),
+   ['npc','你说这是张绣的首级？把盒子放过来，我要亲自看清楚，别想拿别人的脑袋骗我。'],['jiaxu',"首级在此，将军何不近前验看？诸位往后些，别碰着盒盖。"],['hero',"弩箭！他中箭了！营门快合上了，文和，往这边走！"]],[F('击退郭汜','camp')]),
   return:S('wan','向贾诩问明木盒的来历','jiaxu',[
-   ['npc','你别担心，张将军还在府里。盒子里装的是机关弩。郭汜一听我带来了首级，就以为城里的人已经互相残杀，连盒子都没让手下先查。'],['hero','你早一点告诉我，我也不至于一路都在担心。下次再做这么危险的事，可得先跟我们商量。'],['npc','这回是我没说明白，叫你们跟着担心了。幸亏有你们挡着，我抱着那么重的盒子，一个人可跑不回来。']],[N('与贾诩商议去留','freed')]),
+   ['npc',"张将军好端端坐在府里，盒中自然是机关弩。郭汜听了“张绣首级”四个字，连查验都顾不得。他倒巴不得城中先乱起来。"],['hero',"我抱了一路，差点真以为里头是颗人头。下回盒子若会射箭，劳烦提前说一声。"],['npc',"是我的疏漏。幸而诸位跑得快，也没嫌我这只盒子碍事。少了你们，我可出不了那道营门。"]],[N('与贾诩商议去留','freed')]),
   freed:End('jiaxu','wan',[['npc','郭汜退兵以后，城里暂时能安稳些了。我准备去许昌拜见曹公。你们救人的时候还顾着别伤到百姓，我想跟你们一起走一段。'],['hero','我们正缺一个能商量事情的人，先生愿意同行当然好。不过以后有什么打算，得先告诉大家。']])
  },{escape:{stage:['mansion','escape'],next:'camp',title:'宛城脱身',sceneId:'market-street',count:3},camp:{stage:['camp'],next:'return',title:'郭汜营中',sceneId:'bandit-camp',named:[['guosi',10,'front']]}});
  R('zhangliao','虎牢守将',{
   rumor:S('hulao','与虎牢守将张辽交谈','zhangliao',[
-   ['npc','前面就是虎牢关了。你们是来做什么的？如果要投军，先去关外登记，别带着人直接往里走。'],['hero','文远将军，我见过你手下的兵，他们肯让百姓过路，也没抢过东西。既然你也不愿意做这些事，为什么还要替董卓守关？'],['npc','董卓的命令，我也不是每一条都肯听。可你想劝我离开，总得让我知道，你们有没有本事保护愿意跟着走的人。']],[F('与张辽切磋','duel')]),
+   ['npc',"止步。虎牢关前，不得擅入。诸位是过关，还是投军？投军的去关外登记。"],['hero',"文远将军，你约束部下，不许抢掠，过路人都念你的好。这样的人，为什么还替董卓守关？"],['npc',"军令也有我不肯奉行的。只是我若走了，这些跟随我的将士、关外的百姓，你拿什么护着？"]],[F('与张辽切磋','duel')]),
   after:S('hulao','听张辽说明守关的缘由','zhangliao',[
-   ['npc','我最放心不下的，是关外这些百姓。换了别人来守，他们还能不能平安过路，就不好说了。可你说得也对，总不能一直这样拖下去。'],['hero','可以跟副将商量好，留下愿意照顾百姓的人守关。其他弟兄如果想走，我们再帮他们找个落脚的地方，总能有个办法。']],[N('与张辽商议去留','freed')]),
+   ['npc',"此关一换人，乡亲还能不能过，便难说了。我守在这里，也正为此。可太师府的催令一日紧过一日，这又能撑多久？"],['hero',"副将中有靠得住的吗？愿留下的守关，愿随你走的另寻去处。总好过等太师府来换将。"]],[N('与张辽商议去留','freed')]),
   freed:End('zhangliao','hulao',[['npc','我已经跟副将谈过了，他答应照常放行百姓。想走的弟兄也收拾好了行装，听说许昌正在招人，我准备带他们去看看。'],['hero','我可以替你们引荐。你先跟我们同行，弟兄们也能有人照应，到了许昌再一起商量。']])
  },{duel:{stage:['rumor','duel'],next:'after',title:'虎牢切磋',sceneId:'rural-road',duel:'zhangliao'}});
  R('xiahoudun','下邳军情',{
   rumor:S('xuchang','向司马懿询问下邳军情','simayi',[
-   ['npc','元让带兵去了下邳。高顺把通往城门的路堵住了，很多逃难的百姓困在外面，他送来了几封求援信。'],['hero','我们可以过去帮忙。夏侯将军驻扎在哪里？我先去找他问清楚情况。'],['npc','他的营地就在下邳城外，门口挂着夏侯的旗。到了先找他，城门那边还在交战，不要直接过去。']],[N('前往下邳军营','camp',{requires:{recruits:{wei:3}}})]),
+   ['npc','元让带兵去了下邳。高顺把通往城门的路堵住了，很多逃难的百姓困在外面，他送来了几封求援信。'],['hero',"将军驻在何处？我们带信去见他。"],['npc',"下邳城外，营前悬着夏侯旗。别径奔城门，高顺的弓手还在墙上。"]],[N('前往下邳军营','camp',{requires:{recruits:{wei:3}}})]),
   camp:S('liang-camp','与夏侯惇商议接应乡民','xiahoudun',[
-   ['npc','是仲达请你们来的吧？高顺不肯开城门，百姓的车又堵在路中间。我正缺人帮忙，得先把这些人送到安全的地方。'],['hero','我们去侧门附近看看。你带人护送车队，等守军往那边调动，我们再从侧面把他们拦住。']],[F('接应城外乡民','approach')]),
+   ['npc',"仲达遣你们来的？来得正好！高顺守着城门，百姓的车堵了一路。我要分兵护车，手里实在缺人。"],['hero',"车队你护着，侧门交给我们。把那边的兵引开，正路便能松动些。"]],[F('接应城外乡民','approach')]),
   gate:S('xiapi','突破高顺守军','gaoshun',[
-   ['npc','前面退下来的人到我这里集合！弓手上城墙，看住侧面的路，不准让他们冲进城门。'],['xiahoudun','百姓已经让开了，你们还想拦着不放？跟我一起往前，把城门打开，别再让车堵在外面！']],[F('夺下城门','gate')]),
+   ['npc','前面退下来的人到我这里集合！弓手上城墙，看住侧面的路，不准让他们冲进城门。'],['xiahoudun',"车都让开了，你还不放人？跟我上，开城门！"]],[F('夺下城门','gate')]),
   recovery:S('liang-camp','探望眼伤初愈的夏侯惇','xiahoudun',[
-   ['npc','郎中已经替我包扎过了，你们不用一直在这里守着。伤的是眼睛，我又不是连路都不会走了。'],['hero','你刚才差一点就被第二支箭射中了，还是坐着歇一会儿吧。城外的事情我们会照看，有消息就来告诉你。'],['npc','行，我先听郎中的，把伤养好。刚才要不是你们把我拉回来，我现在还能不能坐在这里说话都难说。']],[N('与夏侯惇商议去留','freed',{effects:{rest:true}})]),
+   ['npc',"都裹好了，还围着我做甚？少只眼，又不是少了两条腿。"],['hero',"方才第二支箭几乎贴着头过去，你倒忘得快。歇着吧，城外有消息，我们来报。"],['npc',"……行，今日听郎中的。方才若不拉那一把，只怕我还真坐不到这张榻上。"]],[N('与夏侯惇商议去留','freed',{effects:{rest:true}})]),
   freed:End('xiahoudun','liang-camp',[['npc','伤口已经好多了，我可以跟你们一起走。你们接下来不是还要对付董卓吗？这次别忘了叫上我。'],['hero','我们等你准备好再出发。回去的路上还可以看看，之前那些百姓有没有找到住的地方。']])
  },{approach:{stage:['camp','approach'],next:'gate',title:'下邳城外',sceneId:'farmland',count:3,guest:'xiahoudun'},gate:{stage:['gate'],next:'recovery',title:'下邳城门',sceneId:'city-north',named:[['gaoshun',10,'front']],guest:'xiahoudun'}},{viaCourt:true});
  R('simayi','仲达问梦',{
   rumor:S('xuchang','与司马懿谈谈梦中的来客','simayi',[
-   ['npc','那几位先生在梦里提过，说你知道我们以后的事情。我起初不信，可你能说出那么多人的经历，实在不像临时编出来的。'],['hero','我知道的是书上记下来的三国，可这里已经跟书里不一样了。以前的事情只能拿来参考，以后会发生什么，我也不敢保证。'],['npc','你肯把这点说清楚，我反倒更愿意听。那么按你读过的历史，最后是哪一国统一了天下？']],[N('坦言自己知道的历史','future',{requires:{recruits:{wei:3}}}),N('说明自己不愿替未来作保','caution',{requires:{recruits:{wei:3}}})]),
+   ['npc',"那夜梦中，说你知晓后世。我本不信，可你提起这些人的经历，连未出仕的也一一道得出来。倒叫我不得不问了。"],['hero',"我知道的都在书里，可你也看见了，这里的年月根本对不上。拿来寻人还成，要问下一步，我也没把握。"],['npc',"不敢妄断，倒好。那么，只说你书里的天下——三国之中，最后谁胜了？"]],[N('坦言自己知道的历史','future',{requires:{recruits:{wei:3}}}),N('说明自己不愿替未来作保','caution',{requires:{recruits:{wei:3}}})]),
   future:S('xuchang','听司马懿回应后世的消息','simayi',[
-   ['hero','不是这三国中的任何一国，后来建立了晋朝，开国皇帝姓司马。不过那是我原来世界的历史，这里会不会一样，我真的不知道。'],['npc','你倒是坦白，也不怕我听完以后起别的心思。放心，我不会因为一场梦和几句话，就把没发生的事当成自己的安排。']],[N('与司马懿商议同行','freed')]),
+   ['hero',"都不是。后来是晋，开国皇帝姓司马。可那是我那边的历史，这里……我真说不准。"],['npc',"司马？……你倒敢照实说。放心，几句梦话，还不至于叫我把今日的路都改了。况且，后世的司马，未必便是眼前的司马。"]],[N('与司马懿商议同行','freed')]),
   caution:S('xuchang','与司马懿商议眼前的事','simayi',[
-   ['hero','我不想用后来的结局劝你做什么。张角现在还活着，三国却已经建立了，光是这一点就完全对不上。我们还是先看眼前的事情吧。'],['npc','也好，那就先说洛阳。你们找了这么多人，接下来准备怎样对付董卓？我想跟你们走一趟，亲自看看情况。']],[N('与司马懿商议同行','freed')]),
+   ['hero',"我不想拿一个结局劝你选路。张角还活着，魏蜀吴却都立了国，书早就不管用了。眼前能做的，还是讨董。"],['npc',"那就说洛阳。人你寻到了不少，可粮道、援兵、进退之路，总要有个章程。容我再问几处。"]],[N('与司马懿商议同行','freed')]),
   freed:End('simayi','xuchang',[['npc','城里的事务我已经交给主簿，你们以后引荐的人，他也会照常接待。我这边可以动身了，什么时候出发？'],['hero','仲达先生，等大家准备好就走。路上如果还有想问的，你尽管问，我知道多少就说多少，不知道的也不会乱编。']])
  },{},{viaCourt:true});
  R('caocao','乌林归路',{
   rumor:S('xuchang','向司马懿询问曹操的行踪','simayi',[
-   ['npc','主公在乌林遇到了董卓的追兵，和身边的护卫走散了。来送信的人也受了伤，只知道他最后退进了林子，到现在还没有新的消息。'],['hero','我们去找他。追兵既然封住了正路，还有没有别的路能进那片林子？'],['npc','从赤壁北边有一条小路，可以绕进乌林。找到人以后往河边走，我会安排船在那里等，尽量别跟追兵纠缠太久。']],[N('赶往乌林接应','meet',{requires:{recruits:{wei:5}}})]),
+   ['npc','主公在乌林遇到了董卓的追兵，和身边的护卫走散了。来送信的人也受了伤，只知道他最后退进了林子，到现在还没有新的消息。'],['hero',"追兵封的是大路？可有小路绕进去？我们去接人。"],['npc',"赤壁北边有路通乌林。找到主公便往河边去，我遣船相候，别恋战。"]],[N('赶往乌林接应','meet',{requires:{recruits:{wei:5}}})]),
   meet:S('wulin','找到被追兵截住的曹操','caocao',[
-   ['npc','你们来得可真及时。我刚说这条路偏僻，追兵应该找不到，前面就放起了箭。今日这话说得，实在有些丢人。'],['hero','曹公还能开玩笑，看来没有伤到要紧的地方。后面也有追兵，我们先从前面冲出去，到了河边再聊。']],[F('护住曹操','ambush')]),
+   ['npc',"来得好！我方才还说，此路僻静，断无伏兵。话未说完，前头便是一阵箭雨……偏叫诸位看了笑话。"],['hero',"曹公，笑话等上船再讲！后头也追来了，咱们得从前面冲。"]],[F('护住曹操','ambush')]),
   ford:S('wulin','穿过乌林河汊','caocao',[
-   ['npc','你看这片芦苇，正好能藏弓手。要是我来追人，大概也会选在这里……你怎么突然停下了？'],['hero','因为芦苇里真的有人！先退到车后面，我们把渡口的路清出来，别让他们把船夺走。']],[F('夺回渡船','ford')]),
+   ['npc',"芦苇这么密，若伏一队弓手，来一个便——你拉我做甚？"],['hero',"您快别说了！真有弓手，退到车后！渡口还得夺回来！"]],[F('夺回渡船','ford')]),
   road:S('wulin','击退追到渡口的骑兵','caocao',[
-   ['npc','这次我可一句话都没说，他们照样追来了。看来不是我说什么就来什么，是这条路早就让人盯上了。'],['hero','先别管这个了，你上船照看伤兵。我们把岸上的追兵拦住，船夫才敢过来接剩下的人。']],[F('掩护渡河','road')]),
+   ['npc',"这回我可没开口！看来是追兵认路，倒不是我说中了。"],['hero',"上船再论这个吧！伤兵在船上，劳您照看。岸上我们再挡一阵，接后头的人。"]],[F('掩护渡河','road')]),
   freed:End('caocao','xuchang',[['npc','你们为了接我出来，跟着跑了这么远，这份人情我记得。洛阳那边如果要用兵，别急着独自去闯，叫上我一起商量。'],['hero','那就先把身上的伤养好。以后真要去洛阳，还得请你帮忙看看敌人的布置，总比我们自己摸索强。']])
  },{ambush:{stage:['meet','ambush'],next:'ford',title:'乌林伏兵',sceneId:'forest-path',count:3,guest:'caocao'},ford:{stage:['ford'],next:'road',title:'河汊争渡',sceneId:'river-dock',count:4,guest:'caocao'},road:{stage:['road'],next:'return',title:'乌林归路',sceneId:'rural-road',count:4,guest:'caocao'}},{viaCourt:true});
  const H=typeof module!=='undefined'&&module.exports?require('./hero-quests.js'):root.HeroQuests;
- H.definitions.caocao.stages.return=S('xuchang','将曹操送回许昌','caocao',[['npc','总算到许昌了。先把伤兵送进去，后面的车都跟上了吗？派个人到城门口等着，别让落在后头的人找不到地方。'],['hero','最后一辆车也到了，大家都在。我们进去吧，仲达先生一直在等你回来，我也好跟他说一声人已经平安了。']],[N('与曹操商议下一步','freed',{effects:{rest:true}})]);
+ H.definitions.caocao.stages.return=S('xuchang','将曹操送回许昌','caocao',[['npc',"许昌！可算回来了。伤兵入医馆，后车跟紧。再遣个人守着城门，落在后头的，别叫他进城后无处寻人。"],['hero',"最后一辆也到了，曹公放心。仲达在府里等着，我去报个信。"]],[N('与曹操商议下一步','freed',{effects:{rest:true}})]);
  if(typeof module!=='undefined'&&module.exports)module.exports=true;
 })(globalThis);
 
@@ -8613,69 +8613,69 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  K.landmark('xieliang','解良','hedong',38,24);K.landmark('guan-road','西行官道','tongguan',-52,30);K.landmark('ma-residence','马家旧宅','wuwei',36,-36);
  R('zhugeliang','成都问策',{
   rumor:S('chengdu','与诸葛亮谈谈君臣之间的事','zhugeliang',[
-   ['npc','你一直在替魏、蜀、吴找人，却没有打算只留在其中一家。我想听听，你这样做，是为了尽快回家，还是还有别的打算？'],['hero','能回家当然好，可一路上认识了这么多人，我也不能办完自己的事就不管他们。谁愿意一起解决洛阳的问题，我就帮谁。'],['npc','我大概明白了。不过往后几家难免会有争执，我还想问你几个问题。没有标准答案，你照着自己的想法说就好。']],[N('请他直说','one',{requires:{recruits:{shu:3}}})]),
+   ['npc',"你替三家奔走，却不肯只归一家。这一路所图，究竟是仙长许你的归乡，还是别的什么？"],['hero',"我当然想回家。可一路上欠了这么多人情，也答应了不少事，总不能等门一开，转身就走。眼下谁肯讨董，我便帮谁。"],['npc',"眼下或可同心，往后未必。亮有几句想问，不必揣摩我想听什么，照实答便是。"]],[N('请他直说','one',{requires:{recruits:{shu:3}}})]),
   one:S('chengdu','回答诸葛亮关于用人的问题','zhugeliang',[
-   ['npc','如果你跟随的君主准备做一件会伤害百姓的事，你劝过几次，他还是不肯听。到了这个时候，你会怎么办？']],[N('把后果说清，继续劝他','two'),N('先护住会受牵连的人','two')]),
+   ['npc',"若所事之主将害百姓，你屡谏不听，去，还是留？"]],[N('把后果说清，继续劝他','two'),N('先护住会受牵连的人','two')]),
   two:S('chengdu','回答诸葛亮关于百姓的问题','zhugeliang',[
-   ['npc','如果两国都缺粮，眼前只剩一座粮仓，谁把粮运走，另一边的百姓就要挨饿。你带着人到了那里，会先处理什么？']],[N('先分出救急的粮，再谈归属','three'),N('先让双方的乡民退开','three')]),
+   ['npc',"两国皆饥，惟余一仓粮。甲国运走，乙国便无以为食。你恰在仓前，先做何事？"]],[N('先分出救急的粮，再谈归属','three'),N('先让双方的乡民退开','three')]),
   three:S('chengdu','回答诸葛亮关于归途的问题','zhugeliang',[
-   ['npc','最后一个问题，跟你自己有关。假如那些先生现在就能送你回家，但这里还有人等着你帮忙，你准备怎么跟他们说？'],['hero','我会想回去，但也不能突然就走了。至少得把答应过的事情安排好，跟大家说明白，再决定什么时候离开。'],['npc','有你这句话，我就放心些了。我不指望你一个人解决所有事情，只希望遇到难处时，大家还能坐下来商量。']],[N('与诸葛亮商议同行','freed')]),
+   ['npc',"若三位仙长今日便可送你归乡，可此地仍有人等你践约，你如何答他？"],['hero',"我会想走。但答应的事不能一甩手，至少该找着接手的人，也得当面跟同伴说清楚。要回，便堂堂正正回。"],['npc',"如此，亮便知道该怎样与你共事了。只是口中所言，总还得落到实处。"]],[N('与诸葛亮商议同行','freed')]),
   freed:End('zhugeliang','chengdu',[['npc','府里的事情已经有人接手，我可以陪你们出去看看。你知道后来的历史，我熟悉这里的情况，路上应该能帮上忙。'],['hero','那太好了。我们常常到了地方才发现事情跟想的不一样，有孔明先生在，遇到拿不准的事也能商量。']])
  },{},{viaCourt:true});
  R('guanyu','解良西行',{
   rumor:S('xieliang','查看解良面摊前的争执','guanyu',[
-   ['npc','你们吃了面，钱也退给你们了，现在还要来掀摊子？我父母年纪大了，经不起你们这么闹，今天必须把话说清楚。'],['bandit-chief','我们来收的就是这里的税！让你交你就交，一个卖面的，哪来这么多话？再不让开，连你的摊子一起拆了！'],['hero','要收税，把官府的文书拿出来。老人就在后面，你们先把刀收好，别在这里吓唬人。']],[F('护住面摊','stall')]),
+   ['npc',"面钱已经退了，还掀摊作甚？父母在后面歇着。今日谁再动手，莫怪关某不留情。"],['bandit-chief','我们来收的就是这里的税！让你交你就交，一个卖面的，哪来这么多话？再不让开，连你的摊子一起拆了！'],['hero',"税单呢？先收刀，老人就在后头。收的是什么税，当着大家说。"]],[F('护住面摊','stall')]),
   family:S('xieliang','与关羽商议安顿父母','guanyu',[
-   ['npc','这些人隔几天就来找麻烦。我自己倒不怕，可父母还得在这里过日子，总不能每次都让他们跟着担惊受怕。'],['hero','那就带二老换个地方住吧。成都正在安置逃难的百姓，我们可以陪你们过去，帮着找个落脚的院子。'],['npc','父母要是肯走，我当然愿意。只是路上关卡多，老人又不能赶路，得备好车和吃的，把沿途的情况先问清楚。']],[N('准备护送二老西行','pass')]),
+   ['npc',"关某不惧他们，可父母还住在这里。隔三差五闹一回，二老夜里都不敢安睡。"],['hero',"成都正在收容流民，不妨带二老过去。咱们陪着走，到了找间院子住下。"],['npc',"须问过父母。若二老愿往，车、粮都得备齐，沿途关卡也要打听。老人经不得颠簸，不能赶路。"]],[N('准备护送二老西行','pass')]),
   pass:S('guan-road','设法通过西行关卡','river-guard',[
-   ['npc','前面的车停下！你们从哪里来，要去哪里？把通行文书拿出来，车里的人也要下来查。'],['guanyu','车上是我的父母，赶了一天的路，实在累了。文书的事我们可以慢慢说，能不能先让他们到树下歇歇？'],['hero','你先带二老过去喝点水，我留在这里跟守军说。车上的东西不用急着搬下来，他们要看什么，我陪着看。']],[N('出示温侯令牌','arrive',{requires:{items:{'lvbu-token':1}},effects:{rest:true}}),N('请吕布出面','arrive',{requires:{partyAny:['lvbu']},effects:{rest:true}}),N('购得通行文书','arrive',{price:200}),F('打开第一道关口','pass-one')]),
+   ['npc','前面的车停下！你们从哪里来，要去哪里？把通行文书拿出来，车里的人也要下来查。'],['guanyu',"车上是关某父母，已行了一日。文书奉上，请容二老先下车，到树下歇片刻。"],['hero',"云长，扶二老去喝水。查车我陪着，别急着搬，都是随身的家当。"]],[N('出示温侯令牌','arrive',{requires:{items:{'lvbu-token':1}},effects:{rest:true}}),N('请吕布出面','arrive',{requires:{partyAny:['lvbu']},effects:{rest:true}}),N('购得通行文书','arrive',{price:200}),F('打开第一道关口','pass-one')]),
   two:S('guan-road','护住车队，通过第二关','guanyu',[
-   ['npc','后面那辆车的轮轴松了，我刚替他们修好。你去告诉车夫别停在关口，我在这里拦住这些人，等车过去再走。'],['hero','你别一个人留在这里，我们一起挡着。让车夫照顺序往前走，谁也别落到队伍后面。']],[F('通过第二关','pass-two')]),
+   ['npc',"后车轮轴已修好，叫车夫快过关。此处关某来挡，莫让他们再围住车。"],['hero',"一道挡着！车夫听见没有，往前赶，后车跟紧！"]],[F('通过第二关','pass-two')]),
   three:S('guan-road','挡住截断官道的追兵','river-guard',[
-   ['npc','前面的关口传来消息了，就是这支车队！把他们拦下来，一个也不准放过去！'],['hero','他们收到消息，连老人和孩子都不肯放了。云长，我们先打通车队前面的路，跑开的士兵就别追了。']],[F('通过第三关','pass-three')]),
+   ['npc','前面的关口传来消息了，就是这支车队！把他们拦下来，一个也不准放过去！'],['hero',"连老小都不肯放？云长，打通车前这段路，散了的别追！"]],[F('通过第三关','pass-three')]),
   four:S('guan-road','保护随行乡民通过第四关','guanyu',[
-   ['npc','父母刚在车上睡着，叫车夫慢一点过桥。桥头还有一队兵，我过去看看，你帮我照看一下后面的车。'],['hero','我会看着的。你先别走太远，他们要是肯放行最好，不肯的话，我们再一起想办法。']],[F('守住桥头','pass-four')]),
+   ['npc',"父母方睡着，过桥慢些，莫惊醒了。桥头又有兵马，我去问，你照看后车。"],['hero',"后头有我。你别走远，能借道便借，不成我再来帮你。"]],[F('守住桥头','pass-four')]),
   five:S('guan-road','突破最后一道关口','river-guard',[
-   ['npc','后面就是最后一道关门了，不能再退！把路口堵住，别让那支车队过来！'],['guanyu','我们只是要带老人去成都，没有想跟你们结仇。请把路让开，不要再逼这些百姓往回走了。']],[F('通过第五关','pass-five')]),
+   ['npc','后面就是最后一道关门了，不能再退！把路口堵住，别让那支车队过来！'],['guanyu',"关某奉父母往成都，并非寻衅。让开此路，你我尚可各行其事。"]],[F('通过第五关','pass-five')]),
   arrive:S('chengdu','将关家二老安顿在成都','guanyu',[
-   ['npc','院子收拾好了，父母也说住着舒坦。这一路他们坐车，我在前面走，许多事情都靠你帮忙，实在让你费心了。'],['hero','我刚才还听见老人家问，附近哪里能买到面粉。看来他们已经想好，要把面摊重新开起来了。'],['npc','他们做惯了这个，叫他们整天歇着反而难受。等摊子安顿好，我也能放心出去，帮那些还在路上的人。']],[N('与关羽商议去留','freed',{effects:{rest:true}})]),
+   ['npc',"院子收拾好了，父母都说住得惯。此行多承照应，关某在前面持刀，身后的事却都劳烦你。"],['hero',"方才老爷子还问哪里买面粉。我看用不了几日，这院前又该摆面摊了。"],['npc',"父母做惯了，叫他们闲坐，反而不自在。待摊子开起来，关某也可安心出门。"]],[N('与关羽商议去留','freed',{effects:{rest:true}})]),
   freed:End('guanyu','chengdu',[['npc','邻居们答应替我照看父母，我可以跟你们一起走了。听说你们还准备去洛阳，我也想帮上一份忙。'],['hero','那就一起走。等这阵子忙完，我们再陪你回来看看二老，也尝尝新摊子上的面。']])
  },{stall:{stage:['rumor','stall'],next:'family',title:'解良面摊',sceneId:'market-street',count:2,guest:'guanyu'},'pass-one':{stage:['pass','pass-one'],next:'two',title:'西行第一关',sceneId:'rural-road',count:3,guest:'guanyu'},'pass-two':{stage:['two','pass-two'],next:'three',title:'西行第二关',sceneId:'city-frontier',count:3,guest:'guanyu'},'pass-three':{stage:['three','pass-three'],next:'four',title:'西行第三关',sceneId:'rural-road',count:4,guest:'guanyu'},'pass-four':{stage:['four','pass-four'],next:'five',title:'西行第四关',sceneId:'river-dock',count:4,guest:'guanyu'},'pass-five':{stage:['five','pass-five'],next:'arrive',title:'西行第五关',sceneId:'city-frontier',count:5,guest:'guanyu'}});
  R('zhangfei','下邳寻人',{
   rumor:S('xiapi','向城中大娘询问失散的将领','village-aunt',[
-   ['npc','你说的是张飞吧？大嗓门，提着一杆长矛。前些天我还看见他在城外喝酒，叫他进来找个地方住，他怎么也不肯。'],['hero','他是一直住在城外，还是在那里等什么人？我想去找他，先把事情问清楚。'],['npc','不像是在等人。他喝多了就说自己没脸回去，我也不敢细问。你到良成那边看看，他这些天都在那里。']],[N('前往良成找人','meet')]),
+   ['npc','你说的是张飞吧？大嗓门，提着一杆长矛。前些天我还看见他在城外喝酒，叫他进来找个地方住，他怎么也不肯。'],['hero',"良成那边？他是在等人，还是打算就这么住下？"],['npc','不像是在等人。他喝多了就说自己没脸回去，我也不敢细问。你到良成那边看看，他这些天都在那里。']],[N('前往良成找人','meet')]),
   meet:S('xiapi-county','与城外的张飞交谈','zhangfei',[
-   ['npc','谁让你来找我的？你回去告诉他们，下邳是我弄丢的，我知道自己没脸见人，就别再来劝了。'],['hero','我还不知道发生了什么，怎么替你回话？你总得先告诉我，你跟他们闹了什么别扭。'],['npc','这事你去成都问就知道了，我不想再说。让我一个人待会儿吧，今天真的不想见人。']],[N('到成都询问此事','letter')]),
+   ['npc',"又来劝俺？下邳是俺丢的，俺知道！回去吧，别替俺找什么台阶。"],['hero',"我还没开口呢。谁托我来的，你又怎么知道？倒是你，出了什么事？"],['npc',"你去成都问！俺不想提。酒也没了，你别坐这儿陪俺。"]],[N('到成都询问此事','letter')]),
   letter:S('chengdu','向诸葛亮转达张飞的近况','zhugeliang',[
-   ['npc','原来翼德去了那里，大家找了他很久。主公留了一封信，一直没机会送出去，你既然见到他，能不能再替我们跑一趟？'],['hero','可以，我会亲手交给他。不过他现在好像很怕见你们，要是看了信还不肯回来，我该怎么劝？'],['npc','你先让他把信看完。主公没有怪他，大家只是担心他的安危，也还在等他一起把下邳的事情处理好。']],[N('带信回良成','return',{effects:{items:{'zhangfei-letter':1}}})]),
+   ['npc',"翼德原来在那里。主公有信，早就写好了，只愁寻不到送信的人。既与他见过，能否再劳烦你一趟？"],['hero',"我亲手交。他若看了还不肯回来，该怎么说？"],['npc',"信里主公并无责怪，只问他的安危。让他慢慢看，别催。下邳的事，大家也还等着与他一道料理。"]],[N('带信回良成','return',{effects:{items:{'zhangfei-letter':1}}})]),
   return:S('xiapi-county','将书信交给张飞','zhangfei',[
-   ['npc','怎么又是你？我不是说了不回去吗？你们再这样一趟趟地来，我可真要赶人了。'],['hero','玄德公有封信给你，我得亲手交给你。你先把酒放下，看完以后还想让我走，我就不再劝了。']],[{label:'请张飞看信',routes:[{if:{partyAny:['guanyu','liubei']},next:'read'},{if:{},battle:'duel'}]}]),
+   ['npc',"怎么又来？俺说了不回！再劝，连你一块赶出去！"],['hero',"信送到手，我才好走。玄德公亲笔的——酒先放下，看完再赶我不迟。"]],[{label:'请张飞看信',routes:[{if:{partyAny:['guanyu','liubei']},next:'read'},{if:{},battle:'duel'}]}]),
   read:S('xiapi-county','等张飞读完书信','zhangfei',[
-   ['npc','大哥连我吃没吃饭都还惦记着……我一直以为，他最不想见的就是我，回来也只会问我怎么丢了城。'],['hero','信里都写得这么明白了，你也该回去见见他。就算还有什么难受的，也比一个人在这里喝酒强。'],['npc','你说得对，我不能一直让大哥担心。等我把东西收拾好就走，这坛酒也不喝了。']],[N('与张飞商议去留','freed')]),
+   ['npc',"大哥还问俺吃饭没有……俺丢了城，倒叫他惦记起这个。俺还以为，他早不想见俺了。"],['hero',"他连你的住处都不知道，想骂也找不着人。回去见一面吧，别什么都闷在酒里。"],['npc',"……俺收拾收拾。大哥还等回信，不能再躲了。这坛也不喝了。"]],[N('与张飞商议去留','freed')]),
   freed:End('zhangfei','xiapi-county',[['npc','以后你们要去哪里，叫上我一起。该我出力的事情，我不会再躲着，也不想再让大家因为找我来回奔波。'],['hero','翼德，那我们等你一起出发。身上的伤也让郎中看看，路上先别喝酒，别又把伤口弄坏了。']])
  },{duel:{stage:['return','duel'],next:'read',title:'良成切磋',sceneId:'farmland',duel:'zhangfei'}});
  R('machao','武威旧枪',{
   rumor:S('wuwei','向酒馆中的马超问明缘由','machao',[
-   ['npc','想喝酒就坐下，我请你一杯。要是也来劝我出去，就算了，这几天我实在没那个心思。'],['hero','听说马家的旧宅被人占了，你留下的东西也还在里面。你有没有想过先把它们取回来？'],['npc','父亲留给我的飞翼枪还在。我去过几次，每次站到门口，想起以前家里的人，反而不知道该怎么走进去。']],[N('前往马家旧宅','house')]),
+   ['npc',"喝酒便坐，我请。劝我出门的话，省了吧，今日不想听。"],['hero',"不劝你去哪儿。我听说旧宅被占，家里的东西也扣着，你真舍得？"],['npc',"不舍得。父亲的飞翼枪还在堂上。我去过几回，走到门前，便想起从前……偏偏迈不进去。"]],[N('前往马家旧宅','house')]),
   house:S('ma-residence','设法取回飞翼枪','river-guard',[
-   ['npc','这院子现在归军中用了，没得到吩咐，谁也不能进。你们要是来送酒的，我倒可以进去替你们问问。'],['hero','我们来找马家留在这里的一杆枪，就在堂里的枪架上。只拿这件旧物，军中的东西我们不会碰，你能不能通报一声？']],[F('进入旧宅取枪','house'),N('送酒换取旧物','return',{price:200,effects:{items:{'flying-spear':1}}})]),
+   ['npc','这院子现在归军中用了，没得到吩咐，谁也不能进。你们要是来送酒的，我倒可以进去替你们问问。'],['hero',"替马家取一杆旧枪，堂上的枪架便是。军资一概不动，劳烦替我们通报。"]],[F('进入旧宅取枪','house'),N('送酒换取旧物','return',{price:200,effects:{items:{'flying-spear':1}}})]),
   inner:S('ma-residence','从堂内守军手中取回旧枪','river-guard',[
-   ['npc','他们已经进院子了！看住堂里的兵器，别让人靠近枪架，快去叫其他人过来！'],['hero','我们只是来取回马家的旧枪。你们把东西交出来，我们拿到就走，没有必要再动手。']],[F('取回飞翼枪','inner')]),
+   ['npc','他们已经进院子了！看住堂里的兵器，别让人靠近枪架，快去叫其他人过来！'],['hero',"马家的旧枪，还给马家。东西取到便走，何苦拦着？"]],[F('取回飞翼枪','inner')]),
   return:S('wuwei','将飞翼枪交给马超','machao',[
-   ['npc','真的是这杆枪，连枪尾的绑绳都没换。小时候父亲怕我握不稳，亲手替我缠的，我那时候还嫌他缠得难看。'],['hero','孟起，你拿起来试试，看有没有哪里损坏。旧宅里的事也不用你一个人处理，以后想回去，我们还能陪你去看看。'],['npc','没有损坏，拿在手里还是跟从前一样。谢谢你们替我跑这一趟，我去跟掌柜把酒钱结了，不能再一直坐在这里。']],[N('与马超商议去留','freed')]),
+   ['npc',"枪尾这圈绳还在……父亲亲手缠的，怕我握不稳。我那时还笑他，缠得这般丑。"],['hero',"握着还趁手吗？孟起，下回若想回旧宅，不必一个人去。我们在，陪你。"],['npc',"还是从前的分量。劳你们奔这一趟……我该起身了。掌柜，酒钱结一结。"]],[N('与马超商议去留','freed')]),
   freed:End('machao','wuwei',[['npc','飞翼枪我已经收拾好了。你们愿意替一个刚认识的人取回旧物，我也想陪你们走一段，看看有没有能帮上的地方。'],['hero','那就一起出发。武威还有不少人记挂着你，等事情告一段落，我们再回来看看他们。']])
  },{house:{stage:['house'],next:'inner',title:'马家旧宅',sceneId:'city-frontier',count:3},inner:{stage:['inner'],next:'return',title:'旧宅取枪',sceneId:'market-street',count:4,effects:{items:{'flying-spear':1}}}});
  R('liubei','江夏脱身',{
   rumor:S('chengdu','向诸葛亮询问刘备的行踪','zhugeliang',[
-   ['npc','主公去了江夏，想跟当地的人商量怎样安置逃难的百姓。原本隔几天就有信，这回却迟迟没送来，我有些担心。'],['hero','我们可以过去找他。要是只是事情忙，也能带个消息回来，免得你们一直在这里等。'],['npc','那就麻烦你们了。江夏有人不愿意收留那些百姓，他可能跟人争执过。见到他以后，先问问最近有没有遇到麻烦。']],[N('前往江夏拜访','feast',{requires:{recruits:{shu:5}}})]),
+   ['npc','主公去了江夏，想跟当地的人商量怎样安置逃难的百姓。原本隔几天就有信，这回却迟迟没送来，我有些担心。'],['hero',"我去江夏。若只是耽搁了，也带封亲笔信回来，免得你久等。"],['npc',"有劳。当地几家不肯接纳流民，主公为此颇费周折。见到他，多留意身旁的人，莫只听宴上的话。"]],[N('前往江夏拜访','feast',{requires:{recruits:{shu:5}}})]),
   feast:S('jiangxia','赴江夏府中的晚宴','liubei',[
-   ['npc','你们从成都过来了？孔明的信我已经收到了。明天陪我去看看安置百姓的地方吧，今晚先坐下一起吃饭。'],['hero','玄德公，门外刚换了一批守军。端菜的那个人袖子里还藏着刀，我看这顿饭不能再吃了。'],['npc','我也看见了。先别把厅里的人惊着，你帮忙带靠门的客人出去，我去叫后面几桌的人离开。']],[F('护住宴中众人','feast')]),
+   ['npc',"成都来的？孔明的信已到了。正好，明日随我去看安置乡亲的地方。今日来，添几副碗筷！"],['hero',"玄德公，门外换了守军。方才上菜那人袖里有刀，酒别喝了。"],['npc',"我也瞧见了。莫声张，你带门边的客人走，我去唤后头几桌。"]],[F('护住宴中众人','feast')]),
   escape:S('jiangxia','设法离开被封锁的江夏府','liubei',[
-   ['npc','正门已经被他们堵住了。管事告诉我，后院以前有条搬运货物的暗道，只是不知道这些年有没有堵上。'],['hero','我们去后院看看。这里还有不会武艺的客人，能找到别的出口，最好别带着大家从正门硬冲。']],[N('打开暗道机关','road',{puzzle:true}),F('由正门突围','front')],{puzzleTitle:'江夏暗道'}),
+   ['npc','正门已经被他们堵住了。管事告诉我，后院以前有条搬运货物的暗道，只是不知道这些年有没有堵上。'],['hero',"去后院。这些客人不会武艺，能另寻出口，就别从刀口里过。"]],[N('打开暗道机关','road',{puzzle:true}),F('由正门突围','front')],{puzzleTitle:'江夏暗道'}),
   road:S('jiangxia-county','接应落在后面的乡民','liubei',[
-   ['npc','到河边的人先排好队，别一起往船上挤！后面还有几个孩子没跟上来，我过去接，你们帮我照看伤者。'],['hero','我们留在这里拦住追兵。你把孩子带过来，等船靠岸，我会让人过去接你们。']],[F('掩护众人离开','road')]),
+   ['npc',"别挤，船还没靠稳！那几个孩子呢？你们照顾伤者，我回去接！"],['hero',"我们挡追兵。带他们沿岸过来，我叫人接你！"]],[F('掩护众人离开','road')]),
   return:S('chengdu','护送刘备返回成都','liubei',[
-   ['npc','大家都进城了，伤者也安排到了医馆。这一路多亏有你们帮忙，不然我一个人实在顾不过来。'],['hero','人都平安就好。你先进去歇一会儿吧，外面的乡亲知道你回来了，还想等你缓过来以后当面道谢。']],[N('与刘备商议下一步','freed',{effects:{rest:true}})]),
+   ['npc',"伤者进医馆了吗？都好……那便好。若非诸位接应，备一人委实顾不了这些人。"],['hero',"都进城了。外头还有乡亲想道谢，我劝他们明日再来，你也歇一夜。"]],[N('与刘备商议下一步','freed',{effects:{rest:true}})]),
   freed:End('liubei','chengdu',[['npc','成都的事情已经安排好了，我想跟你们一起出去。以前总是听人说各地怎样，我也该亲自去看看，能帮到人的地方就帮一把。'],['hero','我们正好要继续走访各地，你愿意来当然好。先把需要带的东西收拾好，等大家准备齐了就出发。']])
  },{feast:{stage:['feast'],next:'escape',title:'江夏夜宴',sceneId:'market-street',count:3,guest:'liubei'},front:{stage:['escape','front'],next:'road',title:'府门突围',sceneId:'city-river',count:4,guest:'liubei'},road:{stage:['road'],next:'return',title:'江夏接应',sceneId:'rural-road',count:4,guest:'liubei'}},{viaCourt:true});
  if(typeof module!=='undefined'&&module.exports)module.exports=true;
@@ -8690,72 +8690,72 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  K.landmark('north-tribe','北地部落','jinyang',-58,-42);K.landmark('shanyue','山越林地','wuling',38,48);K.landmark('bagua-stones','八卦石阵','yiling',-42,42);
  R('zhouyu','焦尾余音',{
   rumor:S('jianye','与周瑜聊聊失散的古琴','zhouyu',[
-   ['npc','子敬来信说，你们帮他把粮食送到了。我这里还有一件事想托你留意：一张从洛阳流出来的古琴，琴尾被火烧过，你们在外面有没有听人提起？'],['hero','你说的是焦尾琴？这个名字我听过，可没想到它也会落到外面。你知道现在是谁拿着吗？'],['npc','原来是蔡家收藏的，战乱以后就找不到了。最近有人说在北边见过，我想试着找回来，等遇到蔡家的人，也能替他们留住一件旧物。']],[N('到邺城打听古琴下落','inquiry',{requires:{recruits:{wu:3}}})]),
+   ['npc',"子敬信里提过诸位，护粮之事，多谢了。还有一件私事想托你留心：洛阳散出一张古琴，琴尾焦黑，可曾听说？"],['hero',"焦尾琴？我听过这名字。战乱里竟还在？现下落到谁手上了？"],['npc',"先前在蔡家，洛阳乱后便失了踪迹。近来传闻北地有人收着。若能寻回，等遇着蔡家故人，也算为他家存下一件旧物。"]],[N('到邺城打听古琴下落','inquiry',{requires:{recruits:{wu:3}}})]),
   inquiry:S('ye','向北地行商打听焦尾琴','book-dealer',[
-   ['npc','我见过那张琴，外面包着旧绢，琴尾确实有烧过的痕迹。后来让一个往晋阳去的客人买走了，他好像住在北地部落。'],['hero','那个人是做买卖的，还是自己喜欢这张琴？我们过去以后，还能不能从他手里买回来？'],['npc','看着不像商人，他抱着琴很小心。我也没问他的打算，你们到部落里找管马场的主人问问，应该能找到。']],[N('前往北地部落','tribe')]),
+   ['npc','我见过那张琴，外面包着旧绢，琴尾确实有烧过的痕迹。后来让一个往晋阳去的客人买走了，他好像住在北地部落。'],['hero',"买琴的是什么人？若是珍爱这琴，只怕不肯转手吧。"],['npc','看着不像商人，他抱着琴很小心。我也没问他的打算，你们到部落里找管马场的主人问问，应该能找到。']],[N('前往北地部落','tribe')]),
   tribe:S('north-tribe','与部落主人商议古琴的去处','stable-master',[
-   ['npc','琴在我这里，只是我们都不会弹，放久了也是可惜。你说周公瑾认得它，那我愿意转给他，不过当时买琴的花费，还得请你们帮我补上。'],['hero','这是应该的。你说个合适的价钱吧，要是还有别的事情需要我们帮忙，也可以一起商量。'],['npc','价钱我已经跟管事说了。要是你们带的钱不够，也可以陪我的人切磋一场，他们见到远来的朋友，总想比比本事。']],[N('以五百文赎回古琴','return',{price:500,effects:{items:{'jiaowei-qin':1}}}),F('应下比试','trial')]),
+   ['npc','琴在我这里，只是我们都不会弹，放久了也是可惜。你说周公瑾认得它，那我愿意转给他，不过当时买琴的花费，还得请你们帮我补上。'],['hero',"花费我们补。还请说个价，路这么远来了，总不能白叫你割爱。"],['npc','价钱我已经跟管事说了。要是你们带的钱不够，也可以陪我的人切磋一场，他们见到远来的朋友，总想比比本事。']],[N('以五百文赎回古琴','return',{price:500,effects:{items:{'jiaowei-qin':1}}}),F('应下比试','trial')]),
   return:S('jianye','将焦尾琴交给周瑜','zhouyu',[
-   ['npc','就是这张，你看琴尾修补的地方，我以前见过。还好琴身没有裂，换好弦以后应该就能弹了。你们这么远跑一趟，实在辛苦。'],['hero','能找对就好。一路上我们都怕磕坏它，连放上车都要多垫一层布。等公瑾修好了，也弹一段给我们听听吧。'],['npc','当然可以。我先把弦调好，你们进屋喝点茶，今晚就在这里歇着，我也想听听你们在北边遇到了什么事。']],[N('与周瑜商议同行','freed')]),
+   ['npc',"是它。这里的补痕，我认得……还好，琴身未裂，换弦便可。诸位远行一趟，公瑾在此谢过。"],['hero',"一路垫了好几层布，总算没磕坏。公瑾，调好弦，可得让我们听听它的声音。"],['npc',"自然。先入内饮茶，今晚便宿在此处。北地的路这么远，你们也有许多事可讲，我正想听。"]],[N('与周瑜商议同行','freed')]),
   freed:End('zhouyu','jianye',[['npc','城里的事务已经交代给主簿了，我想跟你们一起出去。一直坐在这里等消息，有些事情总不如亲自去看，顺便也能帮你们找找人。'],['hero','我们欢迎。琴就先留在府里吧，往后还要赶路，带着它确实不好照顾，回来再听你弹。']])
  },{trial:{stage:['tribe','trial'],next:'return',title:'北地比试',sceneId:'farmland',count:3,enemyKind:'bandit',effects:{items:{'jiaowei-qin':1}}}},{viaCourt:true});
  R('huanggai','武陵山路',{
   rumor:S('wuling','与准备进山的黄盖交谈','huanggai',[
-   ['npc','山里已经有几拨人没回来了。这伙人以前只抢货，如今连采药的乡民也抓，家里人等得着急，我准备亲自进去找找。'],['hero','我们跟你一起去。山里的岔路多，有没有熟悉道路的人能带路？免得人还没找到，我们先走散了。'],['npc','子明熟悉那片山，前几天却自己跑了进去，也没回来。到了林口先找他的踪迹，看见有人招手也别急着跟，先分清是不是他。']],[N('随黄盖进入林地','entrance')]),
+   ['npc','山里已经有几拨人没回来了。这伙人以前只抢货，如今连采药的乡民也抓，家里人等得着急，我准备亲自进去找找。'],['hero',"我们随行。山路可有人认得？进了岔口，再找人就难了。"],['npc',"子明熟路，偏又一人进山，几日未归。到林口先找他的足迹，远处有人招手也别贸然跟，贼惯会引人。"]],[N('随黄盖进入林地','entrance')]),
   entrance:S('shanyue','穿过有毒烟的林口','huanggai',[
-   ['npc','大家把口鼻遮住，先停在高处！沟里有人在放烟，下面看不清路。去叫住后面的乡兵，别再让他们往沟里走了。'],['hero','我看见放烟的人了，就在那片石头后面。我们从上面绕过去，先拦住他，不能让烟继续往沟里灌。']],[F('打开林口','entrance')]),
+   ['npc',"掩住口鼻，停在坡上！沟里有烟。去拦住后队，谁也不许再下去！"],['hero',"石头后头有人添草！我从坡上绕过去，别让他再点了。"]],[F('打开林口','entrance')]),
   rescue:S('shanyue','救出被困的吕蒙和乡民','lvmeng',[
-   ['npc','公覆将军，我在这里！后面的木棚还关着几个乡亲，门从外面锁了，我受了伤，实在打不开。'],['huanggai','听见了，你先过来，别再拿那条伤胳膊硬撑。人既然找到了，我们会把他们一起带出去，你不用再往棚子里钻。'],['hero','我去把木棚的门打开。你们帮忙守着这条路，里面如果有人走不动，就先扶到桥边等。']],[F('救出被扣的乡民','rescue')]),
+   ['npc','公覆将军，我在这里！后面的木棚还关着几个乡亲，门从外面锁了，我受了伤，实在打不开。'],['huanggai',"子明，先过来！伤成这样还扯门？后头的人交给我们，你站到桥边去。"],['hero',"我开棚门，劳诸位守路！走不动的扶到桥边，别催他们跑。"]],[F('救出被扣的乡民','rescue')]),
   retreat:S('shanyue','护送伤者退出山越林地','huanggai',[
-   ['npc','乡亲们都出来了，你们扶着伤者先走。我在这里看着，等最后一个人过桥再跟上。'],['hero','这座桥太窄，真有人追来，你一个人不好退。我们一起留下，等伤者过完桥，再一起走。']],[F('护住归路','retreat')]),
+   ['npc','乡亲们都出来了，你们扶着伤者先走。我在这里看着，等最后一个人过桥再跟上。'],['hero',"桥窄，一个人留这儿，待会儿怎么退？我们也留下，过完最后一个再走。"]],[F('护住归路','retreat')]),
   return:S('wuling','将吕蒙与乡民交给医者','huanggai',[
-   ['npc','郎中，先看看子明的胳膊。他在山里耽误了好几天，刚才还一直说自己没事，我看他连手都抬不起来了。'],['hero','其他人也都送到城里了。我让人去通知他们的家里，晚些就有人来接，今晚大家都能有地方歇着。']],[N('与黄盖商议去留','freed',{effects:{rest:true}})]),
+   ['npc',"郎中，先瞧子明这条胳膊。在山里拖了好几日，他还说无妨！手都抬不起来了。"],['hero',"乡亲都进城了，我已托人叫家眷来接。今晚有屋可住，不必再赶路。"]],[N('与黄盖商议去留','freed',{effects:{rest:true}})]),
   freed:End('huanggai','wuling',[['npc','山口我已经安排了人巡查，乡亲们再进山采药，也能放心些。你们要是还往外走，带上我吧，在这里等消息，我反倒坐不住。'],['hero','那就一起走。我们在山里能平安出来，多亏你熟悉情况，以后路上也请你多照应大家。']])
  },{entrance:{stage:['entrance'],next:'rescue',title:'山越林口',sceneId:'forest-path',count:3,enemyKind:'bandit',guest:'huanggai'},rescue:{stage:['rescue'],next:'retreat',title:'林中救人',sceneId:'bandit-camp',count:4,enemyKind:'bandit',guest:'huanggai',effects:{flags:{lvmengSaved:true},stages:{lvmeng:'study'}}},retreat:{stage:['retreat'],next:'return',title:'山路断后',sceneId:'forest-path',count:4,enemyKind:'bandit',guests:['huanggai','lvmeng']}});
  R('lvmeng','吴下读书',{
   rumor:S('wuling','向吕家大娘询问吕蒙的下落','village-aunt',[
-   ['npc','吕蒙听说有人被扣在山里，拿了剑就出门。我让他多找几个人，他说怕乡亲们出事，连饭都没顾上吃就走了。'],['hero','大娘先别着急，黄将军也准备去救人，我们这就去找他。见到吕蒙以后，会先把人带回来给你报个平安。']],[N('先协助黄盖救人','waiting',{effects:{stages:{huanggai:'rumor'}}})]),
+   ['npc','吕蒙听说有人被扣在山里，拿了剑就出门。我让他多找几个人，他说怕乡亲们出事，连饭都没顾上吃就走了。'],['hero',"大娘，黄将军也正寻他，我们去找将军一道入山。见了吕蒙，头一件便叫人回来报信。"]],[N('先协助黄盖救人','waiting',{effects:{stages:{huanggai:'rumor'}}})]),
   waiting:S('wuling','协助黄盖，从山越林地救出吕蒙','village-aunt',[
    ['npc','黄将军已经来过了，说找到吕蒙就马上送回来。我在这里等着，你们进山也要小心，别为了赶路把自己也搭进去。']],[N('得知吕蒙已平安后再谈','study',{requires:{flags:{lvmengSaved:true}}})]),
   study:S('wuling','听吕蒙说起进山的经过','lvmeng',[
-   ['npc','我以为路熟，进去就能把人带出来。谁知道他们在沟里放了烟，我连退回来的路都看不清，这才知道自己想得太简单了。'],['hero','公覆将军也是担心你，才劝你多看看兵书。以后去救人，不能只认得路，还得想想对方会把人藏在哪里、准备怎么拦我们。'],['npc','我想学，就是有些字认不全，自己看书很费劲。你愿不愿意陪我到书摊找找？我有不懂的地方，也能跟你请教。']],[N('陪吕蒙寻书','books')]),
+   ['npc',"路是熟的，烟一起，什么也瞧不见。我还以为凭着这把剑，进去就能带人出来……倒叫黄将军来救。"],['hero',"难怪公覆劝你读兵书。认路，和看出人家设的圈套，终究不是一回事。"],['npc',"我也想读。可有些字不识，自己猜，越看越糊涂。你能陪我去趟书摊吗？问起人来，多少也壮些胆。"]],[N('陪吕蒙寻书','books')]),
   books:S('wuling','向书贩借阅三部兵书','book-dealer',[
-   ['npc','这三部我都有，《孙子兵法》《黄石兵书》《六韬》。你想认真读，我可以先借给你，包好带回去，看完再还就行。'],['lvmeng','我会好好保管的。遇到不认识的字，能不能记下来回来问你？我不想随便猜一个意思，反而把书读错了。']],[N('借书研读，再到教场试演','practice')]),
+   ['npc','这三部我都有，《孙子兵法》《黄石兵书》《六韬》。你想认真读，我可以先借给你，包好带回去，看完再还就行。'],['lvmeng',"我包好了带回去。不认得的字，我能记下再来问你吗？胡乱猜了，怕把兵书读反。"]],[N('借书研读，再到教场试演','practice')]),
   practice:S('wuling-county','陪吕蒙试演读过的阵势','lvmeng',[
-   ['npc','刚才读到的那段，我想在这里试试。这回我先看清他们怎么站，你们帮我守着侧面，别让我一看有人退就急着追。'],['hero','可以，我们陪你练。哪里没配合好，打完再慢慢说，不用急着一次就全学会。']],[F('试演阵势','practice')]),
+   ['npc',"方才读的那段，我想试试。这回先看他们布阵，你们替我护住侧面。我若又追远，叫住我！"],['hero',"成。练错了便停下重来，这回没人等着抢药车，咱们有工夫。"]],[F('试演阵势','practice')]),
   freed:End('lvmeng','wuling',[['npc','这些书我会带着继续读。你们以后出去，能不能也带上我？我想跟大家一起做事，遇到不懂的地方也有人能问。'],['hero','当然可以。路上也有很多我们拿不准的事情，到时候大家一起想办法，不用担心问得多。']])
  },{practice:{stage:['practice'],next:'freed',title:'武陵演阵',sceneId:'farmland',count:3,enemyKind:'bandit'}});
  R('luxun','石阵困客',{
   rumor:S('bagua-stones','与被困在石阵中的陆逊交谈','luxun',[
-   ['npc','你们先停一下，别顺着我的脚印走！我已经绕回来三次了，每次都走到这块石头旁边，里面的路肯定有问题。'],['hero','你是怎么进来的？困在这里多久了，身上还有没有水和吃的？'],['npc','天刚亮就进来了，本来只是想看看这些石柱。柱上刻着孔明先生的名字，我试了半天也没找到机关，你们能不能替我到成都问问他？']],[N('前往成都请教','master'),N('请同行的诸葛亮指路','freed',{requires:{partyAny:['zhugeliang']}})]),
+   ['npc','你们先停一下，别顺着我的脚印走！我已经绕回来三次了，每次都走到这块石头旁边，里面的路肯定有问题。'],['hero',"困了多久？水还够吗？别急着走，先说你从哪边进的。"],['npc',"清早进的，本想看一看石柱，竟绕到如今。柱上有孔明先生的题字，我却找不到机关。能否代我去成都问一问？"]],[N('前往成都请教','master'),N('请同行的诸葛亮指路','freed',{requires:{partyAny:['zhugeliang']}})]),
   master:S('chengdu','向诸葛亮请教石阵的出口','zhugeliang',[
-   ['npc','原来有人困在那座石阵里。那是我以前教学生辨认方向时布置的，出口就在南边。中间的石柱要先移开两侧，不能直接往前推。'],['hero','明白了，我回去按你说的试试。他从早上困到现在，水也快喝完了，我们得尽快把人带出来。']],[N('回石阵开启机关','puzzle')]),
+   ['npc','原来有人困在那座石阵里。那是我以前教学生辨认方向时布置的，出口就在南边。中间的石柱要先移开两侧，不能直接往前推。'],['hero',"记住了，两侧先移，再开南路。他快断水了，我这便回去。"]],[N('回石阵开启机关','puzzle')]),
   puzzle:S('bagua-stones','移动石柱，打开石阵出口','luxun',[
    ['npc','你说的南边旧路，我已经找到了，只是被这几块石柱挡着。你在外面看得清，帮我看看应该先挪哪块，我照着动。']],[N('开启石阵机关','freed',{puzzle:true})],{puzzleTitle:'八卦石阵'}),
   freed:End('luxun','bagua-stones',[['npc','总算出来了。刚才明明离出口那么近，我却怎么都绕不到。多谢你们替我跑这一趟，有机会请到建业坐坐，我一定好好招待。'],['hero','我们本来就准备去建业。你要是没有别的安排，也可以跟我们一起走，路上还能聊聊你是怎么找到这座石阵的。']])
  });
  R('sunshangxiang','江东弓影',{
   rumor:S('jianye','与孙尚香商议同行','sunshangxiang',[
-   ['npc','听说你们要四处走访？我正想去柴桑，渡口有一批乡民要接过来，兄长总怕我遇到危险，不肯让我自己去。'],['hero','那我们一起去。路上如果碰见麻烦，先跟大家商量，别一个人追出去，其他人来不及跟上也会着急。'],['npc','我知道啦，不会把你们丢在后面的。真要去追什么人，我先告诉你，咱们一起决定，总可以了吧？']],[N('一同前往柴桑','dock')]),
+   ['npc','听说你们要四处走访？我正想去柴桑，渡口有一批乡民要接过来，兄长总怕我遇到危险，不肯让我自己去。'],['hero',"我们也要走水路，一起去吧。真有险处，彼此还能照应。"],['npc',"那可说定了！兄长问起，你替我说一句，是随你们接人，不是偷溜出去玩的。"]],[N('一同前往柴桑','dock')]),
   dock:S('chaisang','帮助孙尚香接应渡口乡民','sunshangxiang',[
-   ['npc','先别把兵器收起来，你看最后那条船！上面的人把船夫推开了，旁边还站着几个带刀的，那不是来接乡亲的船。'],['hero','我看见了。先把岸上的乡亲送进屋里，等那条船靠岸，我们再过去，别在码头中间跟他们打起来。']],[F('保住渡船','dock')]),
+   ['npc','先别把兵器收起来，你看最后那条船！上面的人把船夫推开了，旁边还站着几个带刀的，那不是来接乡亲的船。'],['hero',"带刀的我也瞧见了。岸上的人先回屋，等船靠稳再上，别挤在码头。"]],[F('保住渡船','dock')]),
   spar:S('jianye','应下孙尚香的切磋','sunshangxiang',[
    ['npc','渡口的事情办好了，我还想跟你切磋一下。刚才一路都听你安排，这回也让我看看，你自己到底有多少本事。'],['hero','可以，咱们找个空地方比一场，不过说好了，不要受伤。以后要一起赶路，也该熟悉一下彼此的招式。']],[F('点到为止','spar')]),
   freed:End('sunshangxiang','jianye',[['npc','跟你们一起做事，比我自己出门放心多了。你们要是还缺人，我想继续跟着；暂时不方便的话，我就在建业等你们回来。'],['hero','我们会记着的。你先把自己的事情安排好，准备出发的时候，我们再来找你一起走。']])
  },{dock:{stage:['dock'],next:'spar',title:'柴桑渡船',sceneId:'river-dock',count:4,enemyKind:'bandit',guest:'sunshangxiang'},spar:{stage:['spar'],next:'freed',title:'江东切磋',sceneId:'farmland',duel:'sunshangxiang',acceptDefeat:true}});
  R('sunquan','柴桑解围',{
   rumor:S('jianye','向周瑜询问孙权的消息','zhouyu',[
-   ['npc','柴桑的信已经断了几天。主公正在那边安置流民，袁术和严白虎却把人围在城外，连运人的船都不肯放过。'],['hero','我们过去看看。他们既然是两路人，总不可能什么事情都商量好了，也许能找到办法把人接出来。'],['npc','我也是这么想的。这里有几封之前送来的军报，你们带上，到了以后先看清他们驻扎的位置，不要直接冲进围兵中间。']],[N('赶往柴桑','plan',{requires:{recruits:{wu:5}}})]),
+   ['npc','柴桑的信已经断了几天。主公正在那边安置流民，袁术和严白虎却把人围在城外，连运人的船都不肯放过。'],['hero',"两路人互相提防吧？我们去看一看，兴许有空当能接人。"],['npc',"他们素不相合。旧军报在此，驻地都标着。先查换防，不宜径闯大营。"]],[N('赶往柴桑','plan',{requires:{recruits:{wu:5}}})]),
   plan:S('chaisang','与孙权商议解围之策','sunquan',[
-   ['npc','你们能进城，真是帮了大忙。袁术和严白虎的人彼此防着，却都不肯放我们的船走。城里每天都有人来问，什么时候才能送家人离开。'],['hero','先别急，我们陪你把城外的布置看一遍。既然他们互相提防，就有可能只顾自己，顾不上替另一边拦人。']],[{label:'商议出城接应',routes:[{if:{partyAny:['zhouyu','luxun','lusu']},next:'rift'},{if:{},next:'ambush'}]}]),
+   ['npc','你们能进城，真是帮了大忙。袁术和严白虎的人彼此防着，却都不肯放我们的船走。城里每天都有人来问，什么时候才能送家人离开。'],['hero',"他们若真同心，也就不会互防了。我们再查一遍营地，看哪一边能借道。"]],[{label:'商议出城接应',routes:[{if:{partyAny:['zhouyu','luxun','lusu']},next:'rift'},{if:{},next:'ambush'}]}]),
   rift:S('chaisang','趁两路敌军争执时接应船只','sunquan',[
-   ['npc','探子刚回来，说他们因为分粮吵起来了，南边撤走了不少人。我们趁今晚把乡亲送上船，再从北门接应，不能等他们重新把路封上。'],['hero','我带人守着上船的那条路。你安排乡亲分批过来，带孩子和有伤的先走，最后再让护卫撤出来。']],[F('击破围城军','rift')]),
+   ['npc','探子刚回来，说他们因为分粮吵起来了，南边撤走了不少人。我们趁今晚把乡亲送上船，再从北门接应，不能等他们重新把路封上。'],['hero',"上船这段我守着。伤者和带孩子的先来，护卫留在最后，分批走，别挤。"]],[F('击破围城军','rift')]),
   ambush:S('chaisang','护住中伏的江东守军','sunquan',[
    ['npc','快让前面的人退回来！营地里是空的，弓手藏在两边的芦苇里，大家散开，别全挤在路中央！'],['hero','我带人去扶后面的伤兵，你先守住路口。等他们都退过来了，我们再往岸边走，不能把伤者留在那里。']],[F('接回守军','ambush')]),
   retreat:S('chaisang','突破追到江岸的敌军','sunquan',[
-   ['npc','乡亲们已经上船，后面只剩一辆车和护送的人。你们先往岸边靠，我去看看车轮是不是卡住了，别让他们落下。'],['hero','我们陪你一起过去。车上还有伤者，等把车推到岸边，再一起上船，不用急着分开走。']],[F('守住江岸','retreat')]),
+   ['npc','乡亲们已经上船，后面只剩一辆车和护送的人。你们先往岸边靠，我去看看车轮是不是卡住了，别让他们落下。'],['hero',"我们帮你推车。伤者抬稳些，到了岸边再分人上船。"]],[F('守住江岸','retreat')]),
   return:S('jianye','护送孙权回到建业','sunquan',[
-   ['npc','渡口已经有人来迎接了，乡亲们的住处也在安排。管事问，等大家休息好了，能不能请你们一起吃顿饭，当面说声谢谢。'],['hero','吃饭的事晚些再说，大家一路都没睡好，先让他们住下来吧。孙将军也去歇一会儿吧，码头这边我们还能帮着看。']],[N('与孙权商议下一步','freed',{effects:{rest:true,flags:{sunquanSafe:true}}})]),
+   ['npc','渡口已经有人来迎接了，乡亲们的住处也在安排。管事问，等大家休息好了，能不能请你们一起吃顿饭，当面说声谢谢。'],['hero',"这顿饭先记着。大家一夜没合眼，住下来再吃不迟。孙将军也歇歇，渡口还有我们。"]],[N('与孙权商议下一步','freed',{effects:{rest:true,flags:{sunquanSafe:true}}})]),
   freed:End('sunquan','jianye',[['npc','城里我已经安排好了，接下来想跟你们出去走走。你们替江东跑了这么多地方，我也该亲自去了解大家遇到的麻烦，不能总等别人送信来。'],['hero','那我们一起出发。路上正好商量一下洛阳的事情，也看看还有没有愿意跟我们一起做事的人。']])
  },{rift:{stage:['rift'],next:'return',title:'柴桑解围',sceneId:'river-dock',named:[['yuanshu',10,'back'],['yanbaihu',10,'front']],guest:'sunquan'},ambush:{stage:['ambush'],next:'retreat',title:'柴桑伏兵',sceneId:'forest-path',count:4,guest:'sunquan'},retreat:{stage:['retreat'],next:'return',title:'江岸断后',sceneId:'river-dock',count:5,guest:'sunquan'}},{viaCourt:true});
  if(typeof module!=='undefined'&&module.exports)module.exports=true;
@@ -8776,7 +8776,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   gift:S('luoyang','将赤兔带到温侯府','lvbu',[
    ['npc','真的是赤兔！我找了这么久，没想到是你们把它送来。先进来坐，我让人去准备水和草料，这一路没出什么事吧？'],['hero','马和看马的孩子都找回来了。马场主人说它还没认主，你先别急着骑，让它在这里熟悉几天，免得受惊伤人。'],['npc','我养过不少马，知道该怎么照顾它。你们帮了这么大的忙，这块令牌拿着吧，下次进来找我，给门口的人看就行。']],[N('与吕布聊聊洛阳近况','worry',{effects:{items:{'lvbu-token':1},flags:{redRabbitGift:true}}})]),
   worry:S('luoyang','听吕布说起董卓近日的反常','lvbu',[
-   ['npc','太师这几天像换了个人。昨天才答应给百姓放粮，今天却叫人去烧城外的粮仓。我去问个明白，守卫竟然连门都不让我进。'],['hero','你手下的将士也收到这些命令了吗？他们跟你这么久，应该也不愿意做这种事吧？'],['npc','他们当然不愿意，已经有好几个人来问我该怎么办。我想带他们离开，又不能叫他们出了城连住处都没有，这件事一直没安排好。']],[N('去天香阁找貂蝉商议','waiting',{effects:{stages:{diaochan:'request'}}})]),
+   ['npc','太师这几天像换了个人。昨天才答应给百姓放粮，今天却叫人去烧城外的粮仓。我去问个明白，守卫竟然连门都不让我进。'],['hero',"这令也发到你军里了？弟兄们怎么说？"],['npc',"都不肯干，几个老兵围着我问怎么办。我能带他们出城，可城外呢？跟我走的，还有妻儿老小，不能叫他们露宿荒野。"]],[N('去天香阁找貂蝉商议','waiting',{effects:{stages:{diaochan:'request'}}})]),
   waiting:S('luoyang','与貂蝉商议如何劝说吕布','palace-steward',[
    ['npc','吕将军在后院等着。你们如果已经跟貂蝉姑娘谈好了，就请她一起过来，我会把旁边的人支开，让你们能好好说话。']],[N('得知两人决定后再会','freed',{requires:{flags:{lvbuConvinced:true}}})]),
   freed:End('lvbu','xinye',[['npc','新野的住处不大，弟兄们倒都睡得踏实。人已经安顿好了，我也能出门。你们要去洛阳对付董卓的话，记得来叫我，我还有话想亲自问他。'],['hero','我们会来找你的。你也不用急着马上赶路，先把大家安顿好，准备好了再一起出发。']])
@@ -8794,26 +8794,26 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  },{},{visibility:{any:[{flags:{redRabbitGift:true}},{chapterComplete:true}]}});
  R('huatuo','青囊药方',{
   rumor:S('xiangyang-county','询问华佗缺少的药材','huatuo',[
-   ['npc','我在试配一种药，想让病人治伤的时候不那么疼。托出去采药的人却一直没回来，药没送到还是小事，我担心他们在路上遇到了麻烦。'],['hero','我们可以去找。你先把他们去的地方和样子告诉我，找到以后，我们把人和药一起带回来，再请你看看药材有没有用。'],['npc','有一拨去了北海，另一拨在华山。路上如果出了事，先照顾人，药材可以重新采，别为了几个药篮让人受伤。']],[N('前往北海寻找采药人','north')]),
+   ['npc',"我在试一种止痛的药，配方还缺几味。采药的去了许久，连个信也没送回。药倒不急，我怕是人出了事。"],['hero',"几人，什么衣着，往哪儿走？先生细说，我记下，沿路找一找。"],['npc',"一拨去北海，一拨去华山。若遇上险事，先带人回来。药生在山里，来年还能再采，人可不能再长一回。"]],[N('前往北海寻找采药人','north')]),
   north:S('beihai-county','找回被扣在林口的采药人','herbalist',[
-   ['npc','药篮被那伙人抢了，同来的几个人也还困在那边。我躲在这里不敢过去，里面还有别人托我带回家的药，真不知道该怎么办。'],['hero','你先到路边歇着，伤口别再碰了。我们过去把你同伴接出来，也会看看药篮在哪里，能带回来就一起带回来。']],[F('护住采药人','north')]),
+   ['npc','药篮被那伙人抢了，同来的几个人也还困在那边。我躲在这里不敢过去，里面还有别人托我带回家的药，真不知道该怎么办。'],['hero',"别再碰伤口了，你到路边等。我们进去找人，药篮若在，也一并带出来。"]],[F('护住采药人','north')]),
   mountain:S('huashan','接应华山的采药人','herbalist',[
-   ['npc','药已经采到了，可下山的路被人堵住。他们说收路钱，后来又要连药篮一起拿走，我实在不敢再往前走了。'],['hero','你带着药先退到宽一点的地方，别站在坡边跟他们争。我们过去说说，要是他们不肯让路，再想办法带你下山。']],[F('清出下山的路','mountain')]),
+   ['npc','药已经采到了，可下山的路被人堵住。他们说收路钱，后来又要连药篮一起拿走，我实在不敢再往前走了。'],['hero',"带着药往宽处退，别站坡边。我们去见见这几位收路钱的。"]],[F('清出下山的路','mountain')]),
   mix:S('xiangyang-county','将药篮送回，协助华佗试制药散','huatuo',[
-   ['npc','采药的人都回来了，我这才放心。药材看着也保存得很好，你们帮我把桌面腾出来，我要分开放，再核对一下分量。'],['hero','我来帮你记。每一种药用了多少、病人有什么反应，都需要写下来吧？你说慢一点，我好一条条记清楚。'],['npc','对，药量和病人多久醒来，都要记清楚。以后别的大夫照着方子用药，全靠这些记录，哪一处拿不准，我们就再试，不能省略。']],[N('协助华佗整理药方','freed',{effects:{flags:{mafeisanReady:true},rest:true}})]),
+   ['npc',"人齐了？齐了便好。药也裹得干爽，没有坏。来，腾张桌子，我一味一味分。"],['hero',"笔纸在这儿。哪味多少，多久见效，先生报一声，我记。"],['npc',"还得记醒来的时辰。后人照这方子用药，差一味、差一钱都可能出事。有疑处留白，不能猜着填。"]],[N('协助华佗整理药方','freed',{effects:{flags:{mafeisanReady:true},rest:true}})]),
   freed:End('huatuo','xiangyang-county',[['npc','方子已经抄好，医馆里也留了一份。我想跟你们去各地看看，遇到不同的病人，也能多学些东西，不想总靠别人送信来问。'],['hero','我们很欢迎。一路上常有人受伤，也有村民想找大夫，能有你同行，他们就不用再拖着病四处找医馆了。']])
  },{north:{stage:['north'],next:'mountain',title:'北海药篮',sceneId:'forest-path',count:3,enemyKind:'bandit'},mountain:{stage:['mountain'],next:'mix',title:'华山采药',sceneId:'forest-path',count:4,enemyKind:'bandit'}});
  R('menghuo','南中七会',{
   rumor:S('nanman','与拦在寨口的孟获交涉','menghuo',[
-   ['npc','你们也是北边来的？先别往寨子里走！前几天才来过一群人，说借个地方歇脚，转头就把粮仓里的东西抢了。'],['hero','我们是路过这里，不是来抢东西的。你先让身后的人站远一点，老人和孩子都在旁边，有什么疑问，我们可以慢慢说。'],['npc','他们上次也这么说！我现在谁也不信。你们真有本事，就先跟我比一场，别只会站在这里说好听的。']],[F('在寨口接下挑战','first')]),
+   ['npc','你们也是北边来的？先别往寨子里走！前几天才来过一群人，说借个地方歇脚，转头就把粮仓里的东西抢了。'],['hero',"没带车，没带粮袋，只有我们几个赶路的。让老人孩子退开些，有话你跟我讲。"],['npc','他们上次也这么说！我现在谁也不信。你们真有本事，就先跟我比一场，别只会站在这里说好听的。']],[F('在寨口接下挑战','first')]),
   elder:S('nanman','向寨老询问部落中的病症','southern-elder',[
-   ['npc','你们别怪他这么着急。寨里很多人又冷又热，躺了好几天，粮食还被外面的人扣着，他一见生人就怕又出了事。'],['hero','病了多久，附近还有别的村子出现这种情况吗？我认识华大夫，可以把你们说的情况告诉他，请他过来看看。'],['npc','那太好了，我们自己也说不清这是什么病。我去把哪家有人生病、病了几天都记下来，你带给大夫看看。']],[N('再与孟获谈谈病人的事','second')]),
+   ['npc','你们别怪他这么着急。寨里很多人又冷又热，躺了好几天，粮食还被外面的人扣着，他一见生人就怕又出了事。'],['hero',"病了几日？附近寨子有没有？我认得华大夫，记下病情去请他来。"],['npc','那太好了，我们自己也说不清这是什么病。我去把哪家有人生病、病了几天都记下来，你带给大夫看看。']],[N('再与孟获谈谈病人的事','second')]),
   second:S('nanman','说服孟获让医者入寨','menghuo',[
    ['npc','寨里有人说，病就是外面的人带进来的。我不懂治病，也不敢随便放人进去，你们总得让我知道，是真的愿意留下来帮忙。'],['hero','我们既然答应去请大夫，就不会说完就走。你要比试，我们可以陪你，但别堵在病人门口，到外面的空地上说。']],[F('接下第二场挑战','second')]),
   third:S('nanman-woods','击退拦在请医路上的孟获','menghuo',[
    ['npc','事情还没说清楚，你们怎么就准备出寨了？不是说要留下帮忙吗？'],['hero','我们得出去请华大夫，他不会自己知道这里有人生病。你再拦着，今天就走不了多远了，不如早点让我们去，把大夫接来。']],[F('打开请医的路','third')]),
   doctor:S('xiangyang-county','请华佗前往南中诊病','huatuo',[
-   ['npc','这些症状我听明白了，但只听人转述，还不能随便开药。我跟你们亲自去一趟，先等我把药箱收拾好，路上再把细节告诉我。'],['hero','寨里的老人把病人的住处都记下来了，我们带着这份记录去，到了就能先看最严重的几家，不用再耽误时间。']],[N('护送华佗前往南中','fourth')]),
+   ['npc',"寒热交作……得看过才知。我取药箱，随你们入寨。路上再说病情，莫漏了头几日的症状。"],['hero',"寨老把各家病了几日都记下了。先生带着，到了好从最重的几户看起。"]],[N('护送华佗前往南中','fourth')]),
   fourth:S('nanman','护住随行医者进入部落','menghuo',[
    ['npc','华先生请先进去，我已经叫人把病人接到宽敞的屋子里了。至于我们两个，我还是想再比一场，上次输得太快，心里不服气。'],['huatuo','你们要切磋就点到为止，别弄出新伤。我先帮有伤的人包扎，比完了也别急着走，还有事情要请你们帮忙。']],[F('护住药箱','fourth')]),
   treatment:S('nanman','协助华佗照料患病的乡民','huatuo',[
@@ -8828,28 +8828,28 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  },{first:{stage:['rumor','first'],next:'elder',title:'南中初会',sceneId:'farmland',named:[['menghuo',10]]},second:{stage:['second'],next:'third',title:'寨外再会',sceneId:'forest-path',named:[['menghuo',10]]},third:{stage:['third'],next:'doctor',title:'药林拦路',sceneId:'forest-path',named:[['menghuo',10]]},fourth:{stage:['fourth'],next:'treatment',title:'护医入寨',sceneId:'farmland',named:[['menghuo',10]],guest:'huatuo'},fifth:{stage:['fifth'],next:'sixth',title:'南中第五会',sceneId:'farmland',named:[['menghuo',10]]},sixth:{stage:['sixth'],next:'seventh',title:'南中第六会',sceneId:'forest-path',named:[['menghuo',10]]},seventh:{stage:['seventh'],next:'freed',title:'南中第七会',sceneId:'farmland',named:[['menghuo',10]]}});
  R('zhangjiao','巨鹿祈雨',{
   rumor:S('julu','向巨鹿乡民询问旱情','village-aunt',[
-   ['npc','井里的水比昨天还少，田里的庄稼也快晒死了。我们听说张角先生能帮忙，派人去营里请，可到现在还没有等到回信。'],['hero','我认识张先生，这就替你们去问问。剩下的水先省着用，别把喝的也拿去浇田，家里人受不了的。']],[N('回营向张角求助','camp')]),
+   ['npc','井里的水比昨天还少，田里的庄稼也快晒死了。我们听说张角先生能帮忙，派人去营里请，可到现在还没有等到回信。'],['hero',"我认得张先生，替你去问。井水先留着喝，田里的事等我带信回来，再一起想办法。"]],[N('回营向张角求助','camp')]),
   camp:S('camp','与张角商议巨鹿旱情','zhangjiao',[
-   ['npc','巨鹿的情况我已经听说了，正准备过去。书里有个祈雨的法子，我想试试。符纸和法子我备好了，还缺清香和一只海螺，要请你帮着找找。'],['hero','我去附近问问。营里也安排些人先过去吧，井要加深，沟渠要清，不管雨能不能求来，这些事情都得有人做。'],['npc','我已经在安排了，让三弟带人先去帮忙。你找到东西以后直接到巨鹿，我们在那里等你，不用再绕回营地。']],[N('到许家村借清香','incense',{effects:{items:{'rain-paper':3}}})]),
+   ['npc',"巨鹿正待雨，我也在备祈雨之法。符纸齐了，还缺清香与一只海螺，能否替我寻来？"],['hero',"我去借。井和渠也得派人修，不然即使下雨，水也存不住。"],['npc',"三弟已带人去了。东西一齐，你直赴巨鹿，不必回营绕路，我们在那儿会合。"]],[N('到许家村借清香','incense',{effects:{items:{'rain-paper':3}}})]),
   incense:S('xujia','向守庙老人借一束清香','temple-keeper',[
-   ['npc','庙里还有香，你拿去吧。也替我跟巨鹿的乡亲说一声，真到没水喝的时候，可以把老人和孩子先送到这里，庙里还能住几家人。'],['hero','谢谢你，我会把这句话带到。巨鹿那边有了消息，我们再派人回来告诉你，借走的东西也会记着。']],[N('到邺城寻海螺','conch',{effects:{items:{'rain-incense':1}}})]),
+   ['npc','庙里还有香，你拿去吧。也替我跟巨鹿的乡亲说一声，真到没水喝的时候，可以把老人和孩子先送到这里，庙里还能住几家人。'],['hero',"我替乡亲谢过了。庙里能收住人的话，我带到巨鹿，若真用得着，就托人来报信。"]],[N('到邺城寻海螺','conch',{effects:{items:{'rain-incense':1}}})]),
   conch:S('ye','向乡人借海螺','village-aunt',[
-   ['npc','海螺是我家孩子捡的，平时当宝贝一样拿着吹。听说要借去帮巨鹿求雨，他自己洗干净了，非让我拿出来等你们。'],['hero','那就先替我谢谢他，用完一定送回来。让他安心在家里等吧，我们一有消息就会来，别让他一直守在外面。']],[N('带齐物品返回巨鹿','rain',{effects:{items:{'rain-conch':1}}})]),
+   ['npc','海螺是我家孩子捡的，平时当宝贝一样拿着吹。听说要借去帮巨鹿求雨，他自己洗干净了，非让我拿出来等你们。'],['hero',"替我谢谢这孩子。用完洗净了送还，不叫他的小宝贝丢了。"]],[N('带齐物品返回巨鹿','rain',{effects:{items:{'rain-conch':1}}})]),
   rain:S('julu','协助张角与乡民完成祈雨','zhangjiao',[
-   ['npc','东西都齐了，你把香放在那张桌上。乡亲们不用全围在这里，留些人去看水车和沟渠，真下了雨，也得有人把水引到田里。'],['hero','我去叫人把田边的沟口挖开。大家等了这么久，别一见下雨只顾着高兴，反而让水都流走了。']],[N('与乡民一起守候雨水','abuse',{effects:{flags:{juluRain:true}}})]),
+   ['npc',"清香放案上。乡亲不必全围在这里，留人看着水车、渠口。雨若来了，正是引水入田的时候。"],['hero',"我到田边去。沟口先挖开，别等水来了，又从地面白白淌走。"]],[N('与乡民一起守候雨水','abuse',{effects:{flags:{juluRain:true}}})]),
   abuse:S('julu','制止借黄巾名义收粮的恶徒','bandit-chief',[
-   ['npc','张先生替你们求来了雨，你们总得给教里送些粮吧？这么大一袋还舍不得，往后遇到事情，谁还肯来帮你们？'],['hero','张先生现在还在田里帮人挖沟，我从没听他说要收粮。你先把袋子放下，要真有人吩咐，你跟我们去当面说清楚。']],[F('护住乡民粮食','abuse')]),
+   ['npc','张先生替你们求来了雨，你们总得给教里送些粮吧？这么大一袋还舍不得，往后遇到事情，谁还肯来帮你们？'],['hero',"张先生还在田里挖沟，何时说过收粮？袋子放下，你随我们去见他，当面问。"]],[F('护住乡民粮食','abuse')]),
   trace:S('julu-county','查清冒名收粮者的同伙','bandit-chief',[
-   ['npc','又不是我们自己想来，上头怎么交代，我们就怎么办。你们只敢拦我们，有本事去营里找下命令的人啊！'],['hero','我们当然会问，不过你们也不能拿了粮就走。跟我们一起回去，把谁让你们来、粮准备送到哪里，都说清楚。']],[F('拦住逃走的同伙','trace')]),
+   ['npc','又不是我们自己想来，上头怎么交代，我们就怎么办。你们只敢拦我们，有本事去营里找下命令的人啊！'],['hero',"下令的会找，你们也走不了。谁派来的，粮送哪里，连人带粮回去说！"]],[F('拦住逃走的同伙','trace')]),
   return:S('camp','将巨鹿发生的事告诉张角','zhangjiao',[
-   ['npc','他们打着黄巾军的名号抢粮，我不能说一句不知情就不管。粮食先退给乡亲，牵涉的人我也会逐个问，查清楚是谁在纵容他们。'],['hero','乡亲们最担心的，是今天退了粮，明天那些人又来。你最好留几个人在这里，让他们遇到事情能找到人说，不用再一路跑到营里。'],['npc','你提醒得对。我会安排人留守，也会亲自去附近几个村子看看。有些事情只听送来的消息，确实发现不了问题。']],[N('与张角商议同行','freed')]),
+   ['npc',"借我旗号抢粮，是我失察。粮先退还，牵涉的人一个个问，谁在背后纵容，也要查出来。"],['hero',"先生，最好留个肯管事的在这儿。乡亲怕的不是今天这几袋，是我们走后，他们又来收。"],['npc',"我留人下来，也亲赴邻村查问。送进营里的消息，竟没有一封写过此事。"]],[N('与张角商议同行','freed')]),
   freed:End('zhangjiao','camp',[['npc','营里已经有人照看，我想跟你们出去走走。那些不敢进营说话的乡亲，见到我在村里，也许愿意把遇到的事情告诉我。'],['hero','我们一起去吧。需要回营的时候再回来，路上的事情也不必都急着一天办完，先把大家的难处问清楚。']])
  },{abuse:{stage:['abuse'],next:'trace',title:'巨鹿还粮',sceneId:'farmland',count:3,enemyKind:'bandit',leaderName:'强盗首领',leaderArt:'brigand'},trace:{stage:['trace'],next:'return',title:'广宗追查',sceneId:'rural-road',count:4,enemyKind:'bandit',leaderName:'强盗首领',leaderArt:'brigand'}});
  R('zhangbao','营中药箱',{
   rumor:S('camp','与张宝商议补充药材','zhangbao',[
-   ['npc','我也想出去看看，只是营里的伤者还离不开人。原定送来的药迟迟没到，要是药不够，我实在没法放心离开。'],['hero','那我去广宗找找送药的人。先把药备齐，等营里有人接手照顾伤者，你也能放心跟我们出去。']],[N('前往广宗取药','supplies')]),
+   ['npc',"营里伤者多，广宗的药车又迟迟不至。我想跟你出去，可这里一断药，谁来照看？"],['hero',"广宗我去。药取回来，再找人替你换班，咱们也不必急着这一天走。"]],[N('前往广宗取药','supplies')]),
   supplies:S('julu-county','帮运药人清出回营的道路','herbalist',[
-   ['npc','药车刚到这里就被拦了。他们说要查货，后来又把药包拿走不肯还，我带着伙计等了半天，连车都不让推过去。'],['hero','先把车扶到路边，别挡在他们中间。你和伙计带好剩下的药往后退，我们去把被拿走的药包要回来。']],[F('护送药材回营','supplies')]),
+   ['npc','药车刚到这里就被拦了。他们说要查货，后来又把药包拿走不肯还，我带着伙计等了半天，连车都不让推过去。'],['hero',"车推到路边，你们带着余药后退。被扣的那些，我去要。"]],[F('护送药材回营','supplies')]),
   freed:End('zhangbao','camp',[['npc','药已经补齐了，营里也安排了人照顾伤者。我可以陪你们走一段，遇到有病有伤的，也能当场看看，不必非得叫人赶来营里。'],['hero','那你把常用的药和工具都带上吧。我们等大家准备好了再出发，药箱重的话，也可以分一些给我们背。']])
  },{supplies:{stage:['supplies'],next:'freed',title:'广宗药车',sceneId:'rural-road',count:3,enemyKind:'bandit'}});
  R('dongzhuo','洛阳余烬',{
@@ -8884,255 +8884,255 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  const lu=H.definitions.lvbu,di=H.definitions.diaochan;
  lu.title='赤兔与归路';lu.recommendedLevel=15;lu.level=Cast.definitions.lvbu.level=15;
  lu.stages.rumor=S('luoyang','向管事打听吕布与赤兔的消息','palace-steward',[
-  ['npc','吕将军不见投军的说客。最近太师府催他交人，他正跟上面争，谁来劝都不肯听。'],['hero','我不是来替董卓传话的。听人说他在找一匹马，我想先问清楚这件事。'],['npc','赤兔原是西羌马场养的，主人一直没肯卖。将军托我打听，可没有叫人去抢。你要去，先问主人愿不愿意，别借将军的名头吓人。']],[N('去西羌马场询问','stable')]);
+  ['npc','吕将军不见投军的说客。最近太师府催他交人，他正跟上面争，谁来劝都不肯听。'],['hero',"不替谁游说。听说将军在寻赤兔，我来打听马的下落。"],['npc',"西羌马场养的，主人不肯卖。将军只叫打听，可没叫抢。真要去，别拿温侯的名头压人，马主人吃不得这一套。"]],[N('去西羌马场询问','stable')]);
  lu.stages.stable=S('west-qiang','帮马场寻找失踪的少年','stable-master',[
-  ['npc','想买马的又来了一拨，昨晚却有人翻进马栏，把赤兔牵走了。我家孩子追出去，到天亮都没回来。'],['hero','先找孩子。知道他们往哪边走了吗？赤兔有什么习性，我们追上以后也好避开。'],['npc','北边干沟有马蹄印。赤兔一受惊就踢人，你们别围着它。我让孩子带的水袋挂在栏上，他恐怕连口水也没带。']],[N('沿干沟寻找少年','tracks')]);
+  ['npc','想买马的又来了一拨，昨晚却有人翻进马栏，把赤兔牵走了。我家孩子追出去，到天亮都没回来。'],['hero',"人要紧，先找孩子。蹄印朝哪儿去？赤兔认生吗，追上该怎么牵？"],['npc','北边干沟有马蹄印。赤兔一受惊就踢人，你们别围着它。我让孩子带的水袋挂在栏上，他恐怕连口水也没带。']],[N('沿干沟寻找少年','tracks')]);
  lu.stages.tracks=S('red-horse-gully','确认马贼与少年的位置','horse-boy',[
-  ['npc','别往前走，他们还在坡后面！我把缰绳割松了，赤兔不肯过沟，他们就把我绑在这里。'],['hero','先把绳子解开。你去那块大石头后面等，别再往马旁边跑，我们把路口守住。'],['npc','那个领头的还说，马拿到洛阳，随便一个将军都会出大价钱。赤兔的后腿已经磨伤了，你们别再让他们拖着走。']],[F('救回赤兔','horse')]);
+  ['npc','别往前走，他们还在坡后面！我把缰绳割松了，赤兔不肯过沟，他们就把我绑在这里。'],['hero',"我替你解开。到大石后躲着，别再近马，让我们过去。"],['npc','那个领头的还说，马拿到洛阳，随便一个将军都会出大价钱。赤兔的后腿已经磨伤了，你们别再让他们拖着走。']],[F('救回赤兔','horse')]);
  lu.stages.horse=lu.stages.tracks;lu.battles.horse.stage=['tracks','horse'];lu.battles.horse.next='horse-care';
  lu.stages['horse-care']=S('red-horse-gully','照料受惊的赤兔','horse-boy',[
-  ['npc','它现在谁也不让靠近。先把刀收起来，把水放地上，退开一点，我慢慢过去试试。'],['hero','大家都往后退，给它留条能走的路。伤口的布带给你，别一上来就碰它的后腿。'],['npc','肯喝水了。等它安静下来，我再牵着走。今天只能慢慢回去，不能骑，更不能硬拉。']],[N('陪少年牵马回马场','horse-owner')]);
+  ['npc','它现在谁也不让靠近。先把刀收起来，把水放地上，退开一点，我慢慢过去试试。'],['hero',"都退后，别堵它的路。布带给你，后腿的伤当心些，别扯着。"],['npc','肯喝水了。等它安静下来，我再牵着走。今天只能慢慢回去，不能骑，更不能硬拉。']],[N('陪少年牵马回马场','horse-owner')]);
  lu.stages['horse-owner']=S('west-qiang','将少年与赤兔平安送回','stable-master',[
-  ['npc','人回来了就好！之前不肯卖，是怕马落到只会拿鞭子抽它的人手里。吕将军肯托人来问，没有直接派兵，我愿意跟他谈。'],['hero','我可以带封信过去，让他自己派懂马的人来接。赤兔的腿还得养几天，不能现在就赶长路。'],['npc','信和养马的注意事项我都写好。你们留两天，等伤口结好了，我带孩子把马送到官道，再由你们陪它到洛阳。']],[N('带马与书信前往洛阳','gift')]);
- lu.stages.gift.npc.turns=[{speaker:'npc',text:'赤兔的伤我看见了，马场的信也读了。我会照着养，不会急着骑。你们先把救人的经过说说，马场主人要的价钱，我派人送过去。'},{speaker:'hero',text:'孩子已经回家了。我们帮的是马场，不是替你抢马。主人最在意的是赤兔以后有没有人好好照料，你得让他放心。'},{speaker:'npc',text:'这件事我答应。往后有什么事，拿这块令牌来找我，不用再在门外等。不过投军的事先别提，我自己的处境还没想明白。'}];
+  ['npc','人回来了就好！之前不肯卖，是怕马落到只会拿鞭子抽它的人手里。吕将军肯托人来问，没有直接派兵，我愿意跟他谈。'],['hero',"我带信，请他派懂马的人来。只是这腿，眼下还走不了远路。"],['npc','信和养马的注意事项我都写好。你们留两天，等伤口结好了，我带孩子把马送到官道，再由你们陪它到洛阳。']],[N('带马与书信前往洛阳','gift')]);
+ lu.stages.gift.npc.turns=[{speaker:'npc',text:"马场的信，我看过了。赤兔先养腿，不急着上鞍。你们怎么救的人，且说来听听。买马的钱，我遣人送去。"},{speaker:'hero',text:"孩子回家了，马主人这才肯谈。他不缺买主，缺的是肯好好待赤兔的人。温侯，信上的叮嘱可都得算数。"},{speaker:'npc',text:"自然。令牌拿着，往后来府里，不必在门外等。只是替谁效力的话，今日别问，我自己还没想透。"}];
  lu.stages.gift.npc.choices=[N('问问吕布在担心什么','worry',{effects:{items:{'lvbu-token':1},flags:{redRabbitGift:true,lvbuMet:true}}})];
  lu.stages.worry.npc.choices=[N('找管事核实被扣的百姓','witness')];
  lu.stages.witness=S('luoyang','向管事了解天香阁的求助','palace-steward',[
   ['npc','城外有几户替府里织布的人，被抓去补征粮的数。天香阁的貂蝉姑娘认识他们，昨天送来一封信，想求将军救人。'],['hero','温侯知道这封信吗？为什么没去见她？'],['npc','信被太师府的人截下了，是阁里的侍女又抄一份送来的。我怕牵连她，没敢直接回信。你们愿意跑一趟，就告诉她，将军并没有答应抓这些人。']],[N('带口信去见貂蝉','waiting',{effects:{flags:{diaochanLead:true},stages:{diaochan:'rumor'}}})]);
  lu.stages.waiting=S('xinye','等部众安顿后，与吕布商议同行','lvbu',[
-  ['npc','我答应离开董卓，不等于把手下的人交给另一位主公。先让大家有饭吃、有地方睡，再谈以后。'],['hero','我们正陪貂蝉姑娘处理这些事。等最后几户人家也到了，我再来找你，不会把人领出来就不管了。']],[N('安顿好众人，再与吕布交谈','trial-talk',{requires:{flags:{lvbuConvinced:true}},effects:{rest:true}})]);
+  ['npc','我答应离开董卓，不等于把手下的人交给另一位主公。先让大家有饭吃、有地方睡，再谈以后。'],['hero',"貂蝉姑娘正替各家清点，我们去新野看住处。等最后几户也到齐，再来寻你。"]],[N('安顿好众人，再与吕布交谈','trial-talk',{requires:{flags:{lvbuConvinced:true}},effects:{rest:true}})]);
  lu.stages['trial-talk']=S('xinye','与吕布约定同行的条件','lvbu',[
-  ['npc','住处和粮食都到了，我没想到你们真会一户户把人接齐。可你们接下来要去洛阳，那里的仗不是救几辆车这么简单。'],['hero','我知道你在担心什么。如果我们连眼前这支队伍都带不好，就算你来了，也不过是把所有危险推给你。'],['npc','那就在营外试一场。你带平常同行的人，我也带两个亲卫，用自己的兵器，不让你故意占便宜。打不过就先去练，什么时候准备好了都能再来，我不会因为你输一场就不认人。']],[N('准备好后接受考验','trial')]);
+  ['npc',"家眷到了，粮也没少，你们办事倒比我想得周全。可洛阳那场仗，可不是护住几辆车便能过关的。"],['hero',"那就试试我们的配合。真到阵前，总不能什么都指望温侯一人。"],['npc',"营外见。你带平日同行的，我带两名亲卫，各用自己的兵器。打不过便回去练，下回再来，我在这里等得起。"]],[N('准备好后接受考验','trial')]);
  battle('lvbu','trial','xinye','lvbu','通过吕布的实战考验',[
-  ['npc','这回只试配合，我会收着力，你们不必顾忌。伤药就在旁边，撑不住便喊停。别只盯着我的戟，还得看住同伴！']],'freed',{roster:()=>{const chapter=node?require('./chapter-one.js'):root.ChapterOne;return chapter.enemies('gate').map((u,i)=>({...u,id:'lvbu-trial-'+i,name:i?'吕布亲卫':u.name,...(!i?{damageMultiplier:.35}:{}),...(i?{weapon:{...u.weapon,name:'练武长枪',power:25},equipment:{...u.equipment,armor:{id:'training-guard-armor',name:'练武皮甲',slot:'armor',quality:'green',attributes:{constitution:20,armor:40,resistance:12}}}}:{})}));},scene:'farmland',level:15});
+  ['npc',"只试配合，我会收力。伤药就在旁边，撑不住便喊停。看我的戟，也看着你身旁的人！"]],'freed',{roster:()=>{const chapter=node?require('./chapter-one.js'):root.ChapterOne;return chapter.enemies('gate').map((u,i)=>({...u,id:'lvbu-trial-'+i,name:i?'吕布亲卫':u.name,...(!i?{damageMultiplier:.35}:{}),...(i?{weapon:{...u.weapon,name:'练武长枪',power:25},equipment:{...u.equipment,armor:{id:'training-guard-armor',name:'练武皮甲',slot:'armor',quality:'green',attributes:{constitution:20,armor:40,resistance:12}}}}:{})}));},scene:'farmland',level:15});
  lu.stages.freed.npc.turns=[{speaker:'npc',text:'行，我跟你们走。不是因为赤兔，是因为你们答应照顾的人，最后都没有落下。到了洛阳，我也要当面问清楚，那些命令到底是谁下的。'},{speaker:'hero',text:'那就一起去。弟兄们留在这里照顾家人，有事随时回来。我们要做的事还很多，路上慢慢商量。'}];
  di.visibility={any:[{flags:{diaochanLead:true}},{chapterComplete:true}]};di.title='天香阁来信';
  di.stages.rumor=S('luoyang','把管事的口信带给貂蝉','diaochan',[
-  ['npc','你们是替吕将军来的？我等了两天，差点以为那封信根本没有送到。'],['hero','信被太师府截过一次。府里的管事让我来告诉你，温侯没有同意抓人。你先说说，被带走的是什么人？'],['npc','有替这里织布的姐妹，还有她们的家人。征粮的人说她们少交了，可收粮的凭据还在我这里。我要的不是一句安慰，是把这些人找回来。']],[N('看过收粮凭据，再想办法','request')]);
+  ['npc','你们是替吕将军来的？我等了两天，差点以为那封信根本没有送到。'],['hero',"第一封被太师府截了，侍女抄的那份才送到。管事让我带句话：温侯没应过抓人。被带走的，是哪些人？"],['npc',"替这里织布的姐妹，连家人也抓去了。说是欠粮，可凭据就在我手里。我们再等等，谁知道会被送到哪里？"]],[N('看过收粮凭据，再想办法','request')]);
  di.stages.request=S('luoyang','与貂蝉查清被扣者的去处','diaochan',[
-  ['npc','这张是已经交过粮的凭据，另一张却说她们欠粮。上面的日期只差一天，根本是换个人再收一次。'],['hero','别先拿去衙门争，开文书的人可能就是同一伙。我们找运粮的车夫问问，先知道人被送到了哪里。'],['npc','车夫每天在城外歇脚，我认得他。他以前给我们搬过布，不愿意得罪官兵，但应该肯把看见的事情告诉我。']],[N('陪貂蝉去找车夫','inquiry')]);
+  ['npc','这张是已经交过粮的凭据，另一张却说她们欠粮。上面的日期只差一天，根本是换个人再收一次。'],['hero',"开凭据的也许就是扣人的，先别去衙门惊动他们。押车的车夫，能找着吗？"],['npc','车夫每天在城外歇脚，我认得他。他以前给我们搬过布，不愿意得罪官兵，但应该肯把看见的事情告诉我。']],[N('陪貂蝉去找车夫','inquiry')]);
  di.stages.inquiry=S('luoyang-county','向车夫核实被扣乡民的下落','boatman',[
-  ['npc','人都关在旧仓后面的院子里。我只运了一趟，就不敢再接了，有个孩子一直在车上找她娘，哭得嗓子都哑了。'],['hero','哪条路能到后门？我们得先看看守卫，不能让他们把人又转走。'],['npc','沿粮车的车辙走，过石井向右。可别从正门问，正门那人刚收了钱，转身就说没有关过任何人。']],[N('去旧仓查看','warehouse')]);
+  ['npc','人都关在旧仓后面的院子里。我只运了一趟，就不敢再接了，有个孩子一直在车上找她娘，哭得嗓子都哑了。'],['hero',"旧仓后门怎么走？我们先看清守卫，人不能再被转走了。"],['npc','沿粮车的车辙走，过石井向右。可别从正门问，正门那人刚收了钱，转身就说没有关过任何人。']],[N('去旧仓查看','warehouse')]);
  battle('diaochan','warehouse','luoyang-county','river-guard','救出旧仓中的乡民',[
   ['npc','谁让你们摸到这里来的？拿几张旧凭据就想领人？把门关上！'],['diaochan','那孩子就在院子里，她已经看见我们了。不能现在退走，让他们把人转去别处。']],'persuade',{count:4,kind:null,scene:'farmland'});
  di.stages.persuade=S('luoyang','让吕布见到获救乡民，商议撤离','lvbu',[
-  ['npc','这些凭据都是真的。我明明让人退过粮，他们竟换个名目又抓人。你们带回来的这几户，我会先留在府里照看。'],['diaochan','留在府里不是长久办法。他们知道我们见过你，以后谁来织布、送药，都会被怀疑。你得想清楚，究竟要不要继续替董卓守着这座城。'],['hero','先别逼他只顾自己离开。愿意走的部众和家人也得一起接出去，我们到新野找住处，再派车回来。'],['npc','好。我去清点愿意走的人，貂蝉留下照顾乡亲。新野有了确实的回信，我们再动身，不让大家在路上挨饿。']],[N('先去新野安排住处','shelter',{requires:{any:[{flags:{lvbuMet:true}},{chapterComplete:true}]}})]);
+  ['npc','这些凭据都是真的。我明明让人退过粮，他们竟换个名目又抓人。你们带回来的这几户，我会先留在府里照看。'],['diaochan',"府门挡得住一日，挡得住一世吗？往后谁来织布、送药，都要被他们盘问。将军还替董卓守着洛阳，他们就总有借口。"],['hero',"愿意走的人，家眷也得接走。我们去新野找住处，有了着落，再回来派车。"],['npc',"我去问各部，愿走的记下名。貂蝉照看乡亲，新野的信一到，便动身。"]],[N('先去新野安排住处','shelter',{requires:{any:[{flags:{lvbuMet:true}},{chapterComplete:true}]}})]);
  di.stages.shelter=S('xinye','为洛阳来的人安顿住处','village-aunt',[
-  ['npc','旧粮栈还能住人，屋顶我叫人补了。粮食先从我家借，等大家安顿好，有力气的帮着修渠就行，不急着还。'],['hero','我会把每家要用的东西记下来。这边既然能住，我们就回信，让老人和孩子先过来，别跟军队挤在最后一批。']],[N('回洛阳接最后一批人','escort')]);
+  ['npc','旧粮栈还能住人，屋顶我叫人补了。粮食先从我家借，等大家安顿好，有力气的帮着修渠就行，不急着还。'],['hero',"我记个单子，看各家缺什么。这里能住，我便送信回去，老人孩子先来，不与军中大队挤在一处。"]],[N('回洛阳接最后一批人','escort')]);
  battle('diaochan','escort','luoyang-county','guosi','拦住追赶车队的守军',[
-  ['npc','吕布自己走也就算了，府里的工匠和车马一件也不许带！全都给我回去！'],['lvbu','他们不是府里的东西，是愿意离开的百姓。你想拿人回去抵数，先问我答不答应。'],['hero','貂蝉，你带车往新野走，我们在这里接应最后面的人。']],'settled',{count:5,kind:null,guest:'lvbu',scene:'rural-road'});
+  ['npc','吕布自己走也就算了，府里的工匠和车马一件也不许带！全都给我回去！'],['lvbu',"人不是我府里的物件！他们愿走，你凭什么拦？郭汜，你再往前一步试试。"],['hero','貂蝉，你带车往新野走，我们在这里接应最后面的人。']],'settled',{count:5,kind:null,guest:'lvbu',scene:'rural-road'});
  di.stages.settled=S('xinye','确认车队全部抵达','diaochan',[
-  ['npc','人都齐了，最后一辆车也进了院子。刚才那个孩子找到她娘，抱着不肯松手，我看着才敢坐下来。'],['hero','粮栈的人会照顾大家。你也歇歇，不用再每听见马蹄声就出去看，门口是我们自己的人。'],['npc','等大家缓过来，我想跟你们出去。我会替这些人继续记着账，粮食、人手、缺的药，都有人问才不会又被忘掉。']],[N('与貂蝉谈谈今后的安排','freed',{effects:{flags:{lvbuConvinced:true},stages:{lvbu:'waiting'},rest:true}})]);
+  ['npc','人都齐了，最后一辆车也进了院子。刚才那个孩子找到她娘，抱着不肯松手，我看着才敢坐下来。'],['hero',"我方才在门口点过，一户不缺。门外站的也是我们的人，马蹄响了不用再跑出去看。"],['npc',"是啊，方才端着茶，手还在抖。等他们缓过来，我也该往前走了。各家的粮药我会继续记着，信从新野送，总找得到我。"]],[N('与貂蝉谈谈今后的安排','freed',{effects:{flags:{lvbuConvinced:true},stages:{lvbu:'waiting'},rest:true}})]);
  // 魏：把线索、实际处置和加入理由分开，不用一件礼物换走一个人。
  before('xunyu','freed',[
   ['owners','changan','book-dealer','核对旧书上的失主名录',[
-   ['npc','我原先只想着把书卖掉，没留意夹页里这些姓名。刚才有个老人认出他家的书，还说一家人搬散以后，连孩子读过什么都找不到了。'],['xunyu','书先别全送到我那里。写着姓名的，请原主人来认；无人认领的，再放到学舍，让孩子们能借着读。']]],
+   ['npc','我原先只想着把书卖掉，没留意夹页里这些姓名。刚才有个老人认出他家的书，还说一家人搬散以后，连孩子读过什么都找不到了。'],['xunyu',"有姓名的，请主人来认；无人认领的，暂存学舍。旧书尚在，家若寻不回，好歹还能留些念想。"]]],
   ['school','changan','xunyu','协助荀彧安排旧书与学舍',[
-   ['npc','学舍已经腾出一间屋子，书贩也答应帮着抄名录。我找书时总怕东西丢了，倒没先想到，还有人在找回自己家的日子。'],['hero','你出门以后，这些书也得有人照管。我们把借阅和归还的办法讲明白，再请先生跟我们去许昌。'],['npc','好，我把书目和钥匙交给教书先生。你肯把这些琐碎的事也做完，我才放心把这里托给他们。']]]
+   ['npc',"书目抄好了，学舍也腾出了屋子。原主认回了几卷，余下的借与学生。我原怕它们散了，如今倒比堆在一人屋里更好。"],['hero',"借书还书，总得有人记着。钥匙和书目交给塾师，先生也好放心随我们去许昌。"],['npc',"钥匙就在这里。塾师答应每日开门，我也留了地址，有缺损便可来信。如此，走远些也无妨。"]]]
  ]);
  before('jiaxu','mansion',[
   ['watch','wan-county','camp-scout','查清郭汜封路的兵力',[
-   ['npc','他们守着运粮的大路，小路却没几个人。前日还进村抢了两辆车，营里缺粮不是假的。'],['hero','那就不能把城里的粮全交出去。我回去告诉文和先生，让城里先把难民接到内街，免得一动手就堵在门口。']]],
+   ['npc','他们守着运粮的大路，小路却没几个人。前日还进村抢了两辆车，营里缺粮不是假的。'],['hero',"那粮更不能交。先回城报信，也叫守门的让开内街，百姓别堵在兵马要走的道上。"]]],
   ['evacuate','wan','jiaxu','先安顿城门附近的百姓',[
-   ['npc','你查到他们缺粮，这一点很要紧。我会请张将军把粮车留在城内，空车调到门外，免得他们看见车就想抢。'],['hero','还有，之后无论用什么计，先告诉我们怎么退。我们肯陪你出去，但不能连带着谁回来都不清楚。'],['npc','这回说清楚：盒里是机关，不是真首级。我引郭汜靠近，你们守侧门，听见弩响就带我撤。城门内的人也会接应，不让你们独自挡一营兵。']]]
+   ['npc',"果然缺粮。我请张将军将粮车留在内街，门外只放空车。省得咱们尚未出门，他们倒先冲进来抢。"],['hero',"文和，怎么进营，你有主意；怎么回来，也得告诉我们。到时谁顾哪一边，别临阵猜。"],['npc',"盒里是弩，不是首级。我诱郭汜近前，你们看住侧门，弩响即退。城门有人接应，不会让诸位独自挡他一营兵。"]]]
  ]);
  before('zhangliao','freed',[
   ['orders','hulao','camp-scout','核实虎牢关外的扣车命令',[
-   ['npc','太师府又派人来催，说张将军放走的人里混着逃工，要把车全扣回去。副将不肯照办，正在下面争。'],['zhangliao','我还没离关，他们就敢拿我的名字抓人。先跟我去看看，换班和放行的事，不能只在屋里说一句就算交代过了。']]],
+   ['npc','太师府又派人来催，说张将军放走的人里混着逃工，要把车全扣回去。副将不肯照办，正在下面争。'],['zhangliao',"借我的名扣人？我还在关上呢！带路，我去见他。副将也叫来，放行的军令当面重申。"]]],
   ['handover','hulao','zhangliao','让关外车队平安通过',[
-   ['npc','放行的名册已经给副将，守军当着乡亲的面也认过了。可传令的人还堵着关外最后一辆车，我们得过去把人接回来。'],['hero','你留下把军令讲清楚，我们去接车。让百姓亲眼看见这次能走，才知道换了守将也不会说话不算数。']],[N('接回关外车队','road-watch')]]
+   ['npc',"名册已交副将，将士也当着乡亲应下了。偏偏传令的还扣着最后一辆车。诸位，得再劳烦一趟。"],['hero',"我们接车，你在关里镇着。路上的人若见车能过，心也就定了。"]],[N('接回关外车队','road-watch')]]
  ]);
  battle('zhangliao','road-watch','hulao','river-guard','护送关外车队通过',[
-  ['npc','名册是关里的，我奉的是太师府的命令！你们敢放车，就连人一起查！'],['hero','这车上是老人和伤者，张将军已经当面核过了。你要查，去关里把命令说清楚，不能在这里扣人。']],'freed',{count:4,kind:null,scene:'rural-road'});
+  ['npc','名册是关里的，我奉的是太师府的命令！你们敢放车，就连人一起查！'],['hero',"老人与伤者也算逃工？张将军核过的车，就在这儿。要争军令，进关找他，放人！"]],'freed',{count:4,kind:null,scene:'rural-road'});
  before('xiahoudun','freed',[
   ['wounded','liang-camp','evacuee','探望被接回营中的乡民',[
-   ['npc','我家老头在车轮下面摔伤了，夏侯将军停下来拉他，才在门口中了箭。我们来送这点吃的，不是给他添麻烦的。'],['hero','我替你带进去，伤者都在东边帐里。你们也去看看自己的家人，他最想知道的就是大家有没有平安回来。']]],
+   ['npc','我家老头在车轮下面摔伤了，夏侯将军停下来拉他，才在门口中了箭。我们来送这点吃的，不是给他添麻烦的。'],['hero',"我带进去，将军正惦记着你们。伤者在东边帐里，也去看看家人吧。"]]],
   ['arrange','liang-camp','xiahoudun','与夏侯惇安排伤兵和后续守备',[
-   ['npc','乡亲的东西我收下，人就别站在帐外等了。我也有话跟你说：副将接了营里的差事，郎中会把换药的办法教给你们。'],['hero','那我们不是趁你带伤，把你拉去继续打。先陪你去许昌养好眼伤，遇到要紧的事再一起商量。'],['npc','你这样说，我心里踏实。以后真要动身，你照常来叫我，别因为少了一只眼就把我当成废人。']]]
+   ['npc',"东西收下了，别叫乡亲在帐外等。副将接了营务，换药的法子郎中也会教给你们。我还不至于拖大家的后腿。"],['hero',"那便一道回许昌。先养伤，旁的事到了再说。一路上郎中怎么嘱咐，你可得听。"],['npc',"听就是了！要动身便叫我，别偷偷把我撇下。"]]]
  ]);
  before('simayi','freed',[
   ['grain-case','xuchang','simayi','协助司马懿核查一份矛盾的粮报',[
-   ['npc','先别只谈未来。有两份粮报，一份说村里已经领粮，一份说运粮车陷在泥里，至今没到。两份都有印，你信哪份？'],['hero','我谁也先不信。去问领粮的人，再看车在哪里，不会因为纸上有印，就让村里继续挨饿。'],['npc','我也是这个意思。你去许县找管粮的书吏，我把两份粮报留下，看看这次是谁想借我们的名头蒙混过去。']]],
+   ['npc',"两份粮报，一份说已发到各户，一份说车陷泥中，至今未达。都是官印，你信哪一份？"],['hero',"不凭这两张纸定。领粮的住哪儿，车陷在哪儿？我去一趟。"],['npc',"许县的管粮书吏见过车，去问他。两份粮报留在我这里，免得回来时，又换了说法。"]]],
   ['grain-witness','xuchang-county','grain-clerk','找到粮车与领粮见证人',[
-   ['npc','车确实陷过，可当天就推出来了。后来押车的兵把粮送进了另一处院子，叫我们在领粮簿上按手印，不按就不准走。'],['hero','你把没领到粮的几户人叫到一起，别自己去争。我们去院子核对粮袋，等拿到实物，再一起回去说清楚。']],[N('查看被藏起的救济粮','grain-seizure')]]
+   ['npc','车确实陷过，可当天就推出来了。后来押车的兵把粮送进了另一处院子，叫我们在领粮簿上按手印，不按就不准走。'],['hero',"那几户人都请来，别独自去跟押车的争。院里粮袋还在吧？我们去看。"]],[N('查看被藏起的救济粮','grain-seizure')]]
  ]);
  battle('simayi','grain-seizure','xuchang-county','bandit-chief','追回被扣的救济粮',[
-  ['npc','粮已经入了这里的账，谁来查都没用！你们拿着司马先生的纸，就想直接搬走？'],['hero','村里的人还没吃上饭，账却已经全结清了。今天你们得把粮和那本账一起交出来。']],'grain-judgment',{count:5,kind:null,scene:'farmland'});
+  ['npc','粮已经入了这里的账，谁来查都没用！你们拿着司马先生的纸，就想直接搬走？'],['hero',"粮进了你的院，账上却说进了百姓的锅。连粮带账拿来，咱们回府核一核。"]],'grain-judgment',{count:5,kind:null,scene:'farmland'});
  H.definitions.simayi.stages['grain-judgment']=S('xuchang','与司马懿核对追回的粮与名册','simayi',[
-  ['npc','粮袋、手印和押车人的口供都对上了。我原本想看看，你遇到两种说法，会不会急着挑一句合自己心意的。你却真把粮给人送回去了。'],['hero','他们不能等我们辩明白以后再吃饭。账要查，眼前的人也得管，少做哪一件都不行。'],['npc','好。府里的事交给主簿，我跟你们走一段。以后我有判断，你们也尽管查，不必只因为是我说的就全信。']],[N('商量同行的安排','freed')]);
+  ['npc',"粮袋、手印、口供，都对上了。你没急着回府争哪份粮报是真的，倒把车先赶回了村。那些人可领着了？"],['hero',"领到了。我回来时正生火。再等咱们辩下去，今夜还得饿着。"],['npc',"如此便好。往后有事，你也照这样问到实处。我说的话，自然也不例外。"]],[N('商量同行的安排','freed')]);
  before('caocao','freed',[
   ['survivors','xuchang','camp-scout','核对乌林护卫的归队名册',[
-   ['npc','最后那条船也到了，还少两个报信的人。他们不是落在追兵手里，是去上游找先前被冲散的伤兵，还没回城。'],['hero','把能认出的名字先记上，派熟悉渡口的人去接。别今天进了城，明天就再没人问他们去了哪里。']]],
+   ['npc','最后那条船也到了，还少两个报信的人。他们不是落在追兵手里，是去上游找先前被冲散的伤兵，还没回城。'],['hero',"名字记上，找个熟渡口的去迎。家里有人等信的，也告诉一声。"]]],
   ['account','xuchang','caocao','向曹操说明此次接应中的问题',[
-   ['npc','我已经叫人去接，也让他们把伤兵的家人通知到。乌林这一趟，我确实轻敌了，连前面换了守军都没问清。'],['hero','你肯把这话跟弟兄们说，他们以后才敢提醒你。否则谁都等着你说一句，再发现不对就晚了。'],['npc','这话你当面说得，我也当面认。往后一起赶路，你看见不对就开口，我要是只想听好话，今日也不会坐在这里请你留下。']]]
+   ['npc',"接应的人已经去了，伤兵家中也都通知了。这回是我轻敌，连前头换了守军都不知晓，险些折在乌林。"],['hero',"这话不妨也跟护卫说。下回他们觉着不对，才敢劝您。"],['npc',"敢在我面前说这话的，倒不多。你不妨一直说下去——若我真只听得顺耳话，今日也留不住这条命。"]]]
  ]);
  before('xuchu','freed',[
   ['grain-home','xujia','village-aunt','把救回的粮与乡亲交还各家',[
-   ['npc','人都回来了，可大家一听见马蹄就往屋里躲。你们走了，那伙人不会又来吧？我们可再拿不出一仓粮。'],['xuchu','我先不走。今晚把能巡夜的人叫齐，每家守哪段路，遇到事往哪里报，大家一起说清楚。']]],
+   ['npc','人都回来了，可大家一听见马蹄就往屋里躲。你们走了，那伙人不会又来吧？我们可再拿不出一仓粮。'],['xuchu',"俺还没走呢！把巡夜的叫来，村口到粮仓，咱们重新排一回。"]]],
   ['night-watch','xujia','xuchu','协助乡里安排巡夜',[
-   ['npc','几个叔伯都答应了，不是我一个人在村口站着才算守村。你们救人时肯停下来等走不动的，我看着放心。'],['hero','村里真有急事，你随时可以回来。我们找同伴，是互相帮忙，不是让谁从此丢下自己的家。'],['npc','那我愿意走。先跟父老打声招呼，锤子和行李收拾好就来。']]]
+   ['npc',"几个叔伯都应下了，今夜就轮班。俺在庙里瞧见你们等着伤者，一个也没丢下，心里便踏实了。"],['hero',"往后村里若有事，咱们再回来。路远了还能捎信，你不用惦记得不敢出门。"],['npc',"那俺去跟父老说！锤子一提就能走，没几件行李。"]]]
  ]);
  before('dianwei','night',[
   ['liu-house','suiyang','liu-widow','听刘氏说清护院争执的来由',[
-   ['npc','李家说我丈夫欠粮，可他替他们做工半年，工钱都没有结。如今人没了，反拿一张账来要宅子，我连孩子都没处送。'],['dianwei','我守在门外，是怕他们夜里再来。但我总不能一辈子站在这里，你们要是能帮着把工钱的旧账找出来，也好替她讲明白。'],['hero','先让母子到邻家住一晚，别再让他们单独留在院子里。明日去李家，把雇工的名册和账一起对清。']]]
+   ['npc','李家说我丈夫欠粮，可他替他们做工半年，工钱都没有结。如今人没了，反拿一张账来要宅子，我连孩子都没处送。'],['dianwei',"我在门口，李家还不敢来。可总守着也不是长久之计。你们若能找到账，便能替她把这桩事断干净。"],['hero',"今夜请母子借住邻家吧，这院子留不得了。明日咱们去李家要雇工名册，对一对旧账。"]]]
  ]);
  // 刘氏的悲剧改为险遭灭口，避免保护安排之后又无解释地让母子遇害。
- const dw=H.definitions.dianwei;dw.stages.morning.npc.turns=[{speaker:'npc',text:'李家昨夜真派人来了，幸亏邻家留着后门，母子躲进了地窖。典韦去追他们，到现在还没回来，院里只留着那把旧戟。'},{speaker:'hero',text:'先请郎中看看母子，有伤别硬撑。李家既然连见证人都不放过，典韦闯进去多半要吃亏，我们得赶紧去接他。'}];
+ const dw=H.definitions.dianwei;dw.stages.morning.npc.turns=[{speaker:'npc',text:'李家昨夜真派人来了，幸亏邻家留着后门，母子躲进了地窖。典韦去追他们，到现在还没回来，院里只留着那把旧戟。'},{speaker:'hero',text:"母子伤着没有？劳烦请个郎中。我去追典韦，李家院里有埋伏，可不能让他一个人闯。"}];
  before('dianwei','freed',[
   ['testimony','suiyang','liu-widow','让获救母子与雇工当面核对旧账',[
-   ['npc','他们少算的工钱，账房都认下了，田契也交回来了。典大哥替我们挡了这么多回，最后反倒让你们去救他，我心里实在过意不去。'],['dianwei','你别这么说。是我一急就冲进去，差点连你们的账都没拿出来。以后遇到事，我先跟大家商量，不再只顾自己抡兵器。'],['hero','母子有人照看，账也留下了副本。把这些交代清楚，咱们再谈出门的事。']]]
+   ['npc','他们少算的工钱，账房都认下了，田契也交回来了。典大哥替我们挡了这么多回，最后反倒让你们去救他，我心里实在过意不去。'],['dianwei',"别这么说。我一急，差点连账都没拿回来。亏得有人拉一把，不然全叫我坏了事。"],['hero',"账留个副本，劳烦邻里替母子照看着。这些妥了，咱们也该歇口气了。"]]]
  ]);
  dw.stages.freed.npc.turns=[{speaker:'npc',text:'母子都安顿下来了，邻家也留着账的副本，李家再想编借口也得先问问大家。我想去许昌看看，听说曹公正在找人。'},{speaker:'hero',text:'那就先同行。你身上的伤还要换药，路上不用一个人硬撑；往后遇到难处，也先跟我们说一声。'},{speaker:'npc',text:'好，这回听你们的。救人不是只把门砸开，后面的事也得一起办妥。'}];
  before('huangzhong','freed',[
   ['horse-return','changsha','stable-master','核对失马，归还浏阳被抢的马匹',[
-   ['npc','马身上都有各家的烙记，不能因为黄将军的马找到了，剩下几匹就全算官府的。还有一匹是乡里借来耕地的。'],['huangzhong','你说得对，按记号一家家还。我的马放在最后，先把耕地那匹送回去，田里的活等不得。']]],
+   ['npc','马身上都有各家的烙记，不能因为黄将军的马找到了，剩下几匹就全算官府的。还有一匹是乡里借来耕地的。'],['huangzhong',"照烙记还，一匹也别扣。耕地的先送回去，老夫的马不急这半日。"]]],
   ['old-general','changsha','huangzhong','听黄忠说明继续出门的打算',[
-   ['npc','你们找马的时候，先把困在棚里的人送出来，这事比打赢我那一场更让我看得上。年纪大了，不代表我只愿坐在教场里教人。'],['hero','那就请你跟我们一起走。我们也不是每天都打仗，路上有人肯说一句怎样更稳妥，大家就少吃些亏。']]]
+   ['npc',"棚里还有人时，你们没急着追马，先救了人。老夫记着呢。打过一场了，往后有事，也不妨叫我。"],['hero',"有您一起走，再好不过。我们这些后生，正缺个走过远路的人指点。"]]]
  ]);
  before('maliang','freed',[
   ['brother','xiangyang','maliang','与马良查明弟弟惹祸的经过',[
-   ['npc','弟弟已经能说话了。他承认先动了手，可是因为对方把借来的书撕了，争执才闹大。我不会替他瞒，也不该让对方借治伤再抓人。'],['hero','那就把两边的伤和东西都记清，谁该赔什么说清楚。你弟弟也得当面认自己动手的错，不能医好了就算过去。']]],
+   ['npc','弟弟已经能说话了。他承认先动了手，可是因为对方把借来的书撕了，争执才闹大。我不会替他瞒，也不该让对方借治伤再抓人。'],['hero',"撕书的赔书，动手的认错。伤该治，账也得当面说清，免得再添一桩。"]]],
   ['settlement','xiangyang','maliang','见证两家说明责任，安排伤者复诊',[
-   ['npc','已经请邻里作了见证，弟弟也道过歉。今后换药有人管，药钱和赔偿都留了凭据，不会再隔两天换一个说法。'],['hero','你这几日不只顾着自家弟弟，还替旁边几个伤者换了药。等这里安排好了，愿不愿意继续跟我们去看看别处的人？'],['npc','我愿意。救急之后还要把事情收好，跟你们做了这一趟，我才真明白其中有多少不能省的地方。']]]
+   ['npc','已经请邻里作了见证，弟弟也道过歉。今后换药有人管，药钱和赔偿都留了凭据，不会再隔两天换一个说法。'],['hero',"忙完自家的事，你还去替旁人换药。我看你也是闲不住的，愿不愿随我们走一程？"],['npc',"愿意。原先只想着赶紧找大夫，今日才知救下之后，还有这么多事等着人做。我去交代一声。"]]]
  ]);
  before('taishici','freed',[
   ['mother','beihai','village-aunt','探望太史慈的母亲',[
-   ['npc','他这孩子，一听我要吃药就急着出门，回来手上添了伤，还想藏着不给我看。你们陪了他这么久，先坐下吃口热的。'],['taishici','娘，药铺已经肯把药送到门上，邻家也答应每天来看看。不是我把你丢在家里不管，你要有不舒服，马上托人带话。'],['npc','我知道。你想跟这些朋友出去，我不拦你。只是路上也听人劝，别救起别人，转头又让别人为你担心。']]],
+   ['npc','他这孩子，一听我要吃药就急着出门，回来手上添了伤，还想藏着不给我看。你们陪了他这么久，先坐下吃口热的。'],['taishici',"娘，药铺肯送药上门，大嫂每日也来。煎药的分量我都写下了。你若不舒服，千万托人告诉我。"],['npc',"知道了。你这孩子，走之前绕着床转多少回了？我不拦你。路上莫逞强，多听朋友一句。"]]],
   ['farewell','beihai','taishici','与太史慈约定同行与回乡的安排',[
-   ['npc','母亲肯让我走，我反倒想再多看她一眼。刚才已经把煎药的用量写给邻家，药夫那边也有人去接了。'],['hero','那就等你收拾好再出发。以后经过北海，我们一起回来看看，不是今天出了门，就不能再回家。']]]
+   ['npc',"本来催着想走，母亲真应了，倒又舍不得。药方交给邻家，药夫也有人去接，应当不会短缺。"],['hero',"不急，收拾妥了再走。北海就在这儿，往后经过，咱们还来蹭她一顿饭。"]]]
  ]);
  before('lusu','freed',[
   ['grain-list','jianye','lusu','核对粮船是否送到各处安置点',[
-   ['npc','码头交接的数够了，可其中一处还没有回信。我们得先确认粮送进了灶里，不能只看管仓的人签了字。'],['hero','让船夫带我们去最后那处看看。如果只是路上耽搁，顺手帮他们卸下；要是真有人扣粮，也别等大家饿了才知道。']]],
+   ['npc',"账上的数是齐了，最后那处灶房却没回信。这粮有没有下锅，还得劳烦诸位陪我走一趟。"],['hero',"船夫认路吧？咱们找他带过去。车若还没卸，正好搭把手。"]]],
   ['grain-kitchen','jianye','evacuee','协助乡民分完最后一船粮',[
-   ['npc','不是没人做饭，是有两个病人领不到，我不敢把他们那份也分掉。鲁先生过来把人接到一起，这才都照顾上。'],['lusu','以后每天按住户记，走不了路的送到门口。这里有人接手，我也能放心跟你们去别处，不必一直守着这一仓粮。']]]
+   ['npc','不是没人做饭，是有两个病人领不到，我不敢把他们那份也分掉。鲁先生过来把人接到一起，这才都照顾上。'],['lusu',"往后照住户记，病着走不动的，送到门上。我请的人明日起便来接手，诸位不必在此久候。"]]]
  ]);
  before('ganning','freed',[
   ['crew','xinye','boatman','确认甘宁部众和被扣船只的下落',[
-   ['npc','甘大哥出来了，可一半弟兄还在东边的旧渡口躲着。他们不敢进城，也不知道牢里的人到底有没有救成。'],['hero','你带个能认人的去报平安。兴霸，你先别急着报仇，大家凑齐，再把那条官船上的账说清楚。'],['ganning','我听你的。那些人是跟着我来招安才中了圈套，我得先把他们带回去。']]],
+   ['npc','甘大哥出来了，可一半弟兄还在东边的旧渡口躲着。他们不敢进城，也不知道牢里的人到底有没有救成。'],['hero',"找个认路的，去渡口报信。兴霸，报仇不差这片刻，得先把弟兄找齐。"],['ganning',"是，他们随我来招安，倒受了这场罪。我这就去接人。"]]],
   ['ledger','xinye','ganning','让甘宁说明官船旧案与今后的去向',[
-   ['npc','官船运的是扣下来的救济粮，账册藏在船板下面。我拿它逼过县尉，却没想到连累弟兄陪我坐牢。'],['hero','账留一份给城里的书吏，另一份交到建业。你自己以前抢过的商船也不能只字不提，愿意重新开始，就得把该还的慢慢还。'],['npc','我认。船上的货先抵给受过害的人，弟兄们愿意回家的给他们盘缠。我跟你走，不是换个名号接着在江上收钱。']]]
+   ['npc','官船运的是扣下来的救济粮，账册藏在船板下面。我拿它逼过县尉，却没想到连累弟兄陪我坐牢。'],['hero',"抄一份给城里的书吏，原账带去建业。有凭有据，县尉才抵赖不得。你以前劫过的船，也列个单子，咱们想法赔还。"],['npc',"那便从我船上的货里出。该赔的赔，想回家的给盘缠。剩下愿意跟我的，我带他们另寻条路，不干这拦船的勾当了。"]]]
  ]);
  // 蜀：问答之后要真正做事，护送之后要交代家人怎样生活。
  before('zhugeliang','freed',[
   ['water-report','chengdu','zhugeliang','与诸葛亮处理城外争水的急报',[
-   ['npc','刚才说两边都缺粮，现在真有件类似的事。城外两村争同一条渠，上游怕断水不肯开闸，下游已经去堵出水口了。'],['hero','我们先去看看，不劝谁先吃亏。你带上会看渠的人，我问清楚每块田什么时候要水，再商量轮流放。'],['npc','可以。军报里没写的细节，到了田边才知道。我跟你一起去，也看看你刚才说的话，碰到真有人着急时还能不能做。']]],
+   ['npc',"巧得很，城外真有一桩。两村共用一渠，上游闭闸，下游堵口，各说再无水便要绝收。争得已经动了锄头。"],['hero',"带个懂渠的去。我问田户缺水的时辰，你看闸怎么分水。两边总得先见到水能流，才肯松开锄头。"],['npc',"也好。我同你去。军报只写“争水”二字，到了田边，兴许另有缘由。"]]],
   ['water-village','chengdu-county','village-aunt','向两村核实用水和损坏的渠闸',[
-   ['npc','不是我们不肯放，昨天闸上的木板让人拆了，一开就全漏。下游只看见我们关闸，以为是故意留着不给。'],['hero','先把这件事跟下游讲清，再请会木工的人修。等水能稳稳流过去，两边才有得谈，光在这里争谁先喝水，闸也不会自己好。'],['zhugeliang','我看过渠口了，修好木板就能分流。只是运木料的车还被一伙逃兵扣着，我们先去把人和木料接回来。']],[N('接应运木料的车队','water-timber')]]
+   ['npc','不是我们不肯放，昨天闸上的木板让人拆了，一开就全漏。下游只看见我们关闸，以为是故意留着不给。'],['hero',"原来闸坏了。劳烦给下游带个话，我们找木工来看看，别再隔着渠骂了。"],['zhugeliang',"换好木板，渠口便能分水。只是木料被逃兵扣了，连车夫也未归。先把人和车接回来。"]],[N('接应运木料的车队','water-timber')]]
  ]);
  battle('zhugeliang','water-timber','chengdu-county','bandit-chief','接回修渠所需的木料',[
-  ['npc','车是我们先扣下的，木料拿去烧火也轮不到你们管！'],['hero','车夫还坐在旁边，这木料是谁的，说得清楚。你们缺柴可以另找，不能拿两村等着用的渠闸来烧。']],'water-settle',{count:5,guest:'zhugeliang',scene:'farmland'});
+  ['npc','车是我们先扣下的，木料拿去烧火也轮不到你们管！'],['hero',"两村等着这车木料修闸，你倒拿来烧火？车夫就在旁边，谁的货，还用得着争？"]],'water-settle',{count:5,guest:'zhugeliang',scene:'farmland'});
  H.definitions.zhugeliang.stages['water-settle']=S('chengdu-county','协助两村修闸，约定轮流用水','zhugeliang',[
-  ['npc','闸能开了，轮水的时辰也由两村自己商定。我把修闸的做法留给木工，下一回坏了，不必再等官府派人。'],['hero','刚才那个不肯让路的人，现在肯帮着抬木料了。原来争得最厉害的，也不一定是不讲道理，只是怕自家撑不过去。'],['npc','所以我愿意跟你同行。知道将来的事固然难得，肯留在田边把眼前的事做完，才是我真正放心的地方。']],[N('回城安排同行事宜','freed')]);
+  ['npc',"渠通了。上下午轮水，两村已各自画押。修闸的木工也留下了图样，往后再坏，不必等成都的人来。"],['hero',"方才堵着渠口骂的那位，还替我们抬了一路木料。早知道是闸坏了，何至于闹成这样。"],['npc',"故而不可只在府中断事。今日这一趟，亮也受教了。往后若再有此类难题，便一同去看。"]],[N('回城安排同行事宜','freed')]);
  const gy=H.definitions.guanyu;gy.stages.pass.npc.choices=[N('核验令牌，带车队通过第一关','two',{requires:{items:{'lvbu-token':1}}}),N('请吕布核实车队身份','two',{requires:{partyAny:['lvbu']}}),F('保护车队通过第一关','pass-one')];
  before('guanyu','freed',[
   ['parents-home','chengdu','village-aunt','陪关羽父母安顿新住处',[
-   ['npc','一路都怕拖累他，夜里咳一声，他就下车来问。如今到了这里，你劝劝他，别每回出门都想着家里没人照应。'],['guanyu','父亲腿脚不便，我怕这里的门槛高。刚请木匠改好了，邻家也留了口信，有事可以到府里找人。'],['hero','二老住得习惯最要紧。云长，等饭做好，我们一起吃一顿，你也坐下歇会儿，别又站在院子里。']]],
+   ['npc','一路都怕拖累他，夜里咳一声，他就下车来问。如今到了这里，你劝劝他，别每回出门都想着家里没人照应。'],['guanyu',"门槛已请木匠削低，父亲出入不碍事了。也与邻家说过，有急事便去府中传信。"],['hero',"云长，灶上都冒烟了，还站着做什么？坐下，今晚陪二老好好吃顿饭。"]]],
   ['road-meaning','chengdu','guanyu','听关羽说起西行途中遇到的人',[
-   ['npc','原想只带父母走，最后却跟了这么多乡亲。过桥时有人替我们修车，也有人把自己的水分出来，我记着这些人。'],['hero','以后再带人赶路，就照这次一样，别把走得慢的落下。我们想找的同伴，也正是愿意这么做的人。'],['npc','那我愿意跟你们同行。父母已经安顿好，眼前再有谁遇上这种事，我不能只当没看见。']]]
+   ['npc',"出门原是自家一辆车，过关时，身后却跟着许多乡亲。有替我们修车的，有送水的，关某都记下了。"],['hero',"下回再遇见走不动的人，咱们也停一停。路远，谁没个要人搭手的时候。"],['npc',"正是。父母已安，关某便随诸位走。遇着关卡兵刃，也多一把刀可用。"]]]
  ]);
  before('zhangfei','freed',[
   ['village-apology','xiapi-county','village-aunt','陪张飞向受惊的乡民解释赔礼',[
-   ['npc','张将军能打，我们知道。可他喝醉摔坏了桥头的栏杆，孩子现在都不敢从那里过。他要走，好歹先把这件事办了。'],['zhangfei','这事是我不对。我带人把木料抬来，怎么修请你们熟悉桥的人说，不能随便钉两根就算。'],['hero','我也留下帮忙。先把桥修好，别让乡亲们每天都得绕远路。']]],
+   ['npc','张将军能打，我们知道。可他喝醉摔坏了桥头的栏杆，孩子现在都不敢从那里过。他要走，好歹先把这件事办了。'],['zhangfei',"俺摔的，俺修！去抬木料来。桥是哪儿松了，劳乡亲指给俺看，俺这回听你们的。"],['hero',"我来帮着搬。早些修好，孩子过桥也不必绕路。"]]],
   ['village-bridge','xiapi-county','zhangfei','修好桥头护栏后，与张飞谈谈',[
-   ['npc','大哥信里没骂我，只问我吃饭没有、住在哪里。我原先憋着一肚子气，今天抬完木料才觉得，自己把事想拧了。'],['hero','翼德，你要回去，当面把话说清楚就行。别让关心你的人一直托别人找，也别用酒把难受拖下去。'],['npc','好，我先回信报平安。往后跟你们出门，喝酒的事你看着我，再摔东西，我自己修。']]]
+   ['npc',"抬完这几根木头，气倒顺了。大哥哪有不认俺？信里一字没骂，倒是俺自个儿越想越气。"],['hero',"那就给他回封信，报个平安。真有不痛快，见了面再吵，总比叫人满天下找你好。"],['npc',"这就写！往后喝酒你看着俺，再砸了什么，俺去修，绝不躲。"]]]
  ]);
  before('machao','freed',[
   ['old-retainer','wuwei','ma-old-soldier','向马家旧部问清旧宅被占的经过',[
-   ['npc','枪取回来了，可替马家守库的几个人还在里面。占宅的人要他们交出粮仓钥匙，他们不肯，就被扣在马棚里。'],['machao','我竟只惦记着父亲的枪，没问你们怎么过的。走，带我回去，这次我自己去接人，不能再让他们替我担着。'],['hero','我们也去。先看守卫把人关在哪间，再动手，别一进去就让人拿被扣的老兵挡在前面。']],[N('与马超回旧宅救人','retainer-rescue')]]
+   ['npc','枪取回来了，可替马家守库的几个人还在里面。占宅的人要他们交出粮仓钥匙，他们不肯，就被扣在马棚里。'],['machao',"人还在马棚里？怎么不早说……不，是我没问。带路，这次我自己去！"],['hero',"我们跟着。到门外先看清关人的地方，别让守卫拿老兵要挟。"]],[N('与马超回旧宅救人','retainer-rescue')]]
  ]);
  battle('machao','retainer-rescue','ma-residence','river-guard','救出马家旧部',[
-  ['npc','刚拿了枪又回来？你们再往里走，这几个人就别想出去！'],['machao','他们只是替家里看门，没有得罪过你们。把门打开，我就在这里，不会拿老人替自己挡刀。']],'retainer-home',{count:5,kind:null,guest:'machao',scene:'city-frontier'});
+  ['npc','刚拿了枪又回来？你们再往里走，这几个人就别想出去！'],['machao',"人若伤一根头发，我拆了这道门！马家的人，我来领，放开他们！"]],'retainer-home',{count:5,kind:null,guest:'machao',scene:'city-frontier'});
  H.definitions.machao.stages['retainer-home']=S('wuwei','将获救旧部安置到安全住处','machao',[
-  ['npc','人都接回来了，粮仓钥匙交给了愿意照管的老人。我把以前留下的东西分了些给他们，先把这个冬天过好。'],['hero','孟起，枪找回来以后，你总算肯抬头看看周围了。那些人等的也不是你一个人冲进去打赢，是想知道你还会回来。'],['npc','这次记住了。你们以后要救谁，我跟着去，也把人安顿好再走。']],[N('与马超谈谈同行','freed')]);
+  ['npc',"人接回来了，粮仓钥匙留给叔伯们。旧物也分下去一些，总要让他们把冬天过了。只有一杆枪回到我手里，哪里算得上回家。"],['hero',"他们一见你便抢着说话，连伤都顾不上。我看，你以后得常回来，别又一坐酒家就没了音信。"],['npc',"不会了。往后随你们走，这里的信也要带着。哪处有人要救，只管叫我。"]],[N('与马超谈谈同行','freed')]);
  before('liubei','feast',[
   ['jiangxia-guest','jiangxia','evacuee','先了解江夏安置百姓的争议',[
    ['npc','刘将军想把河边的空屋借给我们，当地几家却不答应。他们说我们住下就要分粮，昨晚连进城的路都堵了。'],['hero','住处没谈好，怎么先办起宴席来了？'],['npc','说是请两边坐下讲清楚。刘将军不想让我们在外面再等，可我看守卫带得比平常多，你们进去提醒他，凡事小心些。']]]
  ]);
  before('liubei','freed',[
   ['homes','chengdu','evacuee','确认江夏逃难者的住处与家人',[
-   ['npc','城里给我们留了两排屋，失散的孩子也找着家里人了。刘将军从船上下来还在问有谁没到，自己的伤反而不提。'],['hero','你们先把每家的人记齐，缺药的交给医馆。这边有人接手以后，他才肯好好养伤。']]],
+   ['npc','城里给我们留了两排屋，失散的孩子也找着家里人了。刘将军从船上下来还在问有谁没到，自己的伤反而不提。'],['hero',"把名册核一遍，缺谁就来报。药的事找医馆，他也该歇了，总不能叫病人守着伤者。"]]],
   ['promise','chengdu','liubei','与刘备商量如何继续安置逃难百姓',[
-   ['npc','江夏那边还有人没能同行，我已经托人带信，不让他们再单独去赴宴。事情闹成这样，我不能只为自己回来而高兴。'],['hero','那就把后续的接应交给靠得住的人。我们一起出门，也得有人能继续办事，不能大家都跟着走，城里又没人管。'],['npc','你提醒得对。我先把粮和人手交代清楚，再来与你们会合。']]]
+   ['npc','江夏那边还有人没能同行，我已经托人带信，不让他们再单独去赴宴。事情闹成这样，我不能只为自己回来而高兴。'],['hero',"接应的人别撤，留个能作主的。你若跟我们出城，那边送来消息，也总得找得到人办。"],['npc',"已遣人去接，我再将粮和人手拨下去。稍候片刻，交代毕，便与你们会合。"]]]
  ]);
  // 吴：古琴是结识的起点，水路与城防的困难才决定能否并肩做事。
  before('zhouyu','freed',[
   ['river-letter','jianye','zhouyu','与周瑜核对柴桑的求援信',[
-   ['npc','琴弦还没调好，柴桑的信就到了。夜里有水贼用假灯号引船，运粮船已经失了两条。我得先处理这个，弹琴只能改日。'],['hero','我们也去。那张琴留在这里有人照料，船上的人可等不了。灯号是谁教给水贼的，得先查明白。']]],
+   ['npc','琴弦还没调好，柴桑的信就到了。夜里有水贼用假灯号引船，运粮船已经失了两条。我得先处理这个，弹琴只能改日。'],['hero',"琴留在府里，咱们去柴桑。假灯号从哪里传出去的，到了得好好问问。"]]],
   ['river-scout','chaisang','boatman','核实假灯号出现的水道',[
-   ['npc','真接引船在东岸亮一盏灯，贼船却在西岸亮两盏。船夫半夜看不清，就往近的那边靠，一进芦苇沟就出不来了。'],['zhouyu','今晚改用岸上三次击鼓报信，灯只作照明。我们留一条空船在外侧，把他们引出来，乡亲的船先停在内湾。'],['hero','让船夫都知道新的信号，别只有我们自己听明白。空船由熟水的人带，追出芦苇就停，不能反过来跟着贼跑。']],[N('随周瑜守候水道','river-night')]]
+   ['npc','真接引船在东岸亮一盏灯，贼船却在西岸亮两盏。船夫半夜看不清，就往近的那边靠，一进芦苇沟就出不来了。'],['zhouyu',"今夜灯只照路，三次鼓声为号。空船驶外侧诱敌，乡亲的船留内湾。待他们出沟，再断归路。"],['hero',"鼓声得传到每条船上。掌空船的找熟水路的人，出了芦苇沟就撤，别被带着绕远。"]],[N('随周瑜守候水道','river-night')]]
  ]);
  battle('zhouyu','river-night','chaisang','bandit-chief','截住以假灯号劫船的水贼',[
-  ['npc','那条船上怎么没人？后面的，先别靠过去，岸边有人！'],['zhouyu','客船都进内湾了。守住船夫退回来的水口，别让他们再往乡亲那边冲。']],'river-aftermath',{count:5,guest:'zhouyu',scene:'river-dock'});
+  ['npc','那条船上怎么没人？后面的，先别靠过去，岸边有人！'],['zhouyu',"内湾已收齐客船。守住水口，接引水人回来，莫让贼船靠近乡亲！"]],'river-aftermath',{count:5,guest:'zhouyu',scene:'river-dock'});
  H.definitions.zhouyu.stages['river-aftermath']=S('jianye','与周瑜安排水道巡守','zhouyu',[
-  ['npc','原来是个被辞退的引水人，把旧灯号卖给了水贼。船夫已经认出他，之后换信号也会由两边一起确认，不能只凭一盏灯。'],['hero','今晚没丢船，也没把百姓留在岸边等。公瑾，等这里有人轮守，你再跟我们出去，才不用走一半又担心后面。'],['npc','都已安排好了。还有件事，琴已经修好，今晚再忙也该弹给你们听。这回你们坐下，我不会又叫人把船牵出来了。']],[N('与周瑜商议同行','freed')]);
+  ['npc',"是个辞退的引水人，将旧灯号卖给了水贼。船夫已当面认出。往后两岸互验信号，不能见灯便靠。"],['hero',"这回船都保住了。等轮守的人到齐，咱们便能走，不必总惦着这一段。"],['npc',"人已到齐了。倒是欠诸位一曲，今晚该还。放心，不会弹到半截，又请你们去撑船。"]],[N('与周瑜商议同行','freed')]);
  before('huanggai','entrance',[
   ['mountain-witness','wuling','herbalist','请熟悉山路的药夫指出安全入口',[
-   ['npc','正面的沟口以前能走，最近他们堆了湿草，专等有人进沟再点火。吕将军认得的是旧路，恐怕就是在那里吃了亏。'],['huanggai','那就从上坡看清再下去。先救人，别为了抓放烟的那几个，把被困的人又丢在沟里。']]]
+   ['npc','正面的沟口以前能走，最近他们堆了湿草，专等有人进沟再点火。吕将军认得的是旧路，恐怕就是在那里吃了亏。'],['huanggai',"湿草的烟最呛人。从上坡看准再下去。放烟的人跑了便跑了，先将沟里的人带出来。"]]]
  ]);
  before('huanggai','freed',[
   ['mountain-care','wuling','huanggai','确认获救者得到医治与家人接应',[
-   ['npc','乡兵愿意轮班守林口，采药的人也学会结伴走。子明的伤慢慢养，你别看他又想拿剑，郎中还没许他抬那条胳膊。'],['hero','我会提醒他。你也让人替换着守，不能靠一个老将军每天进山，才让所有人安心。'],['npc','你说得对，老将也得肯把事情教给年轻人。这里有人接手，我就跟你们去外面走走。']]]
+   ['npc','乡兵愿意轮班守林口，采药的人也学会结伴走。子明的伤慢慢养，你别看他又想拿剑，郎中还没许他抬那条胳膊。'],['hero',"守林口的人也换着轮班吧，您一人再能走，哪能日日都去。子明那边我劝着，他这阵子先别碰剑。"],['npc',"是该交给后生了。山路图我留下，带他们再认一回，往后便不用事事等老夫。"]]]
  ]);
  before('lvmeng','freed',[
   ['lesson','wuling','lvmeng','复盘演阵中没有守住的侧路',[
-   ['npc','我刚才只顾着追前面那个人，把侧面让空了。书里那句别贪眼前的小利，我认得每个字，做起来还是忘。'],['hero','子明，那就再看一次刚才站的位置。以后真遇到人退，不要先问追不追，先问后面的队友有没有人照应。'],['npc','记下了。附近药车明天过山口，我们不妨陪着走一段，这次不演，真替乡亲把那条侧路守好。']],[N('陪吕蒙护送药车','escort-lesson')]]
+   ['npc',"又追过头了！前头那人一退，我脚就跟着迈，侧面全空着。书上明明才读过，临阵还是忘。"],['hero',"子明，回头看看。你方才那一追，后头就只剩我们两个。再试一回，这次留意身边的人。"],['npc',"这回看明白了。明日有药车过山口，咱们护送一段吧。我来守侧路，可不能再犯。"]],[N('陪吕蒙护送药车','escort-lesson')]]
  ]);
  battle('lvmeng','escort-lesson','wuling-county','lvmeng','护住药车经过山口',[
-  ['npc','前面的人在引我们追，右边却有人往车后绕。大家别散，先把车送过狭口，我来守右边。'],['hero','这回看清楚了。等车过了，咱们一起退，不留谁独自断后。']],'lesson-done',{count:4,guest:'lvmeng',scene:'forest-path'});
+  ['npc',"别追，是诱兵！右侧有人绕后，先送车过狭口，我守这边！"],['hero',"右边交给你！车过了便一齐撤，别断在后头。"]],'lesson-done',{count:4,guest:'lvmeng',scene:'forest-path'});
  H.definitions.lvmeng.stages['lesson-done']=S('wuling','把药车送达后，与吕蒙交谈','lvmeng',[
-  ['npc','这一次没有人受伤，药车也准时送到了。读书不是为了让别人说我懂得多，是为了再进山时不把人带到险处。'],['hero','那就把书继续带着。路上遇到不会的，大家一起问，肯认自己没弄明白，比装懂强。']],[N('与吕蒙商议同行','freed')]);
+  ['npc',"药车到了，一个没伤！我把守侧路的那几句又看了一回，今夜总算不只是认字了。"],['hero',"书卷带上吧。路上看不懂，咱们找懂的人问，总能问出个明白。"]],[N('与吕蒙商议同行','freed')]);
  before('luxun','freed',[
   ['stone-reason','bagua-stones','luxun','问清陆逊进入石阵的原因',[
-   ['npc','我不是只想逞强。旁边运粮的人说，见过一个孩子在石阵边玩，我想进去找，结果自己绕不出来。后来才知道孩子早已回家。'],['hero','伯言，那得先去问明白。你困在里面，外面的人要是也进来找，又会把别人带进去。']]],
+   ['npc','我不是只想逞强。旁边运粮的人说，见过一个孩子在石阵边玩，我想进去找，结果自己绕不出来。后来才知道孩子早已回家。'],['hero',"可问过孩子家里？伯言，你若也失了踪，外头还得再进来找一个。"]]],
   ['stone-warning','yiling','village-aunt','核实孩子平安，给石阵留下醒目标记',[
-   ['npc','孩子就在家里，鞋坏了才绕远路回来。你们真进去找了？我得叫他来赔个不是，害大家担心这么久。'],['luxun','不用责怪他，是我没先问清。阵口我会加上木栏和指路牌，让过路的人知道哪里能走，不能只想着自己认得方向。'],['hero','标记立好了，再请附近的人一起看看。只要下个人不用再进去绕一整天，这趟就没白忙。']]]
+   ['npc','孩子就在家里，鞋坏了才绕远路回来。你们真进去找了？我得叫他来赔个不是，害大家担心这么久。'],['luxun',"不必怪他。是我听了半句话就进阵，没问家中。阵口当立木栏、标清去路，免得旁人再误入。"],['hero',"立好叫附近乡亲认一认，哪边能过，哪边别进。总不能过个路，还得先去请孔明。"]]]
  ]);
  before('sunshangxiang','spar',[
   ['boat-families','chaisang','evacuee','核实渡船上的乡民是否全部上岸',[
-   ['npc','最后一船也上来了，船夫受了点伤。孙姑娘刚把自己的外衣给孩子盖着，人家要谢她，她反倒说是来迟了。'],['sunshangxiang','不是客气，我确实只想着把船接过来，没有想到船上还有走不动的。回去得多备几副担架，下次不能又临时找门板。'],['hero','把这件事记给渡口的人。你想自己做事，就把后面的安排也接住，不是打完一仗就算完。']]]
+   ['npc','最后一船也上来了，船夫受了点伤。孙姑娘刚把自己的外衣给孩子盖着，人家要谢她，她反倒说是来迟了。'],['sunshangxiang',"本以为接到船就成了，谁知下船还得抬人。下回多备几副担架，别再现拆门板了。这事我回去就说。"],['hero',"也跟渡口的管事留个话。明日再有船来，咱们便不用从头忙一遍。"]]]
  ]);
  before('sunquan','plan',[
   ['outer-scout','chaisang','camp-scout','核实柴桑两路围兵的布置',[
-   ['npc','袁术占着上游粮路，严白虎守下游渡口，两边各收各的东西。昨天因为一条粮船吵过，直到夜里都没一起换岗。'],['hero','我们把哪边换岗、哪边扣船记下来，再去见孙将军。先找能把乡亲送走的口子，不急着把两路兵都引到自己面前。']]]
+   ['npc','袁术占着上游粮路，严白虎守下游渡口，两边各收各的东西。昨天因为一条粮船吵过，直到夜里都没一起换岗。'],['hero',"把换岗的时辰记下，回去见孙将军。粮船争的是哪段水道？那里也许便能过人。"]]]
  ]);
  before('sunquan','freed',[
   ['river-return','jianye','sunquan','与孙权清点撤回的船只与伤者',[
-   ['npc','少的那条船不是沉了，是去接上游的人，我刚收到回信。伤者都到了医馆，船夫也拿到了修船的材料。'],['hero','这趟有熟水路的人带着才出来，之后别让他们领了赏就各走各的。把会做这些事的人留下来教别人，下次才不会又临时求人。'],['npc','我会安排。等码头和城里的事务交到人手上，我再与你们一起动身。孙家要人守着，可我也不能因此一辈子只听下面送来的话。']]]
+   ['npc','少的那条船不是沉了，是去接上游的人，我刚收到回信。伤者都到了医馆，船夫也拿到了修船的材料。'],['hero',"这回脱险，多亏几个船夫认路。留他们带带新手吧，往后接人，总不能再临时从街上找。"],['npc',"已留了人，也拨下修船的木料。待这边交接完，我便能动身。总坐在府里等信，连自家水路断在哪儿都不知，也不是长久之计。"]]]
  ]);
  // 群雄与黄巾：让民生事件真正影响人物的决定。
  before('huatuo','freed',[
   ['clinic-test','xiangyang-county','huatuo','协助医馆救治急需处理伤口的病人',[
-   ['npc','药不是配出来就能用。这里有位伤者要取出折在腿里的箭头，我已问过他的意思，也备好了止血的东西。你帮我记下从用药到醒来的时辰。'],['hero','我在旁边记，别的人先离远一点，给你腾出地方。家里人如果问起来，也由我去解释，不让他们只在门外着急。']]],
+   ['npc',"药成了，还须看疗效。这位要取腿中箭头，已肯试药，止血之物也备齐。你替我记下服药、取箭、醒来的时辰。"],['hero',"我记着。大家让开些，家眷就在门外，我去告诉他们，免得听不见动静更着急。"]]],
   ['clinic-followup','xiangyang-county','huatuo','确认伤者醒来，留下复诊与用药记录',[
-   ['npc','醒来以后能认人，也能说清疼在哪里，今天还得留在这里观察。方子交给医馆，没学过的人不能拿回去自己照着试。'],['hero','这几天我们跑了不少路，现在看着他能跟家里人说话，才觉得药篮真送到了该送的地方。'],['npc','我也一样。这里的医者已经学会记录和照看，我才放心跟你们出门，不让他们只拿着一张方子就不知该怎么办。']]]
+   ['npc',"醒后认得家人，疼处也说得清。今日仍须留诊。方子交给医馆，未学过药性的人，切莫拿去私试。"],['hero',"方才他一睁眼，门外的人全挤进来了。这几趟山路，总算没白跑。"],['npc',"瞧见了，我也松口气。留诊的几位已会照看、记药，我再叮嘱一遍，往后出门，心里便有底了。"]]]
  ]);
  const mh=H.definitions.menghuo;
- mh.stages.second.npc.turns=[{speaker:'npc',text:'寨老跟我说了病人的事。以前来的人也说要治病，拿了粮就走，我才一直不敢信。你们真能请来大夫，我让人陪着带路。'},{speaker:'hero',text:'先把重病的人搬到干燥处。我们出去请华大夫，你愿意来就带路，别再拿比试耽误病人。'}];mh.stages.second.npc.choices=[N('请孟获带路，到林口查看','third')];
+ mh.stages.second.npc.turns=[{speaker:'npc',text:'寨老跟我说了病人的事。以前来的人也说要治病，拿了粮就走，我才一直不敢信。你们真能请来大夫，我让人陪着带路。'},{speaker:'hero',text:"愿意带路就来，咱们去请大夫。病重的先挪到干屋，别还睡在湿地上。"}];mh.stages.second.npc.choices=[N('请孟获带路，到林口查看','third')];
  mh.stages.third=S('nanman-woods','清除堵住请医道路的劫粮者','bandit-chief',[
-  ['npc','又想从这里出去？上次留下的粮还不够，再交一袋才准过！'],['menghuo','就是你们冒充来治病的人，拿完粮又守在这里抢。今天把路让开，我要去请真正的大夫。']],[F('清出请医的道路','third')]);
+  ['npc','又想从这里出去？上次留下的粮还不够，再交一袋才准过！'],['menghuo',"前日装大夫骗粮的就是你们！还敢守在这儿？让路，我去请真的！"]],[F('清出请医的道路','third')]);
  mh.battles.third={stage:['third'],next:'doctor',title:'林口劫粮者',count:4,enemyKind:'bandit',level:10,sceneId:'forest-path',guest:'menghuo'};
- mh.stages.fourth.npc.turns=[{speaker:'npc',text:'华先生请先进去，病人已经挪到干燥的屋子。可运药的人被那伙劫粮的堵在后面，我带你们去接，不能药箱还没到就让人空等。'},{speaker:'hero',text:'你带熟路的人守住寨口，我们去接药车。这次大家一起做，不用再争谁比谁能打。'}];
+ mh.stages.fourth.npc.turns=[{speaker:'npc',text:"先生请进，病人都在干屋。药担却叫劫粮的截在后头了——我带你们抄近路，得赶紧去接！"},{speaker:'hero',text:'你带熟路的人守住寨口，我们去接药车。这次大家一起做，不用再争谁比谁能打。'}];
  mh.battles.fourth={stage:['fourth'],next:'treatment',title:'南中药车',count:5,enemyKind:'bandit',level:10,sceneId:'rural-road',guest:'menghuo'};
  mh.stages.fifth=S('nanman','与孟获安排清理水源','menghuo',[
-  ['npc','华先生说水得烧开，寨里几家却没够用的柴。我先去砍，你们帮忙问问还有谁家没领到药，别全挤在门口等。'],['hero','柴让能干活的人轮流去，病人家里留一个照顾。水塘也得围起来，免得又有人图近，直接去舀。']],[N('协助寨里清理水源与住处','sixth')]);
+  ['npc','华先生说水得烧开，寨里几家却没够用的柴。我先去砍，你们帮忙问问还有谁家没领到药，别全挤在门口等。'],['hero',"砍柴的人轮着去，病人家里留个照看的。水塘也围一下吧，总有人图近，顺手又舀回去了。"]],[N('协助寨里清理水源与住处','sixth')]);
  mh.stages.sixth=S('nanman','听孟获回应寨中乡民的疑虑','southern-elder',[
-  ['npc','乡亲们看见你们留下来帮忙，已经不再把所有外来人都当坏人。孟获却还怪自己，觉得是他没守好粮，才害大家跟着病。'],['hero','让他先来看看病人好些没有。真要负责，就把眼前这些事继续做好，不是一个人在外面生闷气。']],[N('与孟获一起探望恢复中的乡民','seventh')]);
+  ['npc','乡亲们看见你们留下来帮忙，已经不再把所有外来人都当坏人。孟获却还怪自己，觉得是他没守好粮，才害大家跟着病。'],['hero',"叫他进屋帮忙吧。病人正好些了，门外那几捆柴也等着劈，他一个人在外头气什么。"]],[N('与孟获一起探望恢复中的乡民','seventh')]);
  mh.stages.seventh=S('nanman','与孟获谈谈这一趟的来往','menghuo',[
-  ['npc','七回见面，从寨口拦你们，到今天肯坐下来吃饭，是我一点点认错。我原以为不让外人进来就能护住大家，最后连大夫也拦在外头。'],['hero','谨慎没有错，可也要让人有把事情说明白的机会。以后我们一起出去，你熟悉南中，我熟悉外面的路，谁也别只认自己的老办法。'],['npc','我愿意。寨老会照顾这里，你们给我留的位置，不是俘虏该站的地方，是朋友同行的位置，这一点我明白。']],[N('安顿寨中事务后，再谈同行','freed')]);
+  ['npc',"头回在寨口，我拿刀拦你；如今都第七回见面了，倒要请你吃饭。当初连大夫都不许进，我这脑袋，真不知在想什么。"],['hero',"饭可得管饱，几趟山路走得够呛。往后我们来，你总认得了吧？外头的路我们带，南中的路还得借你的本事。"],['npc',"自然认得！刀是拦外人的，朋友来喝酒。寨老替我照看这里，你们要走时，喊上我。"]],[N('安顿寨中事务后，再谈同行','freed')]);
  mh.stages.freed.npc.turns=[{speaker:'npc',text:'病人能下床了，水塘也围好了，寨里的人一见你们就招手。我原先只想把门守死，结果连愿意帮忙的人都挡在外面，自己还不肯认。'},{speaker:'hero',text:'现在愿意一起做事就好。你跟我们出去，也能看看别处的人怎么过日子；寨里要有事，我们随时陪你回来。'},{speaker:'npc',text:'好，我去跟寨老说一声。你们不拿我当外人，我也不会只顾着自己的寨子。'}];
  // 旧档仍在旧比试阶段时可继续结算；新流程不再反复打同一个人。
  before('zhangjiao','rain',[
   ['julu-water','julu','village-aunt','与乡民查看干涸的田渠',[
-   ['npc','纸和香都备好了，可我们也怕求完了雨，田还是救不回来。旧沟口堵了好多年，真下一场，也只会往低洼处冲。'],['zhangjiao','那就先疏沟。祈雨是我答应的事，田渠也得我们一起管，不让大家只站在这里等。'],['hero','我去叫能出力的人，按田块分开挖。借来的海螺和香也留好，用完记着还给人家，别把乡亲的好意当成理所当然。']]]
+   ['npc','纸和香都备好了，可我们也怕求完了雨，田还是救不回来。旧沟口堵了好多年，真下一场，也只会往低洼处冲。'],['zhangjiao',"先疏沟，我也来。祈雨之事我自会做，田渠若坏了，下雨也济不了这些田。"],['hero',"能出力的跟我来，照田块分着挖。香与海螺先收好，都是借的，用完还得送还。"]]]
  ]);
  before('zhangjiao','freed',[
   ['julu-account','julu','zhangjiao','当面退还冒名收走的粮食',[
-   ['npc','收走的粮都在这里，谁家少了多少，由乡亲自己核。我问过下令的人，他说以前这样收过，没有人来追问，才一再做下去。'],['hero','那今天不只要退粮，也得让他们知道，以后有人会来查。留下能管事的人，乡亲才不用每次都等你本人路过。'],['npc','已经安排了。我也会出去看看，不再只坐在营里听好消息。你们愿意把这种难听的话当面告诉我，我才更想跟你们一起走。']]]
+   ['npc',"各家对着粮袋来认，缺多少便领多少。下令的人还辩，说从前也这般收，未曾有人来查。"],['hero',"留个查得着账、找得着人的地方吧。先生总不能天天在巨鹿，乡亲也不能回回跑到营里告状。"],['npc',"人已留下。这回若非你当面告我，我还蒙在鼓里。往后我该多走几处，看看旗号底下究竟做了什么。"]]]
  ]);
  before('zhangbao','freed',[
   ['medicine-delivery','camp','zhangbao','核对药材，安排营中伤者后续照料',[
-   ['npc','药车一到，我先把急用的分出去了。送药的伙计也受了伤，他原想直接回去，被我留下敷药了。'],['hero','让营里其他会照看伤者的人跟着学，什么时候换药、药材在哪都讲清楚。你能出门，不该靠伤者都咬牙说自己没事。'],['npc','我明白。已经有两个人愿意轮流接手，我等他们都做熟了，再收拾药箱，不会今天拿到药就甩手走。']]]
+   ['npc','药车一到，我先把急用的分出去了。送药的伙计也受了伤，他原想直接回去，被我留下敷药了。'],['hero',"换药的人手齐不齐？什么时候用哪包药，也得让接班的记熟。咱们等他们学会了再走。"],['npc',"已有两个人跟着学，我再带几日。药箱在旁边，哪日可以出门，我自会来找你。"]]]
  ]);
  // 更新旧阶段别名的下一步，避免战斗恢复后落回旧的直接招募路线。
  const api={version:2,before};root.RecruitmentStories=api;if(node)module.exports=api;
@@ -9150,7 +9150,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  z.stages.return.npc.choices=[Go('把信交给张飞','read')];
  Stories.before('zhangfei','freed',[
   ['trial-talk','xiapi-county','zhangfei','与张飞商量同行的事',[
-   ['npc','信我看了，桥也修好了。跟你们出去，我愿意。不过往后真要一起上阵，我还不知道你自己怎么应付敌人。'],['hero','你是想跟我比一场？'],['npc','对，就咱们两个，点到为止。不是替大哥考你，是以后我把后背交给你，总得知道你会怎么出手。没准备好就改天，我在这里等。']],[Go('准备好了，去空地切磋','duel')]]
+   ['npc',"信读了，桥也修了。跟你们走，俺愿意！可真要并肩上阵，俺还没瞧过你手里的本事。"],['hero','你是想跟我比一场？'],['npc',"没错，就你和俺。点到为止，不是大哥叫俺考你，是俺自己手痒！兵器还不趁手，便改日再来，俺等得。"]],[Go('准备好了，去空地切磋','duel')]]
  ]);
  z.stages.duel=S('xiapi-county','与张飞单独切磋','zhangfei',[
   ['npc','把旁边的人让开，别碰着。赢了咱们再商量同行，输了也没什么丢人的，回去练好再来。'],['hero','说好了，只有我们两个。准备好了就开始。']],[F('与张飞单挑','duel')]);
@@ -9164,7 +9164,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   ['depart-for-wu','beihai','taishici','与太史慈道别',[
    ['npc','母亲的药和吃住都有了安排，我准备去建业。孙家在招人，我想亲自看看，他们是不是真肯让人做些事情。'],['hero','那我们以后到了建业，再去找你。'],['npc','好。你们帮我的事，我记在心里。不过帮忙是一回事，要一起领兵，还得知道彼此的本事。到了建业教场，咱们单独比一场，你赢了，我就跟你走。']],[Go('约在建业教场再见','jianye-meet')]],
   ['jianye-meet','jianye','taishici','到建业教场与太史慈单挑',[
-   ['npc','你们来了。我已经在江东报了到，今天教场也空着。之前说的比试还算数，不过这回别请同伴帮忙。'],['hero','我自己上。你也不用因为北海那件事让着我。'],['npc','正合我意。伤药放在门边，不要硬撑。什么时候准备好，你开口。']],[Go('接受太史慈的单挑','jianye-duel')]]
+   ['npc',"等你们多时了！我已在江东报到，今日教场正空。北海说的那场比试，可没忘吧？这回就你我两个。"],['hero','我自己上。你也不用因为北海那件事让着我。'],['npc',"那才痛快。伤药在门边，撑不住便说，别伤了咱们喝酒的兴致。"]],[Go('接受太史慈的单挑','jianye-duel')]]
  ]);
  t.stages['jianye-duel']=S('jianye','单独击败太史慈','taishici',[
   ['npc','旁边的人先退远一点，就看我们两个。准备好了，来吧！']],[F('开始单挑','jianye-duel')]);
@@ -9175,40 +9175,40 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  t.recruitRequires={flags:{taishiciTrialWon:true},hint:'太史慈已约在建业教场，单挑获胜后才能邀请同行。'};t.recruitRedirect='jianye-meet';
  // 各条路线保留不同的考验，文士与医者不硬套武力单挑。
  Object.assign(H.definitions.zhangliao.battles.duel,{solo:true,boss:true,scaleToHero:true,trainingWeapon:'练武弩',trainingSkills:[{base:'sword-cut',name:'校场试射'}]});
- H.definitions.zhangliao.stages.rumor.npc.turns.push({speaker:'npc',text:'先不论你想替哪家做事。我跟你单独比一场，看看你遇到拦路的人，会不会只等着同伴来救。比完以后，我们再谈关外这些人的去处。'});
+ H.definitions.zhangliao.stages.rumor.npc.turns.push({speaker:'npc',text:"且试一场，就你我二人。武艺并非全部，可遇着刀兵，总不能只会开口求人。比过，再谈出关的事。"});
  Object.assign(H.definitions.sunshangxiang.battles.spar,{solo:true,boss:true,scaleToHero:true,acceptDefeat:false,trainingWeapon:'练武短弓',trainingSkills:[{base:'sword-cut',name:'校场试射'}]});
- H.definitions.sunshangxiang.stages.spar.npc.turns=[{speaker:'npc',text:'渡船上的人都安顿好了，这回该说说我们自己的事。我想跟你单独比一场，赢了我，再请我同行。不是闹着玩，真到了战场，总不能只知道你会叫大家怎么走。'},{speaker:'hero',text:'可以，先把旁边的东西收好。你用练武的弓，我也自己上，谁都不叫人帮忙。'}];
+ H.definitions.sunshangxiang.stages.spar.npc.turns=[{speaker:'npc',text:"船上的人都送妥了，轮到我问你一件事。你自己使兵器如何？比一场吧，单独比。总不能一路只听你指东指西，还没见你出过几招。"},{speaker:'hero',text:"行，练武弓，我也独自上。让旁边的人挪挪，别碰着东西。"}];
  H.definitions.machao.stages.house.npc.choices[0]={label:'要求守卫通报',next:'house-warning'};
  H.definitions.machao.stages['house-warning']=S('ma-residence','应对拒绝归还旧物的守军','river-guard',[
-  ['npc','通报过了，里面说马家的东西也归军中，你们再不走，就按探营拿人！'],['hero','只是取回家里的旧枪，怎么就成探营了？把门后的人叫出来，当着我们说清楚。'],['npc','还想往里闯？来人，把他们赶出去！']],[F('挡住动手的守军','house')]);H.definitions.machao.battles.house.stage.push('house-warning');
+  ['npc','通报过了，里面说马家的东西也归军中，你们再不走，就按探营拿人！'],['hero',"取自家的枪，倒成探营了？谁下的令，请他出来，我当面问。"],['npc','还想往里闯？来人，把他们赶出去！']],[F('挡住动手的守军','house')]);H.definitions.machao.battles.house.stage.push('house-warning');
  // 两种可见的任务道具由本地委托获得，不能用钱直接买到，也不能被出售。
  const river=N.sideQuests.find(q=>q.id==='cs-riverside');river.effects={...(river.effects||{}),items:{'ox-sinew':1}};
- river.accept+='船夫替军中运过弓料，手里留着一份牛筋弦料。把船接回来，他愿意拿出来修黄将军的旧弓。';
+ river.accept="浏阳的水贼拆了船板生火，老船夫哭着来求助。劳诸位夺回船，能补便补。船夫替军中运过弓料，还留着一份牛筋弦料；船接回来，他愿取出修黄将军的弓。";
  Stories.before('huangzhong','school',[
   ['broken-bow','changsha','huangzhong','替黄忠寻找修弓的牛筋',[
-   ['npc','马找回来了，可马贼把弓弦划坏了。浏阳的老船夫以前替军中运弓料，手里应该还有能用的牛筋。'],['hero','我们去问问。要是他有什么难处，也一起看看能不能解决。'],['npc','他前些日子托人来求过助，说渡船被水贼占了。我本来就想去，你到了先把船上的人接回来，弦料拿不到也别紧追着要。']],[Go('先去浏阳帮船夫','bow-wait',{effects:{acceptSide:['cs-riverside']}})]],
+   ['npc','马找回来了，可马贼把弓弦划坏了。浏阳的老船夫以前替军中运弓料，手里应该还有能用的牛筋。'],['hero',"那就去浏阳问问。老人家若有事为难，咱们帮一把。"],['npc',"他先前便托人求援，说渡船被水贼占了。到了先救人，弦料是小事，别让他以为咱们只为牛筋去的。"]],[Go('先去浏阳帮船夫','bow-wait',{effects:{acceptSide:['cs-riverside']}})]],
   ['bow-wait','changsha','huangzhong','完成渡边灯火，带回牛筋弓弦',[
-   ['npc','船夫那边有消息了吗？我先把弓身理好，等你们回来。乡亲能重新过河，比我早几天拿起弓更要紧。']],[Go('拿出牛筋，修好旧弓','school',{requires:{items:{'ox-sinew':1},hint:'先完成“渡边灯火”，向委托人交付后取得牛筋弓弦。'}})]]
+   ['npc',"浏阳可有消息？弓身我已经理好。先让乡亲们过得了河，弦料迟些不妨。"]],[Go('拿出牛筋，修好旧弓','school',{requires:{items:{'ox-sinew':1},hint:'先完成“渡边灯火”，向委托人交付后取得牛筋弓弦。'}})]]
  ]);
  Object.assign(H.definitions.huangzhong.battles.duel,{solo:true,boss:true,scaleToHero:true,acceptDefeat:false,trainingWeapon:'练武短弓',trainingSkills:[{base:'sword-cut',name:'校场试射'}]});
- H.definitions.huangzhong.stages.school.npc.turns=[{speaker:'npc',text:'船夫的信我看过了，人和船都平安，弓也修好了。这趟多亏你们。要说同行，我还想看看你自己拿兵器的本事，咱们在教场单独试一场。'},{speaker:'hero',text:'好，你用练武的弓，我们点到为止。我打不过，就先回去练，不会拿帮忙的事要你让着。'}];
- N.npcs.push({id:'yicheng-apprentice',name:'药徒',art:'herbalist',place:'xiangyang-county',role:'quest',roleLabel:'委托',side:'left',lines:['先生给病人配的药还有两户没送到。往襄阳的路上有盗匪，我一个人不敢挑着药过去，能不能请你们护送一程？','每家用了什么药、还有哪里不舒服，都得记下来带回去，不能只把药包往门口一放。']});
- N.sideQuests.push({id:'yicheng-rounds',title:'宜城送药',giver:'yicheng-apprentice',giverPlace:'xiangyang-county',place:'xiangyang',sceneId:'rural-road',recommendedLevel:6,rounds:2,money:180,item:'wood-beads',quality:'green',enemyName:'拦路盗贼',enemyArt:'thief',accept:'药徒请你护送药材到襄阳附近，送达后记下伤者的情况，再回宜城交接。',effects:{items:{'rounds-journal':1}}});
+ H.definitions.huangzhong.stages.school.npc.turns=[{speaker:'npc',text:"渡船的事，老船夫来信谢过了。弓也修好，多亏诸位。老夫还想试试你手里的兵器——不为别的，难得遇着个肯练的。教场上，咱们单独过几招？"},{speaker:'hero',text:"奉陪。可说好了，练武弓，点到为止。我若输了，回去练好再来。"}];
+ N.npcs.push({id:'yicheng-apprentice',name:'药徒',art:'herbalist',place:'xiangyang-county',role:'quest',roleLabel:'委托',side:'left',lines:["还有两户没收到药，先生等着回信。往襄阳的路上有贼，我挑着药，腿都不听使唤。诸位肯陪我走一段吗？","先生说，药用了没有，哪里还疼，都得问明白记回来。我把笔带了，可别到了门口一紧张，又忘了问。"]});
+ N.sideQuests.push({id:'yicheng-rounds',title:'宜城送药',giver:'yicheng-apprentice',giverPlace:'xiangyang-county',place:'xiangyang',sceneId:'rural-road',recommendedLevel:6,rounds:2,money:180,item:'wood-beads',quality:'green',enemyName:'拦路盗贼',enemyArt:'thief',accept:"药徒要往襄阳送两户药，求人同行。送到后记下病情，带巡诊簿回宜城交给华佗。",effects:{items:{'rounds-journal':1}}});
  Stories.before('huatuo','freed',[
   ['rounds-request','xiangyang-county','huatuo','与华佗交接宜城病人的后续照料',[
-   ['npc','我想跟你们出去，可还有两户人家的药没送到。药徒昨天被人拦回来，我不放心让他一个人再走。'],['hero','我陪他去。病人还有什么要问的，你先告诉我，我一起记回来。'],['npc','看他们有没有再发热，伤口肿没肿，药有没有按时用。遇到拿不准的就记下来，别自己改方子。等巡诊簿交回来，我也好把这几户托给留下的大夫。']],[Go('护送药徒去送药','rounds-handover',{effects:{acceptSide:['yicheng-rounds']}})]],
+   ['npc','我想跟你们出去，可还有两户人家的药没送到。药徒昨天被人拦回来，我不放心让他一个人再走。'],['hero',"我陪药徒送。哪几样病情要问的，先生说吧，我记回来。"],['npc',"问发热、看伤处肿胀，再问用药是否准时。拿不准便记下，切莫擅改方。诊簿送回，留下的医者才好接诊。"]],[Go('护送药徒去送药','rounds-handover',{effects:{acceptSide:['yicheng-rounds']}})]],
   ['rounds-handover','xiangyang-county','huatuo','完成宜城送药，将巡诊簿交给华佗',[
-   ['npc','两户人家的情况，都交给药徒记好了吗？有这份记录，之后接手的大夫才知道该留意什么，我也能放心出门。']],[Go('拿出巡诊簿，交代病情','freed',{requires:{items:{'rounds-journal':1},hint:'先完成“宜城送药”，回药徒处交付，取得巡诊簿。'}})]]
+   ['npc',"巡诊簿带来了？两户的病情，我须交给坐堂的大夫。翻给我看看，还有什么漏问的。"]],[Go('拿出巡诊簿，交代病情','freed',{requires:{items:{'rounds-journal':1},hint:'先完成“宜城送药”，回药徒处交付，取得巡诊簿。'}})]]
  ]);
  // 固定编成让玩家能观察、辨认和重试，不在每次开战时重新抽敌人。
  for(const [id,phase,roles]of [['xuchu','temple',[null,null,'caster']],['taishici','depot',[null,null,'medic']],['ganning','breach',[null,null,null,'caster','medic']],['maliang','medicine',[null,'healer',null]],['zhouyu','river-night',[null,null,'witch',null,'healer']],['zhugeliang','water-timber',[null,null,'caster',null,'medic']],['simayi','grain-seizure',[null,null,'witch',null,'medic']]])H.definitions[id].battles[phase].enemyRoles=roles;
  // 石阵解围不是递交一封信；陆逊会参与一次真正的守路行动。
  Stories.before('luxun','freed',[
   ['road-warning','yiling','evacuee','与陆逊接应被堵在山口的乡民',[
-   ['npc','你们从石阵那边回来了？刚才有伙人把路口封了，几辆车还在坡下，他们要把货全卸下来才让人过。'],['luxun','那条坡路我刚走过，后面还有一条能绕到石壁边的小径。先把乡亲接出来，别让他们在车旁边动手。'],['hero','你带人看住小径，我们从正面过去。等车夫把人带开，再拦住追上来的，别一见他们退就往山里追。']],[Go('与陆逊前往山口','road-defense')]]
+   ['npc','你们从石阵那边回来了？刚才有伙人把路口封了，几辆车还在坡下，他们要把货全卸下来才让人过。'],['luxun',"石壁旁有条小径，我方才走过，能绕下坡。先接乡亲离车，别叫他们夹在中间。"],['hero',"小径你照看，正面我们去。人撤开了再动手，别追进山里。"]],[Go('与陆逊前往山口','road-defense')]]
  ]);
  H.definitions.luxun.stages['road-defense']=S('yiling','与陆逊击退封路匪首','luxun',[
-  ['npc','乡亲已经沿小径走了，拦路的人正在往这边追。先守住石壁旁的窄口，他们散开以后再出手。'],['hero','我看见后面的弓手了，不能只顾着眼前这个。大家站稳，把背后那条路留给乡亲。']],[F('守住乡民的退路','road-defense')]);
+  ['npc',"乡亲已过小径，追兵正来！石壁前路窄，守住，待他们散开再击。"],['hero',"后头有弓手！别挤上去，背后这条路还得让乡亲走。"]],[F('守住乡民的退路','road-defense')]);
  H.definitions.luxun.battles['road-defense']={stage:['road-defense'],next:'freed',title:'夷陵守路',sceneId:'forest-path',count:3,enemyKind:'bandit',level:8,boss:true,guest:'luxun'};
  H.definitions.luxun.stages.freed.place='yiling';H.definitions.luxun.stages.freed.npc.turns=[{speaker:'npc',text:'车都进城了，刚才落在后面的老伯也有人接走。今天要是我自己从石阵出来就走，那些车恐怕还堵在坡下。多亏你们肯留下帮忙。'},{speaker:'hero',text:'你也一直守着小径，不然我们顾不上那么多人。既然大家都平安，接下来还愿不愿意一起走？我们正准备往江东看看。'},{speaker:'npc',text:'愿意。让我先把那条绕行的路画给守城的人，免得以后再有人被堵在那里，交代完就来找你们。'}];
  H.definitions.luxun.recommendedLevel=8;
@@ -9234,25 +9234,25 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   rumor:S('pingyuan','询问平原村人的下落','py-searcher',[
    ['npc','我儿子昨天去割苇子，一夜都没回来。同行的人说，河边有人听见铃响，看见白影，就再也不敢进去找了。'],
    ['guanlu','我去看过，河滩上有车辙，苇子也让人压倒了一片。要真是鬼怪，难道还得推车走？老人家，先别往坏处想。'],
-   ['hero','我们陪你去看看。大叔，你儿子穿什么衣服，跟谁一起走的？把这些告诉我们，找到人也好认。'],
+   ['hero',"我们一道去。大叔，令郎穿什么，跟谁去的？说仔细些，隔远了也好认。"],
    ['npc','穿件旧褐衣，右边袖口补过，跟邻家的小伙子一起走的。你们要是见到他，跟他说一声，家里还等着他吃饭呢。']],[N('与管辂前往河滩','tracks')]),
   tracks:S('pingyuan-county','沿河滩车辙寻找村人','guanlu',[
    ['npc','你看，绳子从苇子里牵过来，另一头挂着铃。白布也缠在树上，是有人故意吓走来找人的乡亲。'],
-   ['hero','地上还有散下来的苇叶，车应该刚过去不久。我们顺着车辙找，别碰这根绳子，免得让他们知道有人来了。'],
+   ['hero',"苇叶还没干，车刚过去。顺着辙走，绳别碰，铃一响就惊动人了。"],
    ['py-captive','那边的两位！别再往前了，他们就在棚子后面。我腿伤了跑不动，另外几个人还被关在里面！'],
-   ['npc','我们听见了，你先伏低身子。我把棚口挡住，你们趁他们顾不上，先扶伤者出来。']],[F('救出棚中的村人','shed')]),
+   ['npc',"听见了！伏低些。我守棚口，诸位去扶伤者，别叫他在地上挪。"]],[F('救出棚中的村人','shed')]),
   testimony:S('pingyuan-county','听获救村人说明经过','py-captive',[
    ['npc','他们让我们白天割苇子，晚上抬货。有人跑了，他们就拿剩下的人出气。河上的船还没回来，另一伙人在芦泽守着货呢。'],
-   ['hero','先把你们送到路边，家里人正在找。那些货是从哪里来的，有没有看清？'],
+   ['hero',"家里人快找疯了，我叫人送你们回路边。这些箱子装的什么，可看清了？"],
    ['npc','有粮，有布，箱子上还带着各家的记号。你们过去的时候当心，那里有个会使毒的，昨天伤了好几个人。'],
-   ['guanlu','我认得去芦泽的路。先请乡亲把伤者接回去，剩下的事情我们一起办，不能留着他们再来抓人。']],[N('前往芦泽查清货物','marsh')]),
+   ['guanlu',"芦泽的路我认得。伤者交乡亲接回，我们再去一趟。留着这伙人，河滩还是去不得。"]],[N('前往芦泽查清货物','marsh')]),
   marsh:S('poison-marsh','拦住准备转运赃物的盗匪','guanlu',[
    ['npc','箱子还在，船也没靠岸。他们把弓手藏在树后，若只顾着往前冲，岸边的人会先吃亏。'],
-   ['hero','先把他们逼离箱子，免得拿乡亲的东西当挡箭牌。你的术法能照顾到树后吗？'],
+   ['hero',"把他们逼开箱子，别叫他拿失物挡箭。树后那几个，你的术法够得着吗？"],
    ['npc','可以。我先封住那一片水面，你留意使毒的人，别让他绕到我们身后。']],[F('截下赃物','marsh')]),
   return:S('pingyuan','将村人和失物的消息带回平原','guanlu',[
    ['npc','失物按箱上的记号还回去了，乡亲们已经接到人。那个老伯刚才还拉着我，说晚上一定要去他家吃饭。'],
-   ['hero','去吧，他守在村口等了一整天，有你把经过说清楚，往后大家也不用再怕河里的鬼了。'],
+   ['hero',"这饭得去吃，老伯在村口等了一整天。也给他讲讲铃和白布，往后便不用绕着河走了。"],
    ['npc','我会说清楚。你们一路来帮忙，还没来得及问，接下来准备去哪儿？']],[N('与管辂商议同行','freed')]),
   freed:End('guanlu','pingyuan',[
    ['hero','我们想找愿意出力的人，也想弄清楚这天下究竟怎么了。你肯跟我们走一段吗？'],
@@ -9260,32 +9260,32 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  },{
   shed:{stage:['tracks','shed'],next:'testimony',title:'苇棚救人',sceneId:'river-dock',count:3,enemyKind:'bandit',fixedPattern:'earlyPhysical'},
   marsh:{stage:['marsh'],next:'return',title:'芦泽截货',sceneId:'river-dock',count:3,enemyKind:'bandit',fixedPattern:'venom'}
- },{recommendedLevel:5,rumor:'平原有村人去河边割苇子，一夜都没回来。管辂正在帮家里人找，听说已经查到了些线索，你们经过那里可以问问。'});
+ },{recommendedLevel:5,rumor:"平原割苇子的几人一夜未归，河边又传有鬼。管辂不信，已去看过，正在替家人找线索。"});
  R('huangyueying','工坊旧轮',{
   rumor:S('xiangyang','询问工坊门前争执的缘由','huangyueying',[
    ['npc','先别锯，那根轴没有断，换掉木楔就能用。你们若把它拆了，磨坊还得再停好几天。'],
-   ['hero','这是从磨坊运来的？我们路过时看见好几车粮堆在外面，乡亲都在等着磨。'],
+   ['hero',"水磨的轮子？方才路过，几车粮全堆在门外，急得乡亲直转圈。"],
    ['npc','是宜城那边的水磨。我把替换的轮子做好了，可送轮子的车让人扣在半路，学徒回来时连鞋都跑丢一只。'],
-   ['hero','你把路告诉我们，我们去接车。轮子重，得让会装的人一起去，别运到了又安不上。'],
-   ['npc','我就是做这个的，当然一起去。我叫黄月英，等我把工具收好，你们替我扶一下门边这根长木。']],[N('陪黄月英去宜城接车','cart')]),
+   ['hero',"哪段路扣的？我们去接车。不过轮子接回来，还得有人会装，你有空同行吗？"],
+   ['npc',"我做的，自然我去装。姓黄，名月英。等我收拾工具，劳你扶稳门边那根长木，别让它倒了。"]],[N('陪黄月英去宜城接车','cart')]),
   cart:S('xiangyang-county','在宜城磨坊外接回应送的轮车','yueying-apprentice',[
    ['npc','师傅，车就在后面！他们嫌木轮不值钱，把车留下给自己装东西，却不肯让我们把轮子卸下来。'],
    ['huangyueying','车上的铜箍也不能拿，少一个都装不稳。你到路口等着，别再跟他们争了。'],
-   ['hero','我们去把车接出来。附近的人先离远一点，这根轮轴滚下来会伤人。']],[F('取回轮车','cart')]),
+   ['hero',"大家往远处让让！这轮轴若滚下来，可不是躲一躲便躲得开的。车我们去要。"]],[F('取回轮车','cart')]),
   repair:S('xiangyang-county','帮黄月英换好磨坊的水轮','huangyueying',[
    ['npc','扶着这里，对，再往上抬一点。木楔敲进去就稳了，你把手松开，我转一圈看看。'],
-   ['hero','已经转起来了，旁边的磨盘也跟着动了。你刚才那件铜制的器械是什么？搬的时候，我看它比木轮还沉。'],
+   ['hero',"转了，磨盘也跟着动了！对了，你那铜家伙是做什么的？搬的时候，比木轮还沉。"],
    ['npc','我试做的一门轻炮，原本只想试试能不能打穿厚木。可工坊里的试靶太小，我想找个宽敞的地方，再把准头校一校。'],
    ['yueying-apprentice','师傅，先别试了！刚才跑掉的人带着同伙往襄阳去了，还问是谁做的这些轮子，我怕他们要去工坊！']],[N('赶回襄阳查看工坊','workshop')]),
   workshop:S('xiangyang','阻止盗匪砸毁工坊','yueying-raider',[
    ['npc','就是这家！把里头的铜件都抬走，车我也要。今天谁还敢拦着，就连屋子一起拆了！'],
-   ['huangyueying','院里还住着几个学徒，你们把锤子放下！要车可以去找车行买，凭什么来抢我们的东西？'],
-   ['hero','月英，先让学徒从侧门出去。你那门轻炮摆得稳吗？他们前面的铁甲很厚，得想办法拆开。'],
-   ['npc','摆得稳。你别站在炮口前面，等他们走进院口，我先打掉那面护板。']],[F('保住工坊','workshop')]),
+   ['huangyueying',"院里还有人，锤子放下！铜件是我们一件件打出来的，你伸手便拿？"],
+   ['hero',"月英，让学徒走侧门！那门轻炮架得住吗？得先破了他们前头的甲。"],
+   ['huangyueying',"架得住。让开炮口！等他踏进门，我先拆那块护板。"]],[F('保住工坊','workshop')]),
   return:S('xiangyang','与黄月英检查工坊里的损伤','huangyueying',[
    ['npc','屋梁没事，几把工具也找回来了。就是院门得重做，不能总拿那块木板挡着。今天多亏你们回来得快。'],
-   ['hero','磨坊那边也来人了，说以后会轮流派人照看这里。你替大家修过这么多东西，出了事，他们不会袖手旁观的。'],
-   ['npc','那我能放心些了。以前我总把东西做好就交出去，今天才发现，真到了用的时候，还有不少地方得改。']],[N('与黄月英聊聊今后的打算','freed')]),
+   ['hero',"磨坊那边来人了，说往后轮着替你看院。你给他们修磨，他们来帮你修门，正好。"],
+   ['npc',"院里总算有人守了。方才那一炮，我瞧炮架还得加固。在木靶前试得再多，真用起来，才露毛病。"]],[N('与黄月英聊聊今后的打算','freed')]),
   freed:End('huangyueying','xiangyang',[
    ['npc','你们还缺个修器械的人吗？我想带着轻炮出去试试，哪里不好用就改哪里，总比对着院里的木靶琢磨强。'],
    ['hero','当然缺。车轮、兵器，一路上总有东西要修，有你在，大家也能少走些冤枉路。'],
@@ -9293,31 +9293,31 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  },{
   cart:{stage:['cart'],next:'repair',title:'宜城轮车',sceneId:'farmland',count:3,enemyKind:'bandit',fixedPattern:'patrol',guest:'huangyueying'},
   workshop:{stage:['workshop'],next:'return',title:'襄阳工坊',sceneId:'city-river',count:3,enemyKind:'bandit',fixedPattern:'armored',guest:'huangyueying'}
- },{recommendedLevel:8,rumor:'襄阳有位黄姑娘会修水磨，也会做器械。最近送木轮的车出了事，她正找人一起去宜城接车，你们有空可以去工坊看看。'});
+ },{recommendedLevel:8,rumor:"襄阳黄姑娘会修水磨。宜城等着用的木轮没送到，学徒竟连鞋都跑掉一只，怕是车让人扣了。"});
  R('zhurong','药林归路',{
   rumor:S('nanman','向祝融询问药队被劫的经过','zhurong',[
    ['npc','带来的药先送进屋，受伤的坐下，谁也别再往林里跑。我会去把人找回来，不用你们带着伤再走一趟。'],
-   ['hero','林子里还有人？我们可以帮忙，先告诉我们发生了什么。'],
+   ['hero',"林里还扣着人？我们有些身手，兴许帮得上。出了什么事？"],
    ['npc','几个寨子合伙去换药，回来时让一伙人拦了。回来的人说，他们有人穿着我们的衣裳，连招呼的话都学得像，走近了才发现不对。'],
-   ['hero','那就请你带路吧。我们不认得寨里的人，免得把来接应的也当成他们的同伙。'],
-   ['npc','我叫祝融，去过那片林子。你们肯帮忙，我记着，不过先说好，见到伤者先救人，别只顾着追逃走的。']],[N('与祝融前往药林','trail')]),
+   ['hero',"得请你带路。我们不认得寨里人，到了连谁是真接应的都分不清。"],
+   ['npc',"祝融。我认得那片林子，随我来。先接伤者，跑了的回头再算账，别为追一个贼，把人落下。"]],[N('与祝融前往药林','trail')]),
   trail:S('nanman-woods','在南中药林接应背药的村人','southern-carrier',[
    ['npc','夫人，是我们！他们把能走的人都赶去背货了，我腿脚慢，就被扔在这里。前边有人守着，不让我们回寨子。'],
-   ['zhurong','把脚伸出来，我看看绑得紧不紧。药筐先放下，回去有人来拿，你现在别再背了。'],
-   ['hero','脚印沿着山坡往下去了，还有几支箭落在草里。看来他们不只抢药，是准备在这里守着继续劫人。'],
-   ['zhurong','那就不能让他们守下去了。你们留意弓手，我熟悉这片林子，靠近了再动手。']],[F('接回背药的村人','trail')]),
+   ['zhurong',"伸脚来，绳勒进肉了。药筐放下，你还背得动？回头叫人取。"],
+   ['hero',"坡下有脚印，草里还落着箭。他们看来打算留在这儿，专等药担经过。"],
+   ['zhurong',"那这片林子，还能让谁过？你们看住弓手，我从熟路近身。"]],[F('接回背药的村人','trail')]),
   supplies:S('nanman-woods','听祝融辨认留下的药筐','zhurong',[
    ['npc','少了装伤药的那一筐，正是寨里急着用的。刚才那人说药都在这里，是故意指错方向，好让头目带着东西跑。'],
-   ['hero','能看出往哪边去了吗？这片地被踩得很乱，连筐子都拖出了好几道痕。'],
+   ['hero',"乱成这样，还能认出脚印吗？筐子倒是拖了好几道痕。"],
    ['npc','不是全往山上去的。你看低处那丛草，露水刚让人蹭掉，他们绕回林口了。我们从近路赶过去，还来得及。']],[N('从近路截住盗匪头目','chief')]),
   chief:S('nanman-woods','截住携药逃走的盗匪头目','zhurong',[
    ['npc','就是那个背篓。旁边两个人在替他挡路，后面还有个使毒的，别围上去跟他们挤。'],
-   ['hero','我们先把他们分开。拿回药以后，还得留个人问清楚，其他被抓的村人送到哪里了。'],
-   ['npc','好。那头目仗着护甲厚，不肯后退，正好让他尝尝我的匕首，看看还能撑多久。']],[F('截回伤药','chief')]),
+   ['hero',"分开打，别挤过去。头目得留个活口，旁的村人还关在什么地方，只有他知道。"],
+   ['npc',"甲厚便站着不动？他倒给我留了好靶子。你挡一挡，我试试那条甲缝。"]],[F('截回伤药','chief')]),
   return:S('nanman','将药材与获救村人送回寨中','zhurong',[
    ['npc','另外几个人就在林后的棚子里，都带回来了。伤药分给了各寨，刚才那个背药的小伙子也已经包扎好，能安心睡一觉了。'],
-   ['hero','我们从旁边几个寨子借了担架，明天有人过来取。回头让大家认认那几个冒名的人，别再让他们混进来。'],
-   ['npc','已经让人去叫各寨的长者了。这次他们借着我们这里的衣裳骗人，不能抓住几个就算完事，我得把经过说给大家听。']],[N('等祝融安顿好寨中事务','freed')]),
+   ['hero',"担架借的，明日记着还。再请各寨的人来认认贼，穿了你们的衣裳，往后可不能再蒙混。"],
+   ['npc',"长者都叫来了。冒充的说了什么、哪处认不出来，我当面讲给他们，免得再有人栽跟头。"]],[N('等祝融安顿好寨中事务','freed')]),
   freed:End('zhurong','nanman',[
    ['npc','寨里的事安排好了，我也想出去走走。总是别人从外头来，我却连他们说的地方在哪里都不知道，这样下去可不行。'],
    ['hero','我们正好还要往各地去，你愿意就一起走。想家的时候随时回来，不必等我们走完。'],
@@ -9325,7 +9325,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  },{
   trail:{stage:['trail'],next:'supplies',title:'药林接应',sceneId:'forest-path',count:3,enemyKind:'bandit',fixedPattern:'patrol',guest:'zhurong'},
   chief:{stage:['chief'],next:'return',title:'林口截药',sceneId:'forest-path',count:3,enemyKind:'bandit',fixedPattern:'venom',guest:'zhurong'}
- },{recommendedLevel:12,rumor:'南中有队背药的人遭了抢，祝融正准备进林子找人。听说那伙人还会冒充寨民，你们经过建宁时，最好先去寨里问清楚。'});
+ },{recommendedLevel:12,rumor:"南中药队遇了劫，祝融要入林寻人。贼还穿寨里的衣裳，招呼也学得像，去建宁时当心认错。"});
  const api={ids:['guanlu','huangyueying','zhurong']};root.SpecialistRecruitment=api;if(node)module.exports=api;
 })(globalThis);
 
@@ -9336,16 +9336,16 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  'use strict';
  const node=typeof module!=='undefined'&&module.exports,I=node?require('./items.js'):root.ItemCatalog,N=node?require('./nearby-content.js'):root.NearbyContent,R=node?require('./recruitment-content.js'):root.RecruitmentContent;
  const definitions=[
- {id:'abandoned-fort',title:'废弃军堡',parent:'changshan',level:3,sceneId:'bandit-camp',pattern:'earlyPhysical',prize:'fort-brace',rumor:'常山南边那座废军堡，最近总有人进去翻找。听说旧军械库还没塌，里面有些当年留下的护具。去的人也不全是寻宝的，路上小心。'},
- {id:'reed-shrine',title:'芦泽古祠',parent:'pingyuan',level:6,sceneId:'river-dock',pattern:'venom',prize:'shrine-charm',rumor:'平原河滩那座古祠退了水，有人从里面带回一只药香囊。现在去寻东西的人不少，可也有人中了毒回来，最好带个懂医术的。'},
- {id:'old-manor',title:'荒废庄园',parent:'beihai',level:9,sceneId:'market-street',pattern:'arcane',prize:'manor-pendant',rumor:'北海旧庄园的东墙倒了，露出一间封了多年的库房。前两天有人捡到轻巧的旧饰品，消息一传开，连外乡人都往那儿赶。'}
+ {id:'abandoned-fort',title:'废弃军堡',parent:'changshan',level:3,sceneId:'bandit-camp',pattern:'earlyPhysical',prize:'fort-brace',rumor:"常山南边的废军堡，近来总见人往里钻。旧军械库没塌，有人捡了护具出来。不过惦记那点东西的，不光是赶路人。"},
+ {id:'reed-shrine',title:'芦泽古祠',parent:'pingyuan',level:6,sceneId:'river-dock',pattern:'venom',prize:'shrine-charm',rumor:"平原古祠退水了，有人带出只药香囊，便惹得一堆人去寻。也有中了毒横着回来的，最好请个懂医的同去。"},
+ {id:'old-manor',title:'荒废庄园',parent:'beihai',level:9,sceneId:'market-street',pattern:'arcane',prize:'manor-pendant',rumor:"北海旧庄园塌了东墙，露出个老库房。有人捡着旧饰品，说拿在手里轻得很。消息一传，外乡人都赶着去了。"}
  ];
  Object.assign(I.templates,{
  'fort-brace':{id:'fort-brace',name:'玄铁臂盾',slot:'accessory',iconId:'shield',attributes:{armor:24,constitution:8,war:3},price:220,dungeonOnly:true},
  'shrine-charm':{id:'shrine-charm',name:'辟瘴香囊',slot:'accessory',iconId:'woven-charm',attributes:{resistance:10,intelligence:8},statusImmunities:['poison'],price:220,dungeonOnly:true},
  'manor-pendant':{id:'manor-pendant',name:'追风坠',slot:'accessory',iconId:'wood-beads',attributes:{speed:35,technique:8},price:240,dungeonOnly:true}
  });
- for(const d of definitions){R.landmark(d.id,d.title,d.parent,35,45);N.npcs.push({id:'keeper-'+d.id,name:'寻宝客',art:'laborer',role:'quest',place:d.id,side:'left',lines:['里面的路还能走。我们只探过外头几间，你们要继续深入，先把伤势和兵器料理好。'],dungeonId:d.id});N.npcs.push({id:'rumor-'+d.id,name:'过路客',art:'villager',role:'rumor',place:d.parent,side:'left',lines:[d.rumor],dungeonRumor:d.id});N.sideQuests.push({id:d.id,title:d.title,giver:'keeper-'+d.id,giverPlace:d.id,place:d.id,sceneId:d.sceneId,recommendedLevel:d.level,fixedCombatLevel:d.level,pattern:d.pattern,rounds:3,money:d.level*15,item:d.prize,quality:'green',repeatable:true,dungeon:true,enemyName:'寻宝敌手',enemyArt:'brigand',accept:'里面有几伙人在抢东西，连过路的人也不放过。先看看情况，再往里走。'});}
+ for(const d of definitions){R.landmark(d.id,d.title,d.parent,35,45);N.npcs.push({id:'keeper-'+d.id,name:'寻宝客',art:'laborer',role:'quest',place:d.id,side:'left',lines:["外头几间我们走过，里头还没探。伤裹好，兵器拿稳，再进去吧，里面没人给你递药。"],dungeonId:d.id});N.npcs.push({id:'rumor-'+d.id,name:'过路客',art:'villager',role:'rumor',place:d.parent,side:'left',lines:[d.rumor],dungeonRumor:d.id});N.sideQuests.push({id:d.id,title:d.title,giver:'keeper-'+d.id,giverPlace:d.id,place:d.id,sceneId:d.sceneId,recommendedLevel:d.level,fixedCombatLevel:d.level,pattern:d.pattern,rounds:3,money:d.level*15,item:d.prize,quality:'green',repeatable:true,dungeon:true,enemyName:'寻宝敌手',enemyArt:'brigand',accept:"里头几伙人正在争东西，连过路的也抢。我们没敢再进，你们看准了再走。"});}
  const D=node?require('./world-data.js'):root.WorldData,Catalog=node?require('./enemy-catalog.js'):root.EnemyCatalog;const source=D.encounters.thieves;if(source){D.encounters['wild-wolves']={...JSON.parse(JSON.stringify(source)),id:'wild-wolves',title:'野狼拦路',count:2,roster:Catalog.roster(1,2,'beasts')};const previous=D.roadEvents.find(e=>e.kind==='battle'&&e.weight>1);if(previous){previous.weight--;D.roadEvents.push({id:'wild-wolves',kind:'battle',weight:1,encounter:'wild-wolves',title:'林中狼影',text:'草丛里传来低低的呜声，两匹狼已经绕到了路边。'});}}
  const api={definitions};root.EarlyDungeons=api;if(node)module.exports=api;
 })(globalThis);
@@ -9357,11 +9357,11 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  'use strict';
  const node=typeof module!=='undefined'&&module.exports;if(node)require('./recruitment-challenges.js');const H=node?require('./hero-quests.js'):root.HeroQuests;
  const replacements={
- '你帮忙看着车头，我去拦后面的两个人。大叔，趁他们过不来，先把牛牵进院子，别让刀碰着它。':'这些粮是乡亲们省下来的种子，你们一袋也别想拿走。大叔，把牛牵回去，这里有我。',
- '我守着这边。你也小心墙边那个人，他手藏在衣服里，应该还带着刀，别让他绕到你背后。':'他已经把刀抽出来了。既然道理说不通，我们帮你把粮留下。',
- '前面还有老人和孩子，别让他们跑进人群里。你帮我拦左边，我去拉住那辆车，先把这几个人分开。':'病人还在里面，你们也要抢？药车的账还没算，今天就一并说清楚！',
- '昨晚就是他们抢了药车，今天还敢来。这位朋友，帮我守住门口，铺里还有病人，不能让他们冲进去。':'昨晚抢走药车，今天又来砸医馆。乡亲们已经让到这个地步，你们还不肯罢手？',
- '你带熟路的人守住寨口，我们去接药车。这次大家一起做，不用再争谁比谁能打。':'药是给寨里救急的，不能在这里耽搁。你熟悉山路，我们跟着你走。',
+ '你帮忙看着车头，我去拦后面的两个人。大叔，趁他们过不来，先把牛牵进院子，别让刀碰着它。':"种子粮也敢抢！大叔，牵牛回屋。车给俺守着，一袋也少不了。",
+ '我守着这边。你也小心墙边那个人，他手藏在衣服里，应该还带着刀，别让他绕到你背后。':"这几个交给我们。大叔，快走！",
+ '前面还有老人和孩子，别让他们跑进人群里。你帮我拦左边，我去拉住那辆车，先把这几个人分开。':"病人还躺在里面！想进去，先问我手里的刀。",
+ '昨晚就是他们抢了药车，今天还敢来。这位朋友，帮我守住门口，铺里还有病人，不能让他们冲进去。':"昨夜的药车还没还，今日又来？这药铺碍着你们哪条道了！",
+ '你带熟路的人守住寨口，我们去接药车。这次大家一起做，不用再争谁比谁能打。':"走，我们跟你。药担取回来，先生才有药下锅。",
  '我带人去扶后面的伤兵，你先守住路口。等他们都退过来了，我们再往岸边走，不能把伤者留在那里。':'有人中箭了！先把伤者扶起来，芦苇里的人又在拉弓，大家当心！'
  };
  const endings={zhangfei:'往后有仗，记得叫俺！跟你们一起办事痛快。酒俺会少喝，若再犯浑，你就当面说，俺不跟你急。',guanyu:'父母在成都有了照应，我也能放心上路。这一路欠你不少人情，今后遇到难处，尽管来叫我。',xuchu:'村里的粮和人都安顿好了，我也没什么放不下的。你们叫我一声，我提上锤子就走。',huangzhong:'别嫌老夫年纪大。这张弓还拉得开，走起路来也不输年轻人。你们愿意带上我，我就陪你们再跑一趟。',maliang:'我弟弟的事已经有人照看，医馆也交接妥当了。我愿意同行，路上的账目和药材都可以交给我。',lusu:'粮车已经送到，我留下的人也知道后面该怎么办。你们要走，我便一同去，沿途缺什么，我们再想办法筹措。',jiaxu:'这里已经安排妥当，曹公那边也该回个信了。路上的事我可以替你多想几步，至于听不听，你自己拿主意。',zhangjiao:'营里的事已经交代给弟兄们。你既然还愿意为这些乡亲奔走，我也该跟你出去看看。',huatuo:'留下的大夫已经接过诊簿，病人的药也都备齐了。我跟你们走，路上碰见需要看伤的人，也好帮上一把。'};
@@ -9411,171 +9411,171 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  'use strict';
  const node=typeof module!=='undefined'&&module.exports,H=node?require('./hero-quests.js'):root.HeroQuests;
  const endings={
-  "ganning":["新野这座牢，我是再不想回了。弟兄们都还跟着我，可离了江面，他们连吃饭的门路都不熟。","不如去建业见周瑜。他那里需要熟悉水路的人，弟兄们也能有个去处。我替你引荐，也想请你先与我们同行。","建业……好，俺也去看看。丑话先说在前头，若又像这回一样骗我们入牢，我可不会再忍。"],
+  "ganning":["弟兄们都齐了，这新野牢里的饭，我是再不想吃。只是离了江面，他们往后靠什么吃饭，我还没着落。","去建业见见周瑜吧，江东正缺熟水路的将士。我来递信。你若肯帮我，咱们先同行，弟兄的去处也一道问。","行，便去建业！这回可不喝什么招安酒了，先瞧人，再谈事。船上的弟兄，我去招呼一声。"],
   "xuchu": [
-    "村里有人轮着守粮，我总算能歇口气了。只是以后……我没想过，我只会种地、使锤，别的也不懂。",
-    "去许昌见见曹操吧。他那里缺能带兵的人，你又能打，又肯护着乡亲，应该用得上。我替你引荐，也想请你先陪我们走一程。",
-    "那俺也去看看！先容俺回家说一声，把锤带上。村里往后有事，你们可得捎信给俺。"
+    "夜里有人守粮了，父老也说，叫俺不必老蹲在村口。俺除了种地，就只会抡这锤子，还真没想过旁的。",
+    "许昌的曹操正找将士，你这身本事，可别只用来搬粮。咱们去见见？路上也请你帮我挡些险。",
+    "曹公？那俺也去瞧瞧！容俺跟家里说一声。村里有事，捎信来，俺再赶回去。"
   ],
   "dianwei": [
-    "借据交出去了，可刘大嫂和孩子再也回不来了……我若早些赶回东街，兴许……",
-    "你也拼了命去救他们。先把伤养好，往后跟我们一起走吧。你若想有个落脚处，我替你引荐曹公，许昌总好过在外躲来躲去。",
-    "……好。以后再遇到这种事，叫上我。李家欺负人的那些招数，我记住了。"
+    "刘家母子能睡安稳觉了，我也省得半夜总往东街跑。可我这脾气，一急就只知道挥戟，往后还得有人拦一拦。",
+    "那就跟我们走。你有胆气，也肯为人出头，许昌的曹公该见见你。我替你引荐，总好过一个人四处躲官差。",
+    "曹公那里，劳你替我说。我这人不大会讲话。有力气的事，交给我便是。"
   ],
   "huangzhong": [
-    "老夫这张弓还没到挂起来的时候。可如今到处征兵，听着都说要保境安民，到了村里又只会催粮。",
-    "不如去成都见刘备。他收留了不少流民，正缺带兵的老将。您先与我们同行，到了成都，再亲眼看看他治下如何。",
-    "好，老夫就走这一趟。若真是个肯顾百姓的人，这把老骨头还能替他做些事。"
+    "老夫的弓还拉得开。可如今遍地招兵，旗上都写安民，进村却只知道催粮，叫人不敢轻信。",
+    "成都的刘备收留了许多流民。您若有意，我带您去见。路上先与我们同行，到时亲眼看看，是真是假，不必听我夸。",
+    "好，便去成都。这把老骨头，还走得动。若真肯为百姓做事，老夫也愿再挽几回弓。"
   ],
   "maliang": [
-    "舍弟这几日肯在医馆帮忙了，我总算放下些心。自己的去处倒还没想过，先把他送回家再说吧。",
-    "你会理账，也懂医药，成都正缺这样的人。我替你引荐刘备和诸葛亮。若不急着动身，先跟我们走走也好。",
-    "那就有劳了。等我把药材账交清，便来找你。舍弟也该学着自己担些事，不能总让我守着。"
+    "舍弟每日去医馆帮工，总算知道些轻重了。我也不必守着他。只是一时脱了身，倒不知道该忙什么。",
+    "这几日账目、药材，你都理得清楚。成都的刘备、诸葛亮正用得着，我替你引荐。眼下还想请季常先随我们走一程。",
+    "承你看重。我把这里的药账交清便来。舍弟该学着自己办事，我总守着，他也长不大。"
   ],
   "taishici": [
-    "比试也比过了，母亲那边又有人照料。你们接下来往哪里走？我能抽身出来了。",
-    "先在建业落脚吧。我先前劝你来见周瑜，也是觉得你能在这里施展本事。眼下我还想请你同行，路上若有险事，多个人也好商量。",
-    "好！刀法我见识过了，这一路你怎样待人，我也看在眼里。以后有事，尽管叫我。"
+    "痛快！这场比试，等了这些日子，总算没白等。母亲的药也有人照料，我如今抽得出身了。",
+    "那就请子义同行。平日在建业落脚，周瑜那里也有你的用武之地。出远门时，咱们还少一位敢断后的朋友。",
+    "断后便叫我！你肯为北海的事跑那么远，这份交情，我不会只拿一场比试来还。"
   ],
   "lusu": [
-    "粮食送到了，伙计也留了两个帮忙。只是这么一趟趟地送，家里粮再多，恐怕也有用尽的一天。",
-    "不妨以建业为落脚处，和周瑜商量个长久的办法。我想请你先与我们走一程，沿途哪里缺粮、哪里有余粮，你比我们更会打听。",
-    "好，我回去把账交给管事。路上住宿吃饭的地方我也认识几家，总不能叫大家饿着肚子赶路。"
+    "一船接一船，家里的粮再多，也总有尽头。眼下救了急，入冬以后又该怎样？我还得算一算。",
+    "不妨在建业与周瑜商量，路上也请你同行。各处哪里有粮、哪里缺粮，你比我们会问。总得把这条粮路接起来。",
+    "也好，管事留在此处，我带账簿走。沿路客店我还认得几家，诸位别的不用愁，吃住总不会短缺。"
   ],
   "xunyu": [
-    "学舍的事有人接手了。这些年读了许多书，若只在这里教书抄书，又觉得有些不甘。",
-    "文若不妨去许昌见曹操。那里正忙着恢复田地、安置流民，需要你这样的人。我可以引荐，也想请你先与我们同行。",
-    "许昌……好，我去见见。书先留给学舍，路上带两卷便够了。你若还有要问的事，途中慢慢谈。"
+    "书有了去处，学舍也开了门。我如今日日坐在案前，读到治世两字，倒常停笔。",
+    "那便去许昌见曹操。田地、粮仓、流民，那里都有人等着主意。我给文若引荐，也请你先随我们看看沿途。",
+    "许昌……好。书留学舍，我带两卷在身边便是。路上若有想问的，咱们不妨边走边谈。"
   ],
   "jiaxu": [
-    "追兵暂时退了，可我也不能总在这里躲下去。如今谁家门前都不太平，投错了人，比不投还麻烦。",
-    "先去许昌看看吧，我替你引荐曹公。用不着一见面便答应留下。你若愿意，也请先跟我们走一程，帮我看看路上的凶险。",
-    "既不催着我认主，那就去看看。路上我若劝你别走哪条道，你至少先听完缘由。"
+    "此地暂能容身，可总仰着城门等追兵，也不是办法。人要择主，偏偏这年头，选错比不选还难收场。",
+    "我认得许昌的曹公，不如去见见？不必一见便认主。文和若肯与我们同行，路上的险处，也请你多指点。",
+    "先见再说，那便好。路上我若劝你换条道，可别嫌我怕死——我多活一日，诸位也少挨一回追。"
   ],
   "zhangliao": [
-    "想走的弟兄都收拾好了。可他们跟我离了这里，总得有地方吃住，我不能只带他们出了城就不管。",
-    "我替你去许昌引荐曹操，也替弟兄们问清安置。你若愿意，先与我们同行，到了那里再决定。",
-    "好。有你帮着说话，我也能少些顾虑。不许侵扰百姓的规矩，我得当面跟他讲明。"
+    "愿走的将士已收拾好。父母妻儿也有随行的，我领他们出关，往后的吃住便都得算在我头上。",
+    "许昌的曹操求将心切，我替文远引荐，也问清各家的住处。咱们同行过去，谈得合再留，如何？",
+    "那就同行。我不求厚禄，只求军中有令，不能任部下扰民。这一点，见面时须先讲明。"
   ],
   "xiahoudun": [
-    "眼伤还疼，倒不妨碍走路。弟兄们让我歇着，我一坐下来，又总想起那些没回来的兵。",
-    "先回许昌把实情告诉曹操吧。他得知道前线是什么样子。我也想请你同行，不过伤口得按时换药，不能再硬撑。",
-    "好，听你的。郎中交代的话我记着，少了一只眼，又不是连人都不会照顾自己了。"
+    "郎中叫我静养，一静下来，倒总想起城门口那些兵。少只眼是小事，有几人却再也回不来了。",
+    "回许昌养着，也把阵前的事告诉曹操。元让若愿意，今后便与我们同行。药我替你带，路上按时换。",
+    "药给我，自己的伤还记得。要走便一道走，别因这只眼，什么事都不肯再叫我。"
   ],
   "simayi": [
-    "主簿总算能接手了。你带来的几桩消息，和公文上写的差得很远，究竟漏了多少事，倒叫我坐不住。",
-    "那就请仲达与我们出去看看。许昌有主簿照看，我们遇到难辨真假的消息，也正好请你参详。",
-    "也好。把地图留下来，我先看看你们打算走哪条路。许昌这边，我会交代清楚。"
+    "府中的公文倒是写得齐整，偏与你在乡间见的全不相符。再这样看下去，我只怕连许县在何处都要认错了。",
+    "仲达不如亲自走一趟。许昌留给主簿，沿路的事我们当面问。碰上两种说法，也请你替我们分辨。",
+    "许昌便这样交代。地图借我，既要动身，总得先将路看明白，不能只盯着洛阳二字。"
   ],
   "caocao": [
-    "这趟若没有接应，怕是回不来了。许昌积了多少事，还没来得及问，洛阳又不消停。",
-    "先稳住许昌，再商议洛阳吧。我想请你与我们走一程，亲眼看看外面的粮路和村落。府里留人接应，就不至于两头都顾不上。",
-    "好，我也想听听，离开府衙以后，百姓到底怎么说。给我些工夫，先把城里的事交代下去。"
+    "乌林险些归不得，许昌也积了许多事。洛阳那边又来催令，董卓是真不想让人喘口气。",
+    "许昌的事交代妥了，曹公不妨与我们同行。去看看粮路，也听听村里的人怎么说。洛阳的事，咱们一路商议。",
+    "此议甚好。坐在堂上，听见的总隔一层。给我些工夫，将府里的人分派好，咱们便走。"
   ],
   "zhugeliang": [
-    "名册和粮账都交给主簿了。只是有几处村落，送来的信总对不上，我也正想查问。",
-    "请孔明与我们同行吧。到了村里直接问，总比等信来得明白。成都这边仍要有人接应，我们也好随时送消息回来。",
-    "好。我把要问的几件事记下来，免得到了地方又漏下。出城前，容我再去看看那几户新来的乡亲。"
+    "府中暂有主簿理事。只是乡里的信，每封各有说法，等转到案上，事情又过了几日。",
+    "与我们同行吧，孔明。到了村中，人便在眼前，不必等信。成都有事，也可遣人沿路追上我们。",
+    "那便同行。亮将路上要问的记下，再去见见新到成都的几户，与你们一同出城。"
   ],
   "guanyu": [
-    "二老在这里住下，关某也能安心了。只是往后替谁效力，还未想定。",
-    "去成都见刘备吧。他重信义，也肯接济流民，我想你们谈得来。我来引荐，也想先请云长同行。",
-    "那就有劳引荐。是否留下，关某见过他再定。你们若要动身，提前叫我一声便是。"
+    "父母在成都住稳，关某心里这块石头，总算落了地。往后这一身武艺，又该用在何处？",
+    "既到了成都，不妨去见刘备。他重信义，云长与他也许谈得来。我替你引荐，再请你随我们走一程。",
+    "有劳。关某见过他，自有决断。出门时叫我便是，答应同行，绝不失约。"
   ],
   "zhangfei": [
-    "这回误事，俺也认了。酒醒以后再想想，俺空有一身力气，怎么总把事情弄糟？",
-    "先少喝些酒吧。成都的刘备，你可以去见见，他肯听人说话，也需要能护着乡亲的人。我来引荐，路上先和我们一起走，如何？",
-    "行！酒坛子俺不带了，俺也去成都看看。真遇到俺又犯浑，你就像今天这样，当面骂醒俺。"
+    "酒醒了，桥也修了，俺心里倒松快了。可一想到下邳，还是不知回去怎么见大哥。",
+    "回成都见刘备吧，信里不都写着等你吗？路上跟我们走，少带酒，多看着点事，有话当面讲。",
+    "去便去！俺连个面都不敢见，还算什么张飞！酒坛留下，枪带着。路上俺要犯浑，你就喊。"
   ],
   "machao": [
-    "枪和旧物都找回来了。可武威已经不是从前的武威，往后带着这些人往哪里去，我还没想定。",
-    "去成都问问刘备吧。他肯接纳远来的人。弟兄和家眷怎么安顿，先问清楚，再决定留下。我也想请你与我们同行。",
-    "好，先去见他。家里的东西我留人看守，不能再丢一回。你们何时动身，来知会我。"
+    "人和旧物都找回来了，武威却已不是从前那般。那些随我多年的，还等着我拿个主意。",
+    "成都的刘备肯接纳远来的人。我带你去见，先问家眷和将士怎么安置，再谈效力。孟起，也请你一路与我们同行。",
+    "去成都。我把家里留守的人再嘱咐一遍，便来会合。这次得替跟着我的人，寻个稳当的去处。"
   ],
   "liubei": [
-    "成都的住处和粮食已安排下去了。可城外究竟还有多少人在逃难，我知道的，恐怕还不及你们多。",
-    "那就请你与我们出去看看吧。成都留人接应，沿途遇到无家可归的人，我们也知道该送去哪里。",
-    "好，我去跟主簿交代。收容的人多了，也不能让原先的住户吃亏，这件事还得嘱咐清楚。"
+    "进城的乡亲有屋可住，我才敢歇一夜。可江夏那条路上，尚有多少人没到，信里也说不尽。",
+    "玄德公不如随我们再走一程。成都留人接应，沿途若遇着无家可归的，也有人能告诉他们往哪里去。",
+    "好。收容的事，我再嘱咐主簿一遍。新来旧住，都得有口饭吃，不能顾了这一头，又饿了那一头。"
   ],
   "zhouyu": [
-    "城中的事暂时能交出去了。江上的消息一天一个样，我也想亲自去看，可总怕一走，渡口又出了事。",
-    "让主簿照看渡口，请公瑾与我们沿江走一趟吧。建业作接应，遇到哪段水路被堵了，也能及时送信回来。",
-    "好。我先去点几条快船，信使往来总得有船可用。等这些安排好了，我们便动身。"
+    "江上新报旧报叠在一起，图上倒像条条水路皆通。我也想下船走一走，可渡口这边，总还放不下。",
+    "交给主簿和轮守的将士吧。请公瑾与我们沿江走走，以建业作接应，哪段被堵，便能及时送信。",
+    "可。拨几条快船专供传信，城里的事便不致误。待我点完船，与你们会合。"
   ],
   "huanggai": [
-    "山路已派人巡查，采药的也回去了。老夫还能走，可一想到那些后生跟着受伤，心里就不痛快。",
-    "请您与我们同行吧。您熟悉山路，也知道怎样带兵护粮。平日以建业为落脚处，和周瑜彼此接应。",
-    "也好。这份山路图先留给巡守的人，往后采药的乡亲再进山，不必像这回一样摸着走。"
+    "采药的都回家了，子明也在养伤。老夫这口气才缓下来。看着后生受苦，比自己挨一刀还难受。",
+    "那就请您同行。带兵、护粮，许多事我们还得请教。平日在建业落脚，也与周瑜通个声气。",
+    "容老夫把山路图交给巡守的，便可动身。乡亲下回入山，有个明白的路走，也省得再吃这一番苦。"
   ],
   "lvmeng": [
-    "书是看了，可有些地方还是看不懂。以前总想着会打仗便够了，如今才知道，光会使剑不行。",
-    "去建业找周瑜请教吧。他那里既能练兵，也有人陪你读书。我来引荐，若愿意，先跟我们一起走一程。",
-    "好！书我也带着。路上再遇到不懂的，你可别嫌我问得多。"
+    "这几卷书，越读越觉着自己少见识。原以为剑使得好，便什么都不怕，进回山，险些连退路都找不着。",
+    "去建业找周瑜吧，他能教你练兵，也能指点书里的意思。我给你引荐，路上先与我们同行，读到哪句，便一起琢磨哪句。",
+    "我带着书！字有些还不识，路上免不了要问你。别嫌烦，我问过一回，便记在旁边。"
   ],
   "luxun": [
-    "最后一辆车也进城了。先前在阵里，我算来算去，只算着自己怎样出来，差点把坡下的人忘了。",
-    "能回头把他们接出来，已经很不容易了。你去建业见见周瑜吧，他那里用得上你。我也想请你先与我们同行。",
-    "那就有劳引荐。我先把绕路的图交给守城的人，后面若再有车来，也好提醒他们。"
+    "车都进城了。我从石阵出来时，还只顾着算自己走错了几处。坡下那些人，倒险些让他们独自遇着贼。",
+    "你认得小径，才把人接上来。伯言这份本领，建业的周瑜用得着，我替你引荐。也想请你与我们同行。",
+    "有劳。绕路的图交给守城人，我便来。往后有车经过，也不必再在坡下摸索。"
   ],
   "sunshangxiang": [
-    "家里问我下次还出不出门，我倒答不上来了。以前只觉得在府里闷，出来才知道，光会射箭还不够。",
-    "那就先跟我们护送乡亲吧。留在建业时，也能帮着渡口接应。总比为了出门，随便找条路便走强些。",
-    "好，这回我可知道出门是去做什么了。我去跟家里说，弓箭也得重新理一理。"
+    "兄长问我，出了这一趟门，还闹不闹着走。我竟答不出。回府是闷，可外头也不像我想的，只带张弓就成。",
+    "那就与我们护送乡亲。以建业作落脚处，得闲也去渡口帮手。既有事做，又能走远路，你兄长该少拦几回了。",
+    "这回我就这么回他！弓箭理好，担架也得备着——你别笑，渡口那块门板，我可不想再抬一回了。"
   ],
   "sunquan": [
-    "人都接回来了，可外头还有多少渡口不通，城里的地图上一点也看不出来。我想去看看，又不知先往哪处走。",
-    "先与我们走一趟粮路吧。建业留人接应，沿途船只为什么被扣、百姓为什么不敢回家，到了地方就能问。",
-    "好。我先让人备船，也把接应的事交代下去。这一回，不能又叫府里断了消息。"
+    "柴桑围兵的事，到了跟前才知军报漏了许多。如今其余渡口怎样，府里这张图，只怕也作不得数。",
+    "不如与我们走一趟粮路。建业留人接信，沿途谁在扣船、乡亲怕的是什么，仲谋自己听一听。",
+    "便如此。我遣快船往来报信，不能再似柴桑这回，叫城里苦等。诸位稍候，我去交代。"
   ],
   "lvbu": [
-    "赤兔回来了，家眷也睡得安稳。可离了董卓，以后做什么，我还没想过。总不能谁叫一声，我又替谁冲锋。",
-    "先在新野安顿下来吧。我想请你与我们同行，路上遇到什么人、什么事，你自己看。等想清楚了，再决定替谁效力。",
-    "好，我跟你们走。到了洛阳，我还要亲口问问董卓，那些命令究竟是怎么回事。"
+    "赤兔养好了，部众的家眷也睡得安稳。离了董卓，这杆戟往后替谁使，我还没想过。",
+    "不急着认主，新野能住，先住着。温侯不妨与我们同行，路上的事自己看，值得出手便出手，不必听谁一声招呼就往前冲。",
+    "好，跟你们走。到了洛阳，我还要亲口问问董卓。他这些日子的命令，我可没忘。"
   ],
   "diaochan": [
-    "在新野住了这几日，夜里总算不再惊醒了。往后去哪里，我还没想好，也不敢想得太远。",
-    "那就先安心住在新野。等你歇够了，不妨与我们同行，沿途看看别处的生活。想回来时，再回来就是。",
-    "好。让我把这几件衣裳收拾好，走的时候来叫我。头一回自己出远门，倒还有些紧张。"
+    "昨夜一觉睡到天亮，醒来还愣了片刻。原来不在洛阳，真能睡得这样沉。再往后，我还没敢多想。",
+    "先在新野住稳吧。等你歇够了，和我们出去走走，也看看别处。想回来，一封信便有人替你留着门。",
+    "那便等我收好衣裳。这回出门，不必等谁吩咐了……倒还真有些不习惯。"
   ],
   "huatuo": [
-    "药方留了，病人也交给弟子了。可我每离开一处，总怕前脚刚走，后脚便有人来求医。",
-    "以宜城医馆作落脚处吧，弟子能接着看诊。我想请先生与我们同行，遇到缺医少药的村落，也好教人些应急的办法。",
-    "也好，我再备些常用的药。你们不必替我背药箱，这么些年，我背着它走惯了。"
+    "人托给了弟子，方子也留下了。出门前我总要多站一会儿，怕刚背起药箱，门外又有病人来。",
+    "宜城有弟子坐诊，先生不妨与我们同行。路上那些缺药少医的村子，也等着人教些法子，不能总让病人翻山来求您。",
+    "说得是。我再装些常用药。药箱你们不必争，背惯了，肩上轻了反倒不自在。"
   ],
   "menghuo": [
-    "寨里的人好起来了，我才睡了个整觉。要不是你们，恐怕到现在我还在门口拦大夫。山外的事，我懂得太少。",
-    "那就跟我们出去看看吧。南蛮的事先托给寨老，各地怎样分水、怎样运药，学到合用的，再带回来。",
-    "好！我去跟寨老说。你们等等我，我把路上吃的也带上，总不能出了寨子还要你们管饭。"
+    "今早总算没人在门外喊缺药了，我睡到日头高，才觉着饿。外头有会救人的大夫，我却差点把他赶跑。",
+    "跟我们出山走一趟吧。南蛮这边拜托寨老，别处怎么引水、怎么运药，你亲眼见过，带回来也讲得明白。",
+    "走！先叫寨老备些路上吃的。你们替寨里忙这些天，总不能出了山，还要你们来管我的饭。"
   ],
   "zhangjiao": [
-    "雨是下了，抢粮的人也抓到了，可他们顶着我的名号出去，我竟一点消息也没有。营外还有多少这样的事？",
-    "不如与我们出去走走，直接问乡亲吧。黄巾营地留人照看伤者，遇到抢粮的、缺药的，也知道往哪里送消息。",
-    "好，我把营里的事交给弟弟。往后有人来告状，不许守门的再拦着，我得先把这句话吩咐下去。"
+    "雨下了，本该是喜事，却有人趁机借我的旗号敛粮。我竟一直蒙在鼓里。想来营外，还有许多未传到耳中的事。",
+    "先生随我们出营走走吧，直接听乡亲说。黄巾营地有人照看，缺粮缺药的，也知道该往哪里送信。",
+    "待我与二弟交代。还有，来营中告状的人，不得再拦在门外——这话须当着守门的说。"
   ],
   "zhangbao": [
-    "药箱补齐了，换药的事也有人接手。我总算能出营几日了，你们还缺人手吗？",
-    "正想请你同行。沿途缺药的地方不少，你认得药材，也能帮着照看病人。黄巾营地留作接应，有急事再捎信回来。",
-    "好，我把常用的药装上。箱子有些重，上坡的时候，还得请你们搭把手。"
+    "药柜填上了，接班的也会换药了。我这几日竟能空出半天，坐在帐外倒有些不习惯。",
+    "正好跟我们走。药材你认得，伤也看得，比我强多了。黄巾营地留作接应，走到哪里都还能捎信回来。",
+    "我收药箱去。上坡搭把手，里头的瓶瓶罐罐，可不比拿杆枪省事。"
   ],
   "dongzhuo": [
-    "关人的名册还在，我会叫人逐户去查。可有几户已经举家逃走了，连往哪里去了都不知道……",
-    "先在洛阳开仓放人，把能查到的逐户补偿。我也想请你跟我们去受害的村里看看，有些话，得听他们当面说。",
-    "……好，我去。该骂的，我听着。府里的人也得留下查账，不能我一出城，他们又将事情拖过去。"
+    "名册还在，照着查便是。只是有几家宅子早已空了，一家老小不知逃往何处……他们连等我查账也等不得。",
+    "洛阳先开仓放人，找得到的逐户补偿。也请你跟我们去村里，见见受害的人。那些话，总得亲耳听。",
+    "我去。府里留人查，不许拖。见了那些人，他们要骂，便骂吧，这张脸总得露。"
   ],
   "guanlu": [
-    "这几桩传言问下来，十句里倒有八句不真。我再替人算下去，若连听来的话都没问明白，岂不是误人？",
-    "那就与我们一起去问吧。平原作落脚处，沿途听到怪事，先找当事人。你看人看事仔细，正好帮我们辨一辨。",
-    "好。卦具带着，纸笔也带着。听过的、亲眼见过的，我会分开记，免得日后自己也弄混了。"
+    "铃、白布、车辙，哪一样也不难找，偏偏一传就成了鬼怪。替人卜问前，我倒该先问他，亲眼见过没有。",
+    "那就同行吧。平原作落脚处，别处再有怪事，你也帮我们看一看。有你查这些门道，总比我乱猜强。",
+    "好，卦具、纸笔都带上。说是何人说，见是何处见，分开记，免得日后我自己也讲成了传闻。"
   ],
   "huangyueying": [
-    "木靶打得再准，车一上路，轮子照样会坏。我守着院子改来改去，总有想不到的地方。",
-    "请你跟我们走一程吧，修车、运粮，路上都有。襄阳的工坊留人照看，哪里不好用，记下来再送回去改。",
-    "这倒好！我去收拾工具，带的东西可能有些多，你们车上还放得下吧？"
+    "木靶前试过那么多回，出门还坏轮轴，开炮还晃架子。看来守着院子做得再好，也得拉出去才知哪里不成。",
+    "那请你随我们走，路上少不了修车运粮。襄阳的工坊照旧留着，坏在哪儿，便写信回去改，总比只盯木靶强。",
+    "好，我收工具！得占你们车上一角，东西不多……也就是几只箱子，外加那根长轴。"
   ],
   "zhurong": [
-    "寨里的事都安排好了，可真要出山，我连往哪边走都不熟。你们去过的地方多，替我说说？",
-    "先跟我们一起走吧。各地怎样防山火、运药粮，都能看看。南蛮这边留人接应，见到合用的办法，回来也能教给族人。",
-    "好，我去取兵器。山里的路我带你们走，出了山，可就得你们带我了。"
+    "各寨都认过那几个人了，林里的路也有人守。我倒空下手来，想去山外，可哪条道通哪里，一问又不认得。",
+    "跟我们走吧，山外的路我们熟。防火、运药，各处都有不同的法子，见了合用的再带回南蛮，也省得只听过路人传。",
+    "那便交换，山里我领，山外你们带。我去取兵器，不必替我备车，走得动。"
   ]
 };
  for(const [id,rows]of Object.entries(endings)){
@@ -9583,10 +9583,10 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   for(const stage of Object.values(d.stages))if(stage.npc?.choices?.some(c=>Object.hasOwn(c,'recruit'))){stage.npc.turns=rows.map((text,i)=>({speaker:i===1?'hero':'npc',text}));stage.npc.lines=rows.filter((_,i)=>i!==1);}
  }
  const depart=H.definitions.taishici.stages['depart-for-wu'].npc;
- depart.turns=[{speaker:'npc',text:'母亲的药够用，邻家大嫂也答应来照看，我能放心出门几日了。只是往哪边去，还没有想定。'},{speaker:'hero',text:'不妨去建业见见周瑜。江东正缺能独当一面的人，你又重信义，我想你们谈得来。我替你引荐，去不去由你。'},{speaker:'npc',text:'好，我去见见。先前说过的比试可别忘了，咱们约在建业教场，比一场再喝酒！'}];
+ depart.turns=[{speaker:'npc',text:"母亲肯放我出门，大嫂也应下照看。这几日一忙完，倒像忽然没了去处，站在门口都不知道往哪头走。"},{speaker:'hero',text:"去建业见周瑜吧。江东正缺能独当一面的将士，我想你们能谈得来。我替你写信，子义愿不愿走这一趟？"},{speaker:'npc',text:"去！不过说好的比试别忘了。建业教场见，比一场，再喝酒。"}];
  const convoy=H.definitions.lusu.stages.convoy.npc;
- convoy.turns[0].text='公瑾来信，建业收容的流民越来越多，粮食快不够了。我手里尚有些粮，只是沿江几处都来求援，一时不知道该先往哪里送。';
- convoy.turns[1].text='先送建业吧，渡口还能接应别处的人。你也不妨在那里落脚，和周瑜商量往后怎样送粮。这趟我们陪你去，准备走哪条路？';
+ convoy.turns[0].text="公瑾来信，建业的流民日增，存粮快告罄了。可沿江几处也来告急，这批粮先给谁，我还未定。";
+ convoy.turns[1].text="先送建业，那里通水路，还能转运别处。子敬不妨就此落脚，与周瑜商议。我陪你护粮，预备从哪儿上船？";
  const api={endings};root.RecruitmentIntentions=api;if(node)module.exports=api;
 })(globalThis);
 
@@ -9615,12 +9615,12 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  const normalize=value=>({stage:stages.includes(value?.stage)?value.stage:'gather',accepted:!!value?.accepted,endingIndex:Math.max(0,Math.min(20,Math.floor(Number(value?.endingIndex)||0)))});
  const W=node?require('./weapon-skills.js'):root.WeaponSkills,G=node?require('./character-growth.js'):root.CharacterGrowth,I=node?require('./items.js'):root.ItemCatalog;
  const phases={
-  vanguard:{title:'关前先锋',sceneId:'rural-road',next:'garrison',speaker:'huaxiong',lines:['各路人马终于到齐了？那就别再说什么借路，想进洛阳，先打赢我华雄。后面的兵都站好了，今天谁也不许往回跑！'],roster:[['huaxiong','front'],['soldier','back'],['soldier','back']]},
-  garrison:{title:'陷阵守军',sceneId:'city-frontier',next:'gate',speaker:'gaoshun',lines:['前面退下来的人到我身后集合，受伤的先撤进去。弩手看住两侧，别为了追一个人跑出去，把关门前的阵势守好！'],roster:[['gaoshun','front'],['crossbow','back'],['crossbow','back']]},
-  gate:{title:'温侯拦关',sceneId:'city-frontier',next:'street',speaker:'lvbu',lines:['我知道你们迟早会来。太师最近确实有些反常，我也想问个明白，可我还守着这道门。你们想过去，先拿出本事让我看看。'],roster:[['lvbu','front'],['soldier','back'],['soldier','back']]},
-  street:{title:'洛阳街垒',sceneId:'market-street',next:'advisor',speaker:'lijue',lines:['街口都让他们打进来了，再退就只剩太师府了！郭汜，你带人看住右边的小巷，别让他们从屋后绕过去，我们在这里把人拦住！'],roster:[['lijue','front'],['guosi','front'],['assassin','back']]},
-  advisor:{title:'府前毒阵',sceneId:'city-north',next:'dongzhuo',speaker:'liru',lines:['外面的守军居然没能拦住你们，看来我得亲自招待了。院门已经关好，几位既然进来了，就在这里多待一会儿，别急着去见董太师。'],roster:[['guard','front'],['guard','front'],['liru','back']]},
-  dongzhuo:{title:'太师府决战',sceneId:'city-north',next:'aftermath',speaker:'dongzhuo',lines:['一路打到这里，就以为我只能坐着等你们来问话？既然都来了，谁也别想再轻轻松松走出去，进来让我看看你们的本事！'],roster:[['dongzhuo','front']]}
+  vanguard:{title:'关前先锋',sceneId:'rural-road',next:'garrison',speaker:'huaxiong',lines:["华雄在此！借路进洛阳？先过我这一关！后队列阵，谁敢退，军法伺候！"],roster:[['huaxiong','front'],['soldier','back'],['soldier','back']]},
+  garrison:{title:'陷阵守军',sceneId:'city-frontier',next:'gate',speaker:'gaoshun',lines:["退下的收拢到我身后，伤兵入关！弩手看住两翼，不准追，守住关门！"],roster:[['gaoshun','front'],['crossbow','back'],['crossbow','back']]},
+  gate:{title:'温侯拦关',sceneId:'city-frontier',next:'street',speaker:'lvbu',lines:["你们终于来了。太师近来如何，我也有话要问。可这道关，眼下仍由我守。想过，便拿出本事。"],roster:[['lvbu','front'],['soldier','back'],['soldier','back']]},
+  street:{title:'洛阳街垒',sceneId:'market-street',next:'advisor',speaker:'lijue',lines:["再退便是太师府！郭汜，封右巷，别叫他们绕到屋后。街口给我守住！"],roster:[['lijue','front'],['guosi','front'],['assassin','back']]},
+  advisor:{title:'府前毒阵',sceneId:'city-north',next:'dongzhuo',speaker:'liru',lines:["倒真闯到这里来了。关上院门。几位不妨多留片刻，太师那边，我自会去报。"],roster:[['guard','front'],['guard','front'],['liru','back']]},
+  dongzhuo:{title:'太师府决战',sceneId:'city-north',next:'aftermath',speaker:'dongzhuo',lines:["杀到府门，就以为能来问我的罪？进来！让我瞧瞧，是谁给你们的胆！"],roster:[['dongzhuo','front']]}
  };
  function mob(role,index){const type={soldier:'spear',crossbow:'crossbow',assassin:'dagger',guard:'shield'}[role],weapon=I.create('weapon-'+type,'blue','luoyang-'+role+'-'+index),skills=role==='soldier'?['spear-cut']:role==='crossbow'?W.forWeapon(weapon).slice(0,1):role==='assassin'?W.forWeapon(weapon).slice(0,1):['shield-taunt','spear-cut'];return {...G.create(role==='guard'?'imperialCaptain':role==='crossbow'?'imperialSkirmisher':'imperialGuard',15),id:'luoyang-'+role+'-'+index,name:{soldier:'西凉军士',crossbow:'西凉弩手',assassin:'府中刺客',guard:'府前护卫'}[role],characterId:role==='assassin'?'thief':'imperial-soldier',weapon,skills,priorities:W.prioritiesFor(skills),equipment:{armor:I.create('iron-armor','blue')},armor:10,resistance:8,targetRule:'random'};}
  function battleGear(u,role){const defensive=role==='guard'||role==='gaoshun',arcane=role==='liru';return {...u,weapon:{...u.weapon,power:role==='lvbu'?20:18},equipment:{...u.equipment,armor:{uid:'luoyang-armor-'+role,id:'luoyang-armor',name:defensive?'陷阵重甲':'西凉战甲',slot:'armor',quality:'blue',attributes:{constitution:defensive?65:45,armor:defensive?95:60,resistance:arcane?60:18}},accessory1:{uid:'luoyang-seal-'+role,id:'luoyang-seal',name:'西凉军印',slot:'accessory',quality:'blue',attributes:{war:arcane?0:5,intelligence:arcane?5:0,technique:8}},accessory2:u.equipment?.accessory2}};}
@@ -9637,14 +9637,14 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
  function npc(world){if(world.state.nodeId!=='luoyang'||world.state.chapterOne.stage==='complete')return null;return {id:'luoyang-scout',name:'联军斥候',art:'imperial-soldier',role:'chapter',roleLabel:'讨董',side:'left'};}
  function quest(world){const q=world.state.chapterOne;if(!world.coalitionReady()&&!q.accepted&&q.stage!=='complete')return null;return {id:'chapter-one',title:'第一章 · 洛阳风起',category:'main',recommendedLevel:q.stage==='dongzhuo'?25:20,accepted:!!q.accepted,complete:q.stage==='complete',taskStatus:q.stage==='complete'?null:world.coalitionReady()?'ready':'active',target:'luoyang',objective:q.stage==='complete'?'第一章结束':q.stage==='aftermath'?'查看董卓恢复意识后发生的情况':['gather','rally'].includes(q.stage)?'前往洛阳，和联军斥候商量进攻安排':'击破'+(phases[q.stage]?.title||'洛阳守军')};}
  const ending=[
-  {id:'hero',name:null,art:'hero',side:'right',text:'大家先停一下！刚才董卓身后有个人影，你们看见没有？它像是从他身上钻出来，然后一下就不见了。'},
-  {id:'dongzhuo',name:'董卓',art:'dongzhuo',side:'left',text:'我这是在洛阳？你们是什么人，怎么都站在这里……那盏灯先拿开一点，晃得我什么都看不清。'},
-  {id:'hero',name:null,art:'hero',side:'right',text:'你刚才还在跟我们交手，现在却问我们是谁？城外的粮仓是你下令烧的，被抓的百姓也是你的人关的，你都不记得了吗？'},
-  {id:'dongzhuo',name:'董卓',art:'dongzhuo',side:'left',text:'有些事情我记得，可像是在旁边看着，身体怎么都动不了。那个人借着我的嘴下令，我想喊人住手，连一句话也说不出来。'},
-  {id:'hero',name:null,art:'hero',side:'right',text:'所以刚才跑掉的那个人影，一直在控制你？你有没有听见它说过什么，或者知道它准备去哪里？'},
-  {id:'dongzhuo',name:'董卓',art:'dongzhuo',side:'left',text:'我想不起来。最后能清楚记得的，是进太庙那一天，后面就只剩断断续续的事了。你们不放心可以先收走兵器，但外头的兵不能再乱下令了。'},
-  {id:'hero',name:null,art:'hero',side:'right',text:'刀先交给我们。你现在叫还能听令的人停手，把百姓放出来，再打开粮仓救急。等城里安顿好，我们再一起查到底发生了什么。'},
-  {id:'dongzhuo',name:'董卓',art:'dongzhuo',side:'left',text:'我会照办，现在就派人出去传令。等这些事安排好，我也想跟你们去查。有人控制我做了这么多事，我不能就这样装作什么都不知道。'}
+  {id:'hero',name:null,art:'hero',side:'right',text:"停手！他身后那道影子，你们瞧见没有？钻出来就不见了！"},
+  {id:'dongzhuo',name:'董卓',art:'dongzhuo',side:'left',text:"这是……洛阳？你们何人？灯挪开些，照得我眼疼。"},
+  {id:'hero',name:null,art:'hero',side:'right',text:"刚才还在跟我们打，转眼便不认人？烧粮仓、抓乡民，都是你下的令，你也不认？"},
+  {id:'dongzhuo',name:'董卓',art:'dongzhuo',side:'left',text:"有些记得。我像是站在一旁，眼见自己开口、挥刀，却管不住手脚。想喊，也喊不出。那东西……它借的是我的身子。"},
+  {id:'hero',name:null,art:'hero',side:'right',text:"跑掉的那影子，就是它？可听见它说过什么，要往哪里去？"},
+  {id:'dongzhuo',name:'董卓',art:'dongzhuo',side:'left',text:"想不起来。只记得那日去了太庙，后头便断断续续。兵器你们拿去，外头的军令，却得立刻止住。"},
+  {id:'hero',name:null,art:'hero',side:'right',text:"刀先交来。传令停兵，放人，开仓。城里安定之后，我们再查太庙的事。在那之前，你哪里也别去。"},
+  {id:'dongzhuo',name:'董卓',art:'dongzhuo',side:'left',text:"来人，照办！……待这些办妥，我也要去查。借我的手做下这许多事，我总得知道，它究竟是谁。"}
  ];
  const api={normalize,Cast,phases,enemies,npc,quest,ending};root.ChapterOne=api;if(node)module.exports=api;
 })(globalThis);
@@ -9978,7 +9978,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       else{if(!this.state.recruits[d.country].includes(id))this.state.recruits[d.country].push(id);this.state.residents[id]={...unit,startSoldiers:unit.startSoldiers??I.apply(unit).maxSoldiers};}if(stay&&unit.condition)this.state.conditions[id]=unit.condition;delete this.state.questRetainers[id];q.stage='complete';this.markQuestComplete(id);const items=this.claimEquipmentReward('hero:'+id);if(items.length){this.lastReward={title:'获得谢礼',gains:[],money:0,items};this.state.pendingReward=copy(this.lastReward);this.state.afterBattle=null;}return true;
     }
     nearbyRumor(at=this.state.nodeId){const from=D.placeMap[at];if(!from)return null;return Object.values(H.definitions).filter(d=>this.heroQuestVisible(d)&&this.state.heroQuests[d.id].stage===d.start&&!this.state.heroQuests[d.id].accepted&&d.rumor).map(d=>({id:d.id,text:d.rumor,place:H.place(d.id,this.state.heroQuests[d.id]),distance:Math.hypot(D.placeMap[d.place].x-from.x,D.placeMap[d.place].y-from.y),heard:this.state.heroQuests[d.id].heard})).filter(r=>r.distance<450).sort((a,b)=>Number(a.heard)-Number(b.heard)||a.distance-b.distance)[0]||null;}
-    tavernRumor(at=this.state.nodeId){const from=D.placeMap[at];if(!from)return null;const place=[...Tavern.capitals].sort((a,b)=>Math.hypot(D.placeMap[a].x-from.x,D.placeMap[a].y-from.y)-Math.hypot(D.placeMap[b].x-from.x,D.placeMap[b].y-from.y))[0],city=D.placeMap[place].name;return {id:'tavern-recruit',place,text:(at===place?'城里的酒肆常有些游历的人歇脚。':'你要是想找人搭伴，可以去'+city+'的酒肆问问。')+'有会使兵器的，也有懂医术、会些法术的，掌柜认得他们，肯帮着引荐。先聊聊，看合不合得来，再请人同行。许昌、成都、建业都有这样的酒肆。'};}
+    tavernRumor(at=this.state.nodeId){const from=D.placeMap[at];if(!from)return null;const place=[...Tavern.capitals].sort((a,b)=>Math.hypot(D.placeMap[a].x-from.x,D.placeMap[a].y-from.y)-Math.hypot(D.placeMap[b].x-from.x,D.placeMap[b].y-from.y))[0],city=D.placeMap[place].name;return {id:'tavern-recruit',place,text:(at===place?'城里的酒肆常有些游历的人歇脚。':'你要是想找人搭伴，可以去'+city+'的酒肆问问。')+"酒肆掌柜认得些行路人，会武、识药的都有。想请同伴，可先去见见。许昌、成都、建业的酒肆，都肯替人引荐。"};}
     townRumor(at=this.state.nodeId){return !this.state.serviceRumors.tavern?this.tavernRumor(at):this.nearbyRumor(at);}
     visitTavern(){if(!this.tavernAvailable())return false;if(this.state.serviceRumors.tavern!=='visited'){this.state.serviceRumors.tavern='visited';this.markQuestComplete('tavern-recruit');}return true;}
     hearRumor(id,place){if(id==='tavern-recruit'){if(this.state.serviceRumors.tavern)return false;this.state.serviceRumors.tavern='heard';this.state.serviceRumors.tavernPlace=Tavern.capitals.includes(place)?place:this.tavernRumor()?.place;return true;}const d=H.definitions[id],q=this.state.heroQuests[id];if(!d||!q||['locked','complete'].includes(q.stage)||q.accepted||q.heard)return false;q.heard=true;return true;}
@@ -10042,12 +10042,12 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     }
     inviteResident(id){this.syncCompanionLevels();const u=this.state.residents[id];if(!u||(u.origin==='tavern'&&!this.tavernAvailable())||this.state.releasedRetainers.includes(id)||(u.homeNode!==this.state.nodeId&&!(u.origin==='tavern'&&this.tavernAvailable()))||this.pending||this.journey||this.state.companions.some(c=>c.id===id)||!this.canRecruit())return false;this.state.companions.push(copy(u));if(id==='zhenji'){this.state.quests.changshan.healerJoined=true;this.state.quests.changshan.healerStayDecided=true;if(!this.state.recruits.wei.includes(id))this.state.recruits.wei.push(id);}this.state.troops[id]=u.startSoldiers??E.maxHealth(u.constitution);if(u.condition)this.state.conditions[id]=u.condition;if(this.state.activeIds.length<this.activeLimit())this.state.activeIds.push(id);delete this.state.residents[id];return true;}
     campAdvice(){
-      if(!Object.values(this.state.trainingWins).some(Boolean))return ['我还是担心你在路上碰到乱兵。要是不急着走，先去教场找我三弟练练吧，他就在那边，想试什么兵器都能陪你，不会的也可以问他。'];
-      if(this.state.quests.changshan.stage!=='complete')return [{available:'常山就在营地西北边，离得不远。前些天来投宿的人说，赵子龙在那里照顾逃难的乡亲，应该就是你想找的人，你可以先过去问问。',entry:'你要找的赵子龙就在常山村里。到了跟乡亲们打听一下，他们都认得他，也知道他平时在哪里帮忙。',supplies:(this.state.quests.changshan.healerRescued||this.state.quests.changshan.healerJoined)?'甄姑娘和伤者都平安就好。粮仓里若还有贼，你们先和子龙把粮夺回来，再安排人装车。常山的乡亲还在等着呢。':'中山的粮食一直没送到，看来不是临时耽误。你和子龙一起过去，把仓守找来问问，看看是路不通，还是粮车出了事情。',rescue:'中山粮仓里还扣着人？先别急着运粮，把后院的门打开，看看有没有伤者。我二弟这里还有些药，实在不够用，就让人回来取。',escort:'能把粮找回来就好。回常山的时候慢一点，车上还有伤者，中途觉得不舒服就停下来歇歇，不用为了赶路一直颠着他们。',return:'到了常山先找里正，让他叫人卸粮、分发。大家已经等了很久，村口一下围太多人，反而容易把车上的伤者挤着。',decision:'常山的事情暂时安排好了，你们也能歇一会儿。子龙以后准备去哪里，你问过没有？既然一起忙了这么久，也该坐下来好好聊聊。'}[this.state.quests.changshan.stage]||'你这趟出去还顺利吗？遇到什么不好处理的事情，告诉我们听听，能帮忙的地方，我们再一起想办法。'];
-      if(!this.state.visited.includes('changshan'))return ['我听说赵子龙还在常山照顾流民，你可以先去村里找他。路上要是受伤，记得回来让我二弟看看，不要觉得回来一趟麻烦就硬撑。'];
-      if(this.coalitionReady())return ['魏、蜀、吴都有了愿意帮忙的人，现在可以认真商量怎么对付董卓了。你先去跟各家负责的人谈谈，确定谁能出兵、谁来接应，再到洛阳去。'];
+      if(!Object.values(this.state.trainingWins).some(Boolean))return ["三弟在教场，你出营前不妨去找他。他虽莽撞，兵器上的本领却不差，愿意陪你多练几回。"];
+      if(this.state.quests.changshan.stage!=='complete')return [{available:"常山在营地西北，不远。近来投宿的人都说，赵子龙在那里照看流民，你寻的应当便是他。",entry:"到了常山，问乡亲赵子龙在哪里。他日日帮着做事，村里没有不认得的。",supplies:(this.state.quests.changshan.healerRescued||this.state.quests.changshan.healerJoined)?"甄姑娘与伤者平安便好。仓里若尚有贼，和子龙先夺下门，再装粮，常山仍等着这几车。":"中山该来的粮迟迟不到，必有缘故。你与子龙去见仓守，问问车还在仓里，还是已上了路。",rescue:"后仓还关着人？先开门，别急着推粮。二弟这边尚有药，不够便遣人来取。",escort:"粮寻回便好。车上有伤者，回常山莫赶路，疼得受不住便停一停，哪差这半个时辰。",return:"入村先叫里正，卸粮、分发，他都清楚。别停在村口，乡亲围上来，车上伤者不好下。",decision:"常山这回过了难关，子龙也该能歇歇。你们一道奔波这些日子，往后想往哪儿去，可谈过了？"}[this.state.quests.changshan.stage]||"回来便好。哪处还有难办的，说来听听，我们也替你想一想。"];
+      if(!this.state.visited.includes('changshan'))return ["子龙还在常山，去问村里的人便知。路上伤了便回营，二弟在，不必拖着伤赶路。"];
+      if(this.coalitionReady())return ["三家人手齐备，讨董便可议了。先与各府商定援军、粮道，再赴洛阳，别只带着一纸会盟便去闯关。"];
       const clue=D.clues.filter(c=>H.definitions[c.id]&&!this.state.recruits[c.faction].includes(c.id)&&!this.state.visited.includes(c.place)).sort((a,b)=>(this.findRoute(a.place)?.distance??Infinity)-(this.findRoute(b.place)?.distance??Infinity))[0];
-      return [clue?clue.text:'你最近跑了不少地方，先在营里歇歇吧。找人的事情不用每次都急着赶路，遇到愿意聊天的乡亲，多问问附近的消息，也许就能有线索。'];
+      return [clue?clue.text:"歇一歇再走吧。寻人有时急不得，肯坐下与乡亲谈几句，反比只顾赶路多得些消息。"];
     }
     enemyLevel(){return Math.max(1,Math.min(this.character.level,this.state.enemyLevelCap));}
     unlockEnemyLevelCap(cap){if(!N.combatProgression.caps.includes(cap)||cap<=this.state.enemyLevelCap)return false;this.state.enemyLevelCap=cap;return true;}
@@ -10114,7 +10114,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
         return {id:'camp-training',title:training.label,scene:Scenes.arrange(copy(D.townScenes.camp),enemies),allies:[...this.trainingAllies(training),...extraAllies],enemies,passives:heroPassives(),rules:{difficulty:this.character.difficulty,partySlots:this.activeLimit(),bossBattle:!!training.rivals,level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true,seed:this.pending.seed}};
       }
       if(['story','side'].includes(this.pending.kind)){
-        const p=this.pending,data=p.kind==='story'?N.storyBattles[p.phase]:N.sideQuests.find(q=>q.id===p.questId),level=data.fixedCombatLevel||Progression.recommended(data),count=p.kind==='story'?data.count:data.rounds===5?[2,3,2,3,5][this.state.quests.side[data.id].wins]:[2,3,5][Math.min(2,this.state.quests.side[data.id].wins)],enemies=(data.bossId?Optional.roster(data.bossId):(node?require('./enemy-catalog.js'):root.EnemyCatalog).roster(level,count,p.kind==='story'?(data.pattern||'earlyPhysical'):data.pattern||['patrol','arcane','venom','armored','ambush'][E.seedNumber(p.questId)%5])).map((u,i)=>({...u,...(root.CharacterAssets?root.CharacterAssets.resolve(u.characterId):{}),...(p.kind==='story'&&p.phase==='escort'&&i===0?{constitution:Math.floor(u.constitution*.5)}:{}),...(p.kind==='side'&&i===0&&data.enemyName?{name:data.enemyName}:{}),...(p.kind==='side'&&i===0&&data.enemyArt?{characterId:data.enemyArt,...(root.CharacterAssets?root.CharacterAssets.resolve(data.enemyArt):{})}:{}),id:'local-enemy-'+i}));
+        const p=this.pending,data=p.kind==='story'?N.storyBattles[p.phase]:N.sideQuests.find(q=>q.id===p.questId),level=data.fixedCombatLevel||Progression.recommended(data),count=p.kind==='story'?data.count:data.rounds===5?[2,3,2,3,5][this.state.quests.side[data.id].wins]:[2,3,5][Math.min(2,this.state.quests.side[data.id].wins)],enemies=(data.bossId?Optional.roster(data.bossId):(node?require('./enemy-catalog.js'):root.EnemyCatalog).roster(level,count,p.kind==='story'?(data.pattern||'earlyPhysical'):data.pattern||['patrol','arcane','venom','armored','ambush'][E.seedNumber(p.questId)%5])).map((u,i)=>({...u,...(root.CharacterAssets?root.CharacterAssets.resolve(u.characterId):{}),...(p.kind==='side'&&i===0&&data.enemyName?{name:data.enemyName}:{}),...(p.kind==='side'&&i===0&&data.enemyArt?{characterId:data.enemyArt,...(root.CharacterAssets?root.CharacterAssets.resolve(data.enemyArt):{})}:{}),id:'local-enemy-'+i}));
         return {id:'local-'+p.kind,title:data.title,scene:Scenes.arrange(Scenes.get(data.sceneId||'rural-road'),enemies),allies:[...this.storyAllies(p.phase),...extraAllies],enemies,passives:heroPassives(),rules:{difficulty:this.character.difficulty,partySlots:this.activeLimit(),bossBattle:!!data.bossId,allySp:0,hit:true,critical:true,seed:p.seed}};
       }
       const troops=this.members(),allies=this.state.activeIds.map(id=>troops.find(u=>u.id===id)).filter(Boolean),encounter=D.encounters[this.pending.encounterId];if(!encounter)throw new Error('遭遇配置不存在');
@@ -10646,25 +10646,25 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     }
     nearbyDialogue(npc){
       if(npc.role==='companion')return false;if(npc.dungeonRumor){this.speak(npc,{lines:npc.lines,choices:[{label:'记下地点',action:()=>{this.openQuestOffer(npc.dungeonRumor,{onAccept:()=>{if(this.model.acceptSide(npc.dungeonRumor)){this.save();this.panel=null;}}});}},{label:'告辞',dismiss:true,action:()=>this.closeDialogue()}]});return true;}
-      if(npc.questId){const data=root.NearbyContent.sideQuests.find(t=>t.id===npc.questId);this.speak(npc,{lines:[data.id==='grain-escort'?'粮车就在我们这里。你们想把粮带走，先看看能不能从我们手里抢回去，别站在这里说废话！':'这段路现在由我们守着，想过去就把东西留下。要是不肯交，那就别怪我们动手了！'],choices:[{label:data.dungeon?'继续探索':'剿匪',action:()=>{if(this.model.beginSideBattle(data.id))this.startBattle();}},{label:'离开',dismiss:true,action:()=>this.closeDialogue()}]});return true;}const N=root.NearbyContent,q=this.model.state.quests.changshan;
-      if(npc.id==='changshan-elder'&&q.stage==='return'){this.speak(npc,{lines:['你们总算回来了！刚才村口又闹起来，我还怕伤着车上的人。先把粮车推进院里吧，我叫乡亲们来帮忙卸。','这一趟让你们费心了，今晚就在村里歇着吧。住处已经收拾好了，乡亲们也想请大家吃顿饭，当面说声谢谢。'],onComplete:()=>{this.model.advanceChangshan();this.save();this.questDialogue(D.questNpcs.zhaoyun);}});return true;}
+      if(npc.questId){const data=root.NearbyContent.sideQuests.find(t=>t.id===npc.questId);this.speak(npc,{lines:[data.id==='grain-escort'?"粮就在身后，有本事过来拿！少废话，弟兄们看紧仓门！":"此路归我们管！东西留下，放你过去。不交？那便连人也留下！"],choices:[{label:data.dungeon?'继续探索':'剿匪',action:()=>{if(this.model.beginSideBattle(data.id))this.startBattle();}},{label:'离开',dismiss:true,action:()=>this.closeDialogue()}]});return true;}const N=root.NearbyContent,q=this.model.state.quests.changshan;
+      if(npc.id==='changshan-elder'&&q.stage==='return'){this.speak(npc,{lines:["回来了！方才村口一闹，我还怕车上伤者又遭罪。车往院里推，来几个人，帮着卸粮！","今夜住下吧，铺盖早收拾好了。大伙凑了一桌饭，都盼着你们来，可别叫我们白摆碗筷。"],onComplete:()=>{this.model.advanceChangshan();this.save();this.questDialogue(D.questNpcs.zhaoyun);}});return true;}
       if(npc.id==='grain-steward'&&q.stage==='supplies'){
-        this.speak(npc,{lines:[q.grainWins?'前院的粮袋清点过了，封口还好。余下的贼退进了后仓，正往门口堆东西。里头都是干粮和草袋，你们小心些，千万别让他们点着火。':'赵将军，你们可来了！这些粮是乡亲们凑给常山的，贼却把仓门锁了，连送粮的人也不放进去。前仓守的人少些，你们若能把门夺回来，我就叫人备车。','袋口都缝着各家的记号，认起来不难。我们守在外头，接出来一袋就清点一袋，你们只管顾好自己，别为了粮食伤着。'],choices:[{label:q.grainWins?'夺取后仓':'夺取前仓',action:()=>{if(this.model.beginStoryBattle('grain'))this.startBattle();}},{label:'稍后再来',action:()=>this.closeDialogue()}]});return true;
+        this.speak(npc,{lines:[q.grainWins?"前仓点过了，封口没坏。贼退进后仓，还往门边堆东西。里头草袋、干粮多，可别叫他们点起火来！":"赵将军，等着你们呢！常山的粮全锁里头了，连送粮的也不许进。前仓人少，若能夺回门，我立刻备车。","各家袋口的记号我认得，你们取一袋，我点一袋。粮少些还可想办法，人别伤着，切记。"],choices:[{label:q.grainWins?'夺取后仓':'夺取前仓',action:()=>{if(this.model.beginStoryBattle('grain'))this.startBattle();}},{label:'稍后再来',action:()=>this.closeDialogue()}]});return true;
       }
       if(npc.id==='refugee-laborer'&&q.stage==='rescue'){
         this.model.advanceChangshan();this.showZhenRescue();return true;
       }
       if(npc.id==='zhenji'){
         if(q.healerDecision){this.offerZhenStay();return true;}
-        if(!q.healerJoined&&(q.healerRescued||['return','decision','complete'].includes(q.stage)))this.speak(npc,{lines:['这边的伤者已经有人接着照顾，我也能放心出门了。你们还缺人手吗？我学过些医术，若能同行，路上也好照看大家。'],choices:[{label:'请同行',action:()=>{if(this.model.recruitZhenJi()){this.save();this.closeDialogue();}else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}},{label:'改日再会',action:()=>this.closeDialogue()}]});
-        else this.speak(npc,{lines:['让我看看手上的伤，好些了吗？你们在外面赶路，伤口容易磨开，觉得疼就告诉我，别等布条全湿了才想起来换。'],choices:[{label:'请她疗伤',action:()=>{this.model.rest();this.save();this.speak(npc,{lines:['已经重新包好了，你轻轻动一下，看看还有没有特别疼的地方。晚上要是又发热或者肿起来，记得来找我。']});}},{label:'聊聊药箱',action:()=>this.speak(npc,{lines:['这药箱是从家里带出来的，扣子坏过两回，我又找人修好了。里面的针和医书都用了很多年，哪样放在哪层，我已经很熟悉，换个新的反倒不习惯。']})},{label:'告辞',action:()=>this.closeDialogue()}]});return true;
+        if(!q.healerJoined&&(q.healerRescued||['return','decision','complete'].includes(q.stage)))this.speak(npc,{lines:["这里有人照看伤者，我也得空了。诸位若还愿带我，我背上药箱，随时能走。"],choices:[{label:'请同行',action:()=>{if(this.model.recruitZhenJi()){this.save();this.closeDialogue();}else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}},{label:'改日再会',action:()=>this.closeDialogue()}]});
+        else this.speak(npc,{lines:["手伸来，上回那处还疼吗？赶路磨开的，自己未必察觉。别等布条渗透了才换。"],choices:[{label:'请她疗伤',action:()=>{this.model.rest();this.save();this.speak(npc,{lines:["包好了，轻轻动一下。夜里又热又肿的话，来找我，别闷在被子里忍着。"]});}},{label:'聊聊药箱',action:()=>this.speak(npc,{lines:["家里带出的药箱。扣子坏了两回，我又修上了。针、医书各有一格，闭眼也摸得到。真换新的，找东西反倒慢。"]})},{label:'告辞',action:()=>this.closeDialogue()}]});return true;
       }
       const definition=N.npcs.find(n=>n.id===npc.id);if(!definition)return false;
       const variants=N.conversations?.[npc.id],lines=(['return','decision','complete'].includes(q.stage)&&variants?.afterReturn)||((q.healerRescued||q.healerJoined)&&variants?.afterRescue)||definition.lines;
       const talks=this.model.state.npcTalks[npc.id]||0;this.model.state.npcTalks[npc.id]=talks+1;const choices=[];
-      if(npc.role==='healer'){const service=N.services.healing;choices.push({label:'疗伤 · '+service.price+service.currency,action:()=>{if(this.model.state.money>=service.price){this.model.state.money-=service.price;this.model.rest();this.save();this.speak(npc,{lines:['伤口都清理好了，你慢慢站起来试试。今天先别跑得太急，刚包扎的地方很容易又裂开，实在不舒服就回来找我。']});}else this.notify('铜钱不够，可以回黄巾营地找张宝治疗。');}});}
+      if(npc.role==='healer'){const service=N.services.healing;choices.push({label:'疗伤 · '+service.price+service.currency,action:()=>{if(this.model.state.money>=service.price){this.model.state.money-=service.price;this.model.rest();this.save();this.speak(npc,{lines:["血止住了，慢些起身试试。今日别急跑，刚合的口子容易又裂。不舒服便回来，我还在这儿。"]});}else this.notify('铜钱不够，可以回黄巾营地找张宝治疗。');}});}
       if(npc.role==='merchant')for(const mode of ['buy','sell'])choices.push({label:mode==='buy'?'购买':'出售',action:()=>{this.dialogue=null;this.panel={type:'shop',shopMode:mode,scroll:0};}});
-      for(const data of N.sideQuests.filter(t=>t.giver===npc.id)){const side=this.model.state.quests.side[data.id];if(!side.accepted)choices.push({label:(data.repeatable?'委托':'支线')+' · '+data.title,action:()=>{this.openQuestOffer(data.id,{onAccept:()=>{if(this.model.acceptSide(data.id)){this.save();this.speak(npc,{lines:[data.accept+' 他们就在'+D.placeMap[data.place].name+'那边。']});}}});}});else if(side.wins<data.rounds)choices.push({label:'询问'+data.title,action:()=>this.speak(npc,{lines:['他们还在'+D.placeMap[data.place].name+'那边。到了以后找找拦路的那伙人，把路上的麻烦处理好，再回来跟我说一声，我也好通知大家可以走了。']})});else if(!side.paid)choices.push({label:data.repeatable?'交付委托':'完成支线',action:()=>{const reward=this.model.turnInSide(data.id);if(reward){this.dialogue=null;this.save();this.showReward(reward);}}});else if(data.repeatable)choices.push({label:'再次探索',action:()=>{this.openQuestOffer(data.id,{onAccept:()=>{if(this.model.repeatSide(data.id)){this.save();this.panel=null;}}});}});else if(!choices.some(c=>c.label==='聊聊近况'))choices.push({label:'聊聊近况',action:()=>this.speak(npc,{lines:['这几天已经有人敢出门做事了，前阵子可是谁都不放心。你们替大家清了路，乡亲们一直惦记着这件事。']})});}
+      for(const data of N.sideQuests.filter(t=>t.giver===npc.id)){const side=this.model.state.quests.side[data.id];if(!side.accepted)choices.push({label:(data.repeatable?'委托':'支线')+' · '+data.title,action:()=>{this.openQuestOffer(data.id,{onAccept:()=>{if(this.model.acceptSide(data.id)){this.save();this.speak(npc,{lines:[data.accept+' 他们就在'+D.placeMap[data.place].name+'那边。']});}}});}});else if(side.wins<data.rounds)choices.push({label:'询问'+data.title,action:()=>this.speak(npc,{lines:['他们还在'+D.placeMap[data.place].name+"那边便是。清掉拦路那伙，回来给我带句话，我也好叫等着的人动身。"]})});else if(!side.paid)choices.push({label:data.repeatable?'交付委托':'完成支线',action:()=>{const reward=this.model.turnInSide(data.id);if(reward){this.dialogue=null;this.save();this.showReward(reward);}}});else if(data.repeatable)choices.push({label:'再次探索',action:()=>{this.openQuestOffer(data.id,{onAccept:()=>{if(this.model.repeatSide(data.id)){this.save();this.panel=null;}}});}});else if(!choices.some(c=>c.label==='聊聊近况'))choices.push({label:'聊聊近况',action:()=>this.speak(npc,{lines:["这几日有人敢出门了。前阵子一提那条路，家里人便拦着不许去。诸位清路的情，大伙记着呢。"]})});}
       if(choices.length){if(!choices.some(c=>c.label==='聊聊近况'))choices.push({label:'聊聊近况',action:()=>this.speak(npc,{lines:[lines[(talks+1)%lines.length]]})});choices.push({label:'告辞',action:()=>this.closeDialogue()});}
       const service=npc.role==='civilian'&&talks>0&&!this.model.state.serviceRumors.tavern?this.model.tavernRumor():null;if(service)this.model.hearRumor(service.id,service.place);this.save();this.speak(npc,{lines:[service?.text||lines[talks%lines.length]],choices:choices.length?choices:undefined});return true;
     }
@@ -10675,7 +10675,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     closeWorldPanel(){if(this.renameInput)this.renameInput.hidden=true;if(['party','trackerOrder','tasks'].includes(this.panel?.type))PartyInput.cancel(this);if(this.panel?.type==='reward'){this.finishReward();return;}if(this.panel?.type==='practiceWeapons'){if(this.panel.editor.panel)this.panel.editor.closePanel();else this.showDepartureTrainer();return;}if(this.panel?.type==='tacticsEditor'){this.panel.editor.closePanel();return;}const previous=this.panel?.previous||null;if(previous?.type==='npcDialogue'){this.dialogue=previous.dialogue;this.panel=null;}else this.panel=previous;}
     tavernDialogue(npc,rules=false){
       const choices=[{label:'看看同行人选',action:()=>{this.dialogue=null;this.panel={type:'tavern'};this.invalidate();}},{label:rules?'再聊两句':'打听招募规矩',action:()=>this.tavernDialogue(npc,!rules)},{label:'改日再来',dismiss:true,action:()=>this.closeDialogue()}];
-      this.speak(npc,{lines:rules?['我认得的人里，有常人、能人、俊杰、英豪，也有难得一见的天纵之才。不过资质归资质，擅长什么还得细看。人选旁边记着各项潜力，还有每升一级能长多少，你按队伍缺的人手来挑。','请人同行，要备些谢仪：常人一百文，能人二百，俊杰四百，英豪八百，天纵之才一千六。选定兵器方向后就不能改了，拿不准，可以先看看他们会的招式。','这批没有合意的，花一百文我再替你换一批。也能指定资质，最多连着打听一百次，遇到合适或更好的人就停，只收实际打听的次数。钱不够也不会硬找。已经离队的同伴，可以在酒馆免费请回来。']:['客官，进来歇歇脚。我认得些会武艺、懂医术的行路人，你若想找同伴，先看看他们的本事；招募的规矩，也尽管问我。'],choices});
+      this.speak(npc,{lines:rules?["常人、能人、俊杰、英豪，最难得是天纵之才。我这儿都替你问着。不过光瞧名头不成，各项潜力、每升一级的长进，都写在名帖上，客官细看，挑队里用得着的。","请人同行，谢仪依资质论：常人一百文，能人二百，俊杰四百，英豪八百，天纵之才一千六。各人使惯的兵器定了，往后便不改行，招式先看清再请。","这批不合意，一百文，我再打听一回。你也可点明资质，我替你连着问，最多一百回，遇上同等或更好的便停。只收实际打听的次数，没钱便歇。旧同伴离了队，再来酒馆请，不收谢仪。"]:["客官，里头坐！会武的、识药的，我都认得几位。想请个同伴，先看名帖，规矩不懂便问我。"],choices});
     }
     interact(npc){if(npc.role==='tavern'){this.model.visitTavern();this.save();this.npcInteraction={id:npc.id,offered:false};this.tavernDialogue(npc);return;}const court=Object.values(root.FactionCourts.definitions).find(d=>d.id===(npc.courtId||npc.id));if(court&&!this.model.state.courtDreams[court.id]&&!npc.delegate){this.showCourtDream(npc,court);return;}this.dialogue=null;this.npcInteraction={id:npc.id,offered:false};this.speak(npc);}
     observeNpc(npc){const unit=this.model.npcUnit(npc.id);if(!unit)return;const previous=this.dialogue?{type:'npcDialogue',dialogue:this.dialogue}:null,preview=this.memberPreview(unit);this.dialogue=null;this.panel={type:'character',unitId:unit.id,unit:preview.unit(unit.id),readonly:true,previous};}
@@ -10870,16 +10870,16 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
         loader.preload([scene.background],{priority:0}).then(()=>{if(this.disposed||this.entryRequest!==request)return;this.entryRequest=null;this.entering=false;if(this.model.state.nodeId===nodeId&&!this.journey&&!this.model.journey)this.tryEnter();this.invalidate();}).catch(()=>{if(this.disposed||this.entryRequest!==request)return;this.entryRequest=null;this.entering=false;this.notify('场景未能加载，请重试。');this.invalidate();});return true;
       }
       if(this.model.enter()){this.dialogue=null;this.selected=null;this.save();if(nodeId==='changshan'&&['available','entry'].includes(this.model.state.quests.changshan.stage))this.startChangshanArrival();else if(nodeId==='changshan'&&this.model.state.quests.changshan.stage==='escort')this.startEscortArrival();else if(!this.resumeForcedHeroScene()){const npc=this.model.entryQuestNpc();if(npc)this.interact(npc.heroQuest?{...npc,selectedQuest:true}:npc);}this.invalidate();return true;}
-      const node=this.model.location(),text=node.kind==='village'?'村里正在查问外来的人，今天不许进去。你们先到路边等着，别把门口堵住，有了吩咐再说。':'你们有通行文书吗？没有就先退开，现在不放人进城。别一直站在这里，再拦着路，我就叫人把你们赶出去。';this.speak(D.gateGuard,{lines:[text]});this.invalidate();return false;
+      const node=this.model.location(),text=node.kind==='village'?"村里正盘查，今日不得入内。路边候着，莫堵村口，等上头发话。":"文书呢？没有便退后。今日不放行，再挡路，便请诸位吃军棍了！";this.speak(D.gateGuard,{lines:[text]});this.invalidate();return false;
     }
     questDialogue(npc){
       const q=this.model.state.quests.changshan,stage=q.stage;
       if(npc.id==='zhaoyun'&&['available','entry'].includes(stage)){this.startChangshanArrival();return;}
       if(npc.id==='zhaoyun'&&q.zhaoInvitation){this.offerZhaoJourney();return;}
       if(npc.id==='zhaoyun'&&stage==='decision'){
-        this.playConversation([{npc,lines:['粮食分下去了，伤者也都安顿好，乡亲们终于能安心歇几天。这次救人与运粮赶在一起，多亏你肯帮忙。','我只想找一位真肯为天下万民着想的人。诸侯的名号听得多了，可谁肯管这些挨饿的乡亲，我还没亲眼见过。']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['可以去成都找刘备。我听说他收留了不少流民，你不妨亲自见见他。我也想请你先与我们同行，路上再遇到这样的事，有你在，我心里踏实些。']}],()=>this.speak(npc,{lines:['刘备……我也听过他救济流民的事。既然你这样说，我就去见一见。眼下乡亲们已安顿妥当，你若还缺人手，我愿先与你同行。'],choices:[{label:'与子龙同行',action:()=>this.finishZhaoQuest(true)}]}));return;
+        this.playConversation([{npc,lines:["粮分下了，伤者也有屋住。出去时还怕赶不上，回来竟能听见村里生火做饭。这趟多亏有你。","云想寻的，是肯为天下万民着想之人。诸侯名声各异，究竟哪一位做得到，我还未亲见。"]},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:["去成都见刘备吧。我听说他收留流民，子龙可以亲眼看看。我也想请你先与我们同行，再碰上这样的事，身旁有你，总多一分底气。"]}],()=>this.speak(npc,{lines:["刘备……也曾听闻。既蒙你引荐，云自当往见。眼下乡亲无事，愿先与你同行。"],choices:[{label:'与子龙同行',action:()=>this.finishZhaoQuest(true)}]}));return;
       }
-      if(npc.id==='zhaoyun'){this.speak(npc,{lines:[{supplies:'中山有座粮仓，之前答应送粮到常山，后来却一直没有消息。我想过去问问，你愿不愿意一起？路上多个人，也能互相照应。',rescue:'粮食已经夺回，后院却还有人被锁在屋里。车夫听见了呼救，正在那边等我们；先把门打开，看看里面的人有没有受伤。',escort:'粮都装好了，伤者也坐上了车。你在前面带路，我在后面照看，要是有人喊停，就等一等，别让车夫为了赶路把伤者颠坏了。',return:'乡亲们出来迎接了，我们先把粮车推进院子。里正知道哪几户急着用粮，让他安排分发，别全堵在村口。',complete:'这几天已经有人在修农具，商量着什么时候回田里看看了。能重新种地，大家就不用总靠别人送粮，我也能放心一些。'}[stage]||'稍等我一会儿，我去问问乡亲们还缺什么，确认都安排好就回来。']});return;}
+      if(npc.id==='zhaoyun'){this.speak(npc,{lines:[{supplies:"中山答应送粮，约期过了，却不见车。我想去问，又怕村里无人照看。你可愿陪我一趟？",rescue:"后院门里还有人，车夫听见呼救，正在旁边守着。粮先不忙推走，开门看看。",escort:"粮已装好，伤者也上了车。你领路，我看后车。有人喊停便停，车夫莫催，伤处经不得颠。",return:"乡亲都迎来了，先把车推入院。哪家急着用粮，里正最清楚，请他来分，莫堵村口。",complete:"这几日又听见打农具的声响了，乡亲还在商量回田的日子。能种下去，往后这口饭，便不用日日等人送。"}[stage]||"稍候，我再问问乡亲缺些什么，回来便走。"]});return;}
       this.nearbyDialogue(npc);
     }
     startChangshanArrival(){
@@ -10897,31 +10897,31 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     requiredHeroScene(){return Object.values(root.HeroQuests.definitions).find(d=>root.HeroQuests.place(d.id,this.model.state.heroQuests[d.id])===this.model.state.nodeId&&d.stages[this.model.state.heroQuests[d.id]?.stage]?.strictDialogue);}
     resumeForcedHeroScene(){if(this.disposed||this.dialogue||this.panel||this.battle||this.model.pending||this.journey)return false;const d=this.requiredHeroScene();if(!d)return false;this.heroQuestDialogue(root.HeroQuests.npc(d.id,this.model.state.heroQuests[d.id]));this.invalidate();return true;}
     heroQuestDialogue(npc){
-      if(!npc)return;const alternatives=Object.values(root.HeroQuests.definitions).filter(d=>this.model.heroQuestVisible(d)&&root.HeroQuests.place(d.id,this.model.state.heroQuests[d.id])===this.model.state.nodeId&&root.HeroQuests.npc(d.id,this.model.state.heroQuests[d.id])?.id===npc.id);if(alternatives.length>1&&!npc.selectedQuest){this.speak(npc,{lines:['正好你们来了，这几件事我都记着。你想先问哪一件，我们坐下来慢慢说。'],choices:[...alternatives.map(d=>({label:d.title,action:()=>this.heroQuestDialogue({...root.HeroQuests.npc(d.id,this.model.state.heroQuests[d.id]),selectedQuest:true})})),{label:'告辞',dismiss:true,action:()=>this.closeDialogue()}]});return;}const id=npc.heroQuest,d=root.HeroQuests.definitions[id],stage=this.model.state.heroQuests[id].stage,data=d.stages[stage].npc;if(!data)return;
+      if(!npc)return;const alternatives=Object.values(root.HeroQuests.definitions).filter(d=>this.model.heroQuestVisible(d)&&root.HeroQuests.place(d.id,this.model.state.heroQuests[d.id])===this.model.state.nodeId&&root.HeroQuests.npc(d.id,this.model.state.heroQuests[d.id])?.id===npc.id);if(alternatives.length>1&&!npc.selectedQuest){this.speak(npc,{lines:["来得正好，几桩事都记在这里了。想先问哪一件？"],choices:[...alternatives.map(d=>({label:d.title,action:()=>this.heroQuestDialogue({...root.HeroQuests.npc(d.id,this.model.state.heroQuests[d.id]),selectedQuest:true})})),{label:'告辞',dismiss:true,action:()=>this.closeDialogue()}]});return;}const id=npc.heroQuest,d=root.HeroQuests.definitions[id],stage=this.model.state.heroQuests[id].stage,data=d.stages[stage].npc;if(!data)return;
       const forced=!!d.stages[stage].strictDialogue,turns=data.turns||data.lines.map(text=>({speaker:'npc',text}));
       const choices=[...data.choices.map((choice,index)=>({label:choice.label+(choice.price?' · '+choice.price+'文':''),action:()=>{
         if(!this.model.chooseHeroQuest(id,index,stage)){this.notify(this.model.lastQuestError||'暂时不能进行。');return;}
         this.dialogue=null;this.save();if(choice.puzzle){this.panel={type:'slidingPuzzle',questId:id};return;}if(this.model.pending){this.startBattle();return;}
-        if(this.model.state.heroQuests[id].stage==='complete')this.speak({...npc,name:d.name||'甘宁',art:id},{lines:[choice.recruit?'我把东西收拾好就来。你们在门口歇一会儿，不用急着先走，有什么要带的也可以一起检查。':((d.home||'jianye')===this.model.state.nodeId?'我就留在':'我先回')+D.placeMap[d.home||'jianye'].name+'等你们。路上多保重，以后还需要人帮忙，来找我就好。'],onComplete:()=>{if(this.model.state.pendingReward)this.showReward(this.model.state.pendingReward);}});
+        if(this.model.state.heroQuests[id].stage==='complete')this.speak({...npc,name:d.name||'甘宁',art:id},{lines:[choice.recruit?"容我取行李。诸位在门口歇片刻，缺什么一道备上，再动身。":((d.home||'jianye')===this.model.state.nodeId?'我就留在':'我先回')+D.placeMap[d.home||'jianye'].name+"。我在此等。路上保重，再需人手，来叫一声便是。"],onComplete:()=>{if(this.model.state.pendingReward)this.showReward(this.model.state.pendingReward);}});
         else if(root.HeroQuests.place(id,this.model.state.heroQuests[id])===this.model.state.nodeId)this.heroQuestDialogue({...root.HeroQuests.npc(id,this.model.state.heroQuests[id]),selectedQuest:true});
       }})),...(forced?[]:[{label:'暂且离开',dismiss:true,action:()=>this.closeDialogue()}])];
       if(!forced&&this.npcInteraction?.id===npc.id&&!this.npcInteraction.offered&&this.model.npcUnit(npc.id)){this.npcInteraction.offered=true;choices.splice(Math.max(0,choices.length-1),0,{label:'观察',action:()=>this.observeNpc(npc)});}
       const show=index=>{if(this.disposed||this.model.state.heroQuests[id].stage!==stage)return;const turn=turns[index],actor=turn.speaker==='hero'?{id:'hero',name:this.character.name,art:'hero',side:'right',sceneId:npc.sceneId}:turn.speaker==='npc'?npc:{...(root.RecruitmentContent.actors[turn.speaker]||npc),sceneId:npc.sceneId},last=index===turns.length-1;this.speak(actor,{lines:[turn.text],forced,choices:last?choices:undefined,onComplete:last?undefined:()=>show(index+1)});this.invalidate();};show(0);
     }
     openQuestOffer(questId,options={}){this.dialogue=null;this.panel={type:'taskOffer',questId,scroll:0,previous:null,...options};this.invalidate();}
-    offerZhaoJourney(){this.openQuestOffer('changshan',{forced:true,acceptLabel:'与子龙同行',offerObjective:'前往中山打听粮车下落，帮助常山取回乡粮。',offerDescription:'村里的粮快吃完了，中山答应送来的也一直没到。我想过去问问，可这边还需要人照看，正好你来了，我也想问问你愿不愿意帮忙。\n你能不能陪我去一趟中山？先把粮车的情况问清楚，办完这件事，乡亲们才能有饭吃，我也能放心考虑以后的安排。',onAccept:()=>{if(this.model.startChangshan()){this.save();this.speak(D.questNpcs.zhaoyun,{lines:['那我们一起去中山。先找那里的仓守，他认得送粮的人，应该知道粮车为什么一直没有出发。']});}else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}});}
+    offerZhaoJourney(){this.openQuestOffer('changshan',{forced:true,acceptLabel:'与子龙同行',offerObjective:'前往中山打听粮车下落，帮助常山取回乡粮。',offerDescription:"中山说好的粮车，过了日子还没到。村里余粮已经不多，若再等下去，只怕要断炊。\n我想去见仓守，问清车究竟耽搁在哪里。你能否陪我同去？乡亲有了粮，我也能腾出手，与你商量往后的路。",onAccept:()=>{if(this.model.startChangshan()){this.save();this.speak(D.questNpcs.zhaoyun,{lines:["先去中山见仓守。他认得赶车的人，若路上有变故，也该有个消息。"]});}else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}});}
 
-    offerZhenStay(){const npc=D.questNpcs.zhenji;this.playConversation([{npc,lines:['伤者已交给城里的郎中照看，我也没什么放不下的了。只是兵荒马乱的，我还没想好该往哪里走。']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['不如和我们一起走吧。我们要把粮送回常山，路上也能彼此照应。等这趟忙完，再托人给你家里捎封信，免得他们担心。']}],()=>this.speak(npc,{lines:['好，那就一起走吧。药箱我来背，你们谁觉得伤口疼，别忍着不说。'],forced:true,choices:[{label:'与甄姬同行',action:()=>{if(this.model.finishZhenStay(true)){this.save();this.closeDialogue();}else{this.notify(this.model.lastRecruitError||'请先为甄姬腾出一处同行位置。');this.panel={type:'party',previous:null};}}}]}));}
-    showZhenRescue(){this.model.rest();this.save();this.playConversation([{npc:D.questNpcs.zhaoyun,lines:['两处粮仓都夺回来了，粮袋上的封口也还在。我去叫仓守装车……等等，后院怎么有人敲门？']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['锁在外头，钥匙就挂在墙上。我来开门，里面的人往后退些！']},{npc:D.questNpcs.zhenji,lines:['先扶这位老人出来，他的腿还不能落地。药箱在墙边，劳烦替我拿一下……好了，人都在这里。','多谢相救。我姓甄，原先在中山给乡亲们看伤，那伙人听说甄家有粮，就把我和伤者扣在后仓，逼我写信回家。刚才听见外面的贼退了，我们才敢敲门。']}],()=>{if(this.model.state.quests.changshan.healerDecision)this.offerZhenStay();});}
+    offerZhenStay(){const npc=D.questNpcs.zhenji;this.playConversation([{npc,lines:["伤者已托给城里的郎中，我也能歇口气了。可出了这道仓门，往后去哪里，一时还没着落。"]},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:["那就随我们去常山。车上正缺照看伤者的人，路上也不至于孤身赶路。忙过这趟，我再替你往家里送封信。"]}],()=>this.speak(npc,{lines:["也好，我随你们走。药箱我背着，伤口疼便叫我，别一个个都说无妨。"],forced:true,choices:[{label:'与甄姬同行',action:()=>{if(this.model.finishZhenStay(true)){this.save();this.closeDialogue();}else{this.notify(this.model.lastRecruitError||'请先为甄姬腾出一处同行位置。');this.panel={type:'party',previous:null};}}}]}));}
+    showZhenRescue(){this.model.rest();this.save();this.playConversation([{npc:D.questNpcs.zhaoyun,lines:["两仓的粮齐了，我去叫人装车……且慢。后院那扇门里，是不是有人敲？"]},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:["锁在外头！钥匙就在墙上。里面的人退一退，我开门！"]},{npc:D.questNpcs.zhenji,lines:["扶一下这位老人，他腿上有伤。药箱在墙边，也劳烦取来……人都在，谢天谢地。","小女子姓甄，原在中山给乡亲看伤。贼听说甄家有粮，便将我们扣在后仓，逼我写信。方才外头的脚步声散了，我们才敢敲门，幸亏诸位还在。"]}],()=>{if(this.model.state.quests.changshan.healerDecision)this.offerZhenStay();});}
 
-    finishZhaoQuest(stay){if(!this.model.finishChangshan(stay))return;this.save();this.speak(D.questNpcs.zhaoyun,{lines:[stay?'我愿意继续跟你走。村里的事情已经安顿好，我们先把你手里的事办完，以后有机会再一起去成都。':'那我依你所言，先去成都拜访刘备。你以后经过成都，记得来找我，需要一起出门帮忙的话，也不用再客气。','对了，北海似乎也有一位义士，名叫太史慈。我听过他替人解围的事，是个有胆识的人。最近听说他母亲病了，正在四处寻药。你若要找愿意相助的人，不妨去北海看看，也许正能帮上他的忙。','不过北海离这儿可不近，沿路什么情形，我也没摸清。常山的樵夫正为山道上的贼发愁，巨鹿那边也有人在找失了消息的粮车。不妨先去帮帮他们，添些盘缠，把兵器使顺手了，再走这趟远路。'],onComplete:()=>{if(this.model.state.pendingReward)this.showReward(this.model.state.pendingReward);}});}
+    finishZhaoQuest(stay){if(!this.model.finishChangshan(stay))return;this.save();this.speak(D.questNpcs.zhaoyun,{lines:[stay?"云愿同行。常山无忧，我也该去看看别处。待你手头的事办过，咱们再往成都。":"那我先赴成都，求见刘备。你若经过，记得来找我，云答应过的事，不会忘。","还有个消息。北海有位义士，似是叫太史慈，听过他替人解围的事。近来他母亲病了，正为药奔走。你想寻人，不妨去见见，也许恰能帮上忙。","只是北海路远，沿途我也不熟。常山樵夫正愁山道不通，巨鹿又有粮车失信。不如先把近处走通，备些盘缠，兵器也使熟些，再往北海。"],onComplete:()=>{if(this.model.state.pendingReward)this.showReward(this.model.state.pendingReward);}});}
     scrollPanel(){return ['tacticsEditor','practiceWeapons'].includes(this.panel?.type)?this.panel.editor.panel:this.panel;}
     resumeDeparturePractice(){
       if(this.model.state.departurePractice==='training'){this.showDepartureTrainer();return;}
-      const npc=D.townNpcs.camp.find(n=>n.id==='zhangliang');this.speak(npc,{lines:['兵器挑好了？要不要先在这儿试试手？我陪你练练，免得上了路才发现使不顺。','那边有个稻草人，不会还手，正好先试试招式。觉得顺手了，再找个人陪你过几招；不急这一会儿。'],choices:[{label:'先练练手',action:()=>{this.model.state.departurePractice='training';this.save();this.showDepartureTrainer();}},{label:'先赶路',dismiss:true,action:()=>this.finishDeparturePractice()}]});this.invalidate();
+      const npc=D.townNpcs.camp.find(n=>n.id==='zhangliang');this.speak(npc,{lines:["挑好了？俺陪你试试。赶路才发觉枪拿不稳，那可晚了。","稻草人在那头，不还手的，先使几招瞧瞧。顺了手，俺去叫个人陪你过招。"],choices:[{label:'先练练手',action:()=>{this.model.state.departurePractice='training';this.save();this.showDepartureTrainer();}},{label:'先赶路',dismiss:true,action:()=>this.finishDeparturePractice()}]});this.invalidate();
     }
     showDepartureTrainer(){
-      this.panel=null;this.speak(D.townNpcs.camp.find(n=>n.id==='zhangliang'),{lines:['想先试哪样？兵器用着不顺就再换一件，多试几下。等你说走，我送你到营门口。'],choices:this.trainerChoices()});this.invalidate();
+      this.panel=null;this.speak(D.townNpcs.camp.find(n=>n.id==='zhangliang'),{lines:["想试哪件便取，不趁手再换。等你说走，俺送到营门口。"],choices:this.trainerChoices()});this.invalidate();
     }
     finishDeparturePractice(){
       this.model.state.departurePractice=null;this.model.leave();this.dialogue=null;this.panel=this.model.state.introStep===0?{type:'mapIntro'}:this.model.state.introStep===1?{type:'mapGuide'}:null;this.selected=null;this.focusLocation();this.save();this.invalidate();
@@ -10934,7 +10934,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     trainerChoices(){
       const npc=D.townNpcs.camp.find(n=>n.id==='zhangliang'),practice=this.model.state.departurePractice==='training',choices=D.trainingOptions.filter(t=>!practice||['straw-dummy','militia-one'].includes(t.id)).map(t=>({label:t.label,action:()=>this.startTraining(t.id)}));
       if(practice){choices.push({label:'重选兵器',action:()=>this.openPracticeWeapons()},{label:'结束操练，出营',dismiss:true,action:()=>this.finishDeparturePractice()});return choices;}
-      choices.push({label:'聊聊操练',action:()=>this.speak(npc,{lines:['刚开始练，不用一下叫太多人上来。你还在看眼前这个，旁边的人已经出手了，先把自己的兵器使顺手，再慢慢学着照看周围。','先找一个人陪你练，熟悉以后再多叫几个。受了伤也不用怕，我二哥就在旁边照看，总比出了营门才发现自己不会应付强。']})});
+      choices.push({label:'聊聊操练',action:()=>this.speak(npc,{lines:["刚练别叫一圈人来。你还盯着前头，旁边就挨一下，哪顾得过来？先认熟手里的兵器。","一人练熟，再加人。俺二哥在旁边，打伤了也有药。总好过出营遇着真刀，才知道手该往哪儿放。"]})});
       if(this.model.state.trainingWins['three-brothers']&&!this.model.state.companions.some(u=>u.id==='zhangliang'))choices.push({label:'请你同行',action:()=>this.inviteZhangLiang()});
       choices.push({label:'告辞',dismiss:true,action:()=>this.closeDialogue()});return choices;
     }
@@ -10946,8 +10946,8 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       if(!lines&&this.nearbyDialogue(npc))return;
       if(!lines&&npc.id==='zhenji'&&npc.role!=='companion'){this.questDialogue(npc);return;}
       if(!lines&&npc.role==='story'){this.questDialogue(npc);return;}
-      if(!lines&&npc.role==='companion'){this.speak(npc,{lines:[{zhangliang:'你们回来了？我在营里待了好几天，正想出去走走。这回准备去哪儿，要不要也带上我？',zhaoyun:'这一路还顺利吗？我这里已经安排好了，你们如果又准备出门，可以叫上我一起，不用特意绕去别处找人。',zhenji:'正好你们回来，我想看看上次的伤养好了没有。如果接下来还要赶路，也可以带上我，有人照顾大家会方便一些。'}[npc.id]||'我这边的事情已经忙完了。你们下一站准备去哪里？需要我帮忙的话，我随时都能跟着走。'],choices:[{label:'请你同行',action:()=>{if(this.model.inviteResident(npc.id)){this.save();this.dialogue=null;}else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}},...this.serviceQuestChoices(npc),{label:'改日再会',action:()=>this.closeDialogue()}]});return;}
-      if(!lines){if(npc.role==='advice')lines=this.model.campAdvice();else if(npc.role==='heal'){lines=['身上又添了新伤？来这边坐，我替你们一个个看看。伤重的先把外衣松开，别等着等着又把伤口磨破了。'];choices=[{label:'请先生医治',action:()=>{this.model.rest();this.save();this.speak(npc,{lines:['都处理好了，先喝口水歇一会儿吧。你们一直在外头走，身体也得缓缓，没必要刚包好伤就急着动身。']});}},{label:'暂不劳烦',action:()=>{this.dialogue=null;}}];}else if(npc.role==='training'){lines=['想来练练吗？教场这会儿正空着。我找几个人陪你，或者你想直接跟我比一场，也可以自己挑。'];choices=this.trainerChoices();}else lines=npc.lines||[];}
+      if(!lines&&npc.role==='companion'){this.speak(npc,{lines:[{zhangliang:"回来了？俺待得骨头都松了。这趟上哪儿，可带俺一道？",zhaoyun:"我这边已忙完了。下趟出门，来叫上我，不必另找人。",zhenji:"正想瞧瞧上次的伤。还要赶路的话，我也背上药箱，与你们一道。"}[npc.id]||"这边事毕，我也得空。下一站去哪儿？需人手，尽管叫我。"],choices:[{label:'请你同行',action:()=>{if(this.model.inviteResident(npc.id)){this.save();this.dialogue=null;}else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}},...this.serviceQuestChoices(npc),{label:'改日再会',action:()=>this.closeDialogue()}]});return;}
+      if(!lines){if(npc.role==='advice')lines=this.model.campAdvice();else if(npc.role==='heal'){lines=["新添的伤？到亮处坐，外衣松开些。重的先看，其余别揉，等我来。"];choices=[{label:'请先生医治',action:()=>{this.model.rest();this.save();this.speak(npc,{lines:["处理妥了。喝水，坐一会儿，布上没再渗血，起身才稳当。"]});}},{label:'暂不劳烦',action:()=>{this.dialogue=null;}}];}else if(npc.role==='training'){lines=["来练练？教场正空。叫人陪练，还是跟俺比，你自个儿挑！"];choices=this.trainerChoices();}else lines=npc.lines||[];}
       if(!forced&&!onComplete&&!this.model.state.departurePractice&&['advice','heal','training'].includes(npc.role)){const topics=this.serviceQuestChoices(npc);if(topics.length)choices=[...(choices||[]).filter(c=>!leaveLabels.has(c.label)),...topics,{label:'告辞',dismiss:true,action:()=>this.closeDialogue()}];}
       const initialInteraction=this.npcInteraction?.id===npc.id&&!this.npcInteraction.offered;if(initialInteraction&&!forced&&!onComplete)this.npcInteraction.offered=true;
       if(initialInteraction&&!forced&&!onComplete&&(!choices?.length||choices.some(c=>c.dismiss||leaveLabels.has(c.label)))&&this.model.npcUnit(npc.id)){choices=[...(choices||[])];const exit=choices.findIndex(c=>c.dismiss||leaveLabels.has(c.label));choices.splice(exit<0?choices.length:exit,0,{label:'观察',action:()=>this.observeNpc(npc)});if(exit<0)choices.push({label:'离开',dismiss:true,action:()=>this.closeDialogue()});}
@@ -10957,10 +10957,10 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     chapterDialogue(npc){
       const q=this.model.state.chapterOne,C=root.ChapterOne;
       if(q.stage==='aftermath'){this.showChapterEnding();return;}
-      if(!this.model.coalitionReady()){this.speak(npc,{lines:['各路人还没有到齐，守关的兵也没有撤。你们如果还有同伴在外面，就先去接应，别只带这几个人急着闯关。']});return;}
+      if(!this.model.coalitionReady()){this.speak(npc,{lines:["援军未齐，关上也还在增兵。若有同伴在外，先去接来，这几个人，可不宜就闯关门。"]});return;}
       const stage=['gather','rally'].includes(q.stage)?'vanguard':q.stage==='gate'&&this.model.state.story.flags.lvbuConvinced?'street':q.stage,phase=C.phases[stage];if(!phase)return;
       const begin=()=>{if(this.model.beginChapterBattle()){this.save(this.model.pending.checkpoint);this.startBattle();}};
-      const introduction=stage==='dongzhuo'?'府里的伤兵说，董卓一直盯着伤得最重的人砍，拿盾挡在前面也没用。你们最好多带几位能治伤的人，先商量好谁接着救人，别一见人倒下，就把所有治疗都用在同一个时候。':stage==='vanguard'?'魏、蜀、吴来接应的人都到了，城外的百姓也已经从西边撤走。前面是华雄守的关口，我们可以准备过去了，进城以后还有守军，得一段一段看清楚再往前走。':'前面就是'+phase.title+'。受伤的人先留在这里包扎，你们准备出战的也把兵器检查一下。后面有我们接应，安排妥当以后再过去。';
+      const introduction=stage==='dongzhuo'?"府里逃出的伤兵说，董卓专寻伤重的下手，盾挡着也拦不住。多请几位会治伤的，商量好轮着救，别一下都把药用了，下一轮又接不上。":stage==='vanguard'?"三家接应都到了，乡亲也从西路撤出了。前头华雄守关，可动身了。进城尚有街垒，逐处探明再攻。":'前面就是'+phase.title+"。伤者留此医治，出战的再查一遍兵器。后头有我们接应，备妥便进关。";
       if(!q.accepted){this.openQuestOffer('chapter-one',{offerDescription:introduction,offerObjective:'与联军合力打通虎牢关，攻入洛阳，查明董卓异变。',onAccept:()=>{this.panel=null;this.playConversation([{npc:{id:phase.speaker,name:root.ChapterCast.definitions[phase.speaker].name,art:phase.speaker,side:'left'},lines:phase.lines}],begin);}});return;}
       this.speak(npc,{lines:[introduction],choices:[{label:'前往接战',action:()=>this.playConversation([{npc:{id:phase.speaker,name:root.ChapterCast.definitions[phase.speaker].name,art:phase.speaker,side:'left'},lines:phase.lines}],begin)},{label:'先整顿一下',dismiss:true,action:()=>this.closeDialogue()}]});
     }
@@ -10971,25 +10971,25 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     }
     showCourtDream(npc,data){
       this.dialogue=null;this.panel=null;const hero={id:'hero',name:this.character.name,art:'hero',side:'right'},rows={
-        simayi:[[npc,['之前有人请你到'+D.placeMap[data.place].name+'找我吗？我昨晚做了一场很奇怪的梦，有人特意告诉我，会有一位从很远的地方来的客人。我想先确认一下，是不是说的你。']],[hero,['他们也去过你的梦里？那真是太好了。我本来还在发愁，该怎么跟你解释自己的来历，怕你听完以后觉得我在胡说。']],[npc,['我起初也没当回事，可你今天真的来了，就不能再只当成普通的梦。既然你想找人一起处理眼前的麻烦，我们可以从手头的事情开始商量。']]],
-        zhugeliang:[[npc,['你就是那位从未来来的客人吧？昨晚三位先生托梦给我，说你会到这里来，还让我留意一下你的消息。我原先还在想，该怎么认出你。']],[hero,['他们也没给我能证明身份的东西，我自己都怕说不清楚。这一路遇到的很多事情，跟我知道的历史又不一样，我还在慢慢弄明白。']],[npc,['不用急着证明，你先坐下，把一路的事情告诉我。三位先生只说了你为什么来，具体要怎么做，我们还得一起商量，能帮的我会尽量帮。']]],
-        zhouyu:[[npc,['昨晚我做了个梦，三位先生说会有个远来的客人，帮江东寻找愿意做事的人。我还以为是这几天想招人的事想多了，没想到你今天就来了。']],[hero,['他们倒是替我先介绍过了。不过有件事得说在前面，我只是知道一些人的经历，不是到哪里都能把事情办好，很多地方还得请你们帮忙。']],[npc,['你愿意先把这些说明白，往后合作就方便多了。你在外面打听人，我替你联系江东的住处和人手，遇到难办的事情，咱们再一起商量。']]]
+        simayi:[[npc,['之前有人请你到'+D.placeMap[data.place].name+"是你？那夜梦里说会有位远客，我还当是怪梦。今日倒真见着了，先让我认一认。"]],[hero,["原来你也见了三位先生。我正愁怎么讲来历，才不至于叫门吏当成疯子。"]],[npc,["梦中之言，今日既应验，便不能等闲看待。你在路上可有什么打算？手头正有几件事，倒可一同议议。"]]],
+        zhugeliang:[[npc,["后世来的客人？三位仙长梦中提过，原还忧不知怎样相认，没想到今日便到。请入内坐。"]],[hero,["我也没带什么信物，幸好他们先说过。这一路好多事都跟书里不同，还是得借你们指点。"]],[npc,["来历不急着争辩。先说一路见闻，仙长托付的事，总要从眼前做起。府中能相助的，我自会照看。"]]],
+        zhouyu:[[npc,["梦中相约，今日果然到了。为江东寻人的事，三位仙长已说过。门吏那里我也知会了，不曾为难诸位吧？"]],[hero,["倒很顺利。不过得先说一句，我只知道些人的来历，可不是事事都懂。真碰上难处，还得来府上求助。"]],[npc,["那便彼此分工。你寻访乡野，我替你安排江东的住处、人手。有难处来报，我们当面商量。"]]]
       }[data.id];this.playConversation(rows.map(([npc,lines])=>({npc,lines})),()=>{this.model.state.courtDreams[data.id]=true;this.save();this.interact(npc);});
     }
     courtDialogue(npc){
       this.model.acceptRecruitAssignment(npc.country);
-      const data=root.FactionCourts.definitions[npc.country],ruler=root.FactionCourts.rulerStatus(this.model,npc.country),pending=this.model.pendingReports(npc.country),visits=this.model.state.npcTalks[npc.id]||0,lines=npc.delegate?['先生已经跟我交代过了，你们介绍来的人，由我负责登记。赏钱和需要的文书也都准备好了，有什么事情直接来找我就行。']:pending.length?[data.thanks]:ruler.complete?[ruler.restored]:visits?[data.idle]:data.welcome,choices=[],topics=this.serviceQuestChoices(npc);
+      const data=root.FactionCourts.definitions[npc.country],ruler=root.FactionCourts.rulerStatus(this.model,npc.country),pending=this.model.pendingReports(npc.country),visits=this.model.state.npcTalks[npc.id]||0,lines=npc.delegate?["先生已交代。诸位引来的人，由我录名、备文书，赏钱也在此领取。有事来问，不必再等先生归府。"]:pending.length?[data.thanks]:ruler.complete?[ruler.restored]:visits?[data.idle]:data.welcome,choices=[],topics=this.serviceQuestChoices(npc);
       this.model.state.npcTalks[npc.id]=visits+1;
       if(this.model.state.pendingReward?.items?.some(item=>item.templateId==='three-courts-seal'))choices.push({label:'查看拜访谢礼',action:()=>{this.dialogue=null;this.save();this.showReward(this.model.state.pendingReward);}});
       if(pending.length&&!this.model.state.pendingReward)choices.push({label:'领取赏钱 · '+pending.length*root.FactionCourts.rewardPerHero+'文',action:()=>{const reward=this.model.claimRecruitReward(npc.country);if(reward){this.dialogue=null;this.save();this.showReward(reward);}else this.notify('这份赏钱已经领过了。');}});
       choices.push({label:'询问'+ruler.name+'下落',action:()=>{
-        if(ruler.complete){this.speak(npc,{lines:[this.model.state.companions.some(u=>u.id===ruler.id)?ruler.name+'正与你们同行。府里的交接已经办好，你们放心出门，有急事我会托人送信。':ruler.restored],choices:[{label:'还有别的事',action:()=>this.courtDialogue(npc)}]});return;}
+        if(ruler.complete){this.speak(npc,{lines:[this.model.state.companions.some(u=>u.id===ruler.id)?ruler.name+"正随诸位同行。府中已有交接，请放心上路。有急报，我遣人来追。":ruler.restored],choices:[{label:'还有别的事',action:()=>this.courtDialogue(npc)}]});return;}
         if(!ruler.ready){this.speak(npc,{lines:ruler.before,choices:[{label:'我再去打听人选',action:()=>this.courtDialogue(npc)}]});return;}
-        const q=this.model.state.heroQuests[ruler.id];q.accepted=true;this.save();const at=root.HeroQuests.place(ruler.id,q);if(at===this.model.state.nodeId)this.heroQuestDialogue({...root.HeroQuests.npc(ruler.id,q),selectedQuest:true});else this.speak(npc,{lines:['你们上次说的事，我已经让人去安排了。眼下的线索还在'+D.placeMap[at].name+'，先去那里看看。要是路上受了伤，就回来歇一歇，不必硬撑着赶路。'],choices:[{label:'那我们先去看看',action:()=>this.closeDialogue()}]});
+        const q=this.model.state.heroQuests[ruler.id];q.accepted=true;this.save();const at=root.HeroQuests.place(ruler.id,q);if(at===this.model.state.nodeId)this.heroQuestDialogue({...root.HeroQuests.npc(ruler.id,q),selectedQuest:true});else this.speak(npc,{lines:["上回的事，已遣人去办。眼下有消息的地方，在"+D.placeMap[at].name+"，可去访一访。若受了伤，府里有医者，不必在路上撑着。"],choices:[{label:'那我们先去看看',action:()=>this.closeDialogue()}]});
       }});
       if(topics.length)choices.unshift(...topics);
       if(this.model.state.residents[npc.id])choices.push({label:'请你同行',action:()=>{if(this.model.inviteResident(npc.id)){this.save();this.closeDialogue();}else this.notify(this.model.lastRecruitError);}});
-      choices.push({label:'打听消息',action:()=>{const rumor=this.model.townRumor();if(rumor)this.model.hearRumor(rumor.id,rumor.place);this.save();this.speak(npc,{lines:rumor?[rumor.text]:['最近还没有收到新的消息。你们要是准备出门，可以去附近的村子多问问，过路的人常在那里歇脚，说不定有人知道。']});}},{label:'告辞',dismiss:true,action:()=>this.closeDialogue()});
+      choices.push({label:'打听消息',action:()=>{const rumor=this.model.townRumor();if(rumor)this.model.hearRumor(rumor.id,rumor.place);this.save();this.speak(npc,{lines:rumor?[rumor.text]:["未有新信。附近村落常留过路客，你们可去打听，兴许有人见过。"]});}},{label:'告辞',dismiss:true,action:()=>this.closeDialogue()});
       this.save();this.speak(npc,{lines,choices,onComplete:()=>{if(this.model.state.pendingReward)this.showReward(this.model.state.pendingReward);}});
     }
     playConversation(turns,onComplete){const next=index=>{if(index>=turns.length){onComplete?.();return;}const turn=turns[index];this.speak(turn.npc,{lines:turn.lines,onComplete:()=>next(index+1)});};next(0);}
@@ -11002,7 +11002,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     closeDialogue(){const d=this.dialogue;this.rememberDialogue();this.dialogue=null;if(this.model)this.save();d?.onComplete?.();}
     advanceDialogue(){const d=this.dialogue;if(!d)return;this.rememberDialogue();if(d.index<d.lines.length-1){d.index++;this.rememberDialogue();if(this.model)this.save();}else if(!d.choices)this.closeDialogue();}
     inviteZhangLiang(){
-      const npc=D.townNpcs.camp.find(n=>n.id==='zhangliang');if(!this.model.recruitZhangLiang()){if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);return;}this.save();this.speak(npc,{lines:['我去跟大哥说一声，再拿上自己的东西。你们在营门口等我一会儿，我很快就来，这回可别忘了带我。']});
+      const npc=D.townNpcs.camp.find(n=>n.id==='zhangliang');if(!this.model.recruitZhangLiang()){if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);return;}this.save();this.speak(npc,{lines:["俺去跟大哥说声，提上行李便来。营门等俺啊，这回可别一转眼就走远了！"]});
     }
     drawTownBackdrop(){
       const w=this.w,h=this.h,c=this.ctx,node=this.model.location(),scene=D.townScenes[node.id]||D.townScenes.default,imageReady=root.GameAssetLoader?.get(scene.background),key=[scene.background,!!imageReady,w,h,this.dpr].join('|');if(this.townBackdrop?.key!==key){const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.ceil(w*this.dpr));canvas.height=Math.max(1,Math.ceil(h*this.dpr));const ctx=canvas.getContext('2d'),img=root.GameAssetLoader?.get(scene.background);ctx.scale(this.dpr,this.dpr);ctx.fillStyle='#152b2d';ctx.fillRect(0,0,w,h);if(img){const scale=Math.max(w/img.naturalWidth,h/img.naturalHeight);ctx.drawImage(img,(w-img.naturalWidth*scale)/2,(h-img.naturalHeight*scale)/2,img.naturalWidth*scale,img.naturalHeight*scale);}ctx.fillStyle='#06192335';ctx.fillRect(0,0,w,h);this.townBackdrop={key,canvas};}c.drawImage(this.townBackdrop.canvas,0,0,w,h);if(!this.dialogue){c.fillStyle='#071923ed';c.fillRect(0,0,w,68);}
@@ -11136,18 +11136,18 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     afterBattle(context,victory){
       if(context?.kind==='quest-turn-in')return;
       if(!context)return;
-      if(context.kind==='chapter'){if(victory&&this.model.state.chapterOne.stage==='aftermath')this.showChapterEnding();else if(victory)this.chapterDialogue(root.ChapterOne.npc(this.model));else this.speak({id:'luoyang-scout',name:'联军斥候',art:'imperial-soldier',side:'left'},{lines:['先退到这边来，伤者我会叫人去接！你们先把伤处理好，再商量该怎么打，前面那些守军不是只靠硬冲就能过去的。']});return;}
-      if(context.kind==='heroQuest'){const d=root.HeroQuests.definitions[context.questId],fight=d.battles[context.phase];if(victory){const npc=root.HeroQuests.npc(context.questId,this.model.state.heroQuests[context.questId]);if(npc&&root.HeroQuests.place(context.questId,this.model.state.heroQuests[context.questId])===this.model.state.nodeId)this.heroQuestDialogue({...npc,selectedQuest:true});}else if(fight.duel||fight.friendly){const id=fight.duel||context.questId;this.speak({id,name:root.RecruitmentContent.actors[id]?.name||d.name,art:id,side:'left'},{lines:fight.failureLines||['先停一下，别带着伤硬撑。今天没赢，改天再试就是了，我会在这里等。你回去想想刚才哪里没应付好，准备妥当再来。']});}else this.speak({id:'hero',name:this.character.name,art:'hero',side:'right'},{lines:['先退出来把伤养好。这次不能照原来的办法再冲了，等大家缓过来，把对面的招式和我们手里的兵器重新合计一下。']});return;}
-      if(context.kind==='training'){const followup=()=>{if(this.model.state.departurePractice==='training'){this.showDepartureTrainer();return;}if(victory&&context.trainingId==='three-brothers'&&!this.model.state.companions.some(u=>u.id==='zhangliang'))this.playConversation([{npc:D.townNpcs.camp.find(n=>n.id==='zhangliang'),lines:['好家伙，你们连我们三个都打赢了！营里教场的事有人接手，我这身力气若只用来陪练，也总觉得还差点什么。可出了营该先做什么，我还真没想好。']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['不妨先跟我们走一程。运粮、护送，都需要有人肯顶在前面；你在营里见过乡亲的苦，知道该护住谁。黄巾营地仍留作接应，有事我们就回来。']}],()=>this.speak(D.townNpcs.camp.find(n=>n.id==='zhangliang'),{lines:['你把要做的事说清楚，俺就放心了。那就听你的，看你们什么时候方便动身。'],choices:[{label:'请同行',action:()=>this.inviteZhangLiang()},{label:'改日再请',action:()=>this.closeDialogue()}]}));};if(context.trainingId==='straw-dummy'){this.speak(D.townNpcs.camp.find(n=>n.id==='zhangliang'),{lines:['这几下总算顺手些了吧？稻草人不会躲，也不会还手。要是还想试试怎么应付别人的招式，就叫个人来陪你练。'],onComplete:followup});return;}this.speak(D.townNpcs.camp.find(n=>n.id==='zhangbao'),{lines:['过来坐，我替你们看看伤。刚才那几下打得不轻，已经重新包扎好了，再歇一会儿。想接着练也不用急，我三弟下手总不知道轻重。'],onComplete:followup});return;}
+      if(context.kind==='chapter'){if(victory&&this.model.state.chapterOne.stage==='aftermath')this.showChapterEnding();else if(victory)this.chapterDialogue(root.ChapterOne.npc(this.model));else this.speak({id:'luoyang-scout',name:'联军斥候',art:'imperial-soldier',side:'left'},{lines:["退到这儿！伤者我派人去接。把伤裹好，再议进攻，前头的兵不是一股脑冲便能过去的。"]});return;}
+      if(context.kind==='heroQuest'){const d=root.HeroQuests.definitions[context.questId],fight=d.battles[context.phase];if(victory){const npc=root.HeroQuests.npc(context.questId,this.model.state.heroQuests[context.questId]);if(npc&&root.HeroQuests.place(context.questId,this.model.state.heroQuests[context.questId])===this.model.state.nodeId)this.heroQuestDialogue({...npc,selectedQuest:true});}else if(fight.duel||fight.friendly){const id=fight.duel||context.questId;this.speak({id,name:root.RecruitmentContent.actors[id]?.name||d.name,art:id,side:'left'},{lines:fight.failureLines||["停手，受伤便先歇。改日再来，我仍在此处，输了这一场又不妨事。"]});}else this.speak({id:'hero',name:this.character.name,art:'hero',side:'right'},{lines:["先撤，找地方裹伤。刚才对面那几招，得换种接法，缓过气咱们再议。"]});return;}
+      if(context.kind==='training'){const followup=()=>{if(this.model.state.departurePractice==='training'){this.showDepartureTrainer();return;}if(victory&&context.trainingId==='three-brothers'&&!this.model.state.companions.some(u=>u.id==='zhangliang'))this.playConversation([{npc:D.townNpcs.camp.find(n=>n.id==='zhangliang'),lines:["连俺们三人都赢了，好本事！教场有人接班，俺也想出去使使力气。可光说出门，往哪儿走，倒没个主意。"]},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:["跟我们走吧。护粮、送人，都缺你这样的帮手。黄巾营地还留着，路上有事，再捎信回来。"]}],()=>this.speak(D.townNpcs.camp.find(n=>n.id==='zhangliang'),{lines:["有仗打，有事做，俺便去！什么时候动身，喊一声就成。"],choices:[{label:'请同行',action:()=>this.inviteZhangLiang()},{label:'改日再请',action:()=>this.closeDialogue()}]}));};if(context.trainingId==='straw-dummy'){this.speak(D.townNpcs.camp.find(n=>n.id==='zhangliang'),{lines:["顺手些了吧？可稻草人不躲也不还手。再想试招，俺去叫个人，咱们来回过几下。"],onComplete:followup});return;}this.speak(D.townNpcs.camp.find(n=>n.id==='zhangbao'),{lines:["来，我看看。三弟下手又没轻重，几处都渗血了。包好了先歇，别听他一喊，又拿着兵器上去。"],onComplete:followup});return;}
       if(context.kind==='story'){
-        if(!victory){this.speak(D.questNpcs.zhaoyun,{lines:['先别追了，都退回来！大家身上都有伤，再打下去只会越来越难照顾。等包扎好，我们再想想该从哪边过去。']});return;}
+        if(!victory){this.speak(D.questNpcs.zhaoyun,{lines:["别追，都退回来！伤者靠这边，先止血。等裹好了，再议从哪儿进。"]});return;}
         if(context.phase==='entry'){
-          this.playConversation([{npc:D.questNpcs.zhaoyun,lines:['刚才有没有伤着？让我看看。一直顾着把他们赶走，还没问你的名字。我叫赵云，字子龙。最近在村里帮着照顾那些逃难来的乡亲。']},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['你就是赵子龙？我叫'+this.character.name+'，从黄巾营地来的，本来就是想来找你。刚进村就听见这边吵起来，正想打听怎么回事，他们就拦着不让走了。']},{npc:D.questNpcs.zhaoyun,lines:['原来你是来找我的，那正好留下坐坐。先到乡医那里，让他把伤检查一下，等大家都安顿好，我们再慢慢聊。']}],()=>{this.model.rest();this.save();if(this.model.state.quests.changshan.zhaoInvitation)this.offerZhaoJourney();});return;
+          this.playConversation([{npc:D.questNpcs.zhaoyun,lines:["伤着没有？方才顾着赶贼，忘了相问。我叫赵云，字子龙。近来借住村中，替这些逃难的乡亲看顾一二。"]},{npc:{id:'hero',name:this.character.name,art:'hero',side:'right'},lines:['你就是赵子龙？我叫'+this.character.name+"，从黄巾营地来，正想找你。刚到村口就被拦住，我还没问清楚，他们倒先来搜钱了。"]},{npc:D.questNpcs.zhaoyun,lines:["既是寻云，便留下坐坐。先请乡医替你看伤，诸事停当，再慢慢谈。"]}],()=>{this.model.rest();this.save();if(this.model.state.quests.changshan.zhaoInvitation)this.offerZhaoJourney();});return;
         }
         if(context.phase==='rescue'||context.phase==='grain'&&this.model.state.quests.changshan.grainWins>=2&&this.model.state.quests.changshan.healerDecision){this.showZhenRescue();return;}
         if(context.phase==='grain'){this.model.rest();this.save();}
         const followup=root.NearbyContent.storyBattles[context.phase]?.followup;if(followup&&this.model.canBeginStoryBattle(followup.phase)){this.speak(D.questNpcs[followup.speaker],{lines:followup.lines,onComplete:()=>{if(this.model.beginStoryBattle(followup.phase)){this.save(this.model.pending.checkpoint);this.startBattle({continuous:true});}}});return;}
-        const lines={grain:this.model.state.quests.changshan.grainWins<2?['前院的粮袋都还在，我已经请仓守来清点。其他贼跑进了后仓，我们直接过去，别让他们把仓门堵上。']:['前后都清点过了，只少了几袋，剩下的够乡亲们吃一阵。我去帮着装车，你也歇一会儿，等装好就一起回常山。'],escort:['他们退了，粮车也没事。把车停在院门口吧，乡亲们已经过来帮忙了。里正在那边，我叫他一声。']}[context.phase];this.speak(context.phase==='rescue'?D.questNpcs.zhenji:D.questNpcs.zhaoyun,{lines:lines||['我去看看乡亲们和伤者怎么样了。你也先坐下来歇歇，等大家都到齐，我们再商量下一步的安排。'],forced:true,onComplete:context.phase==='escort'?()=>this.nearbyDialogue(this.model.sceneNpcs().find(n=>n.id==='changshan-elder')):undefined});return;
+        const lines={grain:this.model.state.quests.changshan.grainWins<2?["仓守来点粮了，余贼躲进后院，正在堵门。跟我过去，莫让他们封死仓口。"]:["少了几袋，其余都在，够乡亲吃一阵。来，帮我装这辆车，装妥咱们便回常山。"],escort:["退了！粮车无损，推到院门口吧。里正，来搭把手，乡亲都等着卸粮呢。"]}[context.phase];this.speak(context.phase==='rescue'?D.questNpcs.zhenji:D.questNpcs.zhaoyun,{lines:lines||["我去点点人，看看伤者。你歇片刻，待到齐，再一道走。"],forced:true,onComplete:context.phase==='escort'?()=>this.nearbyDialogue(this.model.sceneNpcs().find(n=>n.id==='changshan-elder')):undefined});return;
       }
       if(!victory)this.panel={type:'notice',title:'战败',text:'已读取战前存档，准备好后可以再次挑战。'};else if(this.journey||this.model.journey||this.model.state.routeTarget)this.resumeJourney();
     }
@@ -11223,149 +11223,149 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   const line=(speaker,text,partner,figure)=>({speaker,text,partner,figure,side:speakerSides[speaker]||'left'});
   const chapters={
     arrival:{scene:'village',title:'序章 · 陌路',next:'first-fight',lines:[
-      line('narrator','你在景区逛了一下午，下山时天已经快黑了。刚才还能看见山下的停车场，转过一道弯，雾就把前面的石阶遮住了。',null),
-      line('narrator','你扶着石墙往下走，听见前面有人赶着车说话，就顺着声音找过去。走了没多远，脚下忽然一滑，原本的石阶已经变成了一条泥路。',null),
-      line('hero','我不是沿着台阶下来的吗？这村子又是从哪儿冒出来的？',null),
-      line('narrator','路边有几间茅屋，几个穿甲的人正往车上搬粮袋。你回头找来时的路，身后却只剩下庄稼地，连那堵石墙也看不见了。',null),
+      line('narrator',"下山时，景区已经没什么人了。你在岔路口停了一下：停车场明明就在山脚，怎么走了这么久，还看不见出口？雾沿着石阶漫上来，很快没过了膝盖。",null),
+      line('narrator',"前面传来车轮声，夹着几句争吵。你扶着石墙往声音那边走，脚下突然一滑。再站稳时，踩着的已经不是石阶，而是黏着草根的泥。",null),
+      line('hero',"不对啊，我刚才还在台阶上……这儿什么时候有个村子？",null),
+      line('narrator',"茅屋前停着一辆粮车，几个穿甲的人正往上搬粮袋。你回身望去，石墙不见了。身后只有一片田，枯黄的秸秆在雾里轻轻晃动。",null),
       line('imperial-soldier','叫你松手，没听见？这是军中征粮，再拦着连你一起带走！','imperial-soldier'),
-      line('narrator','一个老人被推得踉跄几步，险些撞到你身上。你赶紧扶住他，还没问清楚怎么回事，那官兵已经朝你走过来了。','imperial-soldier'),
-      line('hero','老人家，你没事吧？我想问一下，这是什么地方？','imperial-soldier'),
+      line('narrator',"老人死死攥着车绳，被推得跌过来。你下意识扶了一把。还没等他站稳，那官兵已经转过身，手按上了刀柄。",'imperial-soldier'),
+      line('hero',"当心！老人家，站稳了……这是哪儿？",'imperial-soldier'),
       line('imperial-soldier','你干什么的？是不是他家里人，跑来替他撑腰？','imperial-soldier'),
-      line('hero','我不认识他，就是看他快摔了，扶了一下。你们是不是认错人了？','imperial-soldier'),
-      line('imperial-soldier','少跟我装糊涂！站在这儿东张西望半天了，我看你就是来找事的。把他拿下！','imperial-soldier'),
+      line('hero',"不是，我就扶了他一下。你看，他差点摔着。",'imperial-soldier'),
+      line('imperial-soldier',"还敢顶嘴？我瞧你在这儿转半天了。来人，拿下！",'imperial-soldier'),
       line('hero','等一下！别动手——','imperial-soldier')
     ]},
     aftermath:{scene:'village',title:'序章 · 援手',next:'manual-fight',lines:[
-      line('narrator','你被打翻在地，半天没缓过气来。刚撑着胳膊想爬起来，那官兵又一脚踩住了你的衣服。','imperial-soldier'),
-      line('hero','我都说了只是路过……你们讲不讲道理？','imperial-soldier'),
+      line('narrator',"胸口一阵闷痛，你摔在泥里，张着嘴却吸不进气。手掌刚撑上地面，一只靴子便踩住了你的衣襟。",'imperial-soldier'),
+      line('hero',"我就是路过的……路过也不行？",'imperial-soldier'),
       line('imperial-soldier','把这个也带走。','imperial-soldier'),
       line('zhangjiao','放开他。','zhangjiao'),
       line('narrator','一只手拦住了官兵。来人俯下身，把你扶到路边。','zhangjiao'),
-      line('zhangjiao','伤到哪儿了？先别急着起来，试试能不能好好喘气。','zhangjiao'),
-      line('hero','胸口疼，刚才那一下差点没喘上来。你小心点，他们真动手的。','zhangjiao'),
-      line('zhangjiao','我刚才看见了，你也没有伤到他，只是扶了一下老人。自己都应付不了官兵，还肯过去帮忙，我不想看着你因为这个被带走。','zhangjiao'),
-      line('hero','这不就是顺手的事吗？我也没想到，扶个人就能挨一顿打。','zhangjiao'),
-      line('imperial-soldier','你们两个说够了没有？再不滚开，我连你一起收拾！','imperial-soldier'),
+      line('zhangjiao',"别急着起身。伤在胸口？缓一缓，慢些吸气。",'zhangjiao'),
+      line('hero',"疼……嘶，差点背过气去。你当心，他们不听解释的。",'zhangjiao'),
+      line('zhangjiao',"我看见了，是你扶住了那位老丈。他们要拿人，也得有个缘由。你且歇着，我去问他。",'zhangjiao'),
+      line('hero',"这还用问缘由？我手都没碰到他，就挨了一顿打。",'zhangjiao'),
+      line('imperial-soldier',"那边那个，你也想吃军棍？滚开！",'imperial-soldier'),
       line('zhangjiao','你靠着树歇一会儿，他交给我。','zhangjiao'),
 
     ]},
     reinforcements:{scene:'village',title:'序章 · 并肩',next:'prepare',lines:[
       line('imperial-soldier','这人会妖术！都过来，别让他跑了！','imperial-soldier','imperial-soldier'),
       line('narrator','听见喊声，又有几名官兵从路口赶来。张角刚把你扶到树下，村道两头就都被堵住了。','zhangjiao','zhangjiao'),
-      line('zhangliang','大哥，怎么跟他们打起来了？我在那边就听见有人喊。','zhangliang','zhangliang'),
-      line('zhangbao','乡亲们已经从后面走了，不过有几个老人走得慢，还得替他们挡一阵。','zhangbao','zhangbao'),
-      line('zhangjiao','你们来得正好，帮我挡住这边。等乡亲们走远，我们就跟着退，不用追上去，先把大家平安带回营里。','zhangjiao','zhangjiao'),
-      line('hero','他们还有这么多人，要不你们也先走？','zhangjiao'),
-      line('zhangjiao','现在退了，他们就追上乡亲们了。你在树后躲好，我们能应付。','zhangjiao'),
+      line('zhangliang',"大哥！谁在喊？俺隔着半条道都听见了。",'zhangliang','zhangliang'),
+      line('zhangbao',"乡亲们从后面撤了。几个老人走不快，咱们还得挡一会儿。",'zhangbao','zhangbao'),
+      line('zhangjiao',"二弟守左边，三弟随我断后。等乡亲们过了路口便撤，不许追远。",'zhangjiao','zhangjiao'),
+      line('hero',"又来了这么多……咱们还走得了吗？",'zhangjiao'),
+      line('zhangjiao',"走得了。你靠着树，别乱跑，乡亲们还在后头。",'zhangjiao'),
 
     ]},
     camp:{scene:'camp',title:'序章 · 黄天之下',next:'dream',lines:[
-      line('narrator','天黑时，你跟着他们回到了山脚的营地。张宝替你看过伤，又端来一碗粥。你捧着碗坐在火边，总算有空看看四周。','zhangjiao'),
-      line('zhangliang','这几袋也送去伙房吧，那边还有几家没领到。孩子多的，多给他们盛一点。','zhangliang'),
-      line('hero','你们救下来的粮，就这么分了？营里这些人够吃吗？','zhangjiao'),
-      line('zhangjiao','暂时还够。新来的几家已经饿了两天，总不能让他们在锅边看着，等我们的兵吃完再说。','zhangjiao'),
-      line('hero','今天多亏你们了。我叫{name}，还不知道该怎么称呼你。','zhangjiao'),
-      line('zhangjiao','我叫张角。替你看伤的是我二弟张宝，刚才搬粮的那个是三弟张梁。','zhangjiao'),
-      line('hero','张角？你是说……太平道的张角？','zhangjiao'),
-      line('zhangjiao','是我。怎么，你从前听过我的名字？','zhangjiao'),
-      line('zhangbao','大哥，去打听消息的人回来了。洛阳又下令征粮，还要各村派人做工，说是给董卓修新的住处。','zhangbao'),
-      line('zhangjiao','乡亲们已经交不起粮了。我想等营里安排好，就去跟其他义军谈谈，一起对付董卓，不能再让他这样逼大家。','zhangjiao'),
-      line('hero','你刚说董卓？他现在已经控制朝廷了？','zhangjiao'),
-      line('zhangjiao','是，他把皇帝留在宫里，外面的事却全由自己决定。这些征粮、征工的命令，名义上是朝廷发的，最后都在给他办事。','zhangjiao'),
-      line('hero','（董卓掌权的时候，张角不是早就死了吗？怎么还在这里张罗着讨伐他？）','zhangjiao'),
-      line('zhangliang','魏、蜀、吴的粮和兵都比我们多，可我们派人跑了好几趟，他们就是不肯一起商量出兵的事。','zhangliang'),
-      line('hero','等等，你说的魏、蜀、吴，是曹操、刘备和孙家？他们都已经立国了？','zhangjiao'),
-      line('zhangbao','早就建立了啊。曹操在许昌，刘备在成都，孙家在建业。袁绍、袁术也各自占着一些城池，你一路过来，没有听人说过这些吗？','zhangbao'),
-      line('hero','我……不是从这边来的，对这里的事确实不太清楚。','zhangjiao'),
-      line('narrator','张宝见你脸色不好，没有再问。你低头喝了口粥，想把记得的事理一理，却发现这些人和这些事根本排不到一起。','zhangjiao'),
-      line('hero','那你们把董卓赶下去以后呢？谁来管这些城和百姓？','zhangjiao'),
-      line('zhangjiao','我也一直在想。不能换个人来管，就还是照样抢粮、抢田，那些跟着我们逃出来的乡亲，再回去也过不上好日子。','zhangjiao'),
-      line('zhangjiao','我盼着将来种田的人能留下自己的粮食，老了病了也有人照顾。乡绅贵族不能想欺负谁就欺负谁，更不能因为生在哪一家，就注定一辈子受人使唤。','zhangjiao'),
-      line('hero','你说的这种日子……有点像书里讲的大同社会。','zhangjiao'),
-      line('zhangjiao','跟着我们的人，大多只是想有块地能种，家里人不用再挨饿。我觉得这些事情本来就该做到，不应该非得有身份、有钱才轮得到。','zhangjiao'),
-      line('hero','（眼前这个人真是张角？我大概是穿越了，可这跟我记得的三国也差太远了。）','zhangjiao'),
-      line('zhangjiao','你也累了一天了，今晚就在这里住下吧。有什么想问的，明天再慢慢说。','zhangjiao')
+      line('narrator',"回到山脚，天已经黑透。张宝替你敷了药，把热粥塞到手里。胸口还疼，你捧着碗不敢大口喝，只借着火光打量这座营地。",'zhangjiao'),
+      line('zhangliang',"这几袋抬去伙房！那头还有几家没领着。小娃娃的碗也别落下。",'zhangliang'),
+      line('hero',"你们自己不留一点？外头还来了好多人。",'zhangjiao'),
+      line('zhangjiao',"仓里够吃。那几家赶了两天路，总不能叫他们闻着粥香挨饿。",'zhangjiao'),
+      line('hero',"还没谢过你们。我叫{name}。恩人的名字，总得让我知道吧？",'zhangjiao'),
+      line('zhangjiao',"张角。这是二弟张宝，那边搬粮的是三弟张梁。",'zhangjiao'),
+      line('hero',"张角……太平道的那个张角？",'zhangjiao'),
+      line('zhangjiao',"正是。你听说过我？",'zhangjiao'),
+      line('zhangbao',"大哥，探信的人回来了。洛阳又来征粮，还点名各村出丁，说董卓要修府邸。",'zhangbao'),
+      line('zhangjiao',"又征？秋粮才收走，连种子都快没了。等营里这些人安顿下来，我得再去联络各路义军。",'zhangjiao'),
+      line('hero',"董卓？他现在已经在朝廷了？",'zhangjiao'),
+      line('zhangjiao',"皇帝在宫里，诏令却由他出。名目换来换去，最后征来的粮、人，都送进了他手里。",'zhangjiao'),
+      line('hero',"（不对，董卓掌权那会儿，张角不是已经死了吗？）",'zhangjiao'),
+      line('zhangliang',"魏、蜀、吴，哪家不比俺们粮多兵多？偏偏一说讨董，就都没了回音。俺们的人白跑了好几趟。",'zhangliang'),
+      line('hero',"魏蜀吴？曹操、刘备，还有孙家？都立国了？",'zhangjiao'),
+      line('zhangbao',"立了有些年了。许昌、成都、建业，你总听过吧？袁家兄弟也占着好些城。你从哪儿来的，连这个也没听说？",'zhangbao'),
+      line('hero',"很远。那边……消息不太通。",'zhangjiao'),
+      line('narrator',"张宝看了看你的衣服，没有追问。你低头搅着碗里的粥：张角、董卓、魏蜀吴，这些名字怎么也凑不到同一年里。",'zhangjiao'),
+      line('hero',"就算讨了董卓，往后呢？换谁来管？粮还征不征？",'zhangjiao'),
+      line('zhangjiao',"该收的粮要收，可不能连人活命的都拿走。乡亲们跟着我逃出来，总得给他们找条活路。",'zhangjiao'),
+      line('zhangjiao',"我想让他们有田种，有饭吃，病了有药。老了做不动活，也不至于被赶出家门。种一辈子地，不能到头来连葬身的地方都没有。",'zhangjiao'),
+      line('hero',"耕者有其田，老有所养……你想的是大同？",'zhangjiao'),
+      line('zhangjiao',"若真能如此，便好了。可如今有人只因生在穷人家，就得世世代代给人做牛马。这是什么道理？",'zhangjiao'),
+      line('hero',"（这真是张角？我不光是穿越了，连穿到哪段历史都说不清。）",'zhangjiao'),
+      line('zhangjiao',"粥要凉了，先喝吧。帐篷给你留着，夜里冷，缺被褥便来叫人。有话明日再说。",'zhangjiao')
     ]},
     dream:{scene:'dream',title:'序章 · 一枕异梦',next:'dawn',lines:[
-      line('narrator','你躺下没多久就睡着了，迷迷糊糊听见有人在争吵。睁开眼，营帐和铺盖都不见了，四周飘着雾，面前站着三个陌生人。',null),
-      line('zuoci','南华，你当初怎么说的？把人聚到一起，仗就能早点打完？现在倒好，连本来死了的人也回来了，各家还在抢地盘！','zuoci'),
-      line('nanhua','我以为让他们早点见面，早点商量，也许仗就不用打那么久，百姓能少吃一些苦。没想到事情变成了现在这样。','nanhua'),
-      line('zuoci','他们都有自己的打算，你把人拉到一起，也不能让他们都听你的。现在打仗的地方更多了，原来的办法又用不了，你准备怎么收拾？','zuoci'),
-      line('yuji','好了，别当着他的面吵。人已经来了，让他先问吧。','yuji'),
+      line('narrator',"你合上眼，火光还在眼皮后晃。忽然有人在耳边吵起来。你翻了个身，手却摸了个空——铺盖、营帐都不见了，脚下是雾，雾里站着三个人。",null),
+      line('zuoci',"南华，你倒说句话！说好了借这些人的本事平乱，结果死人活了，活人也乱了，各家抢得比从前还凶！",'zuoci'),
+      line('nanhua',"我原想让他们早些相识，少些误会，或许能免去几场大战……谁知这一施法，竟到了这般田地。",'nanhua'),
+      line('zuoci',"你把人拉来，人就肯照你的意思做？如今连年月都对不上了，你还打算怎么办？",'zuoci'),
+      line('yuji',"行了，人醒了。有什么话，让他也听明白。",'yuji'),
       line('hero','这是哪儿？我刚才不是在营里睡觉吗？','nanhua'),
-      line('yuji','你还在营帐里睡着，不用怕，我们只是通过这个梦跟你谈话。我叫于吉，刚才说话的是左元放，另一位是南华。','yuji'),
-      line('nanhua','今天让你受了不少惊吓，还挨了顿打，实在对不住。','nanhua'),
-      line('hero','等一下，你们知道我挨打了？那我到这个地方来，也跟你们有关系？','nanhua'),
-      line('nanhua','你会来到这里，是我们做的。我们想找一个精通三国历史、从未来来的人，帮忙找到那些还没有出名的将领，最后找到了你。','nanhua'),
-      line('hero','我看过些书，也玩过不少三国游戏，可这跟帮你们收拾乱世是两回事吧？','nanhua'),
-      line('zuoci','你知道他们后来做过什么，也知道不少人住在哪里。现在有些人还在家里种地，换成我们去找，很难知道谁能帮上忙。','zuoci'),
+      line('yuji',"你的身子还睡在帐中，这是梦。贫道于吉，那位爱吵的是左元放，旁边这位便是南华。",'yuji'),
+      line('nanhua',"白日受惊了。原不该让你落在官兵手里。",'nanhua'),
+      line('hero',"你们连这个都知道？等会儿，我怎么来的，你们也知道？",'nanhua'),
+      line('nanhua',"是我们带你来的。此地有许多能平乱的人，却还散在乡野。我们想请一个知晓三国往事的后世人，替我们找到他们。",'nanhua'),
+      line('hero',"我就是看过几本书，打过几款游戏。这种事找我？你们是不是找错人了？",'nanhua'),
+      line('zuoci',"赵子龙、许仲康、甘兴霸，这些人，你总认得吧？你知道他们有什么本领，我们却得一个个从头打听。这便是找你的缘故。",'zuoci'),
       line('hero','就算要我帮忙，也该先问问我吧？我家里人还在等我回去！','nanhua'),
-      line('nanhua','这件事确实没有先问过你的意思，是我做得不对。你担心什么，可以直接告诉我们，我们会把能解决的事情都说明白。','nanhua'),
-      line('yuji','你今天听到那些对不上的事情，都是南华施法以后出了问题。原本隔了几十年才会见到的人，现在一起活在这里，所以很多事情已经跟史书不一样了。','yuji'),
-      line('hero','难怪张角还活着，董卓已经控制了朝廷，魏蜀吴也建起来了。我还以为是自己记错了。','yuji'),
-      line('yuji','你的记忆没错，是这里发生了变化。住在这个时代的人自己察觉不到，只记得各自一直在这里生活，没有人觉得哪里不对。','yuji'),
-      line('zuoci','他原先还想再施一次法术，被我们拦住了。谁也不知道还会出什么乱子，这回只能想别的办法。','zuoci'),
-      line('hero','所以你们就来找我？我今天连一个官兵都打不过，你们也看见了。','nanhua'),
-      line('nanhua','我们找你，不是因为你现在就能带兵打仗，而是你知道这些人的经历。许多能做事的人还留在乡里，如果有人找到他们，帮他们解决眼前的困难，就能慢慢把人手聚起来。','nanhua'),
-      line('yuji','你可以先帮魏、蜀、吴找些愿意做事的人，等他们有了足够的人手，我们再想办法请几家一起商量出兵，对付控制朝廷的董卓。','yuji'),
+      line('nanhua',"是我冒失，未曾问过你，便将你带来。你家中的事，我们会设法照看。有什么疑问，你问吧。",'nanhua'),
+      line('yuji',"你今日听到的怪事，也是这场法术所致。原本相隔数十年的人，如今同处一世，前后因果都乱了。",'yuji'),
+      line('hero',"所以张角活着，董卓掌权，连魏蜀吴都已经有了……不是我记错了？",'yuji'),
+      line('yuji',"没记错。本地人却不觉得奇怪，他们记得的从来就是这个天下。你拿史书去问，他们反倒会疑心你。",'yuji'),
+      line('zuoci',"他还想再施一回法术！幸亏叫我们拦住了。这回若再弄出岔子，可就真没法收拾了。",'zuoci'),
+      line('hero',"然后就轮到我收拾？你们也看见了，我连个小兵都打不过。",'nanhua'),
+      line('nanhua',"寻人不只凭武艺。谁值得相交，谁尚困在乡里，你有些底细。先帮他们渡过眼前的难处，往后才好请他们出力。",'nanhua'),
+      line('yuji',"魏、蜀、吴都缺人。你替三家奔走，凑齐人手，我们再请他们会盟，出兵讨董。",'yuji'),
       line('hero','这么说，有些原本该跟着曹操、刘备的人，现在还没去？','yuji'),
-      line('zuoci','对，许仲康还在谯县帮村里守粮，甘兴霸也还在江上活动。这些人暂时没有去你熟悉的那些地方，可他们的本事还在，你比我们更知道该去哪里打听。','zuoci'),
-      line('nanhua','先从近的地方试试吧，赵子龙就在常山照顾逃难的百姓。常山离营地不远，你能先在那里熟悉一下情况，不用马上跑遍天下。','nanhua'),
-      line('hero','人是能找到，可我跟他们非亲非故的，凭什么劝他们走？','nanhua'),
-      line('yuji','先去见一面，问问他们遇到了什么困难。能帮的事情就帮一帮，熟悉以后再谈以后的打算，愿意跟着走的人，也可以先和你同行。','yuji'),
-      line('hero','可他们凭什么信我？我到了城门口，说是三位神仙让我来的，只怕连门都进不去。','nanhua'),
-      line('zuoci','这倒不难。你先别走，我把能作主的人请来。','zuoci'),
-      line('narrator','左慈抬袖一拂，雾中又亮起三道人影。有人手中还握着笔，有人披着外衣，显然也是从睡梦中被唤来的。',null),
-      line('simayi','这是何处？……孔明，公瑾？你们怎么也在这里？','simayi'),
-      line('zhouyu','我方才还在府中。三位前辈，这是用了什么法术？','zhouyu'),
-      line('nanhua','不必惊慌。请三位宰相入梦，是有一件事相托。这位叫{name}，从后世而来，知道一些你们尚未经历的事。','nanhua'),
-      line('zhugeliang','后世之人？这……莫非连我等今日所为，也早已记在书中？','zhugeliang'),
-      line('hero','我只读过一些书。这里已经和书里不同了，我说的也未必都准。','zhugeliang'),
-      line('yuji','如今朝廷落在董卓手里，各地战乱不断。我们请他走访乡里，寻访能人。路上若有难处，还望三位相助，别让他孤身奔走。','yuji'),
-      line('simayi','董卓把持朝政，许昌也屡受其害。若能联络各方共讨董卓，我愿相助。你到了许昌，报我的名字，门吏自会带你入府。','simayi'),
-      line('zhugeliang','成都也正缺人手。你若寻到愿意救民于水火之人，可来府中找我。钱粮、住处，届时一同商议。','zhugeliang'),
-      line('zhouyu','江东亦不愿坐看洛阳生乱。三家合兵，总好过各自为战。到了建业便来找我，我会交代府里的人候着。','zhouyu'),
-      line('hero','那我先从常山走起。等路上安稳些，就去三位府上拜访。','simayi'),
-      line('zuoci','人都认过了，可别到了门前又把他当骗子赶出去。至于董卓，待人手齐备，咱们再商量。','zuoci'),
-      {...line('nanhua','我们知道这趟有危险，不能让你白白承担。等这里的事情办好，我们会负责送你回去，让你能重新见到家里人，这件事一定会做到。','nanhua'),choices:[{id:'gold',label:'那可不够，还要十万两黄金'},{id:'stay',label:'我不想回去'}]}
+      line('zuoci',"有些还没去。许仲康在谯县守粮，甘兴霸还在江上。去处变了，本事没变，你打听起来也有个凭据。",'zuoci'),
+      line('nanhua',"赵子龙就在常山，离营地不远。他正照看一批流民，你可从他那里走起。",'nanhua'),
+      line('hero',"找到以后怎么说？总不能上来就劝人搬家，人家又不认识我。",'nanhua'),
+      line('yuji',"不必急着劝。见见他，问问乡里的事。若有可相助之处，便出一份力，交情自然慢慢有了。",'yuji'),
+      line('hero',"那三家的府门呢？我说神仙托梦让我来的，门房真能放我进去？",'nanhua'),
+      line('zuoci',"这倒好办。你稍候，我把人请来，当面说。",'zuoci'),
+      line('narrator',"左慈振了振衣袖。雾里现出三道人影，一人握着未搁下的笔，一人外衣披到一半。他们望向彼此，脸上都有惊色。",null),
+      line('simayi',"孔明？公瑾？这是什么地方？",'simayi'),
+      line('zhouyu',"方才还在府中……三位仙长，是你们召我等来的？",'zhouyu'),
+      line('nanhua',"请三位来，正为此人。他叫{name}，自后世而来。为解此间战乱，我们想借他的见闻，也想请三位助他一臂之力。",'nanhua'),
+      line('zhugeliang',"后世？难道我等的行事，在后世已有记载？",'zhugeliang'),
+      line('hero',"有是有，可这儿跟书里差得太多，我也不敢照着书说。",'zhugeliang'),
+      line('yuji',"董卓据着朝廷，各方又各自为战。我们请他走访乡野，寻些可用之人。他若到了府上，还请三位多加照拂。",'yuji'),
+      line('simayi',"原来如此。董卓不除，许昌也难安宁。你来许昌时，报我姓名便是。若真能联络各家共讨董卓，我自当出力。",'simayi'),
+      line('zhugeliang',"成都亦缺贤士。你寻到愿意出山的人，可来找我。沿路所需的钱粮、落脚的住处，府里会替你安排。",'zhugeliang'),
+      line('zhouyu',"建业这边，我会交代门吏。三家若能一同出兵，远胜各自相持。你到了江东，便来府上寻我。",'zhouyu'),
+      line('hero',"那就说定了。我先去常山，之后到三位府上拜访。",'simayi'),
+      line('zuoci',"这下认得了？可别等他敲门，又当作骗子赶出去！讨董的事，待人手齐了再议。",'zuoci'),
+      {...line('nanhua',"此行的凶险，我不能瞒你。事情办妥，我会送你回家，让你与亲人重聚。这是我应你的。",'nanhua'),choices:[{id:'gold',label:'那可不够，还要十万两黄金'},{id:'stay',label:'我不想回去'}]}
     ]},
     dawn:{scene:'camp',title:'序章 · 天明',next:'departure',lines:[
-      line('narrator','天已经亮了。你坐起来揉了揉胸口，昨晚挨打的地方还有些疼，那场梦里的话倒是一句也没忘。','zhangjiao'),
-      line('hero','张先生，你们这里有多余的衣服吗？我这一身走到哪儿都惹人看，昨天也蹭破了。','zhangjiao'),
-      line('zhangjiao','有，昨晚就替你找好了。东西放在帐边，你试试合不合身，不合适再拿来改。','zhangjiao'),
+      line('narrator',"帐外传来碗勺相碰的响声。你醒过来，胸口仍有些疼。摸了摸身下的铺盖，再掐一把胳膊，梦中那些话却记得分毫不差。",'zhangjiao'),
+      line('hero',"张先生，有多余的衣裳吗？穿这身出去，谁都得多看我两眼，昨天还蹭破了。",'zhangjiao'),
+      line('zhangjiao',"有，昨夜找的，就在帐边。你试试，若不合身，我叫人替你改。",'zhangjiao'),
       line('narrator','你换好衣服，把原来的那身仔细叠好，收进了行囊。','zhangjiao'),
-      line('zhangjiao','衣服挺合身。伙房还有热粥，吃过了再出来走动，别饿着肚子。','zhangjiao'),
-      line('hero','张先生，我正想跟你说一声。我准备去趟常山，听说那里有个人，也许能帮上你们。','zhangjiao'),
-      line('zhangjiao','常山离这里倒不远。你在那边有认识的人吗，还是有人给你介绍过那里的情况？','zhangjiao'),
-      line('hero','还没见过，只是听过他的事。我想先去找找，总得试一试。','zhangjiao'),
-      line('zhangjiao','你已经决定了，就去试试吧。只是我和两个弟弟暂时还走不开，营里的乡亲得有人照看，不能把他们丢在这里。','zhangjiao'),
-      line('hero','我一个人去就行。这两天已经给你们添了不少麻烦，不能再耽误你们的事。','zhangjiao'),
-      line('zhangjiao','昨天看见老人快摔倒，你自己都没弄清情况，就伸手去扶，我知道你不是个坏人。既然你想出去帮忙，我们也该帮你把上路的东西准备好。','zhangjiao'),
-      line('zhangjiao','这些钱你先拿着，吃饭、住店都用得上。营里的兵器也可以挑一件，路上不太平，有东西防身，总比空着手强。','zhangjiao'),
-      line('hero','那我就收下了，谢谢。等那边有了消息，我再回来告诉你。','zhangjiao'),
-      line('zhangjiao','路上遇到解决不了的事，就先回来，别一个人硬撑。营里一直有你住的地方，回来也不用客气。','zhangjiao'),
-      line('zhangliang','有空就回来找俺练练！路上碰上打不过的，回来把情况说说，咱们琢磨琢磨。别嫌输几场丢人，总比在外头受伤强。','zhangliang'),
-      line('narrator','你把钱收好，跟张角走向放兵器的帐篷。昨天还在山上游玩，现在却得认真想想，带什么才能在路上保住自己。','zhangjiao')
+      line('zhangjiao',"倒像是给你做的。来，伙房还有粥，趁热吃。",'zhangjiao'),
+      line('hero',"我还真有件事想说。我打算去常山找个人，听说他在帮着安置乡亲。",'zhangjiao'),
+      line('zhangjiao',"常山？路不远。你认得那人？",'zhangjiao'),
+      line('hero',"没见过，听过他的名字。我去问问。",'zhangjiao'),
+      line('zhangjiao',"也好。只是我们兄弟还走不开，这一营老小总得有人管。",'zhangjiao'),
+      line('hero',"不用送，我认着路走。已经在这儿白吃白住，还得过你们一回救命的恩。",'zhangjiao'),
+      line('zhangjiao',"哪里的话。昨日素不相识的老人，你也肯伸手去扶。你要出去，我便替你备些行装。",'zhangjiao'),
+      line('zhangjiao',"钱带上，路上吃住都得用。帐里还有些兵器，挑件趁手的。若真遇到乱兵，总要能挡一挡。",'zhangjiao'),
+      line('hero',"好，这钱我记着。到了常山，探到消息就回来告诉你。",'zhangjiao'),
+      line('zhangjiao',"用不着记账。路走不通就回来，帐篷不拆，你住的地方还给你留着。",'zhangjiao'),
+      line('zhangliang',"兵器不会使，就来教场找俺！输几回不丢人，俺当初也没少摔跟头。可别到外头挨了打，才想起来没练过。",'zhangliang'),
+      line('narrator',"你收起钱，把旧衣服叠进行囊。昨日下山时，你还在盘算停车场那家店是否关门，如今却得去挑一件能护身的兵器。",'zhangjiao')
     ]}
   };
   const stages=['arrival','first-fight','aftermath','manual-fight','reinforcements','prepare','squad-fight','camp','dream','dawn','departure','world','complete'];
   const dreamEnding=line('narrator','营帐外有人开始叫大家吃早饭。你还想再问，众人的身影却慢慢消失在雾里。等你睁开眼，看到的已经是帐篷的布顶。',null);
   const dreamBranches={
     gold:[
-      line('hero','送我回去本来就是你们该做的。我还得替你们跑遍各地，弄不好连命都搭进去。事情办成以后，再给我十万两黄金，怎么样？','nanhua'),
+      line('hero',"送我回去，本来就是你们该做的。我这可是拿命替你们跑腿。事成以后，再给十万两黄金，行不行？",'nanhua'),
       line('zuoci','你这价钱开得可不低。南华，这笔账可得算在你头上。','zuoci'),
-      line('nanhua','是我把你带到这里，不能再让你只替我们冒险。十万两黄金，我答应你，送你回去的事情也一定会办，不会说完就算了。','nanhua'),
-      line('hero','那就说好了，你们三个人都听见了。我先到常山找找子龙，至于后面能做到哪一步，还得见了人、弄清情况再说。','nanhua'),
-      line('yuji','我们都记着。路上遇到跟历史不一样的事情，先问清楚，别只因为知道他在书里是什么样，就觉得现在也一定一样。','yuji'),dreamEnding
+      line('nanhua',"好，十万两。我把你带来，这份酬谢也该我出。回家的事同样作数，你不必担心我借钱留人。",'nanhua'),
+      line('hero',"三位都听见了啊。那我先去常山找子龙。后头的事，得看我能不能活着走到再说。",'nanhua'),
+      line('yuji',"我们记下了。还有一句：书里的故人，你未必认得今日的他。相见时，多听听他自己怎么说。",'yuji'),dreamEnding
     ],
     stay:[
-      line('hero','我不想回去。以前读到这些人的结局，总觉得要是有人早一点提醒他们，事情也许就不会那么糟。现在我就在这里，反而有机会试试。','nanhua'),
-      line('hero','这里已经跟原来的历史不同了，我想试着留下来做些事情。要是能少打一场仗，早点提醒一个人，也许后来的百姓就不用再受同样的苦。','nanhua'),
-      line('nanhua','你愿意留下，我们不会拦着。只是我得提醒你，知道历史，也不代表知道每个人现在在想什么，我就是没有弄清这一点，才让事情出了差错。','nanhua'),
-      line('hero','我明白。我也不能保证自己一定做得对，但既然有机会，总想亲自试一次，而不是回去等着一切照旧发生。','nanhua'),
-      line('yuji','那就照着你的打算去做吧。现在想留下，以后又想回去，都可以再跟我们说，我们不会替你决定应该过什么样的生活。','yuji'),
-      line('zuoci','也不会再背着你施什么法术。南华，这回你可听清楚了？','zuoci'),
-      line('nanhua','我听清楚了。你的去留，我们不会干涉。接下来准备怎么走，也由你自己决定。','nanhua'),dreamEnding
+      line('hero',"我……不想回去了。以前看他们的故事，总想，要是那会儿有人多说一句，或许就不一样。现在人就在这儿，我想试试。",'nanhua'),
+      line('hero',"何况这里早就乱了年月，谁也不知道下一步会怎样。真能拦下一场仗，或多救几个人，我倒宁愿把日子过在这里。",'nanhua'),
+      line('nanhua',"你有此心，自是好事。只是莫把史书当作人心。我先前自以为算尽了，到头来，偏偏漏算了人。",'nanhua'),
+      line('hero',"我也没那么大把握。可人都来了，连试都不试就走，以后想起来，恐怕还是放不下。",'nanhua'),
+      line('yuji',"那便留下。将来思乡，想回去了，再来寻我们。这句话，你也记着。",'yuji'),
+      line('zuoci',"还有，南华！往后再施法，先问一问人家愿不愿意。",'zuoci'),
+      line('nanhua',"……记着了。往后的路，你自己选。",'nanhua'),dreamEnding
     ]
   };
   function linesFor(stage,progress={}){const lines=chapters[stage]?.lines;return stage==='dream'&&dreamBranches[progress.dreamChoice]?[...lines,...dreamBranches[progress.dreamChoice]]:lines;}

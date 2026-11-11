@@ -12,3 +12,8 @@ test('新常山全程只走常山中山，先夺两仓再救人，两场夺粮�
   assert.ok(w.advanceChangshan());assert.ok(w.finishChangshan(true));assert.equal(w.state.quests.changshan.stage,'complete');
  }
 });
+
+test('常山返回战头目保持三级完整体质与五百生命，不因赵云甄姬同行而削弱',()=>{
+ const w=new World({name:'行舟',...R.rollHero('normal',()=>.5)},{introStep:2,nodeId:'changshan',weaponType:'sword',quests:{changshan:{stage:'escort',grainWins:2,healerRescued:true,healerStayDecided:true}}});
+ w.recordRecruit('zhaoyun','shu',{...w.zhaoYunUnit(),guest:false});w.recordRecruit('zhenji','wei',{...w.zhenJiUnit(),guest:false});assert.ok(w.beginStoryBattle('escort'));const b=new E.Battle(w.battleScenario()),leader=b.units.find(u=>u.side==='enemy');assert.equal(leader.level,3);assert.equal(leader.constitution,50);assert.equal(leader.maxSoldiers,500);assert.equal(b.living('ally').length,3);
+});

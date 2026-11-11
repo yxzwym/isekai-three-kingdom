@@ -54,7 +54,7 @@ test('半途战斗获胜后仍须赶完剩余路程，战败恢复出发快照',
  const a=new World(w.character,before);a.beginTravel('julu',{eventRoll:0});a.travelEvent();a.resolveBattle({result:'defeat'});assert.deepEqual(a.snapshot(),before);assert.equal(a.journey,null);
 });
 test('梦中先答应回家，再让玩家选择追加报酬或留下，三仙分左右',()=>{
- const dream=P.chapters.dream.lines,text=dream.map(l=>l.text).join('');assert.ok(text.includes('精通三国历史'));assert.ok(!text.includes('十万两黄金'));assert.ok(text.includes('送你回去'));assert.ok(P.dreamBranches.gold.some(l=>l.text.includes('十万两黄金')));assert.ok(P.dreamBranches.stay.some(l=>l.text.includes('不会干涉')));assert.notEqual(dream.find(l=>l.speaker==='zuoci').side,dream.find(l=>l.speaker==='nanhua').side);
+ const dream=P.chapters.dream.lines,text=dream.map(l=>l.text).join('');assert.ok(text.includes('知晓三国往事'));assert.ok(!text.includes('十万两黄金'));assert.ok(text.includes('送你回家'));assert.ok(P.dreamBranches.gold.some(l=>l.text.includes('十万两黄金')));assert.ok(P.dreamBranches.stay.some(l=>l.speaker==='nanhua'&&l.text.includes('你自己选')));assert.notEqual(dream.find(l=>l.speaker==='zuoci').side,dream.find(l=>l.speaker==='nanhua').side);
 });
 
 test('四人上阵限制迁移旧阵容，第五人保留候补；旧九江位置迁往柴桑',()=>{

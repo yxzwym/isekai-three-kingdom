@@ -18,6 +18,10 @@ test('招募战使用战前交谈敌人的姓名与模型，巨鹿两战不再�
  for(const phase of ['abuse','trace']){const f=H.definitions.zhangjiao.battles[phase],u=RC.enemies('zhangjiao',phase)[0];assert.equal(u.characterId,'brigand');assert.equal(u.name,f.leaderName);assert.doesNotMatch(u.name,/官兵/);}
 });
 
+test('工坊对话由黄月英回应开炮，不会借用盗匪的头像与姓名',()=>{
+ const w=make({nodeId:'xiangyang',inside:true,heroQuests:{huangyueying:{stage:'workshop',accepted:true}}}),{v}=view(w);v.heroQuestDialogue({...H.npc('huangyueying',w.state.heroQuests.huangyueying),selectedQuest:true});const speakers=[];for(let i=0;i<4;i++){speakers.push(v.dialogue.npc.id);if(i<3)v.advanceDialogue();}assert.deepEqual(speakers,['yueying-raider','huangyueying','hero','huangyueying']);assert.match(v.dialogue.lines[0],/炮口/);
+});
+
 test('吕布物理必暴击并穿透护甲和物理减伤，计策仍受抗性且不会被强制暴击',()=>{
  const u=Cast.unit('lvbu',20),foe={id:'foe',name:'盾手',constitution:10000,war:10,intelligence:10,speed:10,technique:10,armor:9999,resistance:9999,physicalReduction:.99,skills:['punch']},b=new E.Battle({allies:[u],enemies:[foe],rules:{random:false,hit:false,critical:false}});b.start();b.setMode(u.id,'manual');const a=b.unit(u.id),t=b.unit('foe'),skill=b.skills[a.skills[0]],effective=b.effective(a);assert.equal(E.criticalChance(effective,b.config,skill),1);a.ready=true;a.progress=1;assert.ok(b.manual(a.id,skill.id,t.id).ok);const result=b.events.find(e=>e.type==='action').results[0];assert.ok(result.critical);assert.equal(result.damageType,'true');assert.equal(result.amount,E.calculate({attacker:effective,target:{...b.effective(t),armor:0,physicalReduction:0},skill,critical:1.5}).amount);
  b.skills.probe={id:'probe',name:'计策',kind:'tactic',scope:'single',side:'enemy',scaling:{intelligence:1},cost:0,cooldown:0};a.skills.push('probe');a.ready=true;a.progress=1;assert.ok(b.manual(a.id,'probe',t.id).ok);const magic=b.events.filter(e=>e.type==='action').at(-1).results[0];assert.equal(magic.critical,false);assert.equal(magic.damageType,'tactic');assert.ok(magic.amount<E.calculate({attacker:effective,target:{resistance:0},skill:b.skills.probe}).amount);for(const id of u.passives.filter(id=>!b.passives[id].exclusive))assert.equal(b.passives[id].quality,'gold');
