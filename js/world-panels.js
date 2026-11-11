@@ -81,6 +81,7 @@
  function party(){
   const p=this.panel,groups=this.model.partyGroups(),total=groups.active.length+groups.reserve.length,f=this.frame('队伍 '+total+'/'+this.model.rosterLimit(),600),left=f.x+16,gap=12,cw=(f.w-32-gap)/2,top=f.y+84,bottom=f.y+f.h-18,c=this.ctx;
   p.scrolls||={active:0,reserve:0};p.scrollLimits||={active:0,reserve:0};p.rowHeight=108;p.partyColumns=[{group:'active',x:left,y:top,w:cw,h:bottom-top},{group:'reserve',x:left+cw+gap,y:top,w:cw,h:bottom-top}];
+  this.button('寻人',f.x+f.w-256,f.y+9,48,30,()=>{this.panel={type:'findCompanions',scroll:0,previous:p};});
   this.button('整队轮换',f.x+f.w-202,f.y+9,76,30,()=>{if(this.model.swapPartyTeams()){p.scrolls={active:0,reserve:0};this.save();this.invalidate();}},{disabled:!groups.reserve.length||groups.reserve.length>this.model.activeLimit()||!!this.model.pending||!!this.model.journey});
   this.button(p.sortMode?'完成排序':'排序',f.x+f.w-120,f.y+9,70,30,()=>{p.sortMode=!p.sortMode;},{active:!!p.sortMode});
   this.text('出战 '+groups.active.length+'/'+this.model.activeLimit(),left+cw/2,f.y+61,14,'#e4cf9b','center');this.text('备战 '+groups.reserve.length+'/'+Math.max(0,this.model.rosterLimit()-this.model.activeLimit()),left+cw+gap+cw/2,f.y+61,14,'#b6cbd0','center');c.fillStyle='#425c6266';c.fillRect(left+cw+gap/2-.5,f.y+50,1,f.h-68);
@@ -96,6 +97,22 @@
    if(p.scrollLimits[group]>0){const h=Math.max(20,column.h*column.h/(items.length*p.rowHeight)),yy=top+(column.h-h)*p.scrolls[group]/p.scrollLimits[group];this.box(column.x+cw-2,top,2,column.h,'#18343c',null);this.box(column.x+cw-2,yy,2,h,'#9cb8b5',null);}
   }
   if(p.drag){const d=p.drag,column=p.partyColumns.find(c=>c.group===d.overGroup);if(column){const yy=clamp(top+d.slot*p.rowHeight-p.scrolls[column.group],top,bottom-2);this.box(column.x,yy,column.w-4,3,'#e6cb83',null);}const u=[...groups.active,...groups.reserve].find(u=>u.id===d.id);if(u){c.save();c.globalAlpha=.9;c.shadowColor='#0009';c.shadowBlur=15;partyCard(this,u,d.x-d.offsetX,d.y-d.offsetY,d.w,true);c.restore();}}
+ }
+ function findCompanions(){
+  const p=this.panel,rows=this.model.absentCompanions(),rowH=86,f=this.frame('寻人',Math.min(620,Math.max(240,106+rows.length*rowH))),left=f.x+18,w=f.w-36,top=f.y+88,bottom=f.y+f.h-18,c=this.ctx;
+  this.text('暂别武将 · '+rows.length+'人',left,f.y+66,14,'#b6c0b1');
+  p.maxScroll=Math.max(0,rows.length*rowH-(bottom-top));p.scroll=clamp(p.scroll||0,0,p.maxScroll);const before=this.hits.length;
+  c.save();c.beginPath();c.rect(left,top,w,bottom-top);c.clip();
+  if(!rows.length){this.text('暂无暂别的武将',left+w/2,top+38,16,'#d3c5a6','center');this.text('武将离队后，可在这里查看去处',left+w/2,top+72,14,'#8e9e95','center');}
+  rows.forEach((u,i)=>{const y=top+i*rowH-p.scroll;if(y+78<top||y>bottom)return;
+   this.box(left,y,w,78,'#202624',u.reachable?'#626450':'#414c46',3);
+   this.box(left+10,y+14,48,48,'#14241f','#8b7c59',3);if(u.portrait)this.portrait(u.portrait,left+11,y+15,46,{frame:false});else this.text(u.name.slice(0,1),left+34,y+38,20,'#cbbb94','center');
+   this.text(u.name,left+72,y+24,16,'#e6dcc2');this.text(u.level+'级',left+w-12,y+22,14,'#9eab9d','right');
+   this.text(u.place?u.place.name:'去向不明',left+72,y+54,14,'#b2c2b6');
+   this.text(u.reason||(u.here?'就在此地 ›':'前往 ›'),left+w-12,y+54,14,u.reachable?'#dfc68e':'#7d8c83','right');
+   if(u.reachable)this.hits.push({x:left,y,w,h:78,label:'寻找 '+u.name+' · '+u.place.name,action:()=>this.findCompanion(u.id)});
+  });c.restore();this.hits=this.hits.filter((hit,i)=>i<before||hit.y>=top&&hit.y+hit.h<=bottom);
+  if(p.maxScroll>0){const h=Math.max(24,(bottom-top)**2/(rows.length*rowH));this.box(f.x+f.w-9,top,2,bottom-top,'#263b32',null);this.box(f.x+f.w-9,top+(bottom-top-h)*p.scroll/p.maxScroll,2,h,'#a39670',null);}
  }
  function memberActions(){
   const p=this.panel,u=this.model.members().find(u=>u.id===p.unitId);if(!u){this.closeWorldPanel();return;}const active=this.model.state.activeIds.includes(u.id),retainer=u.origin==='tavern',canLeave=u.id!=='hero'&&!u.guest&&u.homeNode,f=this.frame(u.name+' · 队伍',retainer?346:canLeave?240:180);
@@ -287,6 +304,6 @@
   if(q.id==='visit-courts'&&!q.complete){const courts=Object.values(root.FactionCourts.definitions),bw=(w-16)/3;courts.forEach((d,i)=>{const visited=!!this.model.state.recruitAssignments[d.country];this.button(root.WorldData.placeMap[d.place].name+(visited?' · 已访':''),left+i*(bw+8),f.y+f.h-56,bw,36,()=>goQuest(this,{...q,target:d.place}),{active:!visited});});return;}
   const returnLabel=p.previous?.type==='tasks'?'返回手记':'返回场景';this.button(q.complete?returnLabel:place?'前往 '+place.name:returnLabel,left,f.y+f.h-56,w,36,()=>{if(q.complete||!place)this.panel=p.previous||null;else goQuest(this,q);this.invalidate();},{active:!q.complete&&!!place});
  }
- const handlers={equipmentTarget,character,characterDetails:details,tasks,taskFilter,trackerOrder,party,memberActions,formation,inventory,inventoryFilter,inventorySort,shop:inventory,reward,taskDetail,taskOffer:taskDetail,itemDetail,bulkSell};
+ const handlers={equipmentTarget,character,characterDetails:details,tasks,taskFilter,trackerOrder,party,findCompanions,memberActions,formation,inventory,inventoryFilter,inventorySort,shop:inventory,reward,taskDetail,taskOffer:taskDetail,itemDetail,bulkSell};
  const api={displayAttribute,icon,iconButton,textButton,ownerBadge,bar,itemIcon,questIcon,questColors,draw(v){if(root.TrophyPanels?.draw(v))return true;const p=v.panel,fn=handlers[p?.type];if(!fn)return false;if(['itemDetail','bulkSell'].includes(p.type)&&handlers[p.previous?.type]){v.panel=p.previous;try{handlers[p.previous.type].call(v);}finally{v.panel=p;}}fn.call(v);return true;}};root.WorldPanels=api;if(node)module.exports=api;
 })(globalThis);

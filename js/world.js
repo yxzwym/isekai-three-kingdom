@@ -178,6 +178,15 @@
     }
     renameRetainer(id,name){const u=this.state.companions.find(u=>u.id===id)||this.state.residents[id];if(!u||u.origin!=='tavern'||typeof name!=='string')return false;const next=R.sanitizeName(name).trim();if(!next||R.nameLength(next)>4)return false;u.name=next;this.npcListCache=null;return true;}
     archivedRetainers(){return Object.values(this.state.residents).filter(u=>u.origin==='tavern'&&!this.state.releasedRetainers.includes(u.id)).reverse();}
+    absentCompanions(){
+      const present=new Set(['hero',...this.state.companions.map(u=>u.id)]),released=new Set(this.state.releasedRetainers),known=new Map(Object.values(this.state.residents).map(u=>[u.id,u]));
+      for(const id of Object.values(this.state.recruits).flat())if(!present.has(id)&&!known.has(id)&&!released.has(id)){const u=this.recruitPreview(id);if(u)known.set(id,{...u,homeNode:u.homeNode||({zhaoyun:'chengdu',zhenji:'xuchang'})[id]});}
+      return [...known.values()].filter(u=>u.origin!=='tavern'&&!present.has(u.id)&&!released.has(u.id)).map(u=>{
+        const place=D.placeMap[u.homeNode],route=place?this.findRoute(place.id):null,reason=this.pending?'战斗中':this.journey?'行路中':!place?'去向不明':place.requiresWater?'水路未开通':!route?'暂时无法到达':null;
+        const artId=u.characterId||u.id,portrait=u.portrait||(root.CharacterAssets?.manifest.characters[artId]?root.CharacterAssets.resolve(artId).portrait:null);
+        return {id:u.id,name:u.name,level:u.level,portrait,place,route,reason,reachable:!reason,here:place?.id===this.state.nodeId};
+      }).sort((a,b)=>Number(b.reachable)-Number(a.reachable)||(a.route?.distance??Infinity)-(b.route?.distance??Infinity)||a.name.localeCompare(b.name,'zh-CN'));
+    }
     recallRetainer(id){const u=this.state.residents[id];return !!(this.tavernAvailable()&&u?.origin==='tavern'&&!this.state.releasedRetainers.includes(id)&&this.inviteResident(id));}
     releaseRetainer(id){
       const u=this.state.companions.find(u=>u.id===id)||this.state.residents[id];if(!u||u.origin!=='tavern'||this.pending||this.journey||this.state.releasedRetainers.includes(id))return false;
