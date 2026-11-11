@@ -8,7 +8,7 @@ test('对话标题追加表字，场景及角色姓名不被改写，开局直�
  const w=make({nodeId:'changshan',inside:true}),{v,texts}=view(w),npc={...D.questNpcs.zhaoyun,art:null};v.dialogue={npc,index:0,lines:['我叫赵云，字子龙。']};v.drawDialogue();assert.ok(texts.includes('赵云 子龙'));assert.equal(npc.name,'赵云');assert.equal(D.questNpcs.zhaoyun.name,'赵云');assert.equal(w.zhaoYunUnit().name,'赵云');assert.ok(w.sceneNpcs().some(n=>n.id==='zhaoyun'&&n.name==='赵云'));assert.equal(UI.dialogueName('村民'),'村民');assert.equal(UI.dialogueName('诸葛亮'),'诸葛亮 孔明');
 });
 
-test('三位宰相在入梦阶段结识主角，现实初见承接约定，三府按钮各自前往对应都城',()=>{
+test('三府主事者在入梦阶段结识主角，现实初见承接约定，三府按钮各自前往对应都城',()=>{
  const dream=P.chapters.dream.lines;for(const court of Object.values(Courts.definitions)){const rows=dream.filter(l=>l.speaker===court.id);assert.ok(rows.length,court.id);assert.ok(rows.some(l=>l.text.includes(D.placeMap[court.place].name)),court.id);assert.ok(court.welcome.some(t=>/梦|仙长/.test(t)),court.id);}
  const w=make({quests:{changshan:{stage:'complete'}},trophyClaims:{changshan:true}}),{v}=view(w),icons=global.RpgIcons;global.RpgIcons={draw(){},resolveItem(){return 'trophy';}};try{v.panel={type:'taskDetail',questId:'visit-courts'};Panels.draw(v);const buttons=Object.values(Courts.definitions).map(d=>v.hits.find(h=>h.label===D.placeMap[d.place].name));assert.ok(buttons.every(Boolean));assert.equal(new Set(buttons.map(h=>h.y)).size,1);for(const [i,d]of Object.values(Courts.definitions).entries()){v.panel={type:'taskDetail',questId:'visit-courts'};buttons[i].action();assert.equal(v.travelled,d.place);assert.equal(v.panel,null);}}finally{global.RpgIcons=icons;}
 });

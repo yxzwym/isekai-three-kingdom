@@ -5,7 +5,7 @@ const hero=()=>({name:'行舟',appearance:'armored',difficulty:'normal',...R.rol
 const make=s=>new World(hero(),{introStep:2,weaponType:'sword',...s});
 function view(model){const texts=[],v=Object.assign(Object.create(CanvasWorld.prototype),{model,character:model.character,w:540,h:960,hits:[],ctx:new Proxy({measureText:t=>({width:Array.from(String(t)).length*14})},{get:(o,k)=>o[k]||(()=>{})}),text(t){texts.push(String(t));},box(){},frame(title,height){this.hits=[];texts.push(title);return{x:40,y:40,w:460,h:Math.min(800,height)};},button(label,x,y,w,h,action,options={}){if(!options.disabled)this.hits.push({label,x,y,w,h,action});},image(){return null;},portrait(){},save(){},notify(){},invalidate(){}});return{v,texts};}
 
-test('复命委托须当面拜访各国宰相才开放，招募和到达城门不算接受',()=>{
+test('复命委托须当面拜访各国主事者才开放，招募和到达城门不算接受',()=>{
  const w=make({nodeId:'xuchang',recruits:{wei:['zhenji']}});
  assert.deepEqual(w.state.recruitAssignments,{wei:false,shu:false,wu:false});
  assert.ok(!w.quests().some(q=>q.id.startsWith('report-')));assert.ok(!w.questMarkers().some(q=>q.questId.startsWith('report-')));assert.equal(w.npcQuestStatus(C.npc('wei')),null);
@@ -35,7 +35,7 @@ test('旧档已拜访三府也补发一次奖励，未完成常山不提前完�
  const loaded=new World(w.character,{...w.snapshot(),quests:{changshan:{stage:'complete'}}});assert.equal(loaded.state.trophies.filter(t=>t.templateId==='three-courts-seal').length,1);assert.ok(loaded.quests().find(q=>q.id==='visit-courts').complete);
 });
 
-test('第三府谢礼可从宰相对话领取，关闭对话同样展示，领完再复命不丢赏钱',()=>{
+test('第三府谢礼可从三府主事者对话领取，关闭对话同样展示，领完再复命不丢赏钱',()=>{
  const w=make({nodeId:'jianye',inside:true,quests:{changshan:{stage:'complete'}},trophyClaims:{changshan:true},equipmentRewards:{'story:escort':true},recruitAssignments:{wei:true,shu:true,wu:false}}),{v}=view(w);w.state.recruits.wu.push('taishici');v.speak=(npc,data)=>{v.dialogue={npc,...data};};v.rememberDialogue=()=>{};v.showReward=reward=>{v.panel={type:'reward',reward};};v.afterBattle=()=>{};
  v.courtDialogue(C.npc('wu'));assert.ok(v.dialogue.choices.some(c=>c.label==='查看拜访谢礼'));assert.ok(!v.dialogue.choices.some(c=>c.label.startsWith('领取赏钱')));v.dialogue.choices.find(c=>c.label==='告辞').action();assert.equal(v.dialogue,null);assert.ok(v.panel.reward.items.some(t=>t.templateId==='three-courts-seal'));
  v.finishReward();v.courtDialogue(C.npc('wu'));v.dialogue.choices.find(c=>c.label.startsWith('领取赏钱')).action();assert.equal(v.panel.reward.money,500);assert.equal(w.state.trophies.filter(t=>t.templateId==='three-courts-seal').length,1);
