@@ -5562,6 +5562,10 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
     passive('rampage','修罗血煞','red','物理技能恢复造成伤害25%的生命。',{physicalLifesteal:0.25},'吸血'),
     passive('thunderlord','雷霆万钧','red','计策无视目标25%抗性。',{resistancePierce:0.25},'破谋'),
     passive('neverfall','不屈战魂','red','自身生命低于30%时，受到伤害降低25%。',{lowTroopsThreshold:0.3,lowTroopsTakenMultiplier:0.75},'绝境'),
+    ...[['white',.05,'凝神出手','静心凝神'],['green',.1,'觑隙而击','心领神会'],['blue',.15,'百步穿杨','料敌机先'],['gold',.2,'洞若观火','算定虚实'],['red',.25,'百发百中','洞悉天机']].flatMap(([quality,value,physical,tactic])=>[
+      passive('physical-aim-'+quality,physical,quality,'物理技能命中率增加'+value*100+'个百分点。',{physicalHitBonus:value},'命中'),
+      passive('tactic-aim-'+quality,tactic,quality,'计策命中率增加'+value*100+'个百分点。',{tacticHitBonus:value},'命中')
+    ]),
     passive('unity','万象归一','rainbow','融合品质预留，开局不会出现。'),
     passive('reversal','逆转乾坤','rainbow','融合品质预留，开局不会出现。')
   ];
@@ -5576,15 +5580,25 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
     return randomInt(chosen.min,chosen.max,rng);
   }
   const rollAttribute=(identity,key,rng)=>rollRange(identity.ranges[key],identity.attributeBands,rng);
-  function rollPassives(rng=Math.random,count=3,weights=null){
+  function passiveAffinity(passive,potentials){
+    if(!potentials)return 1;const e=passive.effects,has=keys=>keys.some(key=>e[key]!=null),scores=[];
+    const physical=has(['physicalMultiplier','physicalLifesteal','armorPierce','physicalHitBonus','counterChance']),tactic=has(['tacticMultiplier','resistancePierce','tacticCriticalBonus','tacticCriticalDamageBonus','tacticHitBonus','healingMultiplier','overhealShield']);
+    if(physical&&!tactic&&potentials.intelligence-potentials.war>=15||tactic&&!physical&&potentials.war-potentials.intelligence>=15)return 0;
+    if(physical)scores.push(potentials.war);if(tactic)scores.push(potentials.intelligence);
+    if(has(['constitutionMultiplier','armorMultiplier','resistanceMultiplier','takenMultiplier','tacticTakenMultiplier','lowTroopsTakenMultiplier','openingShield','actionRegen']))scores.push(potentials.constitution);
+    if(has(['intervalMultiplier','initialProgress','physicalDodge']))scores.push(potentials.speed);
+    if(has(['criticalBonus','criticalDamageBonus']))scores.push(potentials.technique);
+    const score=scores.length?Math.max(...scores):Object.values(potentials).reduce((sum,value)=>sum+value,0)/5;return .5+4*Math.pow(score/100,3);
+  }
+  function rollPassives(rng=Math.random,count=3,weights=null,potentials=null){
     const weight=tier=>weights?Number(weights[tier])||0:QUALITIES[tier].weight;
-    const available=PASSIVES.filter(p=>!p.fusionOnly&&weight(p.quality)>0);if(!Number.isInteger(count)||count<0||count>available.length)throw new RangeError('被动数量超出可选范围');
+    const affinities=new Map(PASSIVES.map(p=>[p.id,passiveAffinity(p,potentials)])),available=PASSIVES.filter(p=>!p.fusionOnly&&weight(p.quality)>0&&affinities.get(p.id)>0);if(!Number.isInteger(count)||count<0||count>available.length)throw new RangeError('被动数量超出可选范围');
     const selected=[];
     while(selected.length<count){
       const tiers=Object.entries(QUALITIES).map(([tier])=>[tier,{weight:weight(tier)}]).filter(([tier,q])=>q.weight>0&&available.some(p=>p.quality===tier));
       let pick=unitRandom(rng)*tiers.reduce((sum,[,q])=>sum+q.weight,0),tier=tiers.at(-1)[0];
       for(const [key,q]of tiers){pick-=q.weight;if(pick<0){tier=key;break;}}
-      const matches=available.filter(p=>p.quality===tier),chosen=matches[randomInt(0,matches.length-1,rng)];
+      const matches=available.filter(p=>p.quality===tier);let draw=unitRandom(rng)*matches.reduce((sum,p)=>sum+affinities.get(p.id),0),chosen=matches.at(-1);for(const p of matches){draw-=affinities.get(p.id);if(draw<0){chosen=p;break;}}
       selected.push(chosen.id);available.splice(available.indexOf(chosen),1);
     }
     return selected;
@@ -5601,14 +5615,15 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
       values.push(chosen);remaining-=chosen;
     }
     values.push(remaining);
-    // 分配顺序随机，任何一项属性都有同样的机会成为强项。
+    // 先打乱分配顺序，再让武力与智力从较高、较低的两端配对；总潜力不变。
     for(let i=values.length-1;i>0;i--){const other=randomInt(0,i,rng);[values[i],values[other]]=[values[other],values[i]];}
-    return Object.fromEntries(ATTRIBUTES.map(([key],i)=>[key,values[i]]));
+    const ranked=values.map((value,index)=>({value,index})).sort((a,b)=>a.value-b.value),high=ranked[unitRandom(rng)<.65?3:4],low=ranked[unitRandom(rng)<.65?0:1],pair=unitRandom(rng)<.5?[high.value,low.value]:[low.value,high.value],rest=values.filter((value,index)=>index!==high.index&&index!==low.index);
+    return Object.fromEntries(ATTRIBUTES.map(([key],i)=>[key,[...pair,...rest][i]]));
   }
   function rollHero(difficultyId,rng=Math.random){
     const difficulty=getDifficulty(difficultyId);if(!difficulty)throw new TypeError('请先选择难度');
     const average={hell:40,survival:40,normal:60,heroic:80,protagonist:100}[difficulty.id],growth=G.characterAt({potentials:rollPotentials(average,rng)},1);
-    return {...growth,weaponCatalogVersion:1,passives:rollPassives(rng,3,difficulty.passiveWeights)};
+    return {...growth,weaponCatalogVersion:1,passives:rollPassives(rng,3,difficulty.passiveWeights,growth.potentials)};
   }
   const segments=text=>typeof Intl.Segmenter==='function'?Array.from(new Intl.Segmenter('zh',{granularity:'grapheme'}).segment(text),s=>s.segment):Array.from(text);
   const sanitizeName=value=>segments(String(value||'').replace(/[\u0000-\u001f\u007f\s]/g,'')).slice(0,4).join('');
@@ -6024,7 +6039,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
  },battles:{breach:{stage:['plan','breach'],next:'cell',title:'新野衙门',sceneId:'market-street',count:4},cell:{stage:['cell'],next:'freed',title:'牢房突围',sceneId:'county-prison',count:5}}};
  const definitions={ganning:definition};
  function place(id,state){const d=definitions[id];return d?.stages[state?.stage]?.place||d?.place;}
- function normalize(value={},unlocked=false){return Object.fromEntries(Object.values(definitions).map(d=>{const old=value?.[d.id]||{},stage=Object.hasOwn(d.stages,old.stage)?old.stage:unlocked||d.requiresChangshan===false?d.start:'locked';return [d.id,{stage,heard:!!old.heard,accepted:old.accepted??(!!old.stage&&old.stage!=='locked'&&old.stage!==d.start),...(old.puzzle?{puzzle:old.puzzle}:{})}];}));}
+ function normalize(value={},unlocked=false){return Object.fromEntries(Object.values(definitions).map(d=>{const old=value?.[d.id]||{},stage=Object.hasOwn(d.stages,old.stage)?old.stage:unlocked||d.requiresChangshan===false?d.start:'locked';return [d.id,{stage,heard:!!old.heard,accepted:old.accepted??(!!old.stage&&old.stage!=='locked'&&old.stage!==d.start),...(old.offerAccepted?{offerAccepted:true}:{}),...(old.puzzle?{puzzle:old.puzzle}:{})}];}));}
  function npc(id,state){const d=definitions[id],n=d?.stages[state?.stage]?.npc;return n?{...n,sceneId:d.stages[state.stage].sceneId,heroQuest:id,side:n.side||'left',role:'heroQuest',roleLabel:'剧情'}:null;}
  function companion(currentLevel=1){const weapon=I.create('weapon-blade','green','ganning-blade');return {...G.create('ganning',currentLevel),id:'ganning',name:'甘宁',characterId:'ganning',homeNode:'jianye',experience:0,experienceVersion:2,weaponPlanVersion:3,weapon,skills:W.forWeapon(weapon),priorities:W.prioritiesFor(W.forWeapon(weapon)),equipment:{armor:I.create('leather-armor','green','ganning-armor'),accessory1:null,accessory2:null},armor:4,resistance:3,passives:['ganning-brocade']};}
  function enemies(count){return Array.from({length:count},(_,i)=>{const captain=i===0,weapon=I.create('weapon-'+(captain?'shield':'spear'),'white','jail-weapon-'+i),skills=captain?['shield-taunt','spear-cut']:['spear-cut'];return {...G.create(captain?'imperialCaptain':i%2?'imperialPikeman':'imperialSoldier',10),id:'jail-guard-'+i,name:captain?'官兵队长':'官兵',formationRow:captain?'front':'back',characterId:'imperial-soldier',weapon,attack:weapon.power,equipment:{armor:I.create('leather-armor')},armor:6,resistance:3,skills,targetRule:'random',priorities:skills.map(skill=>({skill,when:W.skills[skill].scope==='all'?'enemyCount':'always',threshold:2,frequency:W.skills[skill].kind==='buff'?'always':'sometimes'}))};});}
@@ -6114,7 +6129,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
   function physical(options){return calculate({...options,skill:options.skill||{kind:'physical',scaling:{war:1},weaponCoefficient:1},damageType:options.damageType||'physical'});}
   function tactic(options){return calculate({...options,attacker:options.attacker||{intelligence:attr(options.intelligence),attack:0},skill:options.skill,damageType:options.skill.damageType||options.skill.kind});}
   function criticalChance(unit,config,skill={}){return unit.guaranteedCritical||skill.kind==='physical'&&unit.physicalGuaranteedCritical?1:clamp((Number(skill.criticalChance)||0)+(Number(skill.criticalBonus)||0)+(Number(unit.criticalBonus)||0)+(skill.kind==='tactic'?(Number(unit.tacticCriticalBonus)||0):0)+Math.max(0,Number(unit.technique)||0)/2000,0,1);}
-  function hitChance(actor,target,skill,dodge=0){return skill.alwaysHit?1:clamp((skill.hitChance??.4)+(Number(actor.hitBonus)||0)+(Math.max(0,Number(actor.technique)||0)/Math.max(1,Number(target.speed)||0))*.3-dodge,0,1);}
+  function hitChance(actor,target,skill,dodge=0){return skill.alwaysHit?1:clamp((skill.hitChance??.4)+(Number(actor.hitBonus)||0)+(Number(actor[skill.kind==='physical'?'physicalHitBonus':'tacticHitBonus'])||0)+(Math.max(0,Number(actor.technique)||0)/Math.max(1,Number(target.speed)||0))*.3-dodge,0,1);}
   function normalizeRule(rule,skill){
     const r=copy(rule);if(!skill)return r;
     if(['physical','tactic'].includes(skill.kind)){
@@ -6208,7 +6223,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
       for(const key of ['war','intelligence','constitution','speed','technique','attack','armor','resistance']){
         const add=(u.statuses||[]).reduce((n,s)=>n+(s.attribute===key?(Number(s.amount)||0)*(s.stacks||1):0),0),mult=(u.statuses||[]).reduce((n,s)=>n*(Number(s[key+'Multiplier'])||1),1);out[key]=Math.max(key==='constitution'?1:0,(u[key]+add+(p[key+'Bonus']||0))*mult*(p[key+'Multiplier']||1));
       }
-      for(const stat of ['healingBonus','physicalBonus','tacticBonus','physicalReduction','tacticReduction','hitBonus','criticalBonus','armorPenetration','resistancePenetration','armorPierce','resistancePierce','criticalDamageBonus','tacticCriticalBonus','tacticCriticalDamageBonus','physicalLifesteal','executeThreshold'])out[stat]=(Number(u[stat])||0)+(p[stat]||0);
+      for(const stat of ['healingBonus','physicalBonus','tacticBonus','physicalReduction','tacticReduction','hitBonus','physicalHitBonus','tacticHitBonus','criticalBonus','armorPenetration','resistancePenetration','armorPierce','resistancePierce','criticalDamageBonus','tacticCriticalBonus','tacticCriticalDamageBonus','physicalLifesteal','executeThreshold'])out[stat]=(Number(u[stat])||0)+(p[stat]||0);
       for(const stat of ['intervalMultiplier','executeMultiplier'])out[stat]=(Number(u[stat])||1)*(p[stat]||1);
       for(const [kind,mult]of [['physical','physicalMultiplier'],['tactic','tacticMultiplier'],['healing','healingMultiplier']])if(p[mult]!==undefined)out[kind+'Bonus']=(1+out[kind+'Bonus'])*p[mult]-1;
       out.physicalTrueDamage=!!(u.physicalTrueDamage||p.physicalTrueDamage);out.damageMultiplier=Number(u.damageMultiplier??1)*(p.damageMultiplier||1);out.guaranteedCritical=!!u.guaranteedCritical;out.physicalGuaranteedCritical=!!p.guaranteedCritical;out.ignoreArmor=!!(u.ignoreArmor||p.ignoreArmor);out.ignoreResistance=!!(u.ignoreResistance||p.ignoreResistance);
@@ -9978,6 +9993,11 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     acceptSide(id){const q=this.state.quests.side[id];if(!q||q.accepted)return false;q.accepted=true;return true;}
     turnInSide(id){const data=N.sideQuests.find(t=>t.id===id),q=this.state.quests.side[id];if(!data||!q?.accepted||q.paid||q.wins<data.rounds||this.state.nodeId!==data.giverPlace||this.pending||this.journey)return false;q.paid=true;Story.apply(this,data.effects);this.markQuestComplete(id);this.state.money+=data.money;const reward={title:data.repeatable?'委托完成':'支线完成',gains:[],money:data.money,items:[this.addItem(data.item,data.quality),...this.claimEquipmentReward('side:'+id),...Object.keys(data.effects?.items||{}).map(id=>Story.itemRecord(this,id)).filter(Boolean)],completedQuest:data.title};this.lastReward=reward;this.state.pendingReward=copy(reward);this.state.afterBattle={kind:'quest-turn-in',questId:id};return reward;}
     beginSideBattle(id){const data=N.sideQuests.find(q=>q.id===id),q=this.state.quests.side[id];if(!data||!q?.accepted||q.wins>=data.rounds||this.state.nodeId!==data.place||this.pending||this.journey)return false;this.pending={kind:'side',questId:id,to:this.state.nodeId,checkpoint:this.snapshot(),memberIds:this.members().map(u=>u.id),seed:this.state.seed+':side:'+id+':'+q.wins};return true;}
+    acceptHeroQuest(id,expectedStage){
+      const d=H.definitions[id],q=this.state.heroQuests[id];if(!d||!q||q.stage!==expectedStage||q.stage!==d.start||q.offerAccepted||this.state.nodeId!==H.place(id,q)||this.pending||this.journey)return false;
+      const stage=d.stages[q.stage],choices=stage.npc?.choices||[],allowed=Story.check(this,stage.requires||(choices.length===1?choices[0].requires:undefined));if(!allowed.ok){this.lastQuestError=allowed.reason;return false;}
+      q.accepted=true;q.offerAccepted=true;return true;
+    }
     chooseHeroQuest(id,index,expectedStage){
       const d=H.definitions[id],q=this.state.heroQuests[id];if(!d||!q||q.stage!==expectedStage||this.state.nodeId!==H.place(id,q)||this.pending||this.journey)return false;const choice=d.stages[q.stage].npc?.choices[index];if(!choice)return false;
       const allowed=Story.check(this,choice.requires||d.stages[q.stage].requires);if(!allowed.ok){this.lastQuestError=allowed.reason;return false;}
@@ -10125,7 +10145,12 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     battleScenario({extraAllies=[]}={}){
       if(!this.pending)throw new Error('没有待结算的路遇战斗');
       if(this.pending.kind==='chapter'){const phase=Chapter.phases[this.pending.phase],enemies=Chapter.enemies(this.pending.phase);return {id:'chapter-'+this.pending.phase,title:phase.title,scene:Scenes.arrange(Scenes.get(phase.sceneId),enemies),allies:[...this.partyGroups().active,...extraAllies],enemies,passives:heroPassives(),rules:{difficulty:this.character.difficulty,partySlots:this.activeLimit(),bossBattle:true,seed:this.pending.seed,hit:true,critical:true}};}
-      if(this.pending.kind==='heroQuest'){const p=this.pending,d=H.definitions[p.questId],fight=d.battles[p.phase],missingGuest=!!(fight.guest||fight.guests?.length),scale=record=>Object.fromEntries(Object.entries(record).map(([key,value])=>[key,Math.max(1,Math.floor(value*.85))])),enemies=Recruitment.enemies(p.questId,p.phase,this.character.level).map(u=>({...u,...(missingGuest?(u.baseAttributes&&u.potentials?{baseAttributes:scale(u.baseAttributes),potentials:scale(u.potentials)}:{war:Math.floor(u.war*.85),intelligence:Math.floor(u.intelligence*.85),constitution:Math.floor(u.constitution*.85)}):{}),...(root.CharacterAssets?root.CharacterAssets.resolve(u.characterId):{})}));return {id:p.questId+'-'+p.phase,title:fight.title,scene:Scenes.arrange(Scenes.get(fight.sceneId),enemies),allies:[...(fight.solo?this.members().filter(u=>u.id==='hero'):this.partyGroups().active),...[...new Set([fight.guest,...(fight.guests||[])].filter(Boolean))].filter(id=>!this.state.activeIds.includes(id)&&(['zhaoyun','zhenji'].includes(id)||countries.some(country=>this.state.recruits[country].includes(id)))).map(id=>this.members().find(u=>u.id===id)||this.prepareRecruit(Recruitment.companion(id,this.character.level))),...(fight.solo?[]:extraAllies)],enemies,passives:heroPassives(),rules:{difficulty:this.character.difficulty,partySlots:fight.solo?1:this.activeLimit(),bossBattle:!!(fight.boss||fight.duel||fight.roster||fight.named),allySp:0,hit:true,critical:true,seed:p.seed}};}
+      if(this.pending.kind==='heroQuest'){
+        const p=this.pending,d=H.definitions[p.questId],fight=d.battles[p.phase],members=this.members(),base=fight.solo?members.filter(u=>u.id==='hero'):this.partyGroups().active;
+        const guests=fight.solo?[]:[...new Set([fight.guest,...(fight.guests||[])].filter(Boolean))].filter(id=>!base.some(u=>u.id===id)).map(id=>members.find(u=>u.id===id)||{...this.prepareRecruit(this.state.questRetainers[id]||Recruitment.companion(id,this.character.level)),guest:true,questGuest:p.questId});
+        const allies=[...base,...guests,...(fight.solo?[]:extraAllies)].filter((u,i,all)=>all.findIndex(other=>other.id===u.id)===i),enemies=Recruitment.enemies(p.questId,p.phase,this.character.level).map(u=>({...u,...(root.CharacterAssets?root.CharacterAssets.resolve(u.characterId):{})}));
+        return {id:p.questId+'-'+p.phase,title:fight.title,scene:Scenes.arrange(Scenes.get(fight.sceneId),enemies),allies,enemies,passives:heroPassives(),rules:{difficulty:this.character.difficulty,partySlots:fight.solo?1:this.activeLimit(),bossBattle:!!(fight.boss||fight.duel||fight.roster||fight.named),allySp:0,hit:true,critical:true,seed:p.seed}};
+      }
       if(this.pending.kind==='training'){
         const training=D.trainingOptions.find(t=>t.id===this.pending.trainingId),enemies=this.trainingRoster(training).map(u=>({...u,...(root.CharacterAssets?.manifest.characters[u.characterId]?root.CharacterAssets.resolve(u.characterId):{})}));
         return {id:'camp-training',title:training.label,scene:Scenes.arrange(copy(D.townScenes.camp),enemies),allies:[...this.trainingAllies(training),...extraAllies],enemies,passives:heroPassives(),rules:{difficulty:this.character.difficulty,partySlots:this.activeLimit(),bossBattle:!!training.rivals,level:1,enemyLevel:1,allySp:0,random:true,hit:true,critical:true,seed:this.pending.seed}};
@@ -10932,7 +10957,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
     resumeForcedHeroScene(){if(this.disposed||this.dialogue||this.panel||this.battle||this.model.pending||this.journey)return false;const d=this.requiredHeroScene();if(!d)return false;this.heroQuestDialogue(root.HeroQuests.npc(d.id,this.model.state.heroQuests[d.id]));this.invalidate();return true;}
     heroQuestDialogue(npc){
       if(!npc)return;const alternatives=Object.values(root.HeroQuests.definitions).filter(d=>this.model.heroQuestVisible(d)&&root.HeroQuests.place(d.id,this.model.state.heroQuests[d.id])===this.model.state.nodeId&&root.HeroQuests.npc(d.id,this.model.state.heroQuests[d.id])?.id===npc.id);if(alternatives.length>1&&!npc.selectedQuest){this.speak(npc,{lines:["来得正好，几桩事都记在这里了。想先问哪一件？"],choices:[...alternatives.map(d=>({label:d.title,action:()=>this.heroQuestDialogue({...root.HeroQuests.npc(d.id,this.model.state.heroQuests[d.id]),selectedQuest:true})})),{label:'告辞',dismiss:true,action:()=>this.closeDialogue()}]});return;}const id=npc.heroQuest,d=root.HeroQuests.definitions[id],stage=this.model.state.heroQuests[id].stage,data=d.stages[stage].npc;if(!data)return;
-      const forced=!!d.stages[stage].strictDialogue,turns=data.turns||data.lines.map(text=>({speaker:'npc',text}));
+      const needsOffer=stage===d.start&&stage!=='freed'&&!this.model.state.heroQuests[id].offerAccepted,forced=!!d.stages[stage].strictDialogue,turns=data.turns||data.lines.map(text=>({speaker:'npc',text}));
       const choices=[...data.choices.map((choice,index)=>({label:choice.label+(choice.price?' · '+choice.price+'文':''),action:()=>{
         if(!this.model.chooseHeroQuest(id,index,stage)){this.notify(this.model.lastQuestError||'暂时不能进行。');return;}
         this.dialogue=null;this.save();if(choice.puzzle){this.panel={type:'slidingPuzzle',questId:id};return;}if(this.model.pending){this.startBattle();return;}
@@ -10940,7 +10965,12 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
         else if(root.HeroQuests.place(id,this.model.state.heroQuests[id])===this.model.state.nodeId)this.heroQuestDialogue({...root.HeroQuests.npc(id,this.model.state.heroQuests[id]),selectedQuest:true});
       }})),...(forced?[]:[{label:'暂且离开',dismiss:true,action:()=>this.closeDialogue()}])];
       if(!forced&&this.npcInteraction?.id===npc.id&&!this.npcInteraction.offered&&this.model.npcUnit(npc.id)){this.npcInteraction.offered=true;choices.splice(Math.max(0,choices.length-1),0,{label:'观察',action:()=>this.observeNpc(npc)});}
-      const show=index=>{if(this.disposed||this.model.state.heroQuests[id].stage!==stage)return;const turn=turns[index],actor=turn.speaker==='hero'?{id:'hero',name:this.character.name,art:'hero',side:'right',sceneId:npc.sceneId}:turn.speaker==='npc'?npc:{...(root.RecruitmentContent.actors[turn.speaker]||npc),sceneId:npc.sceneId},last=index===turns.length-1;this.speak(actor,{lines:[turn.text],forced,choices:last?choices:undefined,onComplete:last?undefined:()=>show(index+1)});this.invalidate();};show(0);
+      let offered=false;
+      const offer=()=>{const first=data.choices.length===1?data.choices[0]:null,next=d.stages[first?.next||first?.battle];this.openQuestOffer(id,{offerObjective:next?.objective||d.stages[stage].objective,onAccept:()=>{
+        if(!this.model.acceptHeroQuest(id,stage)){if(this.model.lastQuestError)this.notify(this.model.lastQuestError);return;}
+        offered=true;this.panel=null;this.save();if(first)choices[0].action();else show(turns.length-1);
+      }});};
+      const show=index=>{if(this.disposed||this.model.state.heroQuests[id].stage!==stage)return;const turn=turns[index],actor=turn.speaker==='hero'?{id:'hero',name:this.character.name,art:'hero',side:'right',sceneId:npc.sceneId}:turn.speaker==='npc'?npc:{...(root.RecruitmentContent.actors[turn.speaker]||npc),sceneId:npc.sceneId},last=index===turns.length-1,invite=last&&needsOffer&&!offered;this.speak(actor,{lines:[turn.text],forced,choices:last&&!invite?choices:undefined,onComplete:invite?offer:last?undefined:()=>show(index+1)});this.invalidate();};show(0);
     }
     openQuestOffer(questId,options={}){this.dialogue=null;this.panel={type:'taskOffer',questId,scroll:0,previous:null,...options};this.invalidate();}
     offerZhaoJourney(){this.openQuestOffer('changshan',{forced:true,acceptLabel:'与子龙同行',offerObjective:'前往中山打听粮车下落，帮助常山取回乡粮。',offerDescription:"中山说好的粮车，过了日子还没到。村里余粮已经不多，若再等下去，只怕要断炊。\n我想去见仓守，问清车究竟耽搁在哪里。你能否陪我同去？乡亲有了粮，我也能腾出手，与你商量往后的路。",onAccept:()=>{if(this.model.startChangshan()){this.save();this.speak(D.questNpcs.zhaoyun,{lines:["先去中山见仓守。他认得赶车的人，若路上有变故，也该有个消息。"]});}else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}});}

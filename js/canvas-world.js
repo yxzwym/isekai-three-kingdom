@@ -293,7 +293,7 @@
     resumeForcedHeroScene(){if(this.disposed||this.dialogue||this.panel||this.battle||this.model.pending||this.journey)return false;const d=this.requiredHeroScene();if(!d)return false;this.heroQuestDialogue(root.HeroQuests.npc(d.id,this.model.state.heroQuests[d.id]));this.invalidate();return true;}
     heroQuestDialogue(npc){
       if(!npc)return;const alternatives=Object.values(root.HeroQuests.definitions).filter(d=>this.model.heroQuestVisible(d)&&root.HeroQuests.place(d.id,this.model.state.heroQuests[d.id])===this.model.state.nodeId&&root.HeroQuests.npc(d.id,this.model.state.heroQuests[d.id])?.id===npc.id);if(alternatives.length>1&&!npc.selectedQuest){this.speak(npc,{lines:["来得正好，几桩事都记在这里了。想先问哪一件？"],choices:[...alternatives.map(d=>({label:d.title,action:()=>this.heroQuestDialogue({...root.HeroQuests.npc(d.id,this.model.state.heroQuests[d.id]),selectedQuest:true})})),{label:'告辞',dismiss:true,action:()=>this.closeDialogue()}]});return;}const id=npc.heroQuest,d=root.HeroQuests.definitions[id],stage=this.model.state.heroQuests[id].stage,data=d.stages[stage].npc;if(!data)return;
-      const forced=!!d.stages[stage].strictDialogue,turns=data.turns||data.lines.map(text=>({speaker:'npc',text}));
+      const needsOffer=stage===d.start&&stage!=='freed'&&!this.model.state.heroQuests[id].offerAccepted,forced=!!d.stages[stage].strictDialogue,turns=data.turns||data.lines.map(text=>({speaker:'npc',text}));
       const choices=[...data.choices.map((choice,index)=>({label:choice.label+(choice.price?' · '+choice.price+'文':''),action:()=>{
         if(!this.model.chooseHeroQuest(id,index,stage)){this.notify(this.model.lastQuestError||'暂时不能进行。');return;}
         this.dialogue=null;this.save();if(choice.puzzle){this.panel={type:'slidingPuzzle',questId:id};return;}if(this.model.pending){this.startBattle();return;}
@@ -301,7 +301,12 @@
         else if(root.HeroQuests.place(id,this.model.state.heroQuests[id])===this.model.state.nodeId)this.heroQuestDialogue({...root.HeroQuests.npc(id,this.model.state.heroQuests[id]),selectedQuest:true});
       }})),...(forced?[]:[{label:'暂且离开',dismiss:true,action:()=>this.closeDialogue()}])];
       if(!forced&&this.npcInteraction?.id===npc.id&&!this.npcInteraction.offered&&this.model.npcUnit(npc.id)){this.npcInteraction.offered=true;choices.splice(Math.max(0,choices.length-1),0,{label:'观察',action:()=>this.observeNpc(npc)});}
-      const show=index=>{if(this.disposed||this.model.state.heroQuests[id].stage!==stage)return;const turn=turns[index],actor=turn.speaker==='hero'?{id:'hero',name:this.character.name,art:'hero',side:'right',sceneId:npc.sceneId}:turn.speaker==='npc'?npc:{...(root.RecruitmentContent.actors[turn.speaker]||npc),sceneId:npc.sceneId},last=index===turns.length-1;this.speak(actor,{lines:[turn.text],forced,choices:last?choices:undefined,onComplete:last?undefined:()=>show(index+1)});this.invalidate();};show(0);
+      let offered=false;
+      const offer=()=>{const first=data.choices.length===1?data.choices[0]:null,next=d.stages[first?.next||first?.battle];this.openQuestOffer(id,{offerObjective:next?.objective||d.stages[stage].objective,onAccept:()=>{
+        if(!this.model.acceptHeroQuest(id,stage)){if(this.model.lastQuestError)this.notify(this.model.lastQuestError);return;}
+        offered=true;this.panel=null;this.save();if(first)choices[0].action();else show(turns.length-1);
+      }});};
+      const show=index=>{if(this.disposed||this.model.state.heroQuests[id].stage!==stage)return;const turn=turns[index],actor=turn.speaker==='hero'?{id:'hero',name:this.character.name,art:'hero',side:'right',sceneId:npc.sceneId}:turn.speaker==='npc'?npc:{...(root.RecruitmentContent.actors[turn.speaker]||npc),sceneId:npc.sceneId},last=index===turns.length-1,invite=last&&needsOffer&&!offered;this.speak(actor,{lines:[turn.text],forced,choices:last&&!invite?choices:undefined,onComplete:invite?offer:last?undefined:()=>show(index+1)});this.invalidate();};show(0);
     }
     openQuestOffer(questId,options={}){this.dialogue=null;this.panel={type:'taskOffer',questId,scroll:0,previous:null,...options};this.invalidate();}
     offerZhaoJourney(){this.openQuestOffer('changshan',{forced:true,acceptLabel:'与子龙同行',offerObjective:'前往中山打听粮车下落，帮助常山取回乡粮。',offerDescription:"中山说好的粮车，过了日子还没到。村里余粮已经不多，若再等下去，只怕要断炊。\n我想去见仓守，问清车究竟耽搁在哪里。你能否陪我同去？乡亲有了粮，我也能腾出手，与你商量往后的路。",onAccept:()=>{if(this.model.startChangshan()){this.save();this.speak(D.questNpcs.zhaoyun,{lines:["先去中山见仓守。他认得赶车的人，若路上有变故，也该有个消息。"]});}else if(this.model.lastRecruitError)this.notify(this.model.lastRecruitError);}});}

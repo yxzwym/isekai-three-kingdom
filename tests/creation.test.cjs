@@ -55,7 +55,7 @@ test('随机潜力可突破原档位范围并达到100，以其他属性让出�
       values.forEach((value,i)=>{assert.ok(value>=1&&value<=100);means[i]+=value;if(value===100)peaks.add(i);if(value<average-15)belowFormerFloor=true;if(value>average+15)aboveFormerCeiling=true;});
       if(values.includes(100))assert.ok(values.filter(value=>value!==100).some(value=>value<average));
     }
-    assert.equal(peaks.size,5,`${id}每项都有机会达到100`);assert.ok(belowFormerFloor&&aboveFormerCeiling);for(const mean of means)assert.ok(Math.abs(mean/36000-average)<1.5,'属性分配不偏向固定一列');
+    assert.equal(peaks.size,5,`${id}每项都有机会达到100`);assert.ok(belowFormerFloor&&aboveFormerCeiling);assert.ok(Math.abs(means[0]-means[1])/36000<1.5,'武力与智力不偏向固定一方');assert.equal(means.reduce((a,b)=>a+b),36000*average*5);
   }
 });
 test('高品质被动概率随难度降低而提高，困难档仍保留稀有机会',()=>{

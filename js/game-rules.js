@@ -293,6 +293,10 @@
     passive('rampage','修罗血煞','red','物理技能恢复造成伤害25%的生命。',{physicalLifesteal:0.25},'吸血'),
     passive('thunderlord','雷霆万钧','red','计策无视目标25%抗性。',{resistancePierce:0.25},'破谋'),
     passive('neverfall','不屈战魂','red','自身生命低于30%时，受到伤害降低25%。',{lowTroopsThreshold:0.3,lowTroopsTakenMultiplier:0.75},'绝境'),
+    ...[['white',.05,'凝神出手','静心凝神'],['green',.1,'觑隙而击','心领神会'],['blue',.15,'百步穿杨','料敌机先'],['gold',.2,'洞若观火','算定虚实'],['red',.25,'百发百中','洞悉天机']].flatMap(([quality,value,physical,tactic])=>[
+      passive('physical-aim-'+quality,physical,quality,'物理技能命中率增加'+value*100+'个百分点。',{physicalHitBonus:value},'命中'),
+      passive('tactic-aim-'+quality,tactic,quality,'计策命中率增加'+value*100+'个百分点。',{tacticHitBonus:value},'命中')
+    ]),
     passive('unity','万象归一','rainbow','融合品质预留，开局不会出现。'),
     passive('reversal','逆转乾坤','rainbow','融合品质预留，开局不会出现。')
   ];
@@ -307,15 +311,25 @@
     return randomInt(chosen.min,chosen.max,rng);
   }
   const rollAttribute=(identity,key,rng)=>rollRange(identity.ranges[key],identity.attributeBands,rng);
-  function rollPassives(rng=Math.random,count=3,weights=null){
+  function passiveAffinity(passive,potentials){
+    if(!potentials)return 1;const e=passive.effects,has=keys=>keys.some(key=>e[key]!=null),scores=[];
+    const physical=has(['physicalMultiplier','physicalLifesteal','armorPierce','physicalHitBonus','counterChance']),tactic=has(['tacticMultiplier','resistancePierce','tacticCriticalBonus','tacticCriticalDamageBonus','tacticHitBonus','healingMultiplier','overhealShield']);
+    if(physical&&!tactic&&potentials.intelligence-potentials.war>=15||tactic&&!physical&&potentials.war-potentials.intelligence>=15)return 0;
+    if(physical)scores.push(potentials.war);if(tactic)scores.push(potentials.intelligence);
+    if(has(['constitutionMultiplier','armorMultiplier','resistanceMultiplier','takenMultiplier','tacticTakenMultiplier','lowTroopsTakenMultiplier','openingShield','actionRegen']))scores.push(potentials.constitution);
+    if(has(['intervalMultiplier','initialProgress','physicalDodge']))scores.push(potentials.speed);
+    if(has(['criticalBonus','criticalDamageBonus']))scores.push(potentials.technique);
+    const score=scores.length?Math.max(...scores):Object.values(potentials).reduce((sum,value)=>sum+value,0)/5;return .5+4*Math.pow(score/100,3);
+  }
+  function rollPassives(rng=Math.random,count=3,weights=null,potentials=null){
     const weight=tier=>weights?Number(weights[tier])||0:QUALITIES[tier].weight;
-    const available=PASSIVES.filter(p=>!p.fusionOnly&&weight(p.quality)>0);if(!Number.isInteger(count)||count<0||count>available.length)throw new RangeError('被动数量超出可选范围');
+    const affinities=new Map(PASSIVES.map(p=>[p.id,passiveAffinity(p,potentials)])),available=PASSIVES.filter(p=>!p.fusionOnly&&weight(p.quality)>0&&affinities.get(p.id)>0);if(!Number.isInteger(count)||count<0||count>available.length)throw new RangeError('被动数量超出可选范围');
     const selected=[];
     while(selected.length<count){
       const tiers=Object.entries(QUALITIES).map(([tier])=>[tier,{weight:weight(tier)}]).filter(([tier,q])=>q.weight>0&&available.some(p=>p.quality===tier));
       let pick=unitRandom(rng)*tiers.reduce((sum,[,q])=>sum+q.weight,0),tier=tiers.at(-1)[0];
       for(const [key,q]of tiers){pick-=q.weight;if(pick<0){tier=key;break;}}
-      const matches=available.filter(p=>p.quality===tier),chosen=matches[randomInt(0,matches.length-1,rng)];
+      const matches=available.filter(p=>p.quality===tier);let draw=unitRandom(rng)*matches.reduce((sum,p)=>sum+affinities.get(p.id),0),chosen=matches.at(-1);for(const p of matches){draw-=affinities.get(p.id);if(draw<0){chosen=p;break;}}
       selected.push(chosen.id);available.splice(available.indexOf(chosen),1);
     }
     return selected;
@@ -332,14 +346,15 @@
       values.push(chosen);remaining-=chosen;
     }
     values.push(remaining);
-    // 分配顺序随机，任何一项属性都有同样的机会成为强项。
+    // 先打乱分配顺序，再让武力与智力从较高、较低的两端配对；总潜力不变。
     for(let i=values.length-1;i>0;i--){const other=randomInt(0,i,rng);[values[i],values[other]]=[values[other],values[i]];}
-    return Object.fromEntries(ATTRIBUTES.map(([key],i)=>[key,values[i]]));
+    const ranked=values.map((value,index)=>({value,index})).sort((a,b)=>a.value-b.value),high=ranked[unitRandom(rng)<.65?3:4],low=ranked[unitRandom(rng)<.65?0:1],pair=unitRandom(rng)<.5?[high.value,low.value]:[low.value,high.value],rest=values.filter((value,index)=>index!==high.index&&index!==low.index);
+    return Object.fromEntries(ATTRIBUTES.map(([key],i)=>[key,[...pair,...rest][i]]));
   }
   function rollHero(difficultyId,rng=Math.random){
     const difficulty=getDifficulty(difficultyId);if(!difficulty)throw new TypeError('请先选择难度');
     const average={hell:40,survival:40,normal:60,heroic:80,protagonist:100}[difficulty.id],growth=G.characterAt({potentials:rollPotentials(average,rng)},1);
-    return {...growth,weaponCatalogVersion:1,passives:rollPassives(rng,3,difficulty.passiveWeights)};
+    return {...growth,weaponCatalogVersion:1,passives:rollPassives(rng,3,difficulty.passiveWeights,growth.potentials)};
   }
   const segments=text=>typeof Intl.Segmenter==='function'?Array.from(new Intl.Segmenter('zh',{granularity:'grapheme'}).segment(text),s=>s.segment):Array.from(text);
   const sanitizeName=value=>segments(String(value||'').replace(/[\u0000-\u001f\u007f\s]/g,'')).slice(0,4).join('');
