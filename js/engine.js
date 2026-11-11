@@ -11,6 +11,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const attr = value => Math.max(1, Math.floor(Number(value) || 1));
   const copy = value => JSON.parse(JSON.stringify(value));
+  const nightingaleDebuff = skill => ['hook-1','hook-3','hook-1-day','hook-3-day'].includes(skill?.template||skill?.id);
   function seedNumber(text) {
     let hash = 2166136261;
     for (const c of String(text)) { hash ^= c.codePointAt(0); hash = Math.imul(hash, 16777619); }
@@ -78,7 +79,7 @@
         u.passives = Array.isArray(u.passives) ? [...new Set(u.passives)].filter(id=>this.passives[id]&&(!this.passives[id].enemyOnly||u.side==='enemy')) : [];
         if(u.side==='enemy'&&!u.passives.includes('enemy-negative-immunity'))for(const immunity of u.statusImmunities||[]){const id=immunity==='stun'?'enemy-stun-resistance':'enemy-status-immunity:'+immunity;if(!this.passives[id]){const name=STATES.definitions[immunity]?.name||immunity;this.passives[id]={id,name:name+'免疫',quality:'white',temporary:true,enemyOnly:true,description:'本场战斗免疫'+name+'。',stats:{},triggers:[]};}u.passives=[...new Set([...u.passives,id])];}
         u.priorities = Array.isArray(u.priorities) ? u.priorities.map(r=>normalizeRule(r,this.skills[r.skill])) : [];
-        u.targetRule=u.targetRule||(u.side==='enemy'?'random':'lowestCurrent');u.lastSingleSkill=null;u.lastManualSkill=null;
+        u.targetRule=u.targetRule||(u.side==='enemy'?'random':'lowestCurrent');u.lastSingleSkill=null;u.lastManualSkill=null;u.lastNightingaleDebuff=null;
         u.maxSoldiers=PASSIVES.maxHealth(u,this.passives);
         u.soldiers = clamp(Math.floor(Number(u.startSoldiers ?? u.maxSoldiers)), 0, u.maxSoldiers);
         u.woundsEnabled=u.side==='ally'&&(u.woundsEnabled??this.config.wounds!==false);u.dead=!!u.dead||u.condition==='dead'||u.soldiers===0&&!u.woundsEnabled;u.wounded=!u.dead&&u.soldiers===0&&u.woundsEnabled;
@@ -211,7 +212,7 @@
     setMode(id, mode) { const u = this.unit(id); if (!u || u.side !== 'ally' || u.soldiers <= 0 || !['auto', 'manual'].includes(mode)) return false; if(mode==='auto'&&this.scenario.control.manualOnly){this.emit('modeblocked',{actor:id,text:'无法自动战斗'});return false;} u.mode = mode; if (mode === 'auto') u.queued = null; this.emit('mode', { actor: id, mode, text: `${u.name}切换为${mode === 'auto' ? '自动' : '手动'}指挥。` }); return true; }
     setPriorities(id, priorities) {
       const u = this.unit(id); if (!u) return false;
-      u.priorities = priorities.filter(r=>u.skills.includes(r.skill)).map(r=>normalizeRule(r,this.skills[r.skill]));u.lastSingleSkill=null;
+      u.priorities = priorities.filter(r=>u.skills.includes(r.skill)).map(r=>normalizeRule(r,this.skills[r.skill]));u.lastSingleSkill=null;u.lastNightingaleDebuff=null;
       this.config.rosterOverrides ||= {};
       this.config.rosterOverrides[id] = { ...(this.config.rosterOverrides[id] || {}), priorities: copy(u.priorities) };this.invalidateAI();
       return true;
@@ -291,7 +292,13 @@
       if(!chosen.always&&['physical','tactic'].includes(chosen.kind)){
         const damage=candidates.filter(c=>['physical','tactic'].includes(c.kind)),groups=damage.filter(c=>c.scope==='all');
         if(groups.length)chosen=groups[0];
-        else chosen=damage[Math.floor(this.rng()*damage.length)];
+        else{
+          chosen=damage[Math.floor(this.rng()*damage.length)];
+          if(chosen.frequency==='sometimes'&&nightingaleDebuff(this.skills[chosen.skill])){
+            const periodic=damage.filter(c=>c.frequency==='sometimes'&&c.scope==='single'&&nightingaleDebuff(this.skills[c.skill])).sort(displayOrder),last=periodic.findIndex(c=>c.skill===u.lastNightingaleDebuff);
+            if(periodic.length>1&&last>=0)chosen=periodic[(last+1)%periodic.length];
+          }
+        }
       }
       if(this.skills[chosen.skill].side==='enemy'&&chosen.scope==='single'&&chosen.kind!=='buff'){const skill=this.skills[chosen.skill],pool=this.targetPool(u,skill),taunted=!skill.ignoreTaunt&&!PASSIVES.statsFor(u,this.passives).ignoreTaunt&&pool.some(t=>t.statuses.some(s=>s.taunt&&s.expiresAt>this.time));if(u.targetRule==='random'||(u.side==='enemy'&&taunted))chosen={...chosen,target:pool[Math.floor(this.rng()*pool.length)].id};}
       return {skill:chosen.skill,target:chosen.target,scope:chosen.scope};
@@ -326,6 +333,7 @@
       if (!validation.ok) return validation;
       const { skill, targets } = validation;
       if(scope==='single'&&['physical','tactic'].includes(skill.kind))u.lastSingleSkill=skillId;
+      if(u.mode==='auto'&&scope==='single'&&nightingaleDebuff(skill))u.lastNightingaleDebuff=skillId;
       const beforeSp = this.availableSp(u);
       if (u.side === 'ally') this.allySp -= skill.cost; else u.sp -= skill.cost;
       u.stats.actions++; this.actionCount++;
