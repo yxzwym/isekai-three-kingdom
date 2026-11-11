@@ -6517,7 +6517,7 @@ const t=THEMES[sceneKey(theme)],eighth=30/t.bpm,bar=Math.floor(step/8)%16,chord=
       view.hits.push({x:xx,y:yy,w:cw,h,label:passive.name,action:()=>onSelect(passive)});
     });return rows.reduce((n,row)=>n+row.h,0);
   }
-  const courtesyNames={赵云:'子龙',刘备:'玄德',关羽:'云长',张飞:'翼德',诸葛亮:'孔明',马超:'孟起',黄忠:'汉升',马良:'季常',曹操:'孟德',司马懿:'仲达',夏侯惇:'元让',张辽:'文远',荀彧:'文若',贾诩:'文和',许褚:'仲康',徐晃:'公明',于禁:'文则',曹仁:'子孝',孙权:'仲谋',周瑜:'公瑾',鲁肃:'子敬',吕蒙:'子明',陆逊:'伯言',甘宁:'兴霸',黄盖:'公覆',太史慈:'子义',吕布:'奉先',董卓:'仲颖',袁绍:'本初',袁术:'公路',华佗:'元化',管辂:'公明',左慈:'元放'};
+  const courtesyNames={赵云:'子龙',刘备:'玄德',关羽:'云长',张飞:'翼德',诸葛亮:'孔明',马超:'孟起',黄忠:'汉升',马良:'季常',曹操:'孟德',司马懿:'仲达',夏侯惇:'元让',张辽:'文远',荀彧:'文若',贾诩:'文和',许褚:'仲康',徐晃:'公明',于禁:'文则',曹仁:'子孝',孙权:'仲谋',周瑜:'公瑾',鲁肃:'子敬',吕蒙:'子明',陆逊:'伯言',甘宁:'兴霸',黄盖:'公覆',太史慈:'子义',吕布:'奉先',董卓:'仲颖',袁绍:'本初',袁术:'公路',华佗:'元化',管辂:'公明'};
   const dialogueName=name=>courtesyNames[name]?name+' '+courtesyNames[name]:name;
   const api={dialogueName,font,serif,surface,controls,dragGrip,centeredText,button,buttonTrim,chevron,pin,textSize,wrapLines,singleChoiceHit,EXCLUSIVE_COLOR,passiveColor,passiveLabel,passiveButtons,passiveHeight};root.PengpaiUI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
@@ -11291,7 +11291,7 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
       line('zuoci','南华，你当初可不是这么说的！把英雄聚到一世，便能少些战乱？如今董卓还在，三国倒先立起来了！','zuoci'),
       line('nanhua','我原想让他们早些相识，免去几场争斗。谁知前后年月一乱，连各人的际遇也跟着变了……','nanhua'),
       line('zuoci','人家各有打算，哪肯照着你的意思走？如今闹成这样，你还想再试一回不成？','zuoci'),
-      line('yuji','元放，先别说了。他醒了。','yuji'),
+      line('yuji','左慈，先别说了。他醒了。','yuji'),
       line('hero','……这是哪儿？我不是在张先生的营里睡觉吗？','yuji'),
       line('yuji','你仍睡在营中，只是入了梦。贫道于吉，这位是左慈，另一位便是南华。','yuji'),
       line('nanhua','白日让你受惊了。原想等你安顿下来再见，没料到先叫你碰上了官兵。','nanhua'),
@@ -11362,8 +11362,14 @@ if(modal.type==='about'){const paragraphs=['一场异梦，将你带入熟悉又
   const dreamBranches={
     gold:[
       line('hero',"送我回去，本来就是你们该做的。我这可是拿命替你们跑腿。事成以后，再给十万两黄金，行不行？",'nanhua'),
-      line('zuoci','你这价钱开得可不低。南华，这笔账可得算在你头上。','zuoci'),
-      line('nanhua',"好，十万两。我把你带来，这份酬谢也该我出。回家的事同样作数，你不必担心我借钱留人。",'nanhua'),
+      line('zuoci','十万两？这算什么！南华会点石成金，你想要多少，让他点多少便是。','zuoci'),
+      line('hero','……还是我格局小了。那我现在改口，还来得及吗？','nanhua'),
+      line('nanhua','你还想要多少？','nanhua'),
+      line('hero','也不多，就白天下山时，那一座山。','nanhua'),
+      line('yuji','才来一天，便要买山置业了？山上可还住着人呢。','yuji'),
+      line('nanhua','屋子、田地都点成金子，人家还过不过日子了？十万两黄金，事成给你；送你回家的事，也一样作数。','nanhua'),
+      line('hero','好好好，十万两就十万两。不过回去的时候，还得劳烦搭把手。我那边托运行李，可是要称重的。','nanhua'),
+      line('zuoci','十万两黄金都拿了，还舍不得出点脚钱！','zuoci'),
       line('hero',"三位都听见了啊。那我先去常山找子龙。后头的事，得看我能不能活着走到再说。",'nanhua'),
       line('yuji',"我们记下了。还有一句：书里的故人，你未必认得今日的他。相见时，多听听他自己怎么说。",'yuji'),dreamEnding
     ],

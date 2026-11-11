@@ -57,7 +57,7 @@
       view.hits.push({x:xx,y:yy,w:cw,h,label:passive.name,action:()=>onSelect(passive)});
     });return rows.reduce((n,row)=>n+row.h,0);
   }
-  const courtesyNames={赵云:'子龙',刘备:'玄德',关羽:'云长',张飞:'翼德',诸葛亮:'孔明',马超:'孟起',黄忠:'汉升',马良:'季常',曹操:'孟德',司马懿:'仲达',夏侯惇:'元让',张辽:'文远',荀彧:'文若',贾诩:'文和',许褚:'仲康',徐晃:'公明',于禁:'文则',曹仁:'子孝',孙权:'仲谋',周瑜:'公瑾',鲁肃:'子敬',吕蒙:'子明',陆逊:'伯言',甘宁:'兴霸',黄盖:'公覆',太史慈:'子义',吕布:'奉先',董卓:'仲颖',袁绍:'本初',袁术:'公路',华佗:'元化',管辂:'公明',左慈:'元放'};
+  const courtesyNames={赵云:'子龙',刘备:'玄德',关羽:'云长',张飞:'翼德',诸葛亮:'孔明',马超:'孟起',黄忠:'汉升',马良:'季常',曹操:'孟德',司马懿:'仲达',夏侯惇:'元让',张辽:'文远',荀彧:'文若',贾诩:'文和',许褚:'仲康',徐晃:'公明',于禁:'文则',曹仁:'子孝',孙权:'仲谋',周瑜:'公瑾',鲁肃:'子敬',吕蒙:'子明',陆逊:'伯言',甘宁:'兴霸',黄盖:'公覆',太史慈:'子义',吕布:'奉先',董卓:'仲颖',袁绍:'本初',袁术:'公路',华佗:'元化',管辂:'公明'};
   const dialogueName=name=>courtesyNames[name]?name+' '+courtesyNames[name]:name;
   const api={dialogueName,font,serif,surface,controls,dragGrip,centeredText,button,buttonTrim,chevron,pin,textSize,wrapLines,singleChoiceHit,EXCLUSIVE_COLOR,passiveColor,passiveLabel,passiveButtons,passiveHeight};root.PengpaiUI=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
